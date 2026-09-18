@@ -27,7 +27,7 @@ abstract final class PlanGenerator {
 
     // Prefer the cheapest combination when the shuffled pick overshoots budget.
     var picks = [for (var i = 0; i < days.length; i++) shuffled[i % shuffled.length]];
-    if (_weekCost(picks, profile.household) > profile.budget) {
+    if (_weekCost(picks) > profile.budget) {
       final cheapest = pool.toList()..sort((a, b) => a.price.compareTo(b.price));
       picks = [for (var i = 0; i < days.length; i++) cheapest[i % cheapest.length]];
     }
@@ -45,8 +45,8 @@ abstract final class PlanGenerator {
     return matching.isEmpty ? catalogue : matching;
   }
 
-  static double _weekCost(List<Recipe> recipes, int household) =>
-      recipes.fold<double>(0, (sum, r) => sum + r.price) * household;
+  static double _weekCost(List<Recipe> recipes) =>
+      recipes.fold<double>(0, (sum, r) => sum + r.price);
 
   static PlannedMeal _toMeal(Weekday day, Recipe recipe) => PlannedMeal(
         day: day,

@@ -1,0 +1,157 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+
+import '../../../core/model/preference_option.dart';
+import '../../../core/theme/app_theme.dart';
+import '../../../core/util/option_labels.dart';
+import '../../../core/widget/surface_card.dart';
+import '../../../l10n/app_localizations.dart';
+
+/// The cost card: spend so far against the weekly budget.
+class CostCard extends StatelessWidget {
+  const CostCard({super.key, required this.total, required this.budget, required this.country});
+
+  final double total;
+  final double budget;
+  final Country country;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppL10n.of(context);
+    final ratio = budget <= 0 ? 0.0 : (total / budget).clamp(0.0, 1.0);
+
+    return SurfaceCard(
+      padding: EdgeInsets.all(16.r),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(l10n.estimatedCost, style: AppTextStyles.cardLabel),
+          SizedBox(height: 8.h),
+          FittedBox(
+            fit: BoxFit.scaleDown,
+            alignment: Alignment.centerLeft,
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.baseline,
+              textBaseline: TextBaseline.alphabetic,
+              children: [
+                Text(formatMoney(country, total), style: AppTextStyles.amountLarge),
+                Text(' / ${formatMoney(country, budget)}', style: AppTextStyles.amountMuted),
+              ],
+            ),
+          ),
+          SizedBox(height: 12.h),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(7.r),
+            child: LinearProgressIndicator(
+              value: ratio,
+              minHeight: 7.h,
+              backgroundColor: AppColors.divider,
+              valueColor: const AlwaysStoppedAnimation(AppColors.brand),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// The tinted shopping-list card that opens the full list.
+class ShoppingSummaryCard extends StatelessWidget {
+  const ShoppingSummaryCard({
+    super.key,
+    required this.checked,
+    required this.total,
+    required this.onTap,
+  });
+
+  final int checked;
+  final int total;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppL10n.of(context);
+    final ratio = total == 0 ? 0.0 : checked / total;
+
+    return SurfaceCard(
+      color: AppColors.info,
+      borderColor: null,
+      padding: EdgeInsets.all(16.r),
+      onTap: onTap,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(l10n.tapToView, style: AppTextStyles.cardLabelInfo),
+          SizedBox(height: 6.h),
+          FittedBox(
+            fit: BoxFit.scaleDown,
+            alignment: Alignment.centerLeft,
+            child: Text(
+              l10n.shoppingList,
+              style: AppTextStyles.sheetTitle.copyWith(fontSize: 18.sp, letterSpacing: -0.6),
+            ),
+          ),
+          SizedBox(height: 2.h),
+          FittedBox(
+            fit: BoxFit.scaleDown,
+            alignment: Alignment.centerLeft,
+            child: Text(
+              l10n.shoppingBoughtCount(checked, total),
+              style: AppTextStyles.caption.copyWith(
+                color: AppColors.inkBody,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+          SizedBox(height: 10.h),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(7.r),
+            child: LinearProgressIndicator(
+              value: ratio,
+              minHeight: 7.h,
+              backgroundColor: AppColors.infoTrack,
+              valueColor: const AlwaysStoppedAnimation(AppColors.brand),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// The "prévu pour {store}" chip under the wordmark.
+class StoreChip extends StatelessWidget {
+  const StoreChip({super.key, required this.store});
+
+  final String store;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.fromLTRB(9.w, 9.h, 20.w, 9.h),
+      decoration: BoxDecoration(
+        color: AppColors.brandSoft,
+        borderRadius: BorderRadius.circular(28.r),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: 34.r,
+            height: 34.r,
+            alignment: Alignment.center,
+            decoration: const BoxDecoration(color: AppColors.surface, shape: BoxShape.circle),
+            child: Text('🛒', style: TextStyle(fontSize: 15.sp, height: 1)),
+          ),
+          SizedBox(width: 12.w),
+          Text(
+            AppL10n.of(context).plannedFor(store),
+            style: AppTextStyles.listItemTitle.copyWith(color: AppColors.brandDark),
+          ),
+        ],
+      ),
+    );
+  }
+}

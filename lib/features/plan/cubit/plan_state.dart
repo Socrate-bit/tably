@@ -17,9 +17,8 @@ class PlanState extends Equatable {
   final bool generating;
   final Object? error;
 
-  /// Total cost of the week for the whole household.
-  double totalCost(int household) =>
-      meals.fold<double>(0, (sum, m) => sum + m.price) * household;
+  /// Total estimated cost of the week, compared against the user's budget.
+  double get totalCost => meals.fold<double>(0, (sum, m) => sum + m.price);
 
   PlanState copyWith({
     PlanStatus? status,
