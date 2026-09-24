@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_native_splash/flutter_native_splash.dart';
 
-import 'core/theme/app_theme.dart';
-import 'core/widget/app_logo.dart';
 import 'features/account/cubit/auth_cubit.dart';
 import 'features/home/screen/home_screen.dart';
 import 'features/onboarding/screen/onboarding_screen.dart';
@@ -12,7 +10,7 @@ import 'features/preferences/cubit/profile_cubit.dart';
 import 'features/recipe/cubit/recipe_cubit.dart';
 import 'features/shopping/cubit/shopping_cubit.dart';
 
-/// Decides what the user sees: a splash while auth resolves, onboarding for a
+/// Decides what the user sees: the native splash while auth resolves, onboarding for a
 /// new user, or the app. Also binds every cubit to the signed-in uid.
 class RootScreen extends StatelessWidget {
   const RootScreen({super.key});
@@ -32,37 +30,17 @@ class RootScreen extends StatelessWidget {
       },
       child: BlocBuilder<AuthCubit, AuthState>(
         builder: (context, authState) {
-          if (!authState.isReady) return const _Splash();
+          if (!authState.isReady) return const SizedBox.shrink();
 
           return BlocBuilder<ProfileCubit, ProfileState>(
             builder: (context, profileState) {
-              if (profileState.isLoading) return const _Splash();
+              if (profileState.isLoading) return const SizedBox.shrink();
+              // Auth and profile resolved — drop the native splash.
+              FlutterNativeSplash.remove();
               return profileState.hasOnboarded ? const HomeScreen() : const OnboardingScreen();
             },
           );
         },
-      ),
-    );
-  }
-}
-
-/// Brand splash shown while auth and the profile resolve.
-class _Splash extends StatelessWidget {
-  const _Splash();
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.scaffold,
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            AppLogo(size: 40.r),
-            SizedBox(height: 2.h),
-            Text('Tably', style: AppTextStyles.wordmarkGenerating),
-          ],
-        ),
       ),
     );
   }

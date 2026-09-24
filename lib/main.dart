@@ -1,5 +1,6 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:posthog_flutter/posthog_flutter.dart';
 
 import 'app.dart';
@@ -14,7 +15,9 @@ const _posthogHost = String.fromEnvironment(
 );
 
 Future<void> main() async {
-  WidgetsFlutterBinding.ensureInitialized();
+  final binding = WidgetsFlutterBinding.ensureInitialized();
+  // Keep the native splash up until RootScreen knows what to show.
+  FlutterNativeSplash.preserve(widgetsBinding: binding);
 
   try {
     await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);

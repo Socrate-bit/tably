@@ -32,6 +32,7 @@ dependencies:
   crypto: ^3.0.6
   intl: any
   flutter_svg: ^2.3.0
+  flutter_native_splash: ^2.4.7
 
 dev_dependencies:
   flutter_test:
@@ -45,3 +46,12 @@ flutter:
     - assets/photos/
     - assets/brand/
     - assets/stores/
+
+# Native launch screen — regenerate with `dart run flutter_native_splash:create`.
+flutter_native_splash:
+  color: "#FFFFFF"
+  image: assets/brand/splash.png
+  android_12:
+    color: "#FFFFFF"
+    image: assets/brand/splash.png
+  web: false
