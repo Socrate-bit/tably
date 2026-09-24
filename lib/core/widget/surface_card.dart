@@ -13,6 +13,7 @@ class SurfaceCard extends StatelessWidget {
     this.radius,
     this.color = AppColors.surface,
     this.borderColor = AppColors.border,
+    this.borderWidth = 1,
     this.onTap,
     this.clip = false,
     this.shadow = false,
@@ -25,6 +26,9 @@ class SurfaceCard extends StatelessWidget {
 
   /// Pass null for a borderless tinted card.
   final Color? borderColor;
+
+  /// Selected cards use the design's 2.5px brand outline.
+  final double borderWidth;
   final VoidCallback? onTap;
 
   /// Clips children to the rounded corners (used by list and image cards).
@@ -40,7 +44,7 @@ class SurfaceCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: color,
         borderRadius: borderRadius,
-        border: borderColor == null ? null : Border.all(color: borderColor!),
+        border: borderColor == null ? null : Border.all(color: borderColor!, width: borderWidth),
         boxShadow: shadow
             ? [BoxShadow(color: Colors.black.withValues(alpha: 0.02), blurRadius: 2.r, offset: Offset(0, 1.h))]
             : null,

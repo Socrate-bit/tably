@@ -29,13 +29,32 @@ class ShoppingCubit extends Cubit<ShoppingState> {
     _uid = uid;
     _subscription?.cancel();
     emit(state.copyWith(status: ShoppingStatus.loading, clearError: true));
+    var created = false;
     _subscription = _service.watch(uid).listen(
-      (items) => emit(state.copyWith(status: ShoppingStatus.ready, items: items, clearError: true)),
+      (items) {
+        // A new user has no list yet — give them the week's list once.
+        if (items.isEmpty && !created) {
+          created = true;
+          unawaited(_createList(uid));
+          return;
+        }
+        emit(state.copyWith(status: ShoppingStatus.ready, items: items, clearError: true));
+      },
       onError: (Object e) {
         debugPrint('[ShoppingCubit] stream error: $e');
         emit(state.copyWith(status: ShoppingStatus.failed, error: e));
       },
     );
+  }
+
+  Future<void> _createList(String uid) async {
+    final items = ShoppingCatalogue.buildList();
+    emit(state.copyWith(status: ShoppingStatus.ready, items: items));
+    try {
+      await _service.createList(uid, items);
+    } catch (e) {
+      emit(state.copyWith(error: e));
+    }
   }
 
   /// Optimistically ticks or unticks an item.

@@ -6,21 +6,39 @@ import '../../../core/theme/app_theme.dart';
 import '../../../core/util/haptics.dart';
 import '../../../core/widget/check_circle.dart';
 import '../../../core/widget/circle_icon_button.dart';
+import '../../../core/widget/line_icon.dart';
 import '../../../core/widget/primary_button.dart';
 import '../../../core/widget/recipe_photo.dart';
+import '../../../core/widget/segmented_toggle.dart';
 import '../../../core/widget/surface_card.dart';
 import '../../../l10n/app_localizations.dart';
+import '../../home/cubit/home_cubit.dart';
+import '../../plan/model/week_plan.dart';
+import '../../preferences/cubit/profile_cubit.dart';
 import '../cubit/recipe_cubit.dart';
 import '../model/recipe.dart';
+import '../service/recipe_catalogue.dart';
 import '../widget/macro_card.dart';
 import '../widget/recipe_tabs.dart';
+import '../widget/replace_sheet.dart';
 
 /// Full recipe view: photo, macros, notes card, ingredients/preparation tabs
 /// and the user's own note.
 class RecipeScreen extends StatefulWidget {
-  const RecipeScreen({super.key, required this.recipeId});
+  const RecipeScreen({super.key, required this.recipeId, this.slot});
 
   final String recipeId;
+
+  /// The planned meal this recipe was opened from, which enables "Remplacer".
+  final PlanSlot? slot;
+
+  /// Opens a recipe full-screen and records it as recently viewed.
+  static Future<void> open(BuildContext context, {required String recipeId, PlanSlot? slot}) {
+    context.read<RecipeCubit>().markViewed(recipeId);
+    return Navigator.of(context).push(
+      MaterialPageRoute<void>(builder: (_) => RecipeScreen(recipeId: recipeId, slot: slot)),
+    );
+  }
 
   @override
   State<RecipeScreen> createState() => _RecipeScreenState();
@@ -46,6 +64,13 @@ class _RecipeScreenState extends State<RecipeScreen> {
     super.dispose();
   }
 
+  Future<void> _replace(Recipe recipe) async {
+    final changed = await ReplaceSheet.show(context, recipe: recipe, slot: widget.slot);
+    if (!changed || !mounted) return;
+    context.read<HomeCubit>().select(HomeTab.menu);
+    Navigator.of(context).pop();
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppL10n.of(context);
@@ -55,7 +80,7 @@ class _RecipeScreenState extends State<RecipeScreen> {
       body: SafeArea(
         child: BlocBuilder<RecipeCubit, RecipeState>(
           builder: (context, state) {
-            final recipe = state.byId(widget.recipeId);
+            final recipe = RecipeCatalogue.byId(widget.recipeId);
             if (recipe == null) {
               return Center(
                 child: CircleIconButton(
@@ -89,18 +114,18 @@ class _RecipeScreenState extends State<RecipeScreen> {
                   SizedBox(height: 14.h),
                   _NotesCard(
                     recipe: recipe,
+                    servings: context.select<ProfileCubit, int>((c) => c.state.profile.household),
                     cooked: interaction.cooked,
                     rating: interaction.rating,
                     onToggleCooked: () => context.read<RecipeCubit>().toggleCooked(recipe.id),
                     onRate: (value) => context.read<RecipeCubit>().setRating(recipe.id, value),
                   ),
                   SizedBox(height: 18.h),
-                  RecipeSegmentedTabs(
-                    showIngredients: _showIngredients,
-                    onChanged: (value) {
-                      Haptics.tap();
-                      setState(() => _showIngredients = value);
-                    },
+                  SegmentedToggle(
+                    first: l10n.recipeTabIngredients,
+                    second: l10n.recipeTabPreparation,
+                    firstSelected: _showIngredients,
+                    onChanged: (value) => setState(() => _showIngredients = value),
                   ),
                   SizedBox(height: 16.h),
                   if (_showIngredients)
@@ -117,10 +142,10 @@ class _RecipeScreenState extends State<RecipeScreen> {
                   _NoteField(controller: _noteController),
                   SizedBox(height: 18.h),
                   PrimaryButton(
-                    label: l10n.recipeAddToWeek,
+                    label: widget.slot != null ? l10n.recipeReplaceMeal : l10n.recipeAddToWeek,
                     fontSize: 17,
                     verticalPadding: 19.h,
-                    onPressed: () => Navigator.of(context).pop(),
+                    onPressed: () => _replace(recipe),
                   ),
                 ],
               ),
@@ -132,7 +157,7 @@ class _RecipeScreenState extends State<RecipeScreen> {
   }
 }
 
-/// Hero image with the back and favourite buttons floating over it.
+/// Hero image with the back and favourite buttons, and the creator credit.
 class _PhotoHeader extends StatelessWidget {
   const _PhotoHeader({
     required this.recipe,
@@ -150,25 +175,27 @@ class _PhotoHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     return Stack(
       children: [
-        RecipePhoto(photoKey: recipe.photoKey, height: 300.h, radius: 22.r),
+        RecipePhoto(photoKey: recipe.photoKey, height: 300.h, width: double.infinity, radius: 22.r),
+        if (recipe.creator != null)
+          Positioned(left: 16.w, bottom: 16.h, child: _CreatorBadge(name: recipe.creator!)),
         Positioned(
           top: 16.h,
           left: 16.w,
-          child: CircleIconButton(
-            glyph: '←',
-            size: 44.r,
-            showBorder: false,
-            onPressed: onBack,
-          ),
+          child: CircleIconButton(glyph: '←', size: 44.r, showBorder: false, onPressed: onBack),
         ),
         Positioned(
           top: 16.h,
           right: 16.w,
           child: CircleIconButton(
-            glyph: favourite ? '♥' : '♡',
             size: 44.r,
             showBorder: false,
-            foreground: favourite ? AppColors.brand : AppColors.ink,
+            background: favourite ? AppColors.brand : AppColors.surface,
+            icon: LineIcon(
+              LineGlyph.heart,
+              size: 21.r,
+              color: favourite ? AppColors.surface : AppColors.ink,
+              filled: favourite,
+            ),
             onPressed: onFavourite,
           ),
         ),
@@ -177,10 +204,55 @@ class _PhotoHeader extends StatelessWidget {
   }
 }
 
+/// "RECETTE DE" credit for creator recipes, with the creator's initials.
+class _CreatorBadge extends StatelessWidget {
+  const _CreatorBadge({required this.name});
+
+  final String name;
+
+  /// "C'est Tarpin Bon" → "CTB".
+  String get _initials => name
+      .split(RegExp(r'\s+'))
+      .where((w) => w.isNotEmpty)
+      .map((w) => w[0].toUpperCase())
+      .take(3)
+      .join();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.fromLTRB(9.w, 8.h, 15.w, 8.h),
+      decoration: BoxDecoration(color: AppColors.creatorScrim, borderRadius: BorderRadius.circular(26.r)),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: 28.r,
+            height: 28.r,
+            alignment: Alignment.center,
+            decoration: const BoxDecoration(color: AppColors.brand, shape: BoxShape.circle),
+            child: FittedBox(child: Text(_initials, style: AppTextStyles.creatorInitials)),
+          ),
+          SizedBox(width: 9.w),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(AppL10n.of(context).recipeCreatedBy, style: AppTextStyles.creatorEyebrow),
+              Text(name, style: AppTextStyles.creatorName),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 /// Cook time, servings, the cooked toggle and the star rating.
 class _NotesCard extends StatelessWidget {
   const _NotesCard({
     required this.recipe,
+    required this.servings,
     required this.cooked,
     required this.rating,
     required this.onToggleCooked,
@@ -188,6 +260,7 @@ class _NotesCard extends StatelessWidget {
   });
 
   final Recipe recipe;
+  final int servings;
   final bool cooked;
   final int rating;
   final VoidCallback onToggleCooked;
@@ -203,7 +276,7 @@ class _NotesCard extends StatelessWidget {
           Text(l10n.recipeNotesLabel, style: AppTextStyles.cardLabelBrand),
           SizedBox(height: 14.h),
           Text(
-            l10n.recipeCookTimeAndServings(recipe.cookTime, recipe.servings),
+            l10n.recipeCookTimeAndServings(recipe.cookTime, servings),
             textAlign: TextAlign.center,
             style: AppTextStyles.bodyMuted,
           ),
@@ -277,9 +350,8 @@ class _StarRating extends StatelessWidget {
               padding: EdgeInsets.only(left: 3.w),
               child: Text(
                 star <= rating ? '★' : '☆',
-                style: TextStyle(
+                style: AppTextStyles.emojiIcon.copyWith(
                   fontSize: 17.sp,
-                  height: 1,
                   color: star <= rating ? AppColors.star : AppColors.neutralBar,
                 ),
               ),

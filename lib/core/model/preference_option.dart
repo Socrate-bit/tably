@@ -93,19 +93,3 @@ enum Country {
   static Country fromId(String id) =>
       Country.values.firstWhere((c) => c.id == id, orElse: () => Country.france);
 }
-
-/// Supermarkets offered for the French market shown in the design.
-abstract final class Stores {
-  static const defaultStore = 'Lidl';
-  static const all = <String>[
-    'Lidl',
-    'Carrefour',
-    'Aldi',
-    'Intermarché',
-    'franprix',
-    'E.Leclerc',
-    'Auchan',
-    'SUPER U',
-    'MONOPRIX',
-  ];
-}

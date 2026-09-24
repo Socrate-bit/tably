@@ -13,35 +13,35 @@ class AppL10nFr extends AppL10n {
 
   @override
   String get tagline =>
-      'planifie tes dîners selon ton budget,\ntes envies et ce qu\'il y a dans ta cuisine';
+      'Planifie tes dîners selon ton budget,\ntes envies et ce qu\'il y a dans ta cuisine';
 
   @override
-  String get actionContinue => 'continuer';
+  String get actionContinue => 'Continuer';
 
   @override
-  String get actionStart => 'commencer';
+  String get actionStart => 'Commencer →';
 
   @override
-  String get actionGeneratePlan => 'générer le plan';
+  String get actionGeneratePlan => 'Générer le plan';
 
   @override
   String get haveACode => 'Vous avez un code ?';
 
   @override
-  String get onbLanguageTitle => 'choose your language';
+  String get onbLanguageTitle => 'Choose your language';
 
   @override
-  String get onbNameTitle => 'comment tu t\'appelles ?';
+  String get onbNameTitle => 'Comment tu t\'appelles ?';
 
   @override
   String get onbNamePlaceholder => 'saisis ici';
 
   @override
-  String get onbAgeTitle => 'quel âge as-tu ?';
+  String get onbAgeTitle => 'Quel âge as-tu ?';
 
   @override
   String get onbAgeSubtitle =>
-      'nous n\'utilisons ces informations que pour personnaliser ton expérience.';
+      'Nous n\'utilisons ces informations que pour personnaliser ton expérience.';
 
   @override
   String get ageUnder24 => '24 ans ou moins';
@@ -59,7 +59,7 @@ class AppL10nFr extends AppL10n {
   String get age55plus => '55+';
 
   @override
-  String get onbGoalTitle => 'qu\'est-ce que tu veux accomplir ?';
+  String get onbGoalTitle => 'Qu\'est-ce que tu aimerais ?';
 
   @override
   String get goalMealPrep => 'Meal prep pour la semaine';
@@ -77,7 +77,7 @@ class AppL10nFr extends AppL10n {
   String get goalFeedFamily => 'Nourrir ma famille';
 
   @override
-  String get onbBlockerTitle => 'qu\'est-ce qui t\'en empêche ?';
+  String get onbBlockerTitle => 'Quels sont les plus gros obstacles ?';
 
   @override
   String get blockerNoTime => 'Manque de temps';
@@ -92,35 +92,16 @@ class AppL10nFr extends AppL10n {
   String get blockerNoInspiration => 'Je manque d\'inspiration';
 
   @override
-  String get onbInfoPlanningTitle => 'planifier les repas, c\'est chronophage…';
-
-  @override
-  String get onbInfoPlanningSubtitle =>
-      'on enlève ce stress et te propose de délicieux repas à cuisiner et savourer';
-
-  @override
-  String get onbSavingsTitle =>
-      'tu as l\'impression de pouvoir économiser plus sur tes courses ?';
-
-  @override
-  String get savingsDefinitely => 'Définitivement';
-
-  @override
-  String get savingsVeryLikely => 'Très probablement';
-
-  @override
-  String get savingsABit => 'Un peu';
-
-  @override
-  String get savingsNotReally => 'Pas vraiment';
+  String get onbInfoPlanningTitle =>
+      'Planifier les repas, c\'est chronophage et ça peut vite coûter cher…';
 
   @override
   String get onbCookTimeTitle =>
-      'combien de temps mets-tu en général à cuisiner ?';
+      'Combien de temps mets-tu en général à cuisiner ?';
 
   @override
   String get onbCookTimeSubtitle =>
-      'on te proposera des recettes adaptées à ton rythme';
+      'On te proposera des recettes adaptées à ton rythme';
 
   @override
   String get cookTime15to30 => '15–30 min';
@@ -135,32 +116,11 @@ class AppL10nFr extends AppL10n {
   String get cookTime60plus => '60+ min';
 
   @override
-  String get onbSourceTitle => 'où as-tu entendu parler de nous ?';
-
-  @override
-  String get sourceInstagram => 'Instagram';
-
-  @override
-  String get sourceTikTok => 'TikTok';
-
-  @override
-  String get sourceYouTube => 'YouTube';
-
-  @override
-  String get sourceFacebook => 'Facebook';
-
-  @override
-  String get sourceWordOfMouth => 'Bouche à oreille';
-
-  @override
-  String get sourceAppStore => 'App Store';
-
-  @override
-  String get onbInfoBarsTitle => 'planifie ta semaine plus vite';
+  String get onbInfoBarsTitle => 'Tably t\'aide à planifier ta semaine';
 
   @override
   String get onbInfoBarsSubtitle =>
-      'moins de temps à choisir des recettes, fouiller le placard et traîner en rayon';
+      'Moins de temps à choisir des recettes, fouiller le placard et traîner en rayon';
 
   @override
   String get onbInfoBarsWithUs => 'avec nous';
@@ -175,14 +135,14 @@ class AppL10nFr extends AppL10n {
   String get onbInfoBarsWithoutUsValue => '60 min';
 
   @override
-  String get onbInfoBarsFooter => 'gagne presque une heure\nchaque semaine';
+  String get onbInfoBarsFooter => 'Gagne presque une heure\nchaque semaine';
 
   @override
-  String get onbCountryTitle => 'd\'où viens-tu ?';
+  String get onbCountryTitle => 'D\'où viens-tu ?';
 
   @override
   String get onbCountrySubtitle =>
-      'on s\'en sert une fois — pour la devise, la cuisine et quelques touches locales';
+      'On s\'en sert une fois — pour la devise, la cuisine et quelques touches locales';
 
   @override
   String get countryUs => 'États-Unis';
@@ -206,11 +166,11 @@ class AppL10nFr extends AppL10n {
   String get countryBrazil => 'Brésil';
 
   @override
-  String get onbEuropeTitle => 'où es-tu en Europe ?';
+  String get onbEuropeTitle => 'Où es-tu en Europe ?';
 
   @override
   String get onbEuropeSubtitle =>
-      'on configure les magasins, la devise et les touches locales';
+      'On configure les magasins, la devise et les touches locales';
 
   @override
   String get countryGermany => 'Allemagne';
@@ -234,16 +194,16 @@ class AppL10nFr extends AppL10n {
   String get countryRestOfEurope => 'Reste de l\'Europe';
 
   @override
-  String get onbStoreTitle => 'choisis ton magasin';
+  String get onbStoreTitle => 'Choisis ton magasin';
 
   @override
-  String get onbStoreSubtitle => 'on planifie tes courses de la semaine autour';
+  String get onbStoreSubtitle => 'On planifie tes courses de la semaine autour';
 
   @override
-  String get onbHouseholdTitle => 'pour combien tu cuisines ?';
+  String get onbHouseholdTitle => 'Pour combien tu cuisines ?';
 
   @override
-  String get onbHouseholdSubtitle => 'on adapte ton plan et ton budget';
+  String get onbHouseholdSubtitle => 'On adapte ton plan et ton budget';
 
   @override
   String peopleCount(int count) {
@@ -257,10 +217,10 @@ class AppL10nFr extends AppL10n {
   }
 
   @override
-  String get onbDaysTitle => 'quels jours tu cuisines ?';
+  String get onbDaysTitle => 'Quels jours tu cuisines ?';
 
   @override
-  String get onbDaysSubtitle => 'choisis les jours avec des repas planifiés';
+  String get onbDaysSubtitle => 'Choisis les jours avec des repas planifiés';
 
   @override
   String daysSelected(int count) {
@@ -274,31 +234,29 @@ class AppL10nFr extends AppL10n {
   }
 
   @override
-  String get onbBudgetTitle => 'quel est ton budget hebdo ?';
+  String get onbBudgetTitle => 'Quel est ton budget hebdo ?';
 
   @override
   String get onbBudgetSubtitle =>
-      'choisis ce que tu veux dépenser ces jours-là';
+      'Choisis ce que tu veux dépenser ces jours-là';
 
   @override
   String get thisWeek => 'cette semaine';
 
   @override
-  String get onbInfoMoneyTitle => 'tu pourrais économiser\nen moyenne';
-
-  @override
-  String get onbInfoMoneySubtitle => 'sur tes courses chaque semaine';
+  String get onbInfoMoneySubtitle =>
+      'Sur les courses chaque semaine, en optimisant tes repas et comparant les prix en magasin';
 
   @override
   String onbInfoMoneyFooter(String amount) {
-    return 'soit $amount par an!';
+    return 'Soit $amount par an !';
   }
 
   @override
-  String get onbCravingsTitle => 'tu as envie de quoi ?';
+  String get onbCravingsTitle => 'Tu as envie de quoi ?';
 
   @override
-  String get chooseUpToThree => 'choisis jusqu\'à 3';
+  String get chooseUpToThree => 'Choisis jusqu\'à 3';
 
   @override
   String get cravingQuick => 'Repas express';
@@ -325,11 +283,11 @@ class AppL10nFr extends AppL10n {
   String get cravingIndulgent => 'Gourmand';
 
   @override
-  String get onbDietTitle => 'des régimes alimentaires ?';
+  String get onbDietTitle => 'Des régimes alimentaires ?';
 
   @override
   String get chooseAllThatApply =>
-      'choisis toutes les options qui s\'appliquent';
+      'Choisis toutes les options qui s\'appliquent';
 
   @override
   String get optionNone => 'Aucun';
@@ -344,7 +302,7 @@ class AppL10nFr extends AppL10n {
   String get dietPescatarian => 'Pescétarien';
 
   @override
-  String get onbAllergiesTitle => 'des allergies ?';
+  String get onbAllergiesTitle => 'Des allergies ?';
 
   @override
   String get allergyGlutenFree => 'Sans gluten';
@@ -368,10 +326,10 @@ class AppL10nFr extends AppL10n {
   String get allergySoyFree => 'Sans soja';
 
   @override
-  String get onbProteinsTitle => 'qu\'est-ce que tu aimes ?';
+  String get onbProteinsTitle => 'Qu\'est-ce que tu aimes ?';
 
   @override
-  String get onbProteinsHint => 'choisis les protéines que tu apprécies';
+  String get onbProteinsHint => 'Choisis les protéines que tu apprécies';
 
   @override
   String get proteinBeef => 'Bœuf';
@@ -386,10 +344,10 @@ class AppL10nFr extends AppL10n {
   String get proteinFish => 'Poisson';
 
   @override
-  String get onbAppliancesTitle => 'quels appareils tu as ?';
+  String get onbAppliancesTitle => 'Quels appareils tu as ?';
 
   @override
-  String get onbAppliancesHint => 'choisis au moins un pour planifier';
+  String get onbAppliancesHint => 'Choisis au moins un pour planifier';
 
   @override
   String get applianceMicrowave => 'Micro-ondes';
@@ -404,11 +362,12 @@ class AppL10nFr extends AppL10n {
   String get applianceAirFryer => 'Friteuse à air chaud';
 
   @override
-  String get onbTestimonialTitle => 'plébiscité par les cooks du quotidien';
+  String get onbTestimonialTitle =>
+      'Déjà 500 000 personnes ne s\'en passent plus';
 
   @override
   String get onbTestimonialSubtitle =>
-      'des vraies personnes, de vrais progrès chaque semaine';
+      'Des vraies personnes, de vrais progrès chaque semaine';
 
   @override
   String get reviewOneName => 'Nicolas';
@@ -456,19 +415,19 @@ class AppL10nFr extends AppL10n {
 
   @override
   String get generatingTaskMatch =>
-      'accord des repas avec ton magasin et ton budget';
+      'Accord des repas avec ton magasin et ton budget';
 
   @override
-  String get generatingTaskOrganise => 'organisation des dîners de la semaine';
+  String get generatingTaskOrganise => 'Organisation des dîners de la semaine';
 
   @override
-  String get generatingTaskShopping => 'création de ta liste de courses';
+  String get generatingTaskShopping => 'Création de ta liste de courses';
 
   @override
-  String get generatingTapToContinue => 'appuie pour continuer';
+  String get generatingTapToContinue => 'Appuie pour continuer';
 
   @override
-  String get generatingReady => 'ton plan est prêt';
+  String get generatingReady => 'Ton plan est prêt';
 
   @override
   String get defaultChefName => 'Chef';
@@ -501,25 +460,7 @@ class AppL10nFr extends AppL10n {
   String get regeneratePlan => 'régénérer le plan';
 
   @override
-  String get exploreEyebrow => 'RECETTES';
-
-  @override
-  String get exploreTitle => 'explorer';
-
-  @override
   String get exploreSearchPlaceholder => 'Rechercher des repas';
-
-  @override
-  String get exploreCravings => 'Tes envies';
-
-  @override
-  String get exploreSeeLess => 'Voir moins';
-
-  @override
-  String get exploreSeeMore => 'Voir plus';
-
-  @override
-  String get exploreByCuisine => 'Explorer par cuisine';
 
   @override
   String get exploreRecent => 'Consultés récemment';
@@ -572,7 +513,7 @@ class AppL10nFr extends AppL10n {
 
   @override
   String recipeCookTimeAndServings(String time, int servings) {
-    return 'Temps de cuisson: $time   |   Portions: $servings';
+    return 'Temps de cuisson: $time  |  Portions: $servings';
   }
 
   @override
@@ -614,10 +555,7 @@ class AppL10nFr extends AppL10n {
   }
 
   @override
-  String get prefsEyebrow => 'TON PLAN';
-
-  @override
-  String get prefsTitle => 'préférence';
+  String get prefsTitle => 'Préférences';
 
   @override
   String get prefsCountry => 'Pays';
@@ -649,14 +587,7 @@ class AppL10nFr extends AppL10n {
   String get prefsCravings => 'Envie du moment';
 
   @override
-  String get prefsChooseUpToThree => 'Choisis jusqu\'à 3';
-
-  @override
   String get prefsDiet => 'Régimes alimentaires';
-
-  @override
-  String get prefsChooseAllThatApply =>
-      'Choisis toutes les options qui s\'appliquent';
 
   @override
   String get prefsAllergens => 'Allergènes';
@@ -675,10 +606,7 @@ class AppL10nFr extends AppL10n {
   String get prefsAppliancesSub => 'Choisis au moins un pour planifier';
 
   @override
-  String get accountEyebrow => 'TON COMPTE';
-
-  @override
-  String get accountTitle => 'compte';
+  String get accountTitle => 'Compte';
 
   @override
   String get accountSignInApple => 'Se connecter avec Apple';
@@ -698,7 +626,7 @@ class AppL10nFr extends AppL10n {
 
   @override
   String accountGreeting(String name) {
-    return 'Salut, $name';
+    return 'Salut, $name ✎';
   }
 
   @override
@@ -776,7 +704,7 @@ class AppL10nFr extends AppL10n {
   String get accountSignOut => 'Se déconnecter';
 
   @override
-  String get tabMenu => 'menu';
+  String get tabMenu => 'Semaine';
 
   @override
   String get tabRecipes => 'Recettes';
@@ -785,7 +713,7 @@ class AppL10nFr extends AppL10n {
   String get tabPreferences => 'Préférence';
 
   @override
-  String get tabAccount => 'compte';
+  String get tabAccount => 'Compte';
 
   @override
   String get dayMonday => 'Lundi';
@@ -830,12 +758,6 @@ class AppL10nFr extends AppL10n {
   String get dayShortSunday => 'D';
 
   @override
-  String get errorGeneric => 'Une erreur est survenue. Réessaie.';
-
-  @override
-  String get errorLoadPlan => 'Impossible de charger ton plan.';
-
-  @override
   String get errorSavePreferences =>
       'Impossible d\'enregistrer tes préférences.';
 
@@ -847,4 +769,298 @@ class AppL10nFr extends AppL10n {
 
   @override
   String get errorShoppingUpdate => 'Impossible de mettre à jour ta liste.';
+
+  @override
+  String get blockerSaving => 'J\'essaye de faire des économies';
+
+  @override
+  String get onbInfoMoneyEyebrow => 'AVEC TABLY, ON ÉCONOMISE EN MOYENNE';
+
+  @override
+  String get onbInfoMoneyPerWeek => 'par semaine';
+
+  @override
+  String get onbPlanStartTitle => 'On attaque ton plan de la semaine';
+
+  @override
+  String get onbPlanStartSubtitle =>
+      'Quelques questions sur ta cuisine et ton budget, et ton plan est prêt.';
+
+  @override
+  String get onbMealsTitle => 'Combien de repas par jour ?';
+
+  @override
+  String get onbMealsSubtitle =>
+      'On réutilise certains plats en restes pour t\'éviter de cuisiner tous les jours';
+
+  @override
+  String mealsPerDayOption(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count repas par jour',
+      one: '1 repas par jour',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get mealsPerDayDinnerOnly => 'Dîner seulement';
+
+  @override
+  String get mealsPerDayLunchDinner => 'Déjeuner + dîner';
+
+  @override
+  String get mealsPerDayAll => 'Matin, midi et soir';
+
+  @override
+  String planSummarySingle(int slots, int recipes) {
+    return 'Un plat différent chaque soir — $slots repas, $recipes recettes à cuisiner.';
+  }
+
+  @override
+  String planSummaryReuse(int slots, int recipes) {
+    return '$slots repas prévus, seulement $recipes recettes à cuisiner : chaque plat est prévu pour deux services.';
+  }
+
+  @override
+  String get slotBreakfast => 'Petit-déjeuner';
+
+  @override
+  String get slotLunch => 'Déjeuner';
+
+  @override
+  String get slotDinner => 'Dîner';
+
+  @override
+  String get switchEyebrow => 'BONNE NOUVELLE';
+
+  @override
+  String get switchTitlePrefix => 'Tes recettes coûteraient ';
+
+  @override
+  String switchTitleHighlight(int percent) {
+    return '$percent % moins cher';
+  }
+
+  @override
+  String switchTitleSuffix(String store) {
+    return ' chez $store';
+  }
+
+  @override
+  String switchSubtitle(String store) {
+    return 'D\'après ton profil et ton panier de la semaine. Tu peux changer maintenant ou garder $store.';
+  }
+
+  @override
+  String switchAccept(String store) {
+    return 'Passer à $store';
+  }
+
+  @override
+  String switchDecline(String store) {
+    return 'Garder $store';
+  }
+
+  @override
+  String budgetSavings(String amount) {
+    return '$amount d\'économie 🎉';
+  }
+
+  @override
+  String planCounts(int slots, int recipes) {
+    return '$slots repas · $recipes recettes à cuisiner';
+  }
+
+  @override
+  String get leftoverBadge => '♻ Reste';
+
+  @override
+  String get regeneratingPlan => 'nouveau plan en cours…';
+
+  @override
+  String get storesTitle => 'Supermarché';
+
+  @override
+  String get storesSubtitle => 'Prix estimé de ton plan cette semaine';
+
+  @override
+  String get storesCurrent => 'Ton magasin actuel';
+
+  @override
+  String storesCheaper(String amount, String store) {
+    return '$amount de moins que $store';
+  }
+
+  @override
+  String storesPricier(String amount) {
+    return '$amount de plus';
+  }
+
+  @override
+  String get storesCurrentTag => 'ACTUEL';
+
+  @override
+  String storesFootnote(int count) {
+    return 'Les prix sont estimés à partir des $count recettes de ta semaine et des relevés en magasin.';
+  }
+
+  @override
+  String get recipesTitle => 'Recettes';
+
+  @override
+  String searchResultCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count résultats',
+      one: '1 résultat',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String searchEmpty(String query) {
+    return 'Aucun repas ne correspond à « $query ».\nEssaie un ingrédient ou un type de plat.';
+  }
+
+  @override
+  String get recipesAll => 'Recettes';
+
+  @override
+  String get filtersEmpty => 'Aucune recette ne correspond à ces filtres.';
+
+  @override
+  String get filtersTitle => 'Filtres';
+
+  @override
+  String get filtersReset => 'Réinitialiser';
+
+  @override
+  String get filtersCravings => 'Tes envies';
+
+  @override
+  String get filtersCuisine => 'Cuisine type';
+
+  @override
+  String get filtersProtein => 'Préférence';
+
+  @override
+  String get filtersProteinSub =>
+      'Le type de viande ou de protéine que tu veux voir';
+
+  @override
+  String get filtersPrice => 'Prix par portion';
+
+  @override
+  String filtersPriceRange(String min, String max) {
+    return '$min – $max';
+  }
+
+  @override
+  String get filtersPriceAll => 'Toutes les recettes';
+
+  @override
+  String filtersPriceUpTo(String amount) {
+    return 'Recettes jusqu\'à $amount par portion';
+  }
+
+  @override
+  String get filtersApply => 'Voir les recettes';
+
+  @override
+  String get proteinTofu => 'Tofu';
+
+  @override
+  String get cuisineItalian => 'Italienne';
+
+  @override
+  String get cuisineItalianDesc => 'Pasta • Risotto • Gnocchi';
+
+  @override
+  String get cuisineAsian => 'Asiatique';
+
+  @override
+  String get cuisineAsianDesc => 'Nouilles • Curry • Sauté';
+
+  @override
+  String get cuisineMexican => 'Mexicaine';
+
+  @override
+  String get cuisineMexicanDesc => 'Tacos • Burritos • Fajitas';
+
+  @override
+  String get cuisineIndian => 'Indienne';
+
+  @override
+  String get cuisineIndianDesc => 'Curry • Tikka • Tandoori';
+
+  @override
+  String get cuisineMediterranean => 'Méditerranéenne';
+
+  @override
+  String get cuisineMediterraneanDesc => 'Gyros • Halloumi • Falafel';
+
+  @override
+  String get favouritesTitle => 'Favoris';
+
+  @override
+  String favouritesCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count recettes enregistrées',
+      one: '1 recette enregistrée',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get favouritesEmpty =>
+      'Aucun favori pour l\'instant.\nAppuie sur le cœur d\'une recette pour l\'enregistrer.';
+
+  @override
+  String get replaceTitle => 'Remplacer par';
+
+  @override
+  String replaceSubtitleSlot(String day) {
+    return 'Choisis le plat qui remplace celui de $day';
+  }
+
+  @override
+  String get replaceSubtitleWeek =>
+      'Choisis le plat qui prend sa place dans la semaine';
+
+  @override
+  String get replaceAll => 'Toutes';
+
+  @override
+  String get replaceFavourites => 'Favoris';
+
+  @override
+  String get replaceEmptyFavourites => 'Aucun favori pour l\'instant.';
+
+  @override
+  String get replaceEmptySearch =>
+      'Aucun repas ne correspond à cette recherche.';
+
+  @override
+  String get recipeCreatedBy => 'RECETTE DE';
+
+  @override
+  String get recipeReplaceMeal => 'Remplacer ce repas';
+
+  @override
+  String get prefsMealsPerDay => 'Repas par jour';
+
+  @override
+  String get prefsMealsPerDaySub =>
+      'Les plats sont réutilisés en restes pour limiter le nombre de recettes';
+
+  @override
+  String get mockCostShort => 'COÛT EST.';
+
+  @override
+  String get mockTapShort => 'APPUYER';
 }

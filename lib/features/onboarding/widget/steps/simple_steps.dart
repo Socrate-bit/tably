@@ -6,12 +6,19 @@ import '../../../../core/model/weekday.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/util/haptics.dart';
 import '../../../../core/util/option_labels.dart';
+import '../../../../core/widget/app_slider.dart';
+import '../../../../core/widget/household_stepper.dart';
 import '../../../../core/widget/surface_card.dart';
 import '../../../../l10n/app_localizations.dart';
+import '../../../plan/widget/meals_per_day_options.dart';
 
 /// "comment tu t'appelles ?" — a single rounded text field.
 class NameStep extends StatefulWidget {
-  const NameStep({super.key, required this.initialValue, required this.onChanged});
+  const NameStep({
+    super.key,
+    required this.initialValue,
+    required this.onChanged,
+  });
 
   final String initialValue;
   final ValueChanged<String> onChanged;
@@ -21,7 +28,9 @@ class NameStep extends StatefulWidget {
 }
 
 class _NameStepState extends State<NameStep> {
-  late final TextEditingController _controller = TextEditingController(text: widget.initialValue);
+  late final TextEditingController _controller = TextEditingController(
+    text: widget.initialValue,
+  );
 
   @override
   void dispose() {
@@ -46,7 +55,9 @@ class _NameStepState extends State<NameStep> {
           style: AppTextStyles.input,
           decoration: InputDecoration(
             hintText: l10n.onbNamePlaceholder,
-            hintStyle: AppTextStyles.input.copyWith(color: AppColors.textDisabled),
+            hintStyle: AppTextStyles.input.copyWith(
+              color: AppColors.textDisabled,
+            ),
             filled: true,
             fillColor: AppColors.surface,
             contentPadding: EdgeInsets.all(20.r),
@@ -60,12 +71,12 @@ class _NameStepState extends State<NameStep> {
   }
 
   OutlineInputBorder get _border => OutlineInputBorder(
-        borderRadius: BorderRadius.circular(22.r),
-        borderSide: const BorderSide(color: AppColors.border),
-      );
+    borderRadius: BorderRadius.circular(22.r),
+    borderSide: const BorderSide(color: AppColors.border),
+  );
 }
 
-/// "pour combien tu cuisines ?" — the household stepper.
+/// "Pour combien tu cuisines ?" — the household stepper.
 class CounterStep extends StatelessWidget {
   const CounterStep({
     super.key,
@@ -88,33 +99,12 @@ class CounterStep extends StatelessWidget {
         SizedBox(height: 10.h),
         Text(l10n.onbHouseholdSubtitle, style: AppTextStyles.subtitleTight),
         Expanded(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  _StepperButton(
-                    glyph: '−',
-                    size: 56,
-                    enabled: count > 1,
-                    onTap: onDecrement,
-                  ),
-                  SizedBox(width: 36.w),
-                  SizedBox(
-                    width: 64.w,
-                    child: Text('$count', textAlign: TextAlign.center, style: AppTextStyles.numeral),
-                  ),
-                  SizedBox(width: 36.w),
-                  _StepperButton(glyph: '+', size: 56, enabled: true, onTap: onIncrement),
-                ],
-              ),
-              SizedBox(height: 14.h),
-              Text(
-                l10n.peopleCount(count),
-                style: AppTextStyles.subtitleLarge.copyWith(color: AppColors.textQuaternary),
-              ),
-            ],
+          child: Center(
+            child: HouseholdStepper(
+              count: count,
+              onIncrement: onIncrement,
+              onDecrement: onDecrement,
+            ),
           ),
         ),
       ],
@@ -122,43 +112,74 @@ class CounterStep extends StatelessWidget {
   }
 }
 
-/// Round grey +/− control. Disabled state only dims the glyph, as in the design.
-class _StepperButton extends StatelessWidget {
-  const _StepperButton({
-    required this.glyph,
-    required this.size,
-    required this.enabled,
-    required this.onTap,
+/// "Combien de repas par jour ?" — the meal-count choice and what it means.
+class MealsStep extends StatelessWidget {
+  const MealsStep({
+    super.key,
+    required this.mealsPerDay,
+    required this.slotCount,
+    required this.recipeCount,
+    required this.onSelected,
   });
 
-  final String glyph;
-  final double size;
-  final bool enabled;
-  final VoidCallback onTap;
+  final int mealsPerDay;
+  final int slotCount;
+  final int recipeCount;
+  final ValueChanged<int> onSelected;
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: enabled
-          ? () {
-              Haptics.toggle();
-              onTap();
-            }
-          : null,
-      child: Container(
-        width: size.r,
-        height: size.r,
-        alignment: Alignment.center,
-        decoration: const BoxDecoration(color: AppColors.fill, shape: BoxShape.circle),
-        child: Text(
-          glyph,
-          style: TextStyle(
-            fontSize: (size * 0.46).sp,
-            height: 1,
-            color: enabled ? AppColors.inkStrong : AppColors.chevron,
+    final l10n = AppL10n.of(context);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Text(l10n.onbMealsTitle, style: AppTextStyles.h1),
+        SizedBox(height: 10.h),
+        Text(
+          l10n.onbMealsSubtitle,
+          style: AppTextStyles.subtitleTight.copyWith(height: 1.4),
+        ),
+        SizedBox(height: 30.h),
+        Expanded(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              MealsPerDayOptions(selected: mealsPerDay, onSelected: onSelected),
+              SizedBox(height: 26.h),
+              Container(
+                padding: EdgeInsets.all(18.r),
+                decoration: BoxDecoration(
+                  color: AppColors.brandSoft,
+                  borderRadius: BorderRadius.circular(20.r),
+                ),
+                child: Row(
+                  children: [
+                    Text(
+                      '♻',
+                      style: AppTextStyles.emojiIcon.copyWith(fontSize: 22.sp),
+                    ),
+                    SizedBox(width: 13.w),
+                    Expanded(
+                      child: Text(
+                        mealsPerDay == 1
+                            ? l10n.planSummarySingle(slotCount, recipeCount)
+                            : l10n.planSummaryReuse(slotCount, recipeCount),
+                        style: AppTextStyles.savings.copyWith(
+                          fontSize: 14.5.sp,
+                          fontWeight: FontWeight.w600,
+                          height: 1.35,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              SizedBox(height: 10.h),
+            ],
           ),
         ),
-      ),
+      ],
     );
   }
 }
@@ -187,7 +208,9 @@ class DaysStep extends StatelessWidget {
                 padding: EdgeInsets.only(bottom: 16.h),
                 child: Text(
                   l10n.daysSelected(selected.length),
-                  style: AppTextStyles.subtitle.copyWith(color: AppColors.textQuaternary),
+                  style: AppTextStyles.subtitle.copyWith(
+                    color: AppColors.textQuaternary,
+                  ),
                 ),
               ),
               Wrap(
@@ -212,7 +235,11 @@ class DaysStep extends StatelessWidget {
 }
 
 class _DayCard extends StatelessWidget {
-  const _DayCard({required this.label, required this.selected, required this.onTap});
+  const _DayCard({
+    required this.label,
+    required this.selected,
+    required this.onTap,
+  });
 
   final String label;
   final bool selected;
@@ -290,15 +317,30 @@ class BudgetStep extends StatelessWidget {
                 child: Text(
                   l10n.thisWeek,
                   textAlign: TextAlign.center,
-                  style: AppTextStyles.subtitleLarge.copyWith(color: AppColors.textQuaternary),
+                  style: AppTextStyles.subtitleLarge.copyWith(
+                    color: AppColors.textQuaternary,
+                  ),
                 ),
               ),
-              BudgetSlider(
-                budget: budget,
-                minBudget: minBudget,
-                maxBudget: maxBudget,
-                country: country,
-                onChanged: onChanged,
+              Row(
+                children: [
+                  Expanded(
+                    child: AppSlider(
+                      value: budget,
+                      min: minBudget,
+                      max: maxBudget,
+                      step: 0.5,
+                      onChanged: onChanged,
+                    ),
+                  ),
+                  SizedBox(width: 14.w),
+                  Text(
+                    formatMoney(country, maxBudget),
+                    style: AppTextStyles.subtitleLarge.copyWith(
+                      color: AppColors.textQuaternary,
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
@@ -308,71 +350,18 @@ class BudgetStep extends StatelessWidget {
   }
 }
 
-/// The slider itself, reused on the preferences screen.
-class BudgetSlider extends StatelessWidget {
-  const BudgetSlider({
-    super.key,
-    required this.budget,
-    required this.minBudget,
-    required this.maxBudget,
-    required this.country,
-    required this.onChanged,
-    this.labelStyle,
-  });
-
-  final double budget;
-  final double minBudget;
-  final double maxBudget;
-  final Country country;
-  final ValueChanged<double> onChanged;
-  final TextStyle? labelStyle;
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: [
-        Expanded(
-          child: SliderTheme(
-            data: SliderTheme.of(context).copyWith(
-              trackHeight: 7.h,
-              activeTrackColor: AppColors.trackDark,
-              inactiveTrackColor: AppColors.trackDark,
-              thumbShape: RoundSliderThumbShape(enabledThumbRadius: 17.r, elevation: 2),
-              thumbColor: AppColors.brand,
-              overlayShape: const RoundSliderOverlayShape(overlayRadius: 0),
-              trackShape: const RoundedRectSliderTrackShape(),
-            ),
-            child: Slider(
-              value: budget.clamp(minBudget, maxBudget),
-              min: minBudget,
-              max: maxBudget,
-              // 0.2 steps, matching the design's slider granularity.
-              divisions: ((maxBudget - minBudget) / 0.2).round(),
-              onChanged: (value) {
-                Haptics.toggle();
-                onChanged(value);
-              },
-            ),
-          ),
-        ),
-        SizedBox(width: 14.w),
-        Text(
-          formatMoney(country, maxBudget),
-          style: labelStyle ??
-              AppTextStyles.subtitleLarge.copyWith(color: AppColors.textQuaternary),
-        ),
-      ],
-    );
-  }
-}
-
-/// Generic emoji + copy screen ("planifier les repas, c'est chronophage…").
+/// Generic emoji + copy screen ("Planifier les repas, c'est chronophage…").
 class InfoStep extends StatelessWidget {
-  const InfoStep({super.key, required this.emoji, required this.title, required this.subtitle});
+  const InfoStep({
+    super.key,
+    required this.emoji,
+    required this.title,
+    this.subtitle,
+  });
 
   final String emoji;
   final String title;
-  final String subtitle;
+  final String? subtitle;
 
   @override
   Widget build(BuildContext context) {
@@ -381,15 +370,29 @@ class InfoStep extends StatelessWidget {
       children: [
         Padding(
           padding: EdgeInsets.only(top: 22.h),
-          child: Text(title, textAlign: TextAlign.center, style: AppTextStyles.h1Center),
+          child: Text(
+            title,
+            textAlign: TextAlign.center,
+            style: AppTextStyles.h1Center,
+          ),
         ),
         Expanded(
-          child: Center(child: Text(emoji, style: TextStyle(fontSize: 112.sp, height: 1))),
+          child: Center(
+            child: Text(
+              emoji,
+              style: AppTextStyles.emojiIcon.copyWith(fontSize: 112.sp),
+            ),
+          ),
         ),
-        ConstrainedBox(
-          constraints: BoxConstraints(maxWidth: 300.w),
-          child: Text(subtitle, textAlign: TextAlign.center, style: AppTextStyles.subtitleLarge),
-        ),
+        if (subtitle != null)
+          ConstrainedBox(
+            constraints: BoxConstraints(maxWidth: 300.w),
+            child: Text(
+              subtitle!,
+              textAlign: TextAlign.center,
+              style: AppTextStyles.subtitleLarge,
+            ),
+          ),
         const Spacer(),
       ],
     );
@@ -407,8 +410,12 @@ class InfoBarsStep extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Padding(
-          padding: EdgeInsets.only(top: 10.h, bottom: 12.h),
-          child: Text(l10n.onbInfoBarsTitle, textAlign: TextAlign.center, style: AppTextStyles.h1Center),
+          padding: EdgeInsets.only(top: 18.h, bottom: 14.h),
+          child: Text(
+            l10n.onbInfoBarsTitle,
+            textAlign: TextAlign.center,
+            style: AppTextStyles.h1Center.copyWith(height: 1.2),
+          ),
         ),
         Center(
           child: ConstrainedBox(
@@ -416,7 +423,7 @@ class InfoBarsStep extends StatelessWidget {
             child: Text(
               l10n.onbInfoBarsSubtitle,
               textAlign: TextAlign.center,
-              style: AppTextStyles.subtitleTight.copyWith(height: 1.4),
+              style: AppTextStyles.subtitle.copyWith(height: 1.5),
             ),
           ),
         ),
@@ -445,7 +452,7 @@ class InfoBarsStep extends StatelessWidget {
                   ),
                 ],
               ),
-              SizedBox(height: 34.h),
+              SizedBox(height: 42.h),
               Text(
                 l10n.onbInfoBarsFooter,
                 textAlign: TextAlign.center,
@@ -481,7 +488,11 @@ class _Bar extends StatelessWidget {
       children: [
         Text(
           value,
-          style: TextStyle(fontSize: 19.sp, fontWeight: FontWeight.w800, color: valueColor),
+          style: AppTextStyles.emojiIcon.copyWith(
+            fontSize: 19.sp,
+            fontWeight: FontWeight.w800,
+            color: valueColor,
+          ),
         ),
         SizedBox(height: 10.h),
         Container(
@@ -493,50 +504,129 @@ class _Bar extends StatelessWidget {
           ),
         ),
         SizedBox(height: 10.h),
-        Text(label, style: AppTextStyles.meta.copyWith(color: AppColors.textQuaternary)),
+        Text(
+          label,
+          style: AppTextStyles.meta.copyWith(color: AppColors.textQuaternary),
+        ),
       ],
     );
   }
 }
 
-/// The savings screen.
+/// "Avec Tably, on économise en moyenne €47 par semaine".
 class InfoMoneyStep extends StatelessWidget {
   const InfoMoneyStep({super.key, required this.country});
 
   final Country country;
 
-  /// Figures shown in the design: €20 a week, €1040 a year.
-  static const _weeklySaving = 20.0;
-  static const _yearlySaving = 1040.0;
+  /// Figures shown in the design.
+  static const _weeklySaving = 47.0;
+  static const _yearlySaving = 2444.0;
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppL10n.of(context);
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text('🤯', style: TextStyle(fontSize: 96.sp, height: 1)),
-          SizedBox(height: 22.h),
-          Text(
-            l10n.onbInfoMoneyTitle,
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Text(
+          '🤯',
+          textAlign: TextAlign.center,
+          style: AppTextStyles.emojiIcon.copyWith(fontSize: 96.sp),
+        ),
+        SizedBox(height: 22.h),
+        Container(
+          padding: EdgeInsets.all(22.r),
+          decoration: BoxDecoration(
+            color: AppColors.brandSoft,
+            borderRadius: BorderRadius.circular(24.r),
+          ),
+          child: Column(
+            children: [
+              Text(
+                l10n.onbInfoMoneyEyebrow,
+                textAlign: TextAlign.center,
+                style: AppTextStyles.savings.copyWith(
+                  fontSize: 15.sp,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: 0.4.sp,
+                ),
+              ),
+              SizedBox(height: 8.h),
+              Text(
+                formatMoney(country, _weeklySaving, decimals: 0),
+                style: AppTextStyles.numeralBrand.copyWith(
+                  fontSize: 44.sp,
+                  letterSpacing: -1.8.sp,
+                ),
+              ),
+              Text(
+                l10n.onbInfoMoneyPerWeek,
+                style: AppTextStyles.meta.copyWith(
+                  fontSize: 15.sp,
+                  color: AppColors.brandSoftInk,
+                ),
+              ),
+            ],
+          ),
+        ),
+        SizedBox(height: 24.h),
+        Center(
+          child: ConstrainedBox(
+            constraints: BoxConstraints(maxWidth: 300.w),
+            child: Text(
+              l10n.onbInfoMoneySubtitle,
+              textAlign: TextAlign.center,
+              style: AppTextStyles.subtitle.copyWith(
+                color: AppColors.textQuaternary,
+              ),
+            ),
+          ),
+        ),
+        SizedBox(height: 24.h),
+        Text(
+          l10n.onbInfoMoneyFooter(
+            formatMoney(country, _yearlySaving, decimals: 0),
+          ),
+          textAlign: TextAlign.center,
+          style: AppTextStyles.h2,
+        ),
+      ],
+    );
+  }
+}
+
+/// "On attaque ton plan de la semaine" — the bridge into the planning questions.
+class PlanStartStep extends StatelessWidget {
+  const PlanStartStep({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppL10n.of(context);
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Text('🗓️', style: AppTextStyles.emojiIcon.copyWith(fontSize: 84.sp)),
+        SizedBox(height: 26.h),
+        ConstrainedBox(
+          constraints: BoxConstraints(maxWidth: 310.w),
+          child: Text(
+            l10n.onbPlanStartTitle,
             textAlign: TextAlign.center,
-            style: AppTextStyles.h1Center.copyWith(fontSize: 29.sp, height: 1.2),
+            style: AppTextStyles.h1Center.copyWith(height: 1.2),
           ),
-          SizedBox(height: 22.h),
-          Text(formatMoney(country, _weeklySaving, decimals: 0), style: AppTextStyles.numeralBrand),
-          SizedBox(height: 4.h),
-          Text(
-            l10n.onbInfoMoneySubtitle,
-            style: AppTextStyles.subtitleTight.copyWith(color: AppColors.textQuaternary),
+        ),
+        SizedBox(height: 26.h),
+        ConstrainedBox(
+          constraints: BoxConstraints(maxWidth: 300.w),
+          child: Text(
+            l10n.onbPlanStartSubtitle,
+            textAlign: TextAlign.center,
+            style: AppTextStyles.subtitle.copyWith(height: 1.5),
           ),
-          SizedBox(height: 26.h),
-          Text(
-            l10n.onbInfoMoneyFooter(formatMoney(country, _yearlySaving, decimals: 0)),
-            style: AppTextStyles.h2,
-          ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }
@@ -549,19 +639,37 @@ class TestimonialStep extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppL10n.of(context);
     final reviews = <({String name, String title, String body})>[
-      (name: l10n.reviewOneName, title: l10n.reviewOneTitle, body: l10n.reviewOneBody),
-      (name: l10n.reviewTwoName, title: l10n.reviewTwoTitle, body: l10n.reviewTwoBody),
-      (name: l10n.reviewThreeName, title: l10n.reviewThreeTitle, body: l10n.reviewThreeBody),
+      (
+        name: l10n.reviewOneName,
+        title: l10n.reviewOneTitle,
+        body: l10n.reviewOneBody,
+      ),
+      (
+        name: l10n.reviewTwoName,
+        title: l10n.reviewTwoTitle,
+        body: l10n.reviewTwoBody,
+      ),
+      (
+        name: l10n.reviewThreeName,
+        title: l10n.reviewThreeTitle,
+        body: l10n.reviewThreeBody,
+      ),
     ];
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Text(l10n.onbTestimonialTitle, style: AppTextStyles.h1Center.copyWith(height: 1.13)),
+        Text(
+          l10n.onbTestimonialTitle,
+          style: AppTextStyles.h1Center.copyWith(height: 1.13),
+        ),
         SizedBox(height: 10.h),
         Padding(
           padding: EdgeInsets.only(bottom: 20.h),
-          child: Text(l10n.onbTestimonialSubtitle, style: AppTextStyles.subtitleTight),
+          child: Text(
+            l10n.onbTestimonialSubtitle,
+            style: AppTextStyles.subtitleTight,
+          ),
         ),
         for (final review in reviews)
           Padding(

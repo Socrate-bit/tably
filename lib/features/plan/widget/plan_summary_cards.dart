@@ -50,6 +50,15 @@ class CostCard extends StatelessWidget {
               valueColor: const AlwaysStoppedAnimation(AppColors.brand),
             ),
           ),
+          SizedBox(height: 9.h),
+          FittedBox(
+            fit: BoxFit.scaleDown,
+            alignment: Alignment.centerLeft,
+            child: Text(
+              l10n.budgetSavings(formatMoney(country, (budget - total).clamp(0, budget), decimals: 0)),
+              style: AppTextStyles.savings,
+            ),
+          ),
         ],
       ),
     );
@@ -114,41 +123,6 @@ class ShoppingSummaryCard extends StatelessWidget {
               backgroundColor: AppColors.infoTrack,
               valueColor: const AlwaysStoppedAnimation(AppColors.brand),
             ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-/// The "prévu pour {store}" chip under the wordmark.
-class StoreChip extends StatelessWidget {
-  const StoreChip({super.key, required this.store});
-
-  final String store;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.fromLTRB(9.w, 9.h, 20.w, 9.h),
-      decoration: BoxDecoration(
-        color: AppColors.brandSoft,
-        borderRadius: BorderRadius.circular(28.r),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Container(
-            width: 34.r,
-            height: 34.r,
-            alignment: Alignment.center,
-            decoration: const BoxDecoration(color: AppColors.surface, shape: BoxShape.circle),
-            child: Text('🛒', style: TextStyle(fontSize: 15.sp, height: 1)),
-          ),
-          SizedBox(width: 12.w),
-          Text(
-            AppL10n.of(context).plannedFor(store),
-            style: AppTextStyles.listItemTitle.copyWith(color: AppColors.brandDark),
           ),
         ],
       ),

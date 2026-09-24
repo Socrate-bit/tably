@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:equatable/equatable.dart';
 
 import '../../../core/model/preference_option.dart';
+import '../../../core/model/store.dart';
 import '../../../core/model/weekday.dart';
 
 /// Everything the planner needs about a user. Stored at `users/{uid}` and
@@ -10,6 +11,7 @@ class UserProfile extends Equatable {
   const UserProfile({
     this.name = '',
     this.household = 1,
+    this.mealsPerDay = 1,
     this.days = const {
       Weekday.monday,
       Weekday.tuesday,
@@ -21,7 +23,7 @@ class UserProfile extends Equatable {
     },
     this.budget = 60,
     this.country = Country.france,
-    this.store = Stores.defaultStore,
+    this.store = Store.fallback,
     this.languageCode = 'fr',
     this.cravings = const {Craving.quick, Craving.highProtein},
     this.diets = const {Diet.none},
@@ -29,21 +31,27 @@ class UserProfile extends Equatable {
     this.proteins = const {Protein.beef, Protein.pork, Protein.chicken},
     this.appliances = const {Appliance.microwave, Appliance.hob},
     this.ageRange,
-    this.goal,
-    this.blocker,
-    this.savingsBelief,
+    this.goals = const {},
+    this.blockers = const {},
     this.cookTime,
-    this.discoverySource,
     this.onboardingComplete = false,
     this.weeklyReminder = false,
   });
 
+  /// Household size bounds, matching the design's stepper.
+  static const minHousehold = 1;
+  static const maxHousehold = 12;
+
+  /// Meals planned per cooking day: dinner, then lunch, then breakfast.
+  static const maxMealsPerDay = 3;
+
   final String name;
   final int household;
+  final int mealsPerDay;
   final Set<Weekday> days;
   final double budget;
   final Country country;
-  final String store;
+  final Store store;
   final String languageCode;
   final Set<Craving> cravings;
   final Set<Diet> diets;
@@ -53,11 +61,9 @@ class UserProfile extends Equatable {
 
   /// Survey answers — captured once during onboarding for personalisation.
   final String? ageRange;
-  final String? goal;
-  final String? blocker;
-  final String? savingsBelief;
+  final Set<String> goals;
+  final Set<String> blockers;
   final String? cookTime;
-  final String? discoverySource;
 
   final bool onboardingComplete;
   final bool weeklyReminder;
@@ -73,10 +79,11 @@ class UserProfile extends Equatable {
   UserProfile copyWith({
     String? name,
     int? household,
+    int? mealsPerDay,
     Set<Weekday>? days,
     double? budget,
     Country? country,
-    String? store,
+    Store? store,
     String? languageCode,
     Set<Craving>? cravings,
     Set<Diet>? diets,
@@ -84,17 +91,16 @@ class UserProfile extends Equatable {
     Set<Protein>? proteins,
     Set<Appliance>? appliances,
     String? ageRange,
-    String? goal,
-    String? blocker,
-    String? savingsBelief,
+    Set<String>? goals,
+    Set<String>? blockers,
     String? cookTime,
-    String? discoverySource,
     bool? onboardingComplete,
     bool? weeklyReminder,
   }) {
     return UserProfile(
       name: name ?? this.name,
       household: household ?? this.household,
+      mealsPerDay: mealsPerDay ?? this.mealsPerDay,
       days: days ?? this.days,
       budget: budget ?? this.budget,
       country: country ?? this.country,
@@ -106,11 +112,9 @@ class UserProfile extends Equatable {
       proteins: proteins ?? this.proteins,
       appliances: appliances ?? this.appliances,
       ageRange: ageRange ?? this.ageRange,
-      goal: goal ?? this.goal,
-      blocker: blocker ?? this.blocker,
-      savingsBelief: savingsBelief ?? this.savingsBelief,
+      goals: goals ?? this.goals,
+      blockers: blockers ?? this.blockers,
       cookTime: cookTime ?? this.cookTime,
-      discoverySource: discoverySource ?? this.discoverySource,
       onboardingComplete: onboardingComplete ?? this.onboardingComplete,
       weeklyReminder: weeklyReminder ?? this.weeklyReminder,
     );
@@ -119,10 +123,11 @@ class UserProfile extends Equatable {
   Map<String, dynamic> toMap() => {
         'name': name,
         'household': household,
+        'mealsPerDay': mealsPerDay,
         'days': orderedDays.map((d) => d.id).toList(),
         'budget': budget,
         'country': country.id,
-        'store': store,
+        'store': store.id,
         'languageCode': languageCode,
         'cravings': cravings.map((c) => c.id).toList(),
         'diets': diets.map((d) => d.id).toList(),
@@ -130,11 +135,9 @@ class UserProfile extends Equatable {
         'proteins': proteins.map((p) => p.id).toList(),
         'appliances': appliances.map((a) => a.id).toList(),
         'ageRange': ageRange,
-        'goal': goal,
-        'blocker': blocker,
-        'savingsBelief': savingsBelief,
+        'goals': goals.toList(),
+        'blockers': blockers.toList(),
         'cookTime': cookTime,
-        'discoverySource': discoverySource,
         'onboardingComplete': onboardingComplete,
         'weeklyReminder': weeklyReminder,
         'updatedAt': FieldValue.serverTimestamp(),
@@ -152,14 +155,17 @@ class UserProfile extends Equatable {
       return parsed.isEmpty ? fallback : parsed;
     }
 
+    Set<String> strings(String key) => (map[key] as List? ?? const []).whereType<String>().toSet();
+
     const fallback = UserProfile();
     return UserProfile(
       name: map['name'] as String? ?? fallback.name,
-      household: (map['household'] as num?)?.toInt() ?? fallback.household,
+      household: ((map['household'] as num?)?.toInt() ?? fallback.household).clamp(minHousehold, maxHousehold),
+      mealsPerDay: ((map['mealsPerDay'] as num?)?.toInt() ?? fallback.mealsPerDay).clamp(1, maxMealsPerDay),
       days: parse('days', Weekday.values, (d) => d.id, fallback.days),
       budget: (map['budget'] as num?)?.toDouble() ?? fallback.budget,
       country: Country.fromId(map['country'] as String? ?? fallback.country.id),
-      store: map['store'] as String? ?? fallback.store,
+      store: Store.fromId(map['store'] as String?),
       languageCode: map['languageCode'] as String? ?? fallback.languageCode,
       cravings: parse('cravings', Craving.values, (c) => c.id, fallback.cravings),
       diets: parse('diets', Diet.values, (d) => d.id, fallback.diets),
@@ -167,11 +173,9 @@ class UserProfile extends Equatable {
       proteins: parse('proteins', Protein.values, (p) => p.id, fallback.proteins),
       appliances: parse('appliances', Appliance.values, (a) => a.id, fallback.appliances),
       ageRange: map['ageRange'] as String?,
-      goal: map['goal'] as String?,
-      blocker: map['blocker'] as String?,
-      savingsBelief: map['savingsBelief'] as String?,
+      goals: strings('goals'),
+      blockers: strings('blockers'),
       cookTime: map['cookTime'] as String?,
-      discoverySource: map['discoverySource'] as String?,
       onboardingComplete: map['onboardingComplete'] as bool? ?? false,
       weeklyReminder: map['weeklyReminder'] as bool? ?? false,
     );
@@ -181,6 +185,7 @@ class UserProfile extends Equatable {
   List<Object?> get props => [
         name,
         household,
+        mealsPerDay,
         days,
         budget,
         country,
@@ -192,11 +197,9 @@ class UserProfile extends Equatable {
         proteins,
         appliances,
         ageRange,
-        goal,
-        blocker,
-        savingsBelief,
+        goals,
+        blockers,
         cookTime,
-        discoverySource,
         onboardingComplete,
         weeklyReminder,
       ];

@@ -1,20 +1,36 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
+import '../../../../core/model/preference_option.dart';
+import '../../../../core/model/store.dart';
 import '../../../../core/theme/app_theme.dart';
-import '../../../../core/widget/circle_icon_button.dart';
+import '../../../../core/util/haptics.dart';
+import '../../../../core/util/option_labels.dart';
+import '../../../../core/widget/app_logo.dart';
 import '../../../../core/widget/primary_button.dart';
+import '../../../../core/widget/recipe_photo.dart';
 import '../../../../l10n/app_localizations.dart';
+import '../../../recipe/model/recipe.dart';
+import '../../../recipe/service/recipe_catalogue.dart';
+import '../../../recipe/widget/craving_badge.dart';
+import 'language_step.dart';
 
-/// The branded welcome screen with the phone mock-up and page dots.
+/// The branded welcome screen: language pill, wordmark and the phone mock-up.
 class WelcomeStep extends StatelessWidget {
-  const WelcomeStep({super.key, required this.onBack, required this.onNext, required this.storeName});
+  const WelcomeStep({
+    super.key,
+    required this.languageCode,
+    required this.store,
+    required this.country,
+    required this.onOpenLanguage,
+    required this.onNext,
+  });
 
-  final VoidCallback onBack;
+  final String languageCode;
+  final Store store;
+  final Country country;
+  final VoidCallback onOpenLanguage;
   final VoidCallback onNext;
-
-  /// Shown inside the mock-up's "prévu pour …" chip.
-  final String storeName;
 
   @override
   Widget build(BuildContext context) {
@@ -23,25 +39,17 @@ class WelcomeStep extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Align(
-          alignment: Alignment.centerLeft,
-          child: Padding(
-            padding: EdgeInsets.only(bottom: 22.h),
-            child: CircleIconButton(glyph: '←', onPressed: onBack),
-          ),
+          alignment: Alignment.centerRight,
+          child: _LanguagePill(language: languageFor(languageCode), onTap: onOpenLanguage),
         ),
-        Column(
-          children: [
-            Text('🥗', style: TextStyle(fontSize: 30.sp, height: 1)),
-            SizedBox(height: 2.h),
-            Text(l10n.appName, style: AppTextStyles.wordmarkLarge),
-          ],
-        ),
-        SizedBox(height: 12.h),
-        Padding(
-          padding: EdgeInsets.only(bottom: 26.h),
-          child: Text(l10n.tagline, textAlign: TextAlign.center, style: AppTextStyles.subtitle),
-        ),
-        _PhoneMockup(storeName: storeName),
+        SizedBox(height: 38.h),
+        AppLogo(size: 46.r),
+        SizedBox(height: 2.h),
+        Text(l10n.appName, textAlign: TextAlign.center, style: AppTextStyles.wordmarkLarge),
+        SizedBox(height: 16.h),
+        Text(l10n.tagline, textAlign: TextAlign.center, style: AppTextStyles.subtitle),
+        SizedBox(height: 18.h),
+        _PhoneMockup(store: store, country: country),
         SizedBox(height: 20.h),
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -51,135 +59,298 @@ class WelcomeStep extends StatelessWidget {
                 width: 7.r,
                 height: 7.r,
                 margin: EdgeInsets.symmetric(horizontal: 3.5.w),
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: i == 0 ? AppColors.inkStrong : AppColors.neutralBar,
-                ),
+                decoration: BoxDecoration(shape: BoxShape.circle, color: i == 0 ? AppColors.inkStrong : AppColors.neutralBar),
               ),
           ],
         ),
         const Spacer(),
-        PrimaryButton(label: l10n.actionStart, trailing: '→', onPressed: onNext),
+        PrimaryButton(label: l10n.actionStart, onPressed: onNext),
         SizedBox(height: 16.h),
-        Text(l10n.haveACode, textAlign: TextAlign.center, style: AppTextStyles.metaSmall.copyWith(
-          fontSize: 14.sp,
-          color: AppColors.textDisabled,
-        )),
-      ],
-    );
-  }
-}
-
-/// Miniature of the menu screen, flanked by two faded side panels.
-class _PhoneMockup extends StatelessWidget {
-  const _PhoneMockup({required this.storeName});
-
-  final String storeName;
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = AppL10n.of(context);
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      crossAxisAlignment: CrossAxisAlignment.center,
-      children: [
-        const _SidePanel(),
-        SizedBox(width: 8.w),
-        Container(
-          width: 150.w,
-          padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 12.h),
-          decoration: BoxDecoration(
-            color: AppColors.surface,
-            border: Border.all(color: AppColors.ink, width: 7.w),
-            borderRadius: BorderRadius.circular(28.r),
-          ),
-          child: Column(
-            children: [
-              Text(
-                'BON APRÈS-MIDI',
-                style: TextStyle(
-                  fontSize: 8.sp,
-                  color: AppColors.textPlaceholder,
-                  letterSpacing: 1.sp,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-              SizedBox(height: 7.h),
-              Text(
-                '${l10n.defaultChefName} !',
-                style: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.w800, color: AppColors.ink),
-              ),
-              SizedBox(height: 7.h),
-              Container(
-                width: double.infinity,
-                padding: EdgeInsets.all(5.r),
-                decoration: BoxDecoration(
-                  color: AppColors.brandSoft,
-                  borderRadius: BorderRadius.circular(20.r),
-                ),
-                child: Text(
-                  l10n.plannedFor(storeName),
-                  textAlign: TextAlign.center,
-                  style: TextStyle(fontSize: 8.sp, color: AppColors.brandDark, fontWeight: FontWeight.w700),
-                ),
-              ),
-              SizedBox(height: 7.h),
-              Row(
-                children: [
-                  const Expanded(child: _MockTile(height: 34, tinted: false)),
-                  SizedBox(width: 5.w),
-                  const Expanded(child: _MockTile(height: 34, tinted: true)),
-                ],
-              ),
-              SizedBox(height: 7.h),
-              for (var i = 0; i < 3; i++) ...[
-                const _MockTile(height: 30, tinted: false),
-                if (i < 2) SizedBox(height: 7.h),
-              ],
-            ],
-          ),
+        Text(
+          l10n.haveACode,
+          textAlign: TextAlign.center,
+          style: AppTextStyles.metaSmall.copyWith(fontSize: 14.sp, color: AppColors.textDisabled),
         ),
-        SizedBox(width: 8.w),
-        const _SidePanel(),
       ],
     );
   }
 }
 
-class _SidePanel extends StatelessWidget {
-  const _SidePanel();
+/// Flag, language name and a chevron — opens the language picker.
+class _LanguagePill extends StatelessWidget {
+  const _LanguagePill({required this.language, required this.onTap});
+
+  final AppLanguage language;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
-    return Opacity(
-      opacity: 0.7,
+    return GestureDetector(
+      onTap: () {
+        Haptics.tap();
+        onTap();
+      },
       child: Container(
-        width: 44.w,
-        height: 190.h,
+        padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 8.h),
         decoration: BoxDecoration(
-          color: AppColors.surfaceSubtle,
+          color: AppColors.surface,
           border: Border.all(color: AppColors.border),
-          borderRadius: BorderRadius.circular(14.r),
+          borderRadius: BorderRadius.circular(22.r),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(language.flag, style: AppTextStyles.emojiIcon.copyWith(fontSize: 19.sp)),
+            SizedBox(width: 8.w),
+            Text(language.name, style: AppTextStyles.languagePill),
+            SizedBox(width: 8.w),
+            Text('⌄', style: AppTextStyles.languagePill.copyWith(color: AppColors.chevron, fontSize: 13.sp)),
+          ],
         ),
       ),
     );
   }
 }
 
-class _MockTile extends StatelessWidget {
-  const _MockTile({required this.height, required this.tinted});
+/// A miniature of the "Semaine" tab, flanked by two faded side panels.
+class _PhoneMockup extends StatelessWidget {
+  const _PhoneMockup({required this.store, required this.country});
 
-  final double height;
-  final bool tinted;
+  final Store store;
+  final Country country;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppL10n.of(context);
+    Widget bar(double widthFactor, {double height = 8}) => FractionallySizedBox(
+          alignment: Alignment.centerLeft,
+          widthFactor: widthFactor,
+          child: Container(
+            height: height.h,
+            decoration: BoxDecoration(color: AppColors.fill, borderRadius: BorderRadius.circular(3.r)),
+          ),
+        );
+
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        _SidePanel(left: true, children: [
+          RecipePhoto(photoKey: Cuisine.indian.photoKey, height: 62.h, width: double.infinity, radius: 8.r),
+          bar(0.8),
+          RecipePhoto(photoKey: Cuisine.mexican.photoKey, height: 62.h, width: double.infinity, radius: 8.r),
+          bar(0.7),
+        ]),
+        SizedBox(width: 10.w),
+        Container(
+          width: 164.w,
+          padding: EdgeInsets.symmetric(horizontal: 9.w, vertical: 10.h),
+          decoration: BoxDecoration(
+            color: AppColors.surface,
+            border: Border.all(color: AppColors.ink, width: 7.r),
+            borderRadius: BorderRadius.circular(30.r),
+            boxShadow: [BoxShadow(color: AppColors.ink.withValues(alpha: 0.16), blurRadius: 30.r, offset: Offset(0, 12.h))],
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Center(
+                child: Container(
+                  width: 38.w,
+                  height: 5.h,
+                  decoration: BoxDecoration(color: AppColors.ink, borderRadius: BorderRadius.circular(5.r)),
+                ),
+              ),
+              SizedBox(height: 7.h),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  AppLogo(size: 14.r),
+                  SizedBox(width: 4.w),
+                  Text(l10n.appName, style: AppTextStyles.mock(15, letterSpacing: -0.7)),
+                ],
+              ),
+              SizedBox(height: 6.h),
+              Container(
+                padding: EdgeInsets.all(4.r),
+                decoration: BoxDecoration(color: AppColors.brandSoft, borderRadius: BorderRadius.circular(20.r)),
+                child: Text(
+                  l10n.plannedFor(store.displayName),
+                  textAlign: TextAlign.center,
+                  style: AppTextStyles.mock(8, color: AppColors.brandDark),
+                ),
+              ),
+              SizedBox(height: 6.h),
+              IntrinsicHeight(
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Expanded(child: _MockCostCard(country: country)),
+                    SizedBox(width: 5.w),
+                    const Expanded(child: _MockShoppingCard()),
+                  ],
+                ),
+              ),
+              for (final recipe in RecipeCatalogue.recipes.take(3)) ...[
+                SizedBox(height: 6.h),
+                _MockMealRow(recipe: recipe),
+              ],
+              SizedBox(height: 6.h),
+              Container(
+                padding: EdgeInsets.only(top: 5.h),
+                decoration: const BoxDecoration(border: Border(top: BorderSide(color: AppColors.divider))),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    Text(l10n.tabMenu, style: AppTextStyles.mock(6, color: AppColors.brand)),
+                    for (final label in [l10n.tabRecipes, l10n.prefsTitle, l10n.tabAccount])
+                      Text(label.toLowerCase(), style: AppTextStyles.mock(6, color: AppColors.textDisabled)),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+        SizedBox(width: 10.w),
+        _SidePanel(left: false, children: [
+          RecipePhoto(photoKey: 'noodle', height: 78.h, width: double.infinity, radius: 8.r),
+          bar(0.85),
+          bar(0.55),
+          bar(1, height: 26),
+        ]),
+      ],
+    );
+  }
+}
+
+/// A faded panel hinting at the screens beside the phone.
+class _SidePanel extends StatelessWidget {
+  const _SidePanel({required this.left, required this.children});
+
+  final bool left;
+  final List<Widget> children;
+
+  @override
+  Widget build(BuildContext context) {
+    final side = BorderSide(color: AppColors.border);
+    return Opacity(
+      opacity: 0.75,
+      child: Container(
+        width: 46.w,
+        height: 200.h,
+        clipBehavior: Clip.antiAlias,
+        padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 9.h),
+        decoration: BoxDecoration(
+          color: AppColors.surface,
+          border: Border(top: side, bottom: side, left: left ? side : BorderSide.none, right: left ? BorderSide.none : side),
+          borderRadius: left
+              ? BorderRadius.horizontal(left: Radius.circular(16.r))
+              : BorderRadius.horizontal(right: Radius.circular(16.r)),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            for (final (i, child) in children.indexed) ...[if (i > 0) SizedBox(height: 6.h), child],
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// The illustrative figures are part of the artwork, not the user's data.
+class _MockCostCard extends StatelessWidget {
+  const _MockCostCard({required this.country});
+
+  final Country country;
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: height.h,
+      padding: EdgeInsets.all(5.r),
       decoration: BoxDecoration(
-        color: tinted ? AppColors.info : AppColors.surfaceTinted,
-        border: tinted ? null : Border.all(color: AppColors.borderSoft),
+        color: AppColors.surface,
+        border: Border.all(color: AppColors.borderSoft),
         borderRadius: BorderRadius.circular(9.r),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(AppL10n.of(context).mockCostShort, style: AppTextStyles.mock(5, color: AppColors.textPlaceholder, letterSpacing: 0.4)),
+          SizedBox(height: 2.h),
+          Text(formatMoney(country, 33.70), style: AppTextStyles.mock(9)),
+          SizedBox(height: 3.h),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(3.r),
+            child: LinearProgressIndicator(
+              value: 0.62,
+              minHeight: 3.h,
+              backgroundColor: AppColors.fill,
+              valueColor: const AlwaysStoppedAnimation(AppColors.brand),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _MockShoppingCard extends StatelessWidget {
+  const _MockShoppingCard();
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppL10n.of(context);
+    return Container(
+      padding: EdgeInsets.all(5.r),
+      decoration: BoxDecoration(color: AppColors.info, borderRadius: BorderRadius.circular(9.r)),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(l10n.mockTapShort, style: AppTextStyles.mock(5, color: AppColors.infoLabel, letterSpacing: 0.4)),
+          SizedBox(height: 2.h),
+          Text(l10n.shoppingList, style: AppTextStyles.mock(8, height: 1.15)),
+          SizedBox(height: 2.h),
+          Text(l10n.shoppingBoughtCount(0, 25), style: AppTextStyles.mock(6, color: AppColors.inkBody, weight: FontWeight.w700)),
+        ],
+      ),
+    );
+  }
+}
+
+class _MockMealRow extends StatelessWidget {
+  const _MockMealRow({required this.recipe});
+
+  final Recipe recipe;
+
+  @override
+  Widget build(BuildContext context) {
+    final (background, ink) = CravingBadge.colorsFor(recipe.craving);
+    return Container(
+      padding: EdgeInsets.all(5.r),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        border: Border.all(color: AppColors.borderSoft),
+        borderRadius: BorderRadius.circular(11.r),
+      ),
+      child: Row(
+        children: [
+          RecipePhoto(photoKey: recipe.photoKey, height: 30.r, width: 30.r, radius: 8.r),
+          SizedBox(width: 6.w),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(recipe.title, maxLines: 1, overflow: TextOverflow.ellipsis, style: AppTextStyles.mock(8, height: 1.2)),
+                SizedBox(height: 3.h),
+                Container(
+                  padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 2.h),
+                  decoration: BoxDecoration(color: background, borderRadius: BorderRadius.circular(20.r)),
+                  child: Text(AppL10n.of(context).cravingLabel(recipe.craving), style: AppTextStyles.mock(6, color: ink)),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }

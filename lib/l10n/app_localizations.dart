@@ -106,25 +106,25 @@ abstract class AppL10n {
   /// No description provided for @tagline.
   ///
   /// In fr, this message translates to:
-  /// **'planifie tes dîners selon ton budget,\ntes envies et ce qu\'il y a dans ta cuisine'**
+  /// **'Planifie tes dîners selon ton budget,\ntes envies et ce qu\'il y a dans ta cuisine'**
   String get tagline;
 
   /// No description provided for @actionContinue.
   ///
   /// In fr, this message translates to:
-  /// **'continuer'**
+  /// **'Continuer'**
   String get actionContinue;
 
   /// No description provided for @actionStart.
   ///
   /// In fr, this message translates to:
-  /// **'commencer'**
+  /// **'Commencer →'**
   String get actionStart;
 
   /// No description provided for @actionGeneratePlan.
   ///
   /// In fr, this message translates to:
-  /// **'générer le plan'**
+  /// **'Générer le plan'**
   String get actionGeneratePlan;
 
   /// No description provided for @haveACode.
@@ -136,13 +136,13 @@ abstract class AppL10n {
   /// No description provided for @onbLanguageTitle.
   ///
   /// In fr, this message translates to:
-  /// **'choose your language'**
+  /// **'Choose your language'**
   String get onbLanguageTitle;
 
   /// No description provided for @onbNameTitle.
   ///
   /// In fr, this message translates to:
-  /// **'comment tu t\'appelles ?'**
+  /// **'Comment tu t\'appelles ?'**
   String get onbNameTitle;
 
   /// No description provided for @onbNamePlaceholder.
@@ -154,13 +154,13 @@ abstract class AppL10n {
   /// No description provided for @onbAgeTitle.
   ///
   /// In fr, this message translates to:
-  /// **'quel âge as-tu ?'**
+  /// **'Quel âge as-tu ?'**
   String get onbAgeTitle;
 
   /// No description provided for @onbAgeSubtitle.
   ///
   /// In fr, this message translates to:
-  /// **'nous n\'utilisons ces informations que pour personnaliser ton expérience.'**
+  /// **'Nous n\'utilisons ces informations que pour personnaliser ton expérience.'**
   String get onbAgeSubtitle;
 
   /// No description provided for @ageUnder24.
@@ -196,7 +196,7 @@ abstract class AppL10n {
   /// No description provided for @onbGoalTitle.
   ///
   /// In fr, this message translates to:
-  /// **'qu\'est-ce que tu veux accomplir ?'**
+  /// **'Qu\'est-ce que tu aimerais ?'**
   String get onbGoalTitle;
 
   /// No description provided for @goalMealPrep.
@@ -232,7 +232,7 @@ abstract class AppL10n {
   /// No description provided for @onbBlockerTitle.
   ///
   /// In fr, this message translates to:
-  /// **'qu\'est-ce qui t\'en empêche ?'**
+  /// **'Quels sont les plus gros obstacles ?'**
   String get onbBlockerTitle;
 
   /// No description provided for @blockerNoTime.
@@ -262,55 +262,19 @@ abstract class AppL10n {
   /// No description provided for @onbInfoPlanningTitle.
   ///
   /// In fr, this message translates to:
-  /// **'planifier les repas, c\'est chronophage…'**
+  /// **'Planifier les repas, c\'est chronophage et ça peut vite coûter cher…'**
   String get onbInfoPlanningTitle;
-
-  /// No description provided for @onbInfoPlanningSubtitle.
-  ///
-  /// In fr, this message translates to:
-  /// **'on enlève ce stress et te propose de délicieux repas à cuisiner et savourer'**
-  String get onbInfoPlanningSubtitle;
-
-  /// No description provided for @onbSavingsTitle.
-  ///
-  /// In fr, this message translates to:
-  /// **'tu as l\'impression de pouvoir économiser plus sur tes courses ?'**
-  String get onbSavingsTitle;
-
-  /// No description provided for @savingsDefinitely.
-  ///
-  /// In fr, this message translates to:
-  /// **'Définitivement'**
-  String get savingsDefinitely;
-
-  /// No description provided for @savingsVeryLikely.
-  ///
-  /// In fr, this message translates to:
-  /// **'Très probablement'**
-  String get savingsVeryLikely;
-
-  /// No description provided for @savingsABit.
-  ///
-  /// In fr, this message translates to:
-  /// **'Un peu'**
-  String get savingsABit;
-
-  /// No description provided for @savingsNotReally.
-  ///
-  /// In fr, this message translates to:
-  /// **'Pas vraiment'**
-  String get savingsNotReally;
 
   /// No description provided for @onbCookTimeTitle.
   ///
   /// In fr, this message translates to:
-  /// **'combien de temps mets-tu en général à cuisiner ?'**
+  /// **'Combien de temps mets-tu en général à cuisiner ?'**
   String get onbCookTimeTitle;
 
   /// No description provided for @onbCookTimeSubtitle.
   ///
   /// In fr, this message translates to:
-  /// **'on te proposera des recettes adaptées à ton rythme'**
+  /// **'On te proposera des recettes adaptées à ton rythme'**
   String get onbCookTimeSubtitle;
 
   /// No description provided for @cookTime15to30.
@@ -337,58 +301,16 @@ abstract class AppL10n {
   /// **'60+ min'**
   String get cookTime60plus;
 
-  /// No description provided for @onbSourceTitle.
-  ///
-  /// In fr, this message translates to:
-  /// **'où as-tu entendu parler de nous ?'**
-  String get onbSourceTitle;
-
-  /// No description provided for @sourceInstagram.
-  ///
-  /// In fr, this message translates to:
-  /// **'Instagram'**
-  String get sourceInstagram;
-
-  /// No description provided for @sourceTikTok.
-  ///
-  /// In fr, this message translates to:
-  /// **'TikTok'**
-  String get sourceTikTok;
-
-  /// No description provided for @sourceYouTube.
-  ///
-  /// In fr, this message translates to:
-  /// **'YouTube'**
-  String get sourceYouTube;
-
-  /// No description provided for @sourceFacebook.
-  ///
-  /// In fr, this message translates to:
-  /// **'Facebook'**
-  String get sourceFacebook;
-
-  /// No description provided for @sourceWordOfMouth.
-  ///
-  /// In fr, this message translates to:
-  /// **'Bouche à oreille'**
-  String get sourceWordOfMouth;
-
-  /// No description provided for @sourceAppStore.
-  ///
-  /// In fr, this message translates to:
-  /// **'App Store'**
-  String get sourceAppStore;
-
   /// No description provided for @onbInfoBarsTitle.
   ///
   /// In fr, this message translates to:
-  /// **'planifie ta semaine plus vite'**
+  /// **'Tably t\'aide à planifier ta semaine'**
   String get onbInfoBarsTitle;
 
   /// No description provided for @onbInfoBarsSubtitle.
   ///
   /// In fr, this message translates to:
-  /// **'moins de temps à choisir des recettes, fouiller le placard et traîner en rayon'**
+  /// **'Moins de temps à choisir des recettes, fouiller le placard et traîner en rayon'**
   String get onbInfoBarsSubtitle;
 
   /// No description provided for @onbInfoBarsWithUs.
@@ -418,19 +340,19 @@ abstract class AppL10n {
   /// No description provided for @onbInfoBarsFooter.
   ///
   /// In fr, this message translates to:
-  /// **'gagne presque une heure\nchaque semaine'**
+  /// **'Gagne presque une heure\nchaque semaine'**
   String get onbInfoBarsFooter;
 
   /// No description provided for @onbCountryTitle.
   ///
   /// In fr, this message translates to:
-  /// **'d\'où viens-tu ?'**
+  /// **'D\'où viens-tu ?'**
   String get onbCountryTitle;
 
   /// No description provided for @onbCountrySubtitle.
   ///
   /// In fr, this message translates to:
-  /// **'on s\'en sert une fois — pour la devise, la cuisine et quelques touches locales'**
+  /// **'On s\'en sert une fois — pour la devise, la cuisine et quelques touches locales'**
   String get onbCountrySubtitle;
 
   /// No description provided for @countryUs.
@@ -478,13 +400,13 @@ abstract class AppL10n {
   /// No description provided for @onbEuropeTitle.
   ///
   /// In fr, this message translates to:
-  /// **'où es-tu en Europe ?'**
+  /// **'Où es-tu en Europe ?'**
   String get onbEuropeTitle;
 
   /// No description provided for @onbEuropeSubtitle.
   ///
   /// In fr, this message translates to:
-  /// **'on configure les magasins, la devise et les touches locales'**
+  /// **'On configure les magasins, la devise et les touches locales'**
   String get onbEuropeSubtitle;
 
   /// No description provided for @countryGermany.
@@ -532,25 +454,25 @@ abstract class AppL10n {
   /// No description provided for @onbStoreTitle.
   ///
   /// In fr, this message translates to:
-  /// **'choisis ton magasin'**
+  /// **'Choisis ton magasin'**
   String get onbStoreTitle;
 
   /// No description provided for @onbStoreSubtitle.
   ///
   /// In fr, this message translates to:
-  /// **'on planifie tes courses de la semaine autour'**
+  /// **'On planifie tes courses de la semaine autour'**
   String get onbStoreSubtitle;
 
   /// No description provided for @onbHouseholdTitle.
   ///
   /// In fr, this message translates to:
-  /// **'pour combien tu cuisines ?'**
+  /// **'Pour combien tu cuisines ?'**
   String get onbHouseholdTitle;
 
   /// No description provided for @onbHouseholdSubtitle.
   ///
   /// In fr, this message translates to:
-  /// **'on adapte ton plan et ton budget'**
+  /// **'On adapte ton plan et ton budget'**
   String get onbHouseholdSubtitle;
 
   /// No description provided for @peopleCount.
@@ -562,13 +484,13 @@ abstract class AppL10n {
   /// No description provided for @onbDaysTitle.
   ///
   /// In fr, this message translates to:
-  /// **'quels jours tu cuisines ?'**
+  /// **'Quels jours tu cuisines ?'**
   String get onbDaysTitle;
 
   /// No description provided for @onbDaysSubtitle.
   ///
   /// In fr, this message translates to:
-  /// **'choisis les jours avec des repas planifiés'**
+  /// **'Choisis les jours avec des repas planifiés'**
   String get onbDaysSubtitle;
 
   /// No description provided for @daysSelected.
@@ -580,13 +502,13 @@ abstract class AppL10n {
   /// No description provided for @onbBudgetTitle.
   ///
   /// In fr, this message translates to:
-  /// **'quel est ton budget hebdo ?'**
+  /// **'Quel est ton budget hebdo ?'**
   String get onbBudgetTitle;
 
   /// No description provided for @onbBudgetSubtitle.
   ///
   /// In fr, this message translates to:
-  /// **'choisis ce que tu veux dépenser ces jours-là'**
+  /// **'Choisis ce que tu veux dépenser ces jours-là'**
   String get onbBudgetSubtitle;
 
   /// No description provided for @thisWeek.
@@ -595,34 +517,28 @@ abstract class AppL10n {
   /// **'cette semaine'**
   String get thisWeek;
 
-  /// No description provided for @onbInfoMoneyTitle.
-  ///
-  /// In fr, this message translates to:
-  /// **'tu pourrais économiser\nen moyenne'**
-  String get onbInfoMoneyTitle;
-
   /// No description provided for @onbInfoMoneySubtitle.
   ///
   /// In fr, this message translates to:
-  /// **'sur tes courses chaque semaine'**
+  /// **'Sur les courses chaque semaine, en optimisant tes repas et comparant les prix en magasin'**
   String get onbInfoMoneySubtitle;
 
   /// No description provided for @onbInfoMoneyFooter.
   ///
   /// In fr, this message translates to:
-  /// **'soit {amount} par an!'**
+  /// **'Soit {amount} par an !'**
   String onbInfoMoneyFooter(String amount);
 
   /// No description provided for @onbCravingsTitle.
   ///
   /// In fr, this message translates to:
-  /// **'tu as envie de quoi ?'**
+  /// **'Tu as envie de quoi ?'**
   String get onbCravingsTitle;
 
   /// No description provided for @chooseUpToThree.
   ///
   /// In fr, this message translates to:
-  /// **'choisis jusqu\'à 3'**
+  /// **'Choisis jusqu\'à 3'**
   String get chooseUpToThree;
 
   /// No description provided for @cravingQuick.
@@ -676,13 +592,13 @@ abstract class AppL10n {
   /// No description provided for @onbDietTitle.
   ///
   /// In fr, this message translates to:
-  /// **'des régimes alimentaires ?'**
+  /// **'Des régimes alimentaires ?'**
   String get onbDietTitle;
 
   /// No description provided for @chooseAllThatApply.
   ///
   /// In fr, this message translates to:
-  /// **'choisis toutes les options qui s\'appliquent'**
+  /// **'Choisis toutes les options qui s\'appliquent'**
   String get chooseAllThatApply;
 
   /// No description provided for @optionNone.
@@ -712,7 +628,7 @@ abstract class AppL10n {
   /// No description provided for @onbAllergiesTitle.
   ///
   /// In fr, this message translates to:
-  /// **'des allergies ?'**
+  /// **'Des allergies ?'**
   String get onbAllergiesTitle;
 
   /// No description provided for @allergyGlutenFree.
@@ -760,13 +676,13 @@ abstract class AppL10n {
   /// No description provided for @onbProteinsTitle.
   ///
   /// In fr, this message translates to:
-  /// **'qu\'est-ce que tu aimes ?'**
+  /// **'Qu\'est-ce que tu aimes ?'**
   String get onbProteinsTitle;
 
   /// No description provided for @onbProteinsHint.
   ///
   /// In fr, this message translates to:
-  /// **'choisis les protéines que tu apprécies'**
+  /// **'Choisis les protéines que tu apprécies'**
   String get onbProteinsHint;
 
   /// No description provided for @proteinBeef.
@@ -796,13 +712,13 @@ abstract class AppL10n {
   /// No description provided for @onbAppliancesTitle.
   ///
   /// In fr, this message translates to:
-  /// **'quels appareils tu as ?'**
+  /// **'Quels appareils tu as ?'**
   String get onbAppliancesTitle;
 
   /// No description provided for @onbAppliancesHint.
   ///
   /// In fr, this message translates to:
-  /// **'choisis au moins un pour planifier'**
+  /// **'Choisis au moins un pour planifier'**
   String get onbAppliancesHint;
 
   /// No description provided for @applianceMicrowave.
@@ -832,13 +748,13 @@ abstract class AppL10n {
   /// No description provided for @onbTestimonialTitle.
   ///
   /// In fr, this message translates to:
-  /// **'plébiscité par les cooks du quotidien'**
+  /// **'Déjà 500 000 personnes ne s\'en passent plus'**
   String get onbTestimonialTitle;
 
   /// No description provided for @onbTestimonialSubtitle.
   ///
   /// In fr, this message translates to:
-  /// **'des vraies personnes, de vrais progrès chaque semaine'**
+  /// **'Des vraies personnes, de vrais progrès chaque semaine'**
   String get onbTestimonialSubtitle;
 
   /// No description provided for @reviewOneName.
@@ -922,31 +838,31 @@ abstract class AppL10n {
   /// No description provided for @generatingTaskMatch.
   ///
   /// In fr, this message translates to:
-  /// **'accord des repas avec ton magasin et ton budget'**
+  /// **'Accord des repas avec ton magasin et ton budget'**
   String get generatingTaskMatch;
 
   /// No description provided for @generatingTaskOrganise.
   ///
   /// In fr, this message translates to:
-  /// **'organisation des dîners de la semaine'**
+  /// **'Organisation des dîners de la semaine'**
   String get generatingTaskOrganise;
 
   /// No description provided for @generatingTaskShopping.
   ///
   /// In fr, this message translates to:
-  /// **'création de ta liste de courses'**
+  /// **'Création de ta liste de courses'**
   String get generatingTaskShopping;
 
   /// No description provided for @generatingTapToContinue.
   ///
   /// In fr, this message translates to:
-  /// **'appuie pour continuer'**
+  /// **'Appuie pour continuer'**
   String get generatingTapToContinue;
 
   /// No description provided for @generatingReady.
   ///
   /// In fr, this message translates to:
-  /// **'ton plan est prêt'**
+  /// **'Ton plan est prêt'**
   String get generatingReady;
 
   /// No description provided for @defaultChefName.
@@ -997,47 +913,11 @@ abstract class AppL10n {
   /// **'régénérer le plan'**
   String get regeneratePlan;
 
-  /// No description provided for @exploreEyebrow.
-  ///
-  /// In fr, this message translates to:
-  /// **'RECETTES'**
-  String get exploreEyebrow;
-
-  /// No description provided for @exploreTitle.
-  ///
-  /// In fr, this message translates to:
-  /// **'explorer'**
-  String get exploreTitle;
-
   /// No description provided for @exploreSearchPlaceholder.
   ///
   /// In fr, this message translates to:
   /// **'Rechercher des repas'**
   String get exploreSearchPlaceholder;
-
-  /// No description provided for @exploreCravings.
-  ///
-  /// In fr, this message translates to:
-  /// **'Tes envies'**
-  String get exploreCravings;
-
-  /// No description provided for @exploreSeeLess.
-  ///
-  /// In fr, this message translates to:
-  /// **'Voir moins'**
-  String get exploreSeeLess;
-
-  /// No description provided for @exploreSeeMore.
-  ///
-  /// In fr, this message translates to:
-  /// **'Voir plus'**
-  String get exploreSeeMore;
-
-  /// No description provided for @exploreByCuisine.
-  ///
-  /// In fr, this message translates to:
-  /// **'Explorer par cuisine'**
-  String get exploreByCuisine;
 
   /// No description provided for @exploreRecent.
   ///
@@ -1138,7 +1018,7 @@ abstract class AppL10n {
   /// No description provided for @recipeCookTimeAndServings.
   ///
   /// In fr, this message translates to:
-  /// **'Temps de cuisson: {time}   |   Portions: {servings}'**
+  /// **'Temps de cuisson: {time}  |  Portions: {servings}'**
   String recipeCookTimeAndServings(String time, int servings);
 
   /// No description provided for @recipeMarkCooked.
@@ -1213,16 +1093,10 @@ abstract class AppL10n {
   /// **'({amount} nécessaire)'**
   String shoppingNeeded(String amount);
 
-  /// No description provided for @prefsEyebrow.
-  ///
-  /// In fr, this message translates to:
-  /// **'TON PLAN'**
-  String get prefsEyebrow;
-
   /// No description provided for @prefsTitle.
   ///
   /// In fr, this message translates to:
-  /// **'préférence'**
+  /// **'Préférences'**
   String get prefsTitle;
 
   /// No description provided for @prefsCountry.
@@ -1279,23 +1153,11 @@ abstract class AppL10n {
   /// **'Envie du moment'**
   String get prefsCravings;
 
-  /// No description provided for @prefsChooseUpToThree.
-  ///
-  /// In fr, this message translates to:
-  /// **'Choisis jusqu\'à 3'**
-  String get prefsChooseUpToThree;
-
   /// No description provided for @prefsDiet.
   ///
   /// In fr, this message translates to:
   /// **'Régimes alimentaires'**
   String get prefsDiet;
-
-  /// No description provided for @prefsChooseAllThatApply.
-  ///
-  /// In fr, this message translates to:
-  /// **'Choisis toutes les options qui s\'appliquent'**
-  String get prefsChooseAllThatApply;
 
   /// No description provided for @prefsAllergens.
   ///
@@ -1327,16 +1189,10 @@ abstract class AppL10n {
   /// **'Choisis au moins un pour planifier'**
   String get prefsAppliancesSub;
 
-  /// No description provided for @accountEyebrow.
-  ///
-  /// In fr, this message translates to:
-  /// **'TON COMPTE'**
-  String get accountEyebrow;
-
   /// No description provided for @accountTitle.
   ///
   /// In fr, this message translates to:
-  /// **'compte'**
+  /// **'Compte'**
   String get accountTitle;
 
   /// No description provided for @accountSignInApple.
@@ -1372,7 +1228,7 @@ abstract class AppL10n {
   /// No description provided for @accountGreeting.
   ///
   /// In fr, this message translates to:
-  /// **'Salut, {name}'**
+  /// **'Salut, {name} ✎'**
   String accountGreeting(String name);
 
   /// No description provided for @accountShoppingAt.
@@ -1516,7 +1372,7 @@ abstract class AppL10n {
   /// No description provided for @tabMenu.
   ///
   /// In fr, this message translates to:
-  /// **'menu'**
+  /// **'Semaine'**
   String get tabMenu;
 
   /// No description provided for @tabRecipes.
@@ -1534,7 +1390,7 @@ abstract class AppL10n {
   /// No description provided for @tabAccount.
   ///
   /// In fr, this message translates to:
-  /// **'compte'**
+  /// **'Compte'**
   String get tabAccount;
 
   /// No description provided for @dayMonday.
@@ -1621,18 +1477,6 @@ abstract class AppL10n {
   /// **'D'**
   String get dayShortSunday;
 
-  /// No description provided for @errorGeneric.
-  ///
-  /// In fr, this message translates to:
-  /// **'Une erreur est survenue. Réessaie.'**
-  String get errorGeneric;
-
-  /// No description provided for @errorLoadPlan.
-  ///
-  /// In fr, this message translates to:
-  /// **'Impossible de charger ton plan.'**
-  String get errorLoadPlan;
-
   /// No description provided for @errorSavePreferences.
   ///
   /// In fr, this message translates to:
@@ -1656,6 +1500,468 @@ abstract class AppL10n {
   /// In fr, this message translates to:
   /// **'Impossible de mettre à jour ta liste.'**
   String get errorShoppingUpdate;
+
+  /// No description provided for @blockerSaving.
+  ///
+  /// In fr, this message translates to:
+  /// **'J\'essaye de faire des économies'**
+  String get blockerSaving;
+
+  /// No description provided for @onbInfoMoneyEyebrow.
+  ///
+  /// In fr, this message translates to:
+  /// **'AVEC TABLY, ON ÉCONOMISE EN MOYENNE'**
+  String get onbInfoMoneyEyebrow;
+
+  /// No description provided for @onbInfoMoneyPerWeek.
+  ///
+  /// In fr, this message translates to:
+  /// **'par semaine'**
+  String get onbInfoMoneyPerWeek;
+
+  /// No description provided for @onbPlanStartTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'On attaque ton plan de la semaine'**
+  String get onbPlanStartTitle;
+
+  /// No description provided for @onbPlanStartSubtitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Quelques questions sur ta cuisine et ton budget, et ton plan est prêt.'**
+  String get onbPlanStartSubtitle;
+
+  /// No description provided for @onbMealsTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Combien de repas par jour ?'**
+  String get onbMealsTitle;
+
+  /// No description provided for @onbMealsSubtitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'On réutilise certains plats en restes pour t\'éviter de cuisiner tous les jours'**
+  String get onbMealsSubtitle;
+
+  /// No description provided for @mealsPerDayOption.
+  ///
+  /// In fr, this message translates to:
+  /// **'{count, plural, =1{1 repas par jour} other{{count} repas par jour}}'**
+  String mealsPerDayOption(int count);
+
+  /// No description provided for @mealsPerDayDinnerOnly.
+  ///
+  /// In fr, this message translates to:
+  /// **'Dîner seulement'**
+  String get mealsPerDayDinnerOnly;
+
+  /// No description provided for @mealsPerDayLunchDinner.
+  ///
+  /// In fr, this message translates to:
+  /// **'Déjeuner + dîner'**
+  String get mealsPerDayLunchDinner;
+
+  /// No description provided for @mealsPerDayAll.
+  ///
+  /// In fr, this message translates to:
+  /// **'Matin, midi et soir'**
+  String get mealsPerDayAll;
+
+  /// No description provided for @planSummarySingle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Un plat différent chaque soir — {slots} repas, {recipes} recettes à cuisiner.'**
+  String planSummarySingle(int slots, int recipes);
+
+  /// No description provided for @planSummaryReuse.
+  ///
+  /// In fr, this message translates to:
+  /// **'{slots} repas prévus, seulement {recipes} recettes à cuisiner : chaque plat est prévu pour deux services.'**
+  String planSummaryReuse(int slots, int recipes);
+
+  /// No description provided for @slotBreakfast.
+  ///
+  /// In fr, this message translates to:
+  /// **'Petit-déjeuner'**
+  String get slotBreakfast;
+
+  /// No description provided for @slotLunch.
+  ///
+  /// In fr, this message translates to:
+  /// **'Déjeuner'**
+  String get slotLunch;
+
+  /// No description provided for @slotDinner.
+  ///
+  /// In fr, this message translates to:
+  /// **'Dîner'**
+  String get slotDinner;
+
+  /// No description provided for @switchEyebrow.
+  ///
+  /// In fr, this message translates to:
+  /// **'BONNE NOUVELLE'**
+  String get switchEyebrow;
+
+  /// No description provided for @switchTitlePrefix.
+  ///
+  /// In fr, this message translates to:
+  /// **'Tes recettes coûteraient '**
+  String get switchTitlePrefix;
+
+  /// No description provided for @switchTitleHighlight.
+  ///
+  /// In fr, this message translates to:
+  /// **'{percent} % moins cher'**
+  String switchTitleHighlight(int percent);
+
+  /// No description provided for @switchTitleSuffix.
+  ///
+  /// In fr, this message translates to:
+  /// **' chez {store}'**
+  String switchTitleSuffix(String store);
+
+  /// No description provided for @switchSubtitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'D\'après ton profil et ton panier de la semaine. Tu peux changer maintenant ou garder {store}.'**
+  String switchSubtitle(String store);
+
+  /// No description provided for @switchAccept.
+  ///
+  /// In fr, this message translates to:
+  /// **'Passer à {store}'**
+  String switchAccept(String store);
+
+  /// No description provided for @switchDecline.
+  ///
+  /// In fr, this message translates to:
+  /// **'Garder {store}'**
+  String switchDecline(String store);
+
+  /// No description provided for @budgetSavings.
+  ///
+  /// In fr, this message translates to:
+  /// **'{amount} d\'économie 🎉'**
+  String budgetSavings(String amount);
+
+  /// No description provided for @planCounts.
+  ///
+  /// In fr, this message translates to:
+  /// **'{slots} repas · {recipes} recettes à cuisiner'**
+  String planCounts(int slots, int recipes);
+
+  /// No description provided for @leftoverBadge.
+  ///
+  /// In fr, this message translates to:
+  /// **'♻ Reste'**
+  String get leftoverBadge;
+
+  /// No description provided for @regeneratingPlan.
+  ///
+  /// In fr, this message translates to:
+  /// **'nouveau plan en cours…'**
+  String get regeneratingPlan;
+
+  /// No description provided for @storesTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Supermarché'**
+  String get storesTitle;
+
+  /// No description provided for @storesSubtitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Prix estimé de ton plan cette semaine'**
+  String get storesSubtitle;
+
+  /// No description provided for @storesCurrent.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ton magasin actuel'**
+  String get storesCurrent;
+
+  /// No description provided for @storesCheaper.
+  ///
+  /// In fr, this message translates to:
+  /// **'{amount} de moins que {store}'**
+  String storesCheaper(String amount, String store);
+
+  /// No description provided for @storesPricier.
+  ///
+  /// In fr, this message translates to:
+  /// **'{amount} de plus'**
+  String storesPricier(String amount);
+
+  /// No description provided for @storesCurrentTag.
+  ///
+  /// In fr, this message translates to:
+  /// **'ACTUEL'**
+  String get storesCurrentTag;
+
+  /// No description provided for @storesFootnote.
+  ///
+  /// In fr, this message translates to:
+  /// **'Les prix sont estimés à partir des {count} recettes de ta semaine et des relevés en magasin.'**
+  String storesFootnote(int count);
+
+  /// No description provided for @recipesTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Recettes'**
+  String get recipesTitle;
+
+  /// No description provided for @searchResultCount.
+  ///
+  /// In fr, this message translates to:
+  /// **'{count, plural, =1{1 résultat} other{{count} résultats}}'**
+  String searchResultCount(int count);
+
+  /// No description provided for @searchEmpty.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucun repas ne correspond à « {query} ».\nEssaie un ingrédient ou un type de plat.'**
+  String searchEmpty(String query);
+
+  /// No description provided for @recipesAll.
+  ///
+  /// In fr, this message translates to:
+  /// **'Recettes'**
+  String get recipesAll;
+
+  /// No description provided for @filtersEmpty.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucune recette ne correspond à ces filtres.'**
+  String get filtersEmpty;
+
+  /// No description provided for @filtersTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Filtres'**
+  String get filtersTitle;
+
+  /// No description provided for @filtersReset.
+  ///
+  /// In fr, this message translates to:
+  /// **'Réinitialiser'**
+  String get filtersReset;
+
+  /// No description provided for @filtersCravings.
+  ///
+  /// In fr, this message translates to:
+  /// **'Tes envies'**
+  String get filtersCravings;
+
+  /// No description provided for @filtersCuisine.
+  ///
+  /// In fr, this message translates to:
+  /// **'Cuisine type'**
+  String get filtersCuisine;
+
+  /// No description provided for @filtersProtein.
+  ///
+  /// In fr, this message translates to:
+  /// **'Préférence'**
+  String get filtersProtein;
+
+  /// No description provided for @filtersProteinSub.
+  ///
+  /// In fr, this message translates to:
+  /// **'Le type de viande ou de protéine que tu veux voir'**
+  String get filtersProteinSub;
+
+  /// No description provided for @filtersPrice.
+  ///
+  /// In fr, this message translates to:
+  /// **'Prix par portion'**
+  String get filtersPrice;
+
+  /// No description provided for @filtersPriceRange.
+  ///
+  /// In fr, this message translates to:
+  /// **'{min} – {max}'**
+  String filtersPriceRange(String min, String max);
+
+  /// No description provided for @filtersPriceAll.
+  ///
+  /// In fr, this message translates to:
+  /// **'Toutes les recettes'**
+  String get filtersPriceAll;
+
+  /// No description provided for @filtersPriceUpTo.
+  ///
+  /// In fr, this message translates to:
+  /// **'Recettes jusqu\'à {amount} par portion'**
+  String filtersPriceUpTo(String amount);
+
+  /// No description provided for @filtersApply.
+  ///
+  /// In fr, this message translates to:
+  /// **'Voir les recettes'**
+  String get filtersApply;
+
+  /// No description provided for @proteinTofu.
+  ///
+  /// In fr, this message translates to:
+  /// **'Tofu'**
+  String get proteinTofu;
+
+  /// No description provided for @cuisineItalian.
+  ///
+  /// In fr, this message translates to:
+  /// **'Italienne'**
+  String get cuisineItalian;
+
+  /// No description provided for @cuisineItalianDesc.
+  ///
+  /// In fr, this message translates to:
+  /// **'Pasta • Risotto • Gnocchi'**
+  String get cuisineItalianDesc;
+
+  /// No description provided for @cuisineAsian.
+  ///
+  /// In fr, this message translates to:
+  /// **'Asiatique'**
+  String get cuisineAsian;
+
+  /// No description provided for @cuisineAsianDesc.
+  ///
+  /// In fr, this message translates to:
+  /// **'Nouilles • Curry • Sauté'**
+  String get cuisineAsianDesc;
+
+  /// No description provided for @cuisineMexican.
+  ///
+  /// In fr, this message translates to:
+  /// **'Mexicaine'**
+  String get cuisineMexican;
+
+  /// No description provided for @cuisineMexicanDesc.
+  ///
+  /// In fr, this message translates to:
+  /// **'Tacos • Burritos • Fajitas'**
+  String get cuisineMexicanDesc;
+
+  /// No description provided for @cuisineIndian.
+  ///
+  /// In fr, this message translates to:
+  /// **'Indienne'**
+  String get cuisineIndian;
+
+  /// No description provided for @cuisineIndianDesc.
+  ///
+  /// In fr, this message translates to:
+  /// **'Curry • Tikka • Tandoori'**
+  String get cuisineIndianDesc;
+
+  /// No description provided for @cuisineMediterranean.
+  ///
+  /// In fr, this message translates to:
+  /// **'Méditerranéenne'**
+  String get cuisineMediterranean;
+
+  /// No description provided for @cuisineMediterraneanDesc.
+  ///
+  /// In fr, this message translates to:
+  /// **'Gyros • Halloumi • Falafel'**
+  String get cuisineMediterraneanDesc;
+
+  /// No description provided for @favouritesTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Favoris'**
+  String get favouritesTitle;
+
+  /// No description provided for @favouritesCount.
+  ///
+  /// In fr, this message translates to:
+  /// **'{count, plural, =1{1 recette enregistrée} other{{count} recettes enregistrées}}'**
+  String favouritesCount(int count);
+
+  /// No description provided for @favouritesEmpty.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucun favori pour l\'instant.\nAppuie sur le cœur d\'une recette pour l\'enregistrer.'**
+  String get favouritesEmpty;
+
+  /// No description provided for @replaceTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Remplacer par'**
+  String get replaceTitle;
+
+  /// No description provided for @replaceSubtitleSlot.
+  ///
+  /// In fr, this message translates to:
+  /// **'Choisis le plat qui remplace celui de {day}'**
+  String replaceSubtitleSlot(String day);
+
+  /// No description provided for @replaceSubtitleWeek.
+  ///
+  /// In fr, this message translates to:
+  /// **'Choisis le plat qui prend sa place dans la semaine'**
+  String get replaceSubtitleWeek;
+
+  /// No description provided for @replaceAll.
+  ///
+  /// In fr, this message translates to:
+  /// **'Toutes'**
+  String get replaceAll;
+
+  /// No description provided for @replaceFavourites.
+  ///
+  /// In fr, this message translates to:
+  /// **'Favoris'**
+  String get replaceFavourites;
+
+  /// No description provided for @replaceEmptyFavourites.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucun favori pour l\'instant.'**
+  String get replaceEmptyFavourites;
+
+  /// No description provided for @replaceEmptySearch.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucun repas ne correspond à cette recherche.'**
+  String get replaceEmptySearch;
+
+  /// No description provided for @recipeCreatedBy.
+  ///
+  /// In fr, this message translates to:
+  /// **'RECETTE DE'**
+  String get recipeCreatedBy;
+
+  /// No description provided for @recipeReplaceMeal.
+  ///
+  /// In fr, this message translates to:
+  /// **'Remplacer ce repas'**
+  String get recipeReplaceMeal;
+
+  /// No description provided for @prefsMealsPerDay.
+  ///
+  /// In fr, this message translates to:
+  /// **'Repas par jour'**
+  String get prefsMealsPerDay;
+
+  /// No description provided for @prefsMealsPerDaySub.
+  ///
+  /// In fr, this message translates to:
+  /// **'Les plats sont réutilisés en restes pour limiter le nombre de recettes'**
+  String get prefsMealsPerDaySub;
+
+  /// No description provided for @mockCostShort.
+  ///
+  /// In fr, this message translates to:
+  /// **'COÛT EST.'**
+  String get mockCostShort;
+
+  /// No description provided for @mockTapShort.
+  ///
+  /// In fr, this message translates to:
+  /// **'APPUYER'**
+  String get mockTapShort;
 }
 
 class _AppL10nDelegate extends LocalizationsDelegate<AppL10n> {

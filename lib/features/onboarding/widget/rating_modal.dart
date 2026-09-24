@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../../core/theme/app_theme.dart';
+import '../../../core/widget/app_logo.dart';
 import '../../../core/util/haptics.dart';
 import '../../../l10n/app_localizations.dart';
 
@@ -43,7 +44,7 @@ class RatingModal extends StatelessWidget {
                     color: AppColors.surface,
                     borderRadius: BorderRadius.circular(14.r),
                   ),
-                  child: Text('🥗', style: TextStyle(fontSize: 28.sp, height: 1)),
+                  child: AppLogo(size: 34.r),
                 ),
                 SizedBox(height: 14.h),
                 Text(
@@ -73,7 +74,7 @@ class RatingModal extends StatelessWidget {
                           },
                           child: Text(
                             '☆',
-                            style: TextStyle(fontSize: 28.sp, color: const Color(0xFF2F6FDB), height: 1),
+                            style: AppTextStyles.emojiIcon.copyWith(fontSize: 28.sp, color: AppColors.ratingStar),
                           ),
                         ),
                       ),

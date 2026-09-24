@@ -1,5 +1,3 @@
-import 'dart:io' show Platform;
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -40,14 +38,13 @@ class AccountScreen extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    Text(l10n.accountEyebrow, textAlign: TextAlign.center, style: AppTextStyles.eyebrow),
-                    SizedBox(height: 4.h),
-                    Text(
-                      l10n.accountTitle,
-                      textAlign: TextAlign.center,
-                      style: AppTextStyles.screenTitle,
+                    Row(
+                      children: [
+                        Expanded(child: Text(l10n.accountTitle, style: AppTextStyles.tabTitle)),
+                        const ActivePill(),
+                      ],
                     ),
-                    SizedBox(height: 22.h),
+                    SizedBox(height: 16.h),
 
                     // Apple sign-in only appears where it is actually available.
                     if (!authState.isSignedIn && _supportsApple) ...[
@@ -71,7 +68,7 @@ class AccountScreen extends StatelessWidget {
                     SizedBox(height: 18.h),
                     ProfileSummaryCard(
                       name: profile.displayName(l10n.defaultChefName),
-                      store: profile.store,
+                      store: profile.store.displayName,
                       onEdit: () => _editName(context, profile.name),
                     ),
                     SizedBox(height: 26.h),
@@ -154,7 +151,10 @@ class AccountScreen extends StatelessWidget {
   }
 
   /// Apple sign-in is only offered on Apple platforms.
-  bool get _supportsApple => !kIsWeb && (Platform.isIOS || Platform.isMacOS);
+  bool get _supportsApple =>
+      !kIsWeb &&
+      (defaultTargetPlatform == TargetPlatform.iOS ||
+          defaultTargetPlatform == TargetPlatform.macOS);
 
   String _languageName(String code) => switch (code) {
         'en' => 'English',

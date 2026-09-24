@@ -6,88 +6,6 @@ import '../../../core/widget/surface_card.dart';
 import '../../../l10n/app_localizations.dart';
 import '../model/recipe.dart';
 
-/// Pill switch between the ingredients and preparation lists.
-class RecipeSegmentedTabs extends StatelessWidget {
-  const RecipeSegmentedTabs({
-    super.key,
-    required this.showIngredients,
-    required this.onChanged,
-  });
-
-  final bool showIngredients;
-  final ValueChanged<bool> onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = AppL10n.of(context);
-    return Container(
-      padding: EdgeInsets.all(5.r),
-      decoration: BoxDecoration(
-        color: AppColors.fill,
-        borderRadius: BorderRadius.circular(32.r),
-      ),
-      child: Row(
-        children: [
-          Expanded(
-            child: _Segment(
-              label: l10n.recipeTabIngredients,
-              active: showIngredients,
-              onTap: () => onChanged(true),
-            ),
-          ),
-          Expanded(
-            child: _Segment(
-              label: l10n.recipeTabPreparation,
-              active: !showIngredients,
-              onTap: () => onChanged(false),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _Segment extends StatelessWidget {
-  const _Segment({required this.label, required this.active, required this.onTap});
-
-  final String label;
-  final bool active;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      behavior: HitTestBehavior.opaque,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 160),
-        padding: EdgeInsets.symmetric(vertical: 13.h),
-        decoration: BoxDecoration(
-          color: active ? AppColors.surface : Colors.transparent,
-          borderRadius: BorderRadius.circular(28.r),
-          boxShadow: active
-              ? [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.08),
-                    blurRadius: 3.r,
-                    offset: Offset(0, 1.h),
-                  ),
-                ]
-              : null,
-        ),
-        child: Text(
-          label,
-          textAlign: TextAlign.center,
-          style: AppTextStyles.segmentedLabel.copyWith(
-            color: active ? AppColors.brandDark : AppColors.textTertiary,
-          ),
-        ),
-      ),
-    );
-  }
-}
-
 /// The ingredients card: icon, name, quantity.
 class IngredientList extends StatelessWidget {
   const IngredientList({super.key, required this.ingredients});
@@ -110,7 +28,7 @@ class IngredientList extends StatelessWidget {
               ),
               child: Row(
                 children: [
-                  Text(ingredient.icon, style: TextStyle(fontSize: 20.sp)),
+                  Text(ingredient.icon, style: AppTextStyles.emojiIcon.copyWith(fontSize: 20.sp)),
                   SizedBox(width: 14.w),
                   Expanded(child: Text(ingredient.name, style: AppTextStyles.ingredientName)),
                   Text(ingredient.quantity, style: AppTextStyles.ingredientQty),

@@ -12,25 +12,16 @@ import '../service/recipe_service.dart';
 
 part 'recipe_state.dart';
 
-/// Owns the recipe catalogue and the user's per-recipe state (favourite,
-/// cooked, rating, notes, view history).
+/// Owns the user's per-recipe state: favourite, cooked, rating, notes and
+/// view history.
 class RecipeCubit extends Cubit<RecipeState> {
   RecipeCubit({required RecipeService service, required AnalyticsService analytics})
       : _service = service,
         _analytics = analytics,
-        super(const RecipeState(recipes: RecipeCatalogue.recipes)) {
-    _catalogueSubscription = _service.watchRecipes().listen(
-      (recipes) => emit(state.copyWith(status: RecipeStatus.ready, recipes: recipes)),
-      onError: (Object e) {
-        debugPrint('[RecipeCubit] catalogue error: $e');
-        emit(state.copyWith(status: RecipeStatus.failed, error: e));
-      },
-    );
-  }
+        super(const RecipeState());
 
   final RecipeService _service;
   final AnalyticsService _analytics;
-  late final StreamSubscription<List<Recipe>> _catalogueSubscription;
   StreamSubscription<Map<String, RecipeInteraction>>? _stateSubscription;
   String? _uid;
 
@@ -46,11 +37,6 @@ class RecipeCubit extends Cubit<RecipeState> {
       },
     );
   }
-
-  void search(String query) => emit(state.copyWith(query: query));
-
-  void toggleCravingsExpanded() =>
-      emit(state.copyWith(cravingsExpanded: !state.cravingsExpanded));
 
   /// Records that the user opened a recipe, feeding the "recently viewed" rail.
   Future<void> markViewed(String recipeId) {
@@ -116,7 +102,6 @@ class RecipeCubit extends Cubit<RecipeState> {
 
   @override
   Future<void> close() {
-    _catalogueSubscription.cancel();
     _stateSubscription?.cancel();
     return super.close();
   }

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../../core/theme/app_theme.dart';
+import '../../../core/widget/app_logo.dart';
 import '../../../core/util/haptics.dart';
 import '../../../core/widget/circle_icon_button.dart';
 import '../../../core/widget/progress_bar.dart';
@@ -152,7 +153,7 @@ class _GeneratingScreenState extends State<GeneratingScreen> with TickerProvider
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text('🥗', style: TextStyle(fontSize: 26.sp, height: 1)),
+                  AppLogo(size: 40.r),
                   Text(AppL10n.of(context).appName, style: AppTextStyles.wordmarkGenerating),
                 ],
               ),
@@ -182,7 +183,7 @@ class _OrbitIcon extends StatelessWidget {
       offset: Offset(cos(angle) * radius, sin(angle) * radius),
       child: Transform.rotate(
         angle: counterRotation,
-        child: Text(icon, style: TextStyle(fontSize: 34.sp, height: 1)),
+        child: Text(icon, style: AppTextStyles.emojiIcon.copyWith(fontSize: 34.sp)),
       ),
     );
   }
@@ -217,12 +218,7 @@ class _TaskRow extends StatelessWidget {
       ),
       child: Text(
         done ? '✓' : '',
-        style: TextStyle(
-          fontSize: 13.sp,
-          fontWeight: FontWeight.w800,
-          color: AppColors.surface,
-          height: 1,
-        ),
+        style: AppTextStyles.emojiIcon.copyWith(fontSize: 13.sp, fontWeight: FontWeight.w800, color: AppColors.surface),
       ),
     );
 

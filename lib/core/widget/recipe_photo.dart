@@ -13,6 +13,7 @@ class RecipePhoto extends StatelessWidget {
     required this.height,
     this.width,
     this.radius,
+    this.opacity = 1,
   });
 
   final String photoKey;
@@ -20,29 +21,36 @@ class RecipePhoto extends StatelessWidget {
   final double? width;
   final double? radius;
 
+  /// Leftover meals show their photo slightly faded.
+  final double opacity;
+
   @override
   Widget build(BuildContext context) {
     final asset = RecipePhotos.assetFor(photoKey);
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(radius ?? 16.r),
-      child: SizedBox(
-        width: width,
-        height: height,
-        child: asset == null
-            ? const DecoratedBox(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [Color(0xFFEEF2F8), AppColors.trackDark],
+    return Opacity(
+      opacity: opacity,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(radius ?? 16.r),
+        child: SizedBox(
+          width: width,
+          height: height,
+          child: asset == null
+              ? const DecoratedBox(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [AppColors.photoPlaceholder, AppColors.trackDark],
+                    ),
                   ),
+                )
+              : Image.asset(
+                  asset,
+                  fit: BoxFit.cover,
+                  errorBuilder: (_, _, _) =>
+                      const ColoredBox(color: AppColors.fill),
                 ),
-              )
-            : Image.asset(
-                asset,
-                fit: BoxFit.cover,
-                errorBuilder: (_, _, _) => const ColoredBox(color: AppColors.fill),
-              ),
+        ),
       ),
     );
   }

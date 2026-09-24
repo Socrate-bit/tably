@@ -5,10 +5,12 @@ import '../model/shopping_item.dart';
 
 /// Reads and writes the shopping list at `users/{uid}/shopping/{itemId}`.
 class ShoppingService {
-  ShoppingService({FirebaseFirestore? firestore})
-      : _db = firestore ?? FirebaseFirestore.instance;
+  ShoppingService({FirebaseFirestore? firestore}) : _firestore = firestore;
 
-  final FirebaseFirestore _db;
+  final FirebaseFirestore? _firestore;
+
+  /// Resolved on first use, so the service can be built before Firebase is.
+  FirebaseFirestore get _db => _firestore ?? FirebaseFirestore.instance;
 
   CollectionReference<Map<String, dynamic>> _col(String uid) =>
       _db.collection('users').doc(uid).collection('shopping');
@@ -18,26 +20,20 @@ class ShoppingService {
         final items = snap.docs.map((d) => ShoppingItem.fromMap(d.id, d.data())).toList();
         items.sort((a, b) => a.order.compareTo(b.order));
         return items;
-      }).handleError((Object e) {
-        debugPrint('[ShoppingService] watch failed: $e');
       });
 
-  /// Replaces the list, keeping nothing from the previous week.
-  Future<void> replaceList(String uid, List<ShoppingItem> items) async {
+  /// Writes a user's first list.
+  Future<void> createList(String uid, List<ShoppingItem> items) async {
     try {
       final col = _col(uid);
-      final existing = await col.get();
       final batch = _db.batch();
-      for (final doc in existing.docs) {
-        batch.delete(doc.reference);
-      }
       for (final item in items) {
         batch.set(col.doc(item.id), item.toMap());
       }
       await batch.commit();
-      debugPrint('[ShoppingService] wrote ${items.length} items for $uid');
+      debugPrint('[ShoppingService] created ${items.length} items for $uid');
     } catch (e) {
-      debugPrint('[ShoppingService] replaceList failed: $e');
+      debugPrint('[ShoppingService] createList failed: $e');
       rethrow;
     }
   }

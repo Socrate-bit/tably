@@ -13,6 +13,7 @@ import 'features/plan/cubit/plan_cubit.dart';
 import 'features/plan/service/plan_service.dart';
 import 'features/preferences/cubit/profile_cubit.dart';
 import 'features/preferences/service/profile_service.dart';
+import 'features/recipe/cubit/recipe_browse_cubit.dart';
 import 'features/recipe/cubit/recipe_cubit.dart';
 import 'features/recipe/service/recipe_service.dart';
 import 'features/shopping/cubit/shopping_cubit.dart';
@@ -54,8 +55,8 @@ class TablyApp extends StatelessWidget {
           ),
           BlocProvider(
             create: (context) => PlanCubit(
-              planService: context.read<PlanService>(),
-              shoppingService: context.read<ShoppingService>(),
+              service: context.read<PlanService>(),
+              profileCubit: context.read<ProfileCubit>(),
               analytics: analytics,
             ),
           ),
@@ -68,6 +69,7 @@ class TablyApp extends StatelessWidget {
           BlocProvider(
             create: (context) => RecipeCubit(service: recipeService, analytics: analytics),
           ),
+          BlocProvider(create: (_) => RecipeBrowseCubit(analytics: analytics)),
           BlocProvider(create: (_) => OnboardingCubit(analytics: analytics)),
           BlocProvider(create: (_) => HomeCubit(analytics: analytics)),
         ],
@@ -75,15 +77,12 @@ class TablyApp extends StatelessWidget {
           // The design was drawn at 402x860.
           designSize: const Size(AppDimens.designWidth, AppDimens.designHeight),
           minTextAdapt: true,
-          builder: (context, _) => BlocBuilder<ProfileCubit, ProfileState>(
-            // The profile owns the chosen language, so the app rebuilds on change.
-            buildWhen: (previous, current) =>
-                previous.profile.languageCode != current.profile.languageCode,
-            builder: (context, state) => MaterialApp(
+          builder: (context, _) => Builder(
+            builder: (context) => MaterialApp(
               title: 'Tably',
               debugShowCheckedModeBanner: false,
               theme: AppTheme.build(),
-              locale: Locale(state.profile.languageCode),
+              locale: _resolveLocale(_languageCode(context)),
               localizationsDelegates: const [
                 AppL10n.delegate,
                 GlobalMaterialLocalizations.delegate,
@@ -97,5 +96,21 @@ class TablyApp extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  /// The saved profile owns the language once onboarding is done; before
+  /// that, the language picked on the welcome screen applies immediately.
+  String _languageCode(BuildContext context) {
+    final onboarded = context.select<ProfileCubit, bool>((c) => c.state.hasOnboarded);
+    final saved = context.select<ProfileCubit, String>((c) => c.state.profile.languageCode);
+    final draft = context.select<OnboardingCubit, String>((c) => c.state.draft.languageCode);
+    return onboarded ? saved : draft;
+  }
+
+  /// The language step offers more languages than the app currently ships
+  /// translations for; anything unsupported falls back to French.
+  Locale _resolveLocale(String languageCode) {
+    final supported = AppL10n.supportedLocales.map((l) => l.languageCode);
+    return Locale(supported.contains(languageCode) ? languageCode : 'fr');
   }
 }

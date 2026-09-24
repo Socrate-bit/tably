@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import 'core/theme/app_theme.dart';
+import 'core/widget/app_logo.dart';
 import 'features/account/cubit/auth_cubit.dart';
 import 'features/home/screen/home_screen.dart';
 import 'features/onboarding/screen/onboarding_screen.dart';
@@ -35,39 +37,11 @@ class RootScreen extends StatelessWidget {
           return BlocBuilder<ProfileCubit, ProfileState>(
             builder: (context, profileState) {
               if (profileState.isLoading) return const _Splash();
-              return profileState.hasOnboarded ? const _PlannedHome() : const OnboardingScreen();
+              return profileState.hasOnboarded ? const HomeScreen() : const OnboardingScreen();
             },
           );
         },
       ),
-    );
-  }
-}
-
-/// The app shell, which generates a first plan if the user has none.
-class _PlannedHome extends StatefulWidget {
-  const _PlannedHome();
-
-  @override
-  State<_PlannedHome> createState() => _PlannedHomeState();
-}
-
-class _PlannedHomeState extends State<_PlannedHome> {
-  @override
-  Widget build(BuildContext context) {
-    return BlocListener<PlanCubit, PlanState>(
-      // A ready-but-empty plan means onboarding just finished, or the week was
-      // never built. Either way, build it once.
-      listenWhen: (previous, current) =>
-          current.status == PlanStatus.ready && current.meals.isEmpty && !current.generating,
-      listener: (context, state) {
-        final profile = context.read<ProfileCubit>().state.profile;
-        context.read<PlanCubit>().generate(
-              profile: profile,
-              catalogue: context.read<RecipeCubit>().state.recipes,
-            );
-      },
-      child: const HomeScreen(),
     );
   }
 }
@@ -78,23 +52,15 @@ class _Splash extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
+    return Scaffold(
       backgroundColor: AppColors.scaffold,
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text('🥗', style: TextStyle(fontSize: 34)),
-            SizedBox(height: 4),
-            Text(
-              'Tably',
-              style: TextStyle(
-                fontSize: 34,
-                fontWeight: FontWeight.w800,
-                color: AppColors.brand,
-                letterSpacing: -1.6,
-              ),
-            ),
+            AppLogo(size: 40.r),
+            SizedBox(height: 2.h),
+            Text('Tably', style: AppTextStyles.wordmarkGenerating),
           ],
         ),
       ),

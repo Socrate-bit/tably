@@ -5,10 +5,12 @@ import '../model/user_profile.dart';
 
 /// Reads and writes the user document at `users/{uid}`.
 class ProfileService {
-  ProfileService({FirebaseFirestore? firestore})
-      : _db = firestore ?? FirebaseFirestore.instance;
+  ProfileService({FirebaseFirestore? firestore}) : _firestore = firestore;
 
-  final FirebaseFirestore _db;
+  final FirebaseFirestore? _firestore;
+
+  /// Resolved on first use, so the service can be built before Firebase is.
+  FirebaseFirestore get _db => _firestore ?? FirebaseFirestore.instance;
 
   DocumentReference<Map<String, dynamic>> _doc(String uid) => _db.collection('users').doc(uid);
 

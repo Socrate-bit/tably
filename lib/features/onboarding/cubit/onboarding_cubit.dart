@@ -6,14 +6,19 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../core/analytics/analytics_service.dart';
 import '../../../core/model/preference_option.dart';
+import '../../../core/model/store.dart';
 import '../../../core/model/weekday.dart';
+import '../../../core/util/selection.dart';
+import '../../plan/model/plan_settings.dart';
+import '../../plan/model/week_plan.dart';
+import '../../plan/service/week_planner.dart';
 import '../../preferences/model/user_profile.dart';
 import '../model/onboarding_step.dart';
 
 part 'onboarding_state.dart';
 
 /// Drives the onboarding flow and assembles the profile as the user answers.
-/// Nothing is written to Firestore until [finishGeneration].
+/// Nothing is written to Firestore until the store-switch offer is answered.
 class OnboardingCubit extends Cubit<OnboardingState> {
   OnboardingCubit({required AnalyticsService analytics})
       : _analytics = analytics,
@@ -27,6 +32,9 @@ class OnboardingCubit extends Cubit<OnboardingState> {
   /// Budget slider bounds, matching the design.
   static const minBudget = 40.0;
   static const maxBudget = 200.0;
+
+  /// Items on the generating screen's checklist.
+  static const generationTasks = 3;
 
   // ---- Navigation ----
 
@@ -44,6 +52,14 @@ class OnboardingCubit extends Cubit<OnboardingState> {
     emit(state.copyWith(stepIndex: state.stepIndex + 1));
   }
 
+  void openLanguage() => emit(state.copyWith(showLanguage: true));
+
+  void closeLanguage() => emit(state.copyWith(showLanguage: false));
+
+  /// Picking a language applies it straight away and returns to the welcome screen.
+  void setLanguage(String languageCode) =>
+      emit(state.copyWith(showLanguage: false, draft: state.draft.copyWith(languageCode: languageCode)));
+
   void back() {
     if (state.phase == OnboardingPhase.generating) {
       _cancelGeneration();
@@ -52,12 +68,6 @@ class OnboardingCubit extends Cubit<OnboardingState> {
     }
     if (state.stepIndex == 0) return;
     emit(state.copyWith(stepIndex: state.stepIndex - 1));
-  }
-
-  /// Language and store selections advance as soon as the user taps.
-  void selectAndAdvance(String optionId) {
-    _apply(state.currentStep.id, optionId);
-    next();
   }
 
   // ---- Answers ----
@@ -69,19 +79,19 @@ class OnboardingCubit extends Cubit<OnboardingState> {
     final draft = state.draft;
     final next = switch (stepId) {
       StepIds.age => draft.copyWith(ageRange: optionId),
-      StepIds.goal => draft.copyWith(goal: optionId),
-      StepIds.blocker => draft.copyWith(blocker: optionId),
-      StepIds.savings => draft.copyWith(savingsBelief: optionId),
+      StepIds.goal => draft.copyWith(goals: Selection.toggle(draft.goals, optionId)),
+      StepIds.blocker => draft.copyWith(blockers: Selection.toggle(draft.blockers, optionId)),
       StepIds.cookTime => draft.copyWith(cookTime: optionId),
-      StepIds.source => draft.copyWith(discoverySource: optionId),
       StepIds.country || StepIds.europeCountry => draft.copyWith(country: Country.fromId(optionId)),
-      StepIds.store => draft.copyWith(store: optionId),
-      StepIds.cravings => draft.copyWith(cravings: _toggleCapped(draft.cravings, Craving.values.byId(optionId), 3)),
-      StepIds.diet => draft.copyWith(diets: _toggleWithNone(draft.diets, Diet.values.byId(optionId), Diet.none)),
+      StepIds.store => draft.copyWith(store: Store.fromId(optionId)),
+      StepIds.cravings =>
+        draft.copyWith(cravings: Selection.toggleCapped(draft.cravings, Craving.values.byId(optionId), max: 3)),
+      StepIds.diet => draft.copyWith(diets: Selection.toggleWithNone(draft.diets, Diet.values.byId(optionId), Diet.none)),
       StepIds.allergies =>
-        draft.copyWith(allergies: _toggleWithNone(draft.allergies, Allergy.values.byId(optionId), Allergy.none)),
-      StepIds.proteins => draft.copyWith(proteins: _toggle(draft.proteins, Protein.values.byId(optionId))),
-      StepIds.appliances => _withAppliance(draft, Appliance.values.byId(optionId)),
+        draft.copyWith(allergies: Selection.toggleWithNone(draft.allergies, Allergy.values.byId(optionId), Allergy.none)),
+      StepIds.proteins => draft.copyWith(proteins: Selection.toggle(draft.proteins, Protein.values.byId(optionId))),
+      StepIds.appliances =>
+        draft.copyWith(appliances: Selection.toggleKeepOne(draft.appliances, Appliance.values.byId(optionId))),
       _ => draft,
     };
     emit(state.copyWith(draft: next));
@@ -92,13 +102,11 @@ class OnboardingCubit extends Cubit<OnboardingState> {
     final d = state.draft;
     return switch (stepId) {
       StepIds.age => d.ageRange == optionId,
-      StepIds.goal => d.goal == optionId,
-      StepIds.blocker => d.blocker == optionId,
-      StepIds.savings => d.savingsBelief == optionId,
+      StepIds.goal => d.goals.contains(optionId),
+      StepIds.blocker => d.blockers.contains(optionId),
       StepIds.cookTime => d.cookTime == optionId,
-      StepIds.source => d.discoverySource == optionId,
       StepIds.country || StepIds.europeCountry => d.country.id == optionId,
-      StepIds.store => d.store == optionId,
+      StepIds.store => d.store.id == optionId,
       StepIds.cravings => d.cravings.any((c) => c.id == optionId),
       StepIds.diet => d.diets.any((x) => x.id == optionId),
       StepIds.allergies => d.allergies.any((x) => x.id == optionId),
@@ -110,21 +118,18 @@ class OnboardingCubit extends Cubit<OnboardingState> {
 
   void setName(String name) => emit(state.copyWith(draft: state.draft.copyWith(name: name)));
 
-  void setLanguage(String languageCode) =>
-      emit(state.copyWith(draft: state.draft.copyWith(languageCode: languageCode)));
-
   void incrementHousehold() => _setHousehold(state.draft.household + 1);
 
   void decrementHousehold() => _setHousehold(state.draft.household - 1);
 
-  void _setHousehold(int value) =>
-      emit(state.copyWith(draft: state.draft.copyWith(household: value.clamp(1, 12))));
+  void _setHousehold(int value) => emit(state.copyWith(
+        draft: state.draft.copyWith(household: value.clamp(UserProfile.minHousehold, UserProfile.maxHousehold)),
+      ));
 
-  void toggleDay(Weekday day) {
-    final days = Set<Weekday>.from(state.draft.days);
-    days.contains(day) ? days.remove(day) : days.add(day);
-    emit(state.copyWith(draft: state.draft.copyWith(days: days)));
-  }
+  void toggleDay(Weekday day) =>
+      emit(state.copyWith(draft: state.draft.copyWith(days: Selection.toggle(state.draft.days, day))));
+
+  void setMealsPerDay(int mealsPerDay) => emit(state.copyWith(draft: state.draft.copyWith(mealsPerDay: mealsPerDay)));
 
   void setBudget(double budget) => emit(
         state.copyWith(draft: state.draft.copyWith(budget: budget.clamp(minBudget, maxBudget))),
@@ -158,19 +163,43 @@ class OnboardingCubit extends Cubit<OnboardingState> {
     }));
   }
 
-  /// Ends onboarding. The listening screen persists [OnboardingState.draft].
+  /// Ends the build, then offers a cheaper store if one exists. Users already
+  /// at the cheapest store go straight in, rather than being told a pricier
+  /// store would save them money.
   void finishGeneration() {
     _cancelGeneration();
+    if (!state.hasCheaperStore) {
+      _complete(state.draft);
+      return;
+    }
+    emit(state.copyWith(phase: OnboardingPhase.storeSwitch, generationStep: generationTasks));
+  }
+
+  /// "Passer à …": switch to the cheapest other store, then finish.
+  void acceptStoreSwitch() {
+    unawaited(_analytics.capture(AnalyticsEvents.storeSwitchAccepted, properties: {'from': state.draft.store.id}));
+    _complete(state.draft.copyWith(store: state.draft.store.cheapestAlternative));
+  }
+
+  /// "Garder …": keep the chosen store, then finish.
+  void declineStoreSwitch() {
+    unawaited(_analytics.capture(AnalyticsEvents.storeSwitchDeclined, properties: {'store': state.draft.store.id}));
+    _complete(state.draft);
+  }
+
+  /// Ends onboarding. The listening screen persists [OnboardingState.draft].
+  void _complete(UserProfile draft) {
     unawaited(_analytics.capture(
       AnalyticsEvents.onboardingCompleted,
       properties: {
-        'household': state.draft.household,
-        'days': state.draft.daysCount,
-        'budget': state.draft.budget,
-        'store': state.draft.store,
+        'household': draft.household,
+        'days': draft.daysCount,
+        'meals_per_day': draft.mealsPerDay,
+        'budget': draft.budget,
+        'store': draft.store.id,
       },
     ));
-    emit(state.copyWith(phase: OnboardingPhase.done, generationStep: 3));
+    emit(state.copyWith(phase: OnboardingPhase.done, draft: draft));
     debugPrint('[OnboardingCubit] onboarding complete');
   }
 
@@ -179,33 +208,6 @@ class OnboardingCubit extends Cubit<OnboardingState> {
       timer.cancel();
     }
     _generationTimers.clear();
-  }
-
-  // ---- Selection helpers ----
-
-  Set<T> _toggle<T>(Set<T> current, T value) {
-    final next = Set<T>.from(current);
-    next.contains(value) ? next.remove(value) : next.add(value);
-    return next;
-  }
-
-  Set<T> _toggleCapped<T>(Set<T> current, T value, int max) {
-    if (current.contains(value)) return _toggle(current, value);
-    if (current.length >= max) return current;
-    return _toggle(current, value);
-  }
-
-  Set<T> _toggleWithNone<T>(Set<T> current, T value, T none) {
-    if (value == none) return {none};
-    final next = Set<T>.from(current)..remove(none);
-    next.contains(value) ? next.remove(value) : next.add(value);
-    return next.isEmpty ? {none} : next;
-  }
-
-  /// At least one appliance must remain selected.
-  UserProfile _withAppliance(UserProfile draft, Appliance appliance) {
-    final next = _toggle(draft.appliances, appliance);
-    return next.isEmpty ? draft : draft.copyWith(appliances: next);
   }
 
   @override

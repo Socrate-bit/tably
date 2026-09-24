@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../../core/theme/app_theme.dart';
 import '../../../core/util/haptics.dart';
+import '../../../core/widget/app_sheet.dart';
 import '../../../l10n/app_localizations.dart';
 
 /// Bottom sheet offering the ways to add a recipe.
@@ -10,13 +11,7 @@ class AddRecipeSheet extends StatelessWidget {
   const AddRecipeSheet({super.key});
 
   /// Presents the sheet over the current screen.
-  static Future<void> show(BuildContext context) => showModalBottomSheet<void>(
-        context: context,
-        backgroundColor: Colors.transparent,
-        barrierColor: AppColors.scrim,
-        isScrollControlled: true,
-        builder: (_) => const AddRecipeSheet(),
-      );
+  static Future<void> show(BuildContext context) => AppSheet.show<void>(context, (_) => const AddRecipeSheet());
 
   @override
   Widget build(BuildContext context) {
@@ -28,55 +23,13 @@ class AddRecipeSheet extends StatelessWidget {
       ('✎', l10n.addRecipeScratch),
     ];
 
-    return Container(
-      width: double.infinity,
-      padding: EdgeInsets.fromLTRB(18.w, 20.h, 18.w, 34.h),
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(30.r)),
-      ),
-      child: SafeArea(
-        top: false,
+    return AppSheet(
+      title: l10n.addRecipeTitle,
+      child: SingleChildScrollView(
         child: Column(
-          mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Row(
-              children: [
-                GestureDetector(
-                  onTap: () {
-                    Haptics.tap();
-                    Navigator.of(context).pop();
-                  },
-                  child: Container(
-                    width: 44.r,
-                    height: 44.r,
-                    alignment: Alignment.center,
-                    decoration: const BoxDecoration(
-                      color: AppColors.surfaceMuted,
-                      shape: BoxShape.circle,
-                    ),
-                    child: Text('←', style: TextStyle(fontSize: 17.sp, color: AppColors.ink)),
-                  ),
-                ),
-                Expanded(
-                  child: Padding(
-                    padding: EdgeInsets.only(right: 44.w),
-                    child: Text(
-                      l10n.addRecipeTitle,
-                      textAlign: TextAlign.center,
-                      style: AppTextStyles.sheetTitle,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            SizedBox(height: 22.h),
-            _WideOption(
-              icon: '📱',
-              title: l10n.addRecipeImportSocial,
-              subtitle: l10n.addRecipeImportSocialSub,
-            ),
+            _WideOption(icon: '📱', title: l10n.addRecipeImportSocial, subtitle: l10n.addRecipeImportSocialSub),
             SizedBox(height: 13.h),
             _WideOption(
               icon: '📷',
@@ -140,7 +93,7 @@ class _WideOption extends StatelessWidget {
                 color: highlighted ? AppColors.surface : AppColors.brandSoft,
                 borderRadius: BorderRadius.circular(14.r),
               ),
-              child: Text(icon, style: TextStyle(fontSize: 20.sp)),
+              child: Text(icon, style: AppTextStyles.emojiIcon.copyWith(fontSize: 20.sp)),
             ),
             SizedBox(width: 16.w),
             Expanded(
@@ -197,7 +150,7 @@ class _SmallOption extends StatelessWidget {
               ),
               child: Text(
                 icon,
-                style: TextStyle(fontSize: 19.sp, color: AppColors.brand),
+                style: AppTextStyles.emojiIcon.copyWith(fontSize: 19.sp, color: AppColors.brand),
               ),
             ),
             Text(label, style: AppTextStyles.optionGrid),

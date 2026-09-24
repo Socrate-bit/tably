@@ -1,3 +1,5 @@
+import '../../features/plan/model/week_plan.dart';
+import '../../features/recipe/model/recipe.dart';
 import '../../l10n/app_localizations.dart';
 import '../model/preference_option.dart';
 import '../model/weekday.dart';
@@ -21,20 +23,11 @@ extension OptionLabels on AppL10n {
         'tired' => blockerTired,
         'hard' => blockerHard,
         'no_inspiration' => blockerNoInspiration,
-        'definitely' => savingsDefinitely,
-        'very_likely' => savingsVeryLikely,
-        'a_bit' => savingsABit,
-        'not_really' => savingsNotReally,
+        'saving' => blockerSaving,
         '15_30' => cookTime15to30,
         '30_45' => cookTime30to45,
         '45_60' => cookTime45to60,
         '60_plus' => cookTime60plus,
-        'instagram' => sourceInstagram,
-        'tiktok' => sourceTikTok,
-        'youtube' => sourceYouTube,
-        'facebook' => sourceFacebook,
-        'word_of_mouth' => sourceWordOfMouth,
-        'app_store' => sourceAppStore,
         // Countries
         'united_states' => countryUs,
         'europe' => countryEurope,
@@ -74,11 +67,11 @@ extension OptionLabels on AppL10n {
         'pork' => proteinPork,
         'chicken' => proteinChicken,
         'fish' => proteinFish,
+        'tofu' => proteinTofu,
         'microwave' => applianceMicrowave,
         'hob' => applianceHob,
         'oven' => applianceOven,
         'air_fryer' => applianceAirFryer,
-        // Store names are proper nouns and stay as-is.
         _ => id,
       };
 
@@ -102,8 +95,39 @@ extension OptionLabels on AppL10n {
         Weekday.sunday => dayShortSunday,
       };
 
-  /// Label for the badge on a meal card.
-  String cravingLabel(String cravingId) => optionLabel(cravingId);
+  /// Label for a recipe's badge.
+  String cravingLabel(Craving craving) => optionLabel(craving.id);
+
+  String slotName(MealSlot slot) => switch (slot) {
+        MealSlot.breakfast => slotBreakfast,
+        MealSlot.lunch => slotLunch,
+        MealSlot.dinner => slotDinner,
+      };
+
+  /// The line under each meals-per-day option.
+  String mealsPerDayDetail(int mealsPerDay) => switch (mealsPerDay) {
+        1 => mealsPerDayDinnerOnly,
+        2 => mealsPerDayLunchDinner,
+        _ => mealsPerDayAll,
+      };
+
+  String cuisineName(Cuisine cuisine) => switch (cuisine) {
+        Cuisine.italian => cuisineItalian,
+        Cuisine.asian => cuisineAsian,
+        Cuisine.mexican => cuisineMexican,
+        Cuisine.indian => cuisineIndian,
+        Cuisine.mediterranean => cuisineMediterranean,
+      };
+
+  String cuisineDescription(Cuisine cuisine) => switch (cuisine) {
+        Cuisine.italian => cuisineItalianDesc,
+        Cuisine.asian => cuisineAsianDesc,
+        Cuisine.mexican => cuisineMexicanDesc,
+        Cuisine.indian => cuisineIndianDesc,
+        Cuisine.mediterranean => cuisineMediterraneanDesc,
+      };
+
+  String proteinName(RecipeProtein protein) => optionLabel(protein.id);
 }
 
 /// Formats an amount with the profile's currency symbol.

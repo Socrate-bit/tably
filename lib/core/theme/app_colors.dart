@@ -24,6 +24,7 @@ abstract final class AppColors {
   static const Color textPlaceholder = Color(0xFF8C97A8);
   static const Color textDisabled = Color(0xFFA6B0BF);
   static const Color chevron = Color(0xFFB4BECC);
+  static const Color emptyStateIcon = Color(0xFFC6CEDA);
 
   // Surfaces
   static const Color scaffold = Color(0xFFF7F9FC);
@@ -35,6 +36,7 @@ abstract final class AppColors {
   static const Color track = Color(0xFFE3E8F0); // progress / slider track
   static const Color trackDark = Color(0xFFDCE3EE);
   static const Color neutralBar = Color(0xFFD4DCE8);
+  static const Color photoPlaceholder = Color(0xFFEEF2F8); // gradient head behind a missing photo
 
   // Borders
   static const Color border = Color(0xFFE6EBF3);
@@ -48,6 +50,7 @@ abstract final class AppColors {
   static const Color infoLabel = Color(0xFF4A85B0);
   static const Color infoTrack = Color(0xFFEAF4FC);
   static const Color star = Color(0xFFF2B32C);
+  static const Color ratingStar = Color(0xFF2F6FDB); // App Store-style prompt
   static const Color danger = Color(0xFFE0503F); // protein macro + destructive
   static const Color carbs = Color(0xFFE39A2B);
 
@@ -56,6 +59,11 @@ abstract final class AppColors {
   static const Color badgeQuickInk = Color(0xFF5E43A8);
   static const Color badgeProteinBg = Color(0xFFFBC6D4);
   static const Color badgeProteinInk = Color(0xFFB02E5C);
+  static const Color badgeIndulgentBg = Color(0xFFFDE7C4);
+  static const Color badgeIndulgentInk = Color(0xFF96601A);
+
+  // Creator credit over a recipe photo
+  static const Color creatorScrim = Color(0xD1141B29); // .82 ink
 
   // Scrims
   static const Color scrim = Color(0x57141B29); // .34 opacity sheet backdrop

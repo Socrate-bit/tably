@@ -25,23 +25,37 @@ class AuthCubit extends Cubit<AuthState> {
   final AnalyticsService _analytics;
   late final StreamSubscription<User?> _subscription;
 
+  /// Guards against two sign-ins racing: the constructor starts one, and the
+  /// initial null from [userChanges] would otherwise start a second.
+  bool _signingIn = false;
+
+  /// True once a user has been seen, so a later null means a real sign-out.
+  bool _hadUser = false;
+
   /// Signs in anonymously so a profile can be created before the user commits
   /// to an account.
   Future<void> start() async {
+    if (_signingIn || _auth.currentUser != null) return;
+    _signingIn = true;
     try {
       await _auth.ensureSignedIn();
     } catch (e) {
       debugPrint('[AuthCubit] start failed: $e');
       emit(state.copyWith(status: AuthStatus.failed, error: e));
+    } finally {
+      _signingIn = false;
     }
   }
 
   void _onUserChanged(User? user) {
     if (user == null) {
       emit(const AuthState(status: AuthStatus.unknown));
-      unawaited(start());
+      // Only re-sign-in after a real sign-out; the initial null is expected
+      // while the constructor's start() is still in flight.
+      if (_hadUser) unawaited(start());
       return;
     }
+    _hadUser = true;
     final signedIn = !user.isAnonymous;
     emit(state.copyWith(
       status: signedIn ? AuthStatus.signedIn : AuthStatus.anonymous,

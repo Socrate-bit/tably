@@ -1,73 +1,48 @@
 {
   "@@locale": "fr",
-
   "appName": "Tably",
-  "tagline": "planifie tes dîners selon ton budget,\ntes envies et ce qu'il y a dans ta cuisine",
-
-  "actionContinue": "continuer",
-  "actionStart": "commencer",
-  "actionGeneratePlan": "générer le plan",
+  "tagline": "Planifie tes dîners selon ton budget,\ntes envies et ce qu'il y a dans ta cuisine",
+  "actionContinue": "Continuer",
+  "actionStart": "Commencer →",
+  "actionGeneratePlan": "Générer le plan",
   "haveACode": "Vous avez un code ?",
-
-  "onbLanguageTitle": "choose your language",
-  "onbNameTitle": "comment tu t'appelles ?",
+  "onbLanguageTitle": "Choose your language",
+  "onbNameTitle": "Comment tu t'appelles ?",
   "onbNamePlaceholder": "saisis ici",
-
-  "onbAgeTitle": "quel âge as-tu ?",
-  "onbAgeSubtitle": "nous n'utilisons ces informations que pour personnaliser ton expérience.",
+  "onbAgeTitle": "Quel âge as-tu ?",
+  "onbAgeSubtitle": "Nous n'utilisons ces informations que pour personnaliser ton expérience.",
   "ageUnder24": "24 ans ou moins",
   "age25to34": "25-34",
   "age35to44": "35-44",
   "age45to54": "45-54",
   "age55plus": "55+",
-
-  "onbGoalTitle": "qu'est-ce que tu veux accomplir ?",
+  "onbGoalTitle": "Qu'est-ce que tu aimerais ?",
   "goalMealPrep": "Meal prep pour la semaine",
   "goalSimpleRecipes": "Trouver des recettes super simples",
   "goalTastyRecipes": "Trouver des recettes super gourmandes",
   "goalFeedMyself": "Me nourrir",
   "goalFeedFamily": "Nourrir ma famille",
-
-  "onbBlockerTitle": "qu'est-ce qui t'en empêche ?",
+  "onbBlockerTitle": "Quels sont les plus gros obstacles ?",
   "blockerNoTime": "Manque de temps",
   "blockerTired": "Trop fatigué(e) après le travail",
   "blockerHard": "Je trouve la cuisine difficile",
   "blockerNoInspiration": "Je manque d'inspiration",
-
-  "onbInfoPlanningTitle": "planifier les repas, c'est chronophage…",
-  "onbInfoPlanningSubtitle": "on enlève ce stress et te propose de délicieux repas à cuisiner et savourer",
-
-  "onbSavingsTitle": "tu as l'impression de pouvoir économiser plus sur tes courses ?",
-  "savingsDefinitely": "Définitivement",
-  "savingsVeryLikely": "Très probablement",
-  "savingsABit": "Un peu",
-  "savingsNotReally": "Pas vraiment",
-
-  "onbCookTimeTitle": "combien de temps mets-tu en général à cuisiner ?",
-  "onbCookTimeSubtitle": "on te proposera des recettes adaptées à ton rythme",
+  "onbInfoPlanningTitle": "Planifier les repas, c'est chronophage et ça peut vite coûter cher…",
+  "onbCookTimeTitle": "Combien de temps mets-tu en général à cuisiner ?",
+  "onbCookTimeSubtitle": "On te proposera des recettes adaptées à ton rythme",
   "cookTime15to30": "15–30 min",
   "cookTime30to45": "30–45 min",
   "cookTime45to60": "45–60 min",
   "cookTime60plus": "60+ min",
-
-  "onbSourceTitle": "où as-tu entendu parler de nous ?",
-  "sourceInstagram": "Instagram",
-  "sourceTikTok": "TikTok",
-  "sourceYouTube": "YouTube",
-  "sourceFacebook": "Facebook",
-  "sourceWordOfMouth": "Bouche à oreille",
-  "sourceAppStore": "App Store",
-
-  "onbInfoBarsTitle": "planifie ta semaine plus vite",
-  "onbInfoBarsSubtitle": "moins de temps à choisir des recettes, fouiller le placard et traîner en rayon",
+  "onbInfoBarsTitle": "Tably t'aide à planifier ta semaine",
+  "onbInfoBarsSubtitle": "Moins de temps à choisir des recettes, fouiller le placard et traîner en rayon",
   "onbInfoBarsWithUs": "avec nous",
   "onbInfoBarsWithoutUs": "sans nous",
   "onbInfoBarsWithUsValue": "5 min",
   "onbInfoBarsWithoutUsValue": "60 min",
-  "onbInfoBarsFooter": "gagne presque une heure\nchaque semaine",
-
-  "onbCountryTitle": "d'où viens-tu ?",
-  "onbCountrySubtitle": "on s'en sert une fois — pour la devise, la cuisine et quelques touches locales",
+  "onbInfoBarsFooter": "Gagne presque une heure\nchaque semaine",
+  "onbCountryTitle": "D'où viens-tu ?",
+  "onbCountrySubtitle": "On s'en sert une fois — pour la devise, la cuisine et quelques touches locales",
   "countryUs": "États-Unis",
   "countryEurope": "Europe",
   "countryUk": "Royaume-Uni",
@@ -75,9 +50,8 @@
   "countryCanada": "Canada",
   "countryNewZealand": "Nouvelle-Zélande",
   "countryBrazil": "Brésil",
-
-  "onbEuropeTitle": "où es-tu en Europe ?",
-  "onbEuropeSubtitle": "on configure les magasins, la devise et les touches locales",
+  "onbEuropeTitle": "Où es-tu en Europe ?",
+  "onbEuropeSubtitle": "On configure les magasins, la devise et les touches locales",
   "countryGermany": "Allemagne",
   "countryIreland": "Irlande",
   "countrySweden": "Suède",
@@ -85,31 +59,42 @@
   "countryFrance": "France",
   "countrySpain": "Espagne",
   "countryRestOfEurope": "Reste de l'Europe",
-
-  "onbStoreTitle": "choisis ton magasin",
-  "onbStoreSubtitle": "on planifie tes courses de la semaine autour",
-
-  "onbHouseholdTitle": "pour combien tu cuisines ?",
-  "onbHouseholdSubtitle": "on adapte ton plan et ton budget",
+  "onbStoreTitle": "Choisis ton magasin",
+  "onbStoreSubtitle": "On planifie tes courses de la semaine autour",
+  "onbHouseholdTitle": "Pour combien tu cuisines ?",
+  "onbHouseholdSubtitle": "On adapte ton plan et ton budget",
   "peopleCount": "{count, plural, =1{personne} other{personnes}}",
-  "@peopleCount": { "placeholders": { "count": { "type": "int" } } },
-
-  "onbDaysTitle": "quels jours tu cuisines ?",
-  "onbDaysSubtitle": "choisis les jours avec des repas planifiés",
+  "@peopleCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "onbDaysTitle": "Quels jours tu cuisines ?",
+  "onbDaysSubtitle": "Choisis les jours avec des repas planifiés",
   "daysSelected": "{count, plural, =1{1 jour sélectionné} other{{count} jours sélectionnés}}",
-  "@daysSelected": { "placeholders": { "count": { "type": "int" } } },
-
-  "onbBudgetTitle": "quel est ton budget hebdo ?",
-  "onbBudgetSubtitle": "choisis ce que tu veux dépenser ces jours-là",
+  "@daysSelected": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "onbBudgetTitle": "Quel est ton budget hebdo ?",
+  "onbBudgetSubtitle": "Choisis ce que tu veux dépenser ces jours-là",
   "thisWeek": "cette semaine",
-
-  "onbInfoMoneyTitle": "tu pourrais économiser\nen moyenne",
-  "onbInfoMoneySubtitle": "sur tes courses chaque semaine",
-  "onbInfoMoneyFooter": "soit {amount} par an!",
-  "@onbInfoMoneyFooter": { "placeholders": { "amount": { "type": "String" } } },
-
-  "onbCravingsTitle": "tu as envie de quoi ?",
-  "chooseUpToThree": "choisis jusqu'à 3",
+  "onbInfoMoneySubtitle": "Sur les courses chaque semaine, en optimisant tes repas et comparant les prix en magasin",
+  "onbInfoMoneyFooter": "Soit {amount} par an !",
+  "@onbInfoMoneyFooter": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "onbCravingsTitle": "Tu as envie de quoi ?",
+  "chooseUpToThree": "Choisis jusqu'à 3",
   "cravingQuick": "Repas express",
   "cravingHighProtein": "Riche en-protéines",
   "cravingLowCalorie": "Peu calorique",
@@ -118,15 +103,13 @@
   "cravingFakeaway": "Fakeaway",
   "cravingEasyDigestion": "Digestion-facile",
   "cravingIndulgent": "Gourmand",
-
-  "onbDietTitle": "des régimes alimentaires ?",
-  "chooseAllThatApply": "choisis toutes les options qui s'appliquent",
+  "onbDietTitle": "Des régimes alimentaires ?",
+  "chooseAllThatApply": "Choisis toutes les options qui s'appliquent",
   "optionNone": "Aucun",
   "dietVegetarian": "Végétarien",
   "dietVegan": "Végan",
   "dietPescatarian": "Pescétarien",
-
-  "onbAllergiesTitle": "des allergies ?",
+  "onbAllergiesTitle": "Des allergies ?",
   "allergyGlutenFree": "Sans gluten",
   "allergyLactoseFree": "Sans lactose",
   "allergyNutFree": "Sans fruits à coque",
@@ -134,23 +117,20 @@
   "allergyShellfishFree": "Sans crustacés",
   "allergySesameFree": "Sans sésame",
   "allergySoyFree": "Sans soja",
-
-  "onbProteinsTitle": "qu'est-ce que tu aimes ?",
-  "onbProteinsHint": "choisis les protéines que tu apprécies",
+  "onbProteinsTitle": "Qu'est-ce que tu aimes ?",
+  "onbProteinsHint": "Choisis les protéines que tu apprécies",
   "proteinBeef": "Bœuf",
   "proteinPork": "Porc",
   "proteinChicken": "Poulet",
   "proteinFish": "Poisson",
-
-  "onbAppliancesTitle": "quels appareils tu as ?",
-  "onbAppliancesHint": "choisis au moins un pour planifier",
+  "onbAppliancesTitle": "Quels appareils tu as ?",
+  "onbAppliancesHint": "Choisis au moins un pour planifier",
   "applianceMicrowave": "Micro-ondes",
   "applianceHob": "Plaques",
   "applianceOven": "Four",
   "applianceAirFryer": "Friteuse à air chaud",
-
-  "onbTestimonialTitle": "plébiscité par les cooks du quotidien",
-  "onbTestimonialSubtitle": "des vraies personnes, de vrais progrès chaque semaine",
+  "onbTestimonialTitle": "Déjà 500 000 personnes ne s'en passent plus",
+  "onbTestimonialSubtitle": "Des vraies personnes, de vrais progrès chaque semaine",
   "reviewOneName": "Nicolas",
   "reviewOneTitle": "Nourrir trois avec un petit budget",
   "reviewOneBody": "Les recettes ne sont pas fancy mais rassasiantes. On dépense moins chaque semaine.",
@@ -160,41 +140,59 @@
   "reviewThreeName": "Thomas",
   "reviewThreeTitle": "De vrais progrès chaque semaine",
   "reviewThreeBody": "Simple après quelques réglages, sans conditions ni surprises.",
-
   "ratingTitle": "Enjoying Tably?",
   "ratingSubtitle": "Tap a star to rate it on the\nApp Store.",
   "ratingNotNow": "Not Now",
-
   "generatingTitle": "{name}, on prépare ta semaine",
-  "@generatingTitle": { "placeholders": { "name": { "type": "String" } } },
-  "generatingTaskMatch": "accord des repas avec ton magasin et ton budget",
-  "generatingTaskOrganise": "organisation des dîners de la semaine",
-  "generatingTaskShopping": "création de ta liste de courses",
-  "generatingTapToContinue": "appuie pour continuer",
-  "generatingReady": "ton plan est prêt",
-
+  "@generatingTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "generatingTaskMatch": "Accord des repas avec ton magasin et ton budget",
+  "generatingTaskOrganise": "Organisation des dîners de la semaine",
+  "generatingTaskShopping": "Création de ta liste de courses",
+  "generatingTapToContinue": "Appuie pour continuer",
+  "generatingReady": "Ton plan est prêt",
   "defaultChefName": "Chef",
-
   "plannedFor": "prévu pour {store}",
-  "@plannedFor": { "placeholders": { "store": { "type": "String" } } },
+  "@plannedFor": {
+    "placeholders": {
+      "store": {
+        "type": "String"
+      }
+    }
+  },
   "estimatedCost": "COÛT EST.",
   "tapToView": "APPUYER POUR VOIR",
   "shoppingList": "Liste de courses",
   "shoppingBoughtCount": "{done}/{total} achetés",
-  "@shoppingBoughtCount": { "placeholders": { "done": { "type": "int" }, "total": { "type": "int" } } },
+  "@shoppingBoughtCount": {
+    "placeholders": {
+      "done": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
   "shoppingDoneCount": "{done}/{total} faits",
-  "@shoppingDoneCount": { "placeholders": { "done": { "type": "int" }, "total": { "type": "int" } } },
+  "@shoppingDoneCount": {
+    "placeholders": {
+      "done": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
   "regeneratePlan": "régénérer le plan",
-
-  "exploreEyebrow": "RECETTES",
-  "exploreTitle": "explorer",
   "exploreSearchPlaceholder": "Rechercher des repas",
-  "exploreCravings": "Tes envies",
-  "exploreSeeLess": "Voir moins",
-  "exploreSeeMore": "Voir plus",
-  "exploreByCuisine": "Explorer par cuisine",
   "exploreRecent": "Consultés récemment",
-
   "addRecipeTitle": "Ajouter une recette",
   "addRecipeImportSocial": "Importer des réseaux",
   "addRecipeImportSocialSub": "Depuis Instagram, TikTok ou Facebook",
@@ -204,15 +202,23 @@
   "addRecipeText": "Importer du texte",
   "addRecipeLink": "Importer un lien",
   "addRecipeScratch": "Écrire de zéro",
-
   "recipeMacros": "MACROS · PAR PORTION",
   "macroKcal": "kcal",
   "macroProtein": "Protéines",
   "macroCarbs": "Glucides",
   "macroFat": "Lipides",
   "recipeNotesLabel": "NOTES DE RECETTE",
-  "recipeCookTimeAndServings": "Temps de cuisson: {time}   |   Portions: {servings}",
-  "@recipeCookTimeAndServings": { "placeholders": { "time": { "type": "String" }, "servings": { "type": "int" } } },
+  "recipeCookTimeAndServings": "Temps de cuisson: {time}  |  Portions: {servings}",
+  "@recipeCookTimeAndServings": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      },
+      "servings": {
+        "type": "int"
+      }
+    }
+  },
   "recipeMarkCooked": "Marquer comme cuisiné",
   "recipeTabIngredients": "Ingrédients",
   "recipeTabPreparation": "Préparation",
@@ -220,16 +226,19 @@
   "recipeYourNotes": "Tes notes",
   "recipeNotePlaceholder": "Ajoute une note à cette recette...",
   "recipeAddToWeek": "Ajouter au menu de la semaine",
-
   "shoppingEyebrow": "CETTE SEMAINE",
   "shoppingCopyList": "Copier la liste",
   "shoppingShare": "Partager",
   "shoppingAddItems": "Ajouter des courses",
   "shoppingNeeded": "({amount} nécessaire)",
-  "@shoppingNeeded": { "placeholders": { "amount": { "type": "String" } } },
-
-  "prefsEyebrow": "TON PLAN",
-  "prefsTitle": "préférence",
+  "@shoppingNeeded": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "prefsTitle": "Préférences",
   "prefsCountry": "Pays",
   "prefsStore": "Supermarché",
   "prefsHousehold": "Taille du foyer",
@@ -238,28 +247,42 @@
   "prefsCookingDaysSub": "Quels jours veux-tu des repas planifiés ?",
   "prefsBudget": "Budget hebdomadaire",
   "prefsBudgetForDays": " pour {count} jours",
-  "@prefsBudgetForDays": { "placeholders": { "count": { "type": "int" } } },
+  "@prefsBudgetForDays": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "prefsCravings": "Envie du moment",
-  "prefsChooseUpToThree": "Choisis jusqu'à 3",
   "prefsDiet": "Régimes alimentaires",
-  "prefsChooseAllThatApply": "Choisis toutes les options qui s'appliquent",
   "prefsAllergens": "Allergènes",
   "prefsProteins": "Préférences",
   "prefsProteinsSub": "On orientera ton plan vers les protéines que tu choisis",
   "prefsAppliances": "Appareils de cuisine",
   "prefsAppliancesSub": "Choisis au moins un pour planifier",
-
-  "accountEyebrow": "TON COMPTE",
-  "accountTitle": "compte",
+  "accountTitle": "Compte",
   "accountSignInApple": "Se connecter avec Apple",
   "accountSignInSub": "Connecte-toi pour enregistrer tes\npréférences dans le cloud.",
   "accountFamilyPlan": "Formule famille",
   "accountFamilyPlanSub": "Partage l'accès à ton compte.",
   "accountInvite": "Inviter amis et famille",
-  "accountGreeting": "Salut, {name}",
-  "@accountGreeting": { "placeholders": { "name": { "type": "String" } } },
+  "accountGreeting": "Salut, {name} ✎",
+  "@accountGreeting": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
   "accountShoppingAt": "Courses chez {store}",
-  "@accountShoppingAt": { "placeholders": { "store": { "type": "String" } } },
+  "@accountShoppingAt": {
+    "placeholders": {
+      "store": {
+        "type": "String"
+      }
+    }
+  },
   "accountActive": "Actif",
   "accountSectionApp": "APP",
   "accountRateTably": "Noter Tably",
@@ -282,12 +305,10 @@
   "accountSectionAccount": "COMPTE",
   "accountDelete": "Supprimer mon compte",
   "accountSignOut": "Se déconnecter",
-
-  "tabMenu": "menu",
+  "tabMenu": "Semaine",
   "tabRecipes": "Recettes",
   "tabPreferences": "Préférence",
-  "tabAccount": "compte",
-
+  "tabAccount": "Compte",
   "dayMonday": "Lundi",
   "dayTuesday": "Mardi",
   "dayWednesday": "Mercredi",
@@ -302,11 +323,233 @@
   "dayShortFriday": "V",
   "dayShortSaturday": "S",
   "dayShortSunday": "D",
-
-  "errorGeneric": "Une erreur est survenue. Réessaie.",
-  "errorLoadPlan": "Impossible de charger ton plan.",
   "errorSavePreferences": "Impossible d'enregistrer tes préférences.",
   "errorGeneratePlan": "Impossible de générer ton plan.",
   "errorSignIn": "Connexion impossible. Réessaie.",
-  "errorShoppingUpdate": "Impossible de mettre à jour ta liste."
+  "errorShoppingUpdate": "Impossible de mettre à jour ta liste.",
+  "blockerSaving": "J'essaye de faire des économies",
+  "onbInfoMoneyEyebrow": "AVEC TABLY, ON ÉCONOMISE EN MOYENNE",
+  "onbInfoMoneyPerWeek": "par semaine",
+  "onbPlanStartTitle": "On attaque ton plan de la semaine",
+  "onbPlanStartSubtitle": "Quelques questions sur ta cuisine et ton budget, et ton plan est prêt.",
+  "onbMealsTitle": "Combien de repas par jour ?",
+  "onbMealsSubtitle": "On réutilise certains plats en restes pour t'éviter de cuisiner tous les jours",
+  "mealsPerDayOption": "{count, plural, =1{1 repas par jour} other{{count} repas par jour}}",
+  "@mealsPerDayOption": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "mealsPerDayDinnerOnly": "Dîner seulement",
+  "mealsPerDayLunchDinner": "Déjeuner + dîner",
+  "mealsPerDayAll": "Matin, midi et soir",
+  "planSummarySingle": "Un plat différent chaque soir — {slots} repas, {recipes} recettes à cuisiner.",
+  "@planSummarySingle": {
+    "placeholders": {
+      "slots": {
+        "type": "int"
+      },
+      "recipes": {
+        "type": "int"
+      }
+    }
+  },
+  "planSummaryReuse": "{slots} repas prévus, seulement {recipes} recettes à cuisiner : chaque plat est prévu pour deux services.",
+  "@planSummaryReuse": {
+    "placeholders": {
+      "slots": {
+        "type": "int"
+      },
+      "recipes": {
+        "type": "int"
+      }
+    }
+  },
+  "slotBreakfast": "Petit-déjeuner",
+  "slotLunch": "Déjeuner",
+  "slotDinner": "Dîner",
+  "switchEyebrow": "BONNE NOUVELLE",
+  "switchTitlePrefix": "Tes recettes coûteraient ",
+  "switchTitleHighlight": "{percent} % moins cher",
+  "@switchTitleHighlight": {
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "switchTitleSuffix": " chez {store}",
+  "@switchTitleSuffix": {
+    "placeholders": {
+      "store": {
+        "type": "String"
+      }
+    }
+  },
+  "switchSubtitle": "D'après ton profil et ton panier de la semaine. Tu peux changer maintenant ou garder {store}.",
+  "@switchSubtitle": {
+    "placeholders": {
+      "store": {
+        "type": "String"
+      }
+    }
+  },
+  "switchAccept": "Passer à {store}",
+  "@switchAccept": {
+    "placeholders": {
+      "store": {
+        "type": "String"
+      }
+    }
+  },
+  "switchDecline": "Garder {store}",
+  "@switchDecline": {
+    "placeholders": {
+      "store": {
+        "type": "String"
+      }
+    }
+  },
+  "budgetSavings": "{amount} d'économie 🎉",
+  "@budgetSavings": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "planCounts": "{slots} repas · {recipes} recettes à cuisiner",
+  "@planCounts": {
+    "placeholders": {
+      "slots": {
+        "type": "int"
+      },
+      "recipes": {
+        "type": "int"
+      }
+    }
+  },
+  "leftoverBadge": "♻ Reste",
+  "regeneratingPlan": "nouveau plan en cours…",
+  "storesTitle": "Supermarché",
+  "storesSubtitle": "Prix estimé de ton plan cette semaine",
+  "storesCurrent": "Ton magasin actuel",
+  "storesCheaper": "{amount} de moins que {store}",
+  "@storesCheaper": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      },
+      "store": {
+        "type": "String"
+      }
+    }
+  },
+  "storesPricier": "{amount} de plus",
+  "@storesPricier": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "storesCurrentTag": "ACTUEL",
+  "storesFootnote": "Les prix sont estimés à partir des {count} recettes de ta semaine et des relevés en magasin.",
+  "@storesFootnote": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "recipesTitle": "Recettes",
+  "searchResultCount": "{count, plural, =1{1 résultat} other{{count} résultats}}",
+  "@searchResultCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "searchEmpty": "Aucun repas ne correspond à « {query} ».\nEssaie un ingrédient ou un type de plat.",
+  "@searchEmpty": {
+    "placeholders": {
+      "query": {
+        "type": "String"
+      }
+    }
+  },
+  "recipesAll": "Recettes",
+  "filtersEmpty": "Aucune recette ne correspond à ces filtres.",
+  "filtersTitle": "Filtres",
+  "filtersReset": "Réinitialiser",
+  "filtersCravings": "Tes envies",
+  "filtersCuisine": "Cuisine type",
+  "filtersProtein": "Préférence",
+  "filtersProteinSub": "Le type de viande ou de protéine que tu veux voir",
+  "filtersPrice": "Prix par portion",
+  "filtersPriceRange": "{min} – {max}",
+  "@filtersPriceRange": {
+    "placeholders": {
+      "min": {
+        "type": "String"
+      },
+      "max": {
+        "type": "String"
+      }
+    }
+  },
+  "filtersPriceAll": "Toutes les recettes",
+  "filtersPriceUpTo": "Recettes jusqu'à {amount} par portion",
+  "@filtersPriceUpTo": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "filtersApply": "Voir les recettes",
+  "proteinTofu": "Tofu",
+  "cuisineItalian": "Italienne",
+  "cuisineItalianDesc": "Pasta • Risotto • Gnocchi",
+  "cuisineAsian": "Asiatique",
+  "cuisineAsianDesc": "Nouilles • Curry • Sauté",
+  "cuisineMexican": "Mexicaine",
+  "cuisineMexicanDesc": "Tacos • Burritos • Fajitas",
+  "cuisineIndian": "Indienne",
+  "cuisineIndianDesc": "Curry • Tikka • Tandoori",
+  "cuisineMediterranean": "Méditerranéenne",
+  "cuisineMediterraneanDesc": "Gyros • Halloumi • Falafel",
+  "favouritesTitle": "Favoris",
+  "favouritesCount": "{count, plural, =1{1 recette enregistrée} other{{count} recettes enregistrées}}",
+  "@favouritesCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "favouritesEmpty": "Aucun favori pour l'instant.\nAppuie sur le cœur d'une recette pour l'enregistrer.",
+  "replaceTitle": "Remplacer par",
+  "replaceSubtitleSlot": "Choisis le plat qui remplace celui de {day}",
+  "@replaceSubtitleSlot": {
+    "placeholders": {
+      "day": {
+        "type": "String"
+      }
+    }
+  },
+  "replaceSubtitleWeek": "Choisis le plat qui prend sa place dans la semaine",
+  "replaceAll": "Toutes",
+  "replaceFavourites": "Favoris",
+  "replaceEmptyFavourites": "Aucun favori pour l'instant.",
+  "replaceEmptySearch": "Aucun repas ne correspond à cette recherche.",
+  "recipeCreatedBy": "RECETTE DE",
+  "recipeReplaceMeal": "Remplacer ce repas",
+  "prefsMealsPerDay": "Repas par jour",
+  "prefsMealsPerDaySub": "Les plats sont réutilisés en restes pour limiter le nombre de recettes",
+  "mockCostShort": "COÛT EST.",
+  "mockTapShort": "APPUYER"
 }

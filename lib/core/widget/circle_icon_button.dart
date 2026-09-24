@@ -8,7 +8,8 @@ import '../util/haptics.dart';
 class CircleIconButton extends StatelessWidget {
   const CircleIconButton({
     super.key,
-    required this.glyph,
+    this.glyph = '',
+    this.icon,
     required this.onPressed,
     this.size,
     this.fontSize,
@@ -19,6 +20,9 @@ class CircleIconButton extends StatelessWidget {
 
   /// A single character or emoji — the design draws glyphs, not icon fonts.
   final String glyph;
+
+  /// Drawn instead of [glyph] when set, e.g. a [LineIcon].
+  final Widget? icon;
   final VoidCallback? onPressed;
   final double? size;
   final double? fontSize;
@@ -45,10 +49,11 @@ class CircleIconButton extends StatelessWidget {
           shape: BoxShape.circle,
           border: showBorder ? Border.all(color: AppColors.border) : null,
         ),
-        child: Text(
-          glyph,
-          style: TextStyle(fontSize: fontSize?.sp ?? 17.sp, color: foreground, height: 1),
-        ),
+        child: icon ??
+            Text(
+              glyph,
+              style: TextStyle(fontSize: fontSize?.sp ?? 17.sp, color: foreground, height: 1),
+            ),
       ),
     );
   }

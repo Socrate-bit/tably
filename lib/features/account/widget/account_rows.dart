@@ -42,7 +42,7 @@ class AppleSignInButton extends StatelessWidget {
             : Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text('', style: TextStyle(fontSize: 18.sp, color: AppColors.surface)),
+                  Text('', style: AppTextStyles.emojiIcon.copyWith(fontSize: 18.sp, color: AppColors.surface)),
                   SizedBox(width: 9.w),
                   Text(
                     AppL10n.of(context).accountSignInApple,
@@ -79,7 +79,7 @@ class FamilyPlanCard extends StatelessWidget {
                   color: AppColors.brandChip,
                   shape: BoxShape.circle,
                 ),
-                child: Text('👨‍👩‍👧', style: TextStyle(fontSize: 18.sp)),
+                child: Text('👨‍👩‍👧', style: AppTextStyles.emojiIcon.copyWith(fontSize: 18.sp)),
               ),
               SizedBox(width: 13.w),
               Expanded(
@@ -146,7 +146,7 @@ class ProfileSummaryCard extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
-                  '${l10n.accountGreeting(name)} ✎',
+                  l10n.accountGreeting(name),
                   style: AppTextStyles.sheetTitle.copyWith(fontSize: 18.sp),
                 ),
                 SizedBox(height: 2.h),
@@ -158,21 +158,27 @@ class ProfileSummaryCard extends StatelessWidget {
             ),
           ),
           SizedBox(width: 12.w),
-          Container(
-            padding: EdgeInsets.symmetric(horizontal: 13.w, vertical: 5.h),
-            decoration: BoxDecoration(
-              color: AppColors.brandChip,
-              borderRadius: BorderRadius.circular(20.r),
-            ),
-            child: Text(
-              l10n.accountActive,
-              style: AppTextStyles.chip.copyWith(
-                color: AppColors.brandDarker,
-                fontWeight: FontWeight.w800,
-              ),
-            ),
-          ),
+          const ActivePill(compact: true),
         ],
+      ),
+    );
+  }
+}
+
+/// The "Actif" subscription pill.
+class ActivePill extends StatelessWidget {
+  const ActivePill({super.key, this.compact = false});
+
+  final bool compact;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: (compact ? 13 : 14).w, vertical: (compact ? 5 : 6).h),
+      decoration: BoxDecoration(color: AppColors.brandChip, borderRadius: BorderRadius.circular(20.r)),
+      child: Text(
+        AppL10n.of(context).accountActive,
+        style: AppTextStyles.chip.copyWith(color: AppColors.brandDarker, fontWeight: FontWeight.w800, letterSpacing: 0),
       ),
     );
   }
@@ -283,7 +289,7 @@ class _Row extends StatelessWidget {
                 },
               )
             else if (row.arrow)
-              Text('›', style: TextStyle(color: AppColors.chevron, fontSize: 18.sp)),
+              Text('›', style: AppTextStyles.emojiIcon.copyWith(color: AppColors.chevron, fontSize: 18.sp)),
           ],
         ),
       ),

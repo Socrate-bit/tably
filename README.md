@@ -38,18 +38,22 @@ firebase deploy --only firestore:rules --project tably-9f3c2
 ### Data model
 
 ```
-users/{uid}                     profile: name, household, days, budget,
-                                country, store, cravings, diets, allergies,
-                                proteins, appliances, survey answers
-users/{uid}/plan/{day}          one PlannedMeal per cooking day
+users/{uid}                     profile: name, household, meals per day, days,
+                                budget, country, store, cravings, diets,
+                                allergies, proteins, appliances, survey answers
+users/{uid}/plan/week           plan settings: shuffle seed + swapped meals
 users/{uid}/shopping/{itemId}   ShoppingItem with its checked state
 users/{uid}/recipeState/{id}    favourite, cooked, rating, note, viewedAt
-recipes/{recipeId}              shared catalogue (seeded on first launch)
-cuisines/{cuisineId}            explore-screen cuisine tiles
 ```
 
-Every one of these is consumed as a Firestore stream, so a change made on one
-device shows up on another without a refresh.
+The week itself is never stored. `WeekPlanner` derives it from the profile
+(cooking days, meals per day) and the plan settings, so changing a preference
+reflows the menu instantly and every device shows the same week. It reproduces
+the design prototype's algorithm exactly — `test/week_planner_test.dart` checks
+45 configurations against fixtures generated from the prototype itself.
+
+The recipe catalogue ships inside the app (`RecipeCatalogue`); no shared
+collection is readable or writable by clients.
 
 ## Architecture
 
@@ -69,8 +73,9 @@ lib/
     analytics/              PostHog wrapper + event names
   features/
     onboarding/             24-step flow, rating prompt, generating screen
-    plan/                   menu tab, plan generator, weekly plan
-    recipe/                 explore tab, recipe detail, catalogue
+    plan/                   week tab, week planner, supermarket comparison
+    recipe/                 recipes tab, filters, favourites, recipe detail,
+                            replace sheet, catalogue
     shopping/               shopping list
     preferences/            preferences tab, UserProfile
     account/                account tab, auth
@@ -84,7 +89,8 @@ lib/
   widgets only render and dispatch.
 - **Equality**: every model and state extends `Equatable`.
 - **Reactivity**: Firestore streams drive the UI; edits are optimistic and roll
-  back on failure (see `ShoppingCubit.toggle`, `RecipeCubit._save`).
+  back on failure (see `ShoppingCubit.toggle`, `RecipeCubit._save`,
+  `PlanCubit._apply`).
 - **Theme**: no colour or text style is written inline — everything comes from
   `core/theme/`.
 - **Localisation**: all UI copy is in `l10n/`. Persisted values are stable ids

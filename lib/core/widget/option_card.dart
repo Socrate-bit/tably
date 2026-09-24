@@ -17,6 +17,7 @@ class OptionCard extends StatelessWidget {
     this.icon,
     this.chip,
     this.serif = false,
+    this.logoAsset,
   });
 
   final String label;
@@ -28,6 +29,9 @@ class OptionCard extends StatelessWidget {
   /// Trailing pill, used for currency codes.
   final String? chip;
   final bool serif;
+
+  /// A store logo shown instead of the label on tiles.
+  final String? logoAsset;
 
   @override
   Widget build(BuildContext context) {
@@ -78,7 +82,7 @@ class OptionCard extends StatelessWidget {
   Widget get _rowContent => Row(
         children: [
           if (icon != null) ...[
-            Text(icon!, style: TextStyle(fontSize: 26.sp, height: 1)),
+            Text(icon!, style: AppTextStyles.emojiIcon.copyWith(fontSize: 26.sp)),
             SizedBox(width: 18.w),
           ],
           Expanded(
@@ -92,11 +96,9 @@ class OptionCard extends StatelessWidget {
       );
 
   Widget get _tileContent => Center(
-        child: Text(
-          label,
-          textAlign: TextAlign.center,
-          style: AppTextStyles.optionGrid,
-        ),
+        child: logoAsset != null
+            ? Image.asset(logoAsset!, fit: BoxFit.contain, semanticLabel: label)
+            : Text(label, textAlign: TextAlign.center, style: AppTextStyles.optionGrid),
       );
 
   Widget get _gridContent => Column(
@@ -104,7 +106,7 @@ class OptionCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           if (icon != null) ...[
-            Text(icon!, style: TextStyle(fontSize: 26.sp, height: 1)),
+            Text(icon!, style: AppTextStyles.emojiIcon.copyWith(fontSize: 26.sp)),
             SizedBox(height: 11.h),
           ],
           Text(label, textAlign: TextAlign.center, style: AppTextStyles.optionGrid),

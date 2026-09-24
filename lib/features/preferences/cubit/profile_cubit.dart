@@ -6,7 +6,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../core/analytics/analytics_service.dart';
 import '../../../core/model/preference_option.dart';
+import '../../../core/model/store.dart';
 import '../../../core/model/weekday.dart';
+import '../../../core/util/selection.dart';
 import '../model/user_profile.dart';
 import '../service/profile_service.dart';
 
@@ -72,23 +74,27 @@ class ProfileCubit extends Cubit<ProfileState> {
 
   Future<void> setName(String name) => _update(state.profile.copyWith(name: name), changed: 'name');
 
-  Future<void> setHousehold(int household) =>
-      _update(state.profile.copyWith(household: household.clamp(1, 12)), changed: 'household');
+  Future<void> setHousehold(int household) => _update(
+        state.profile.copyWith(household: household.clamp(UserProfile.minHousehold, UserProfile.maxHousehold)),
+        changed: 'household',
+      );
 
   Future<void> incrementHousehold() => setHousehold(state.profile.household + 1);
 
   Future<void> decrementHousehold() => setHousehold(state.profile.household - 1);
 
-  Future<void> toggleDay(Weekday day) {
-    final days = Set<Weekday>.from(state.profile.days);
-    days.contains(day) ? days.remove(day) : days.add(day);
-    return _update(state.profile.copyWith(days: days), changed: 'days');
-  }
+  Future<void> toggleDay(Weekday day) =>
+      _update(state.profile.copyWith(days: Selection.toggle(state.profile.days, day)), changed: 'days');
+
+  Future<void> setMealsPerDay(int mealsPerDay) => _update(
+        state.profile.copyWith(mealsPerDay: mealsPerDay.clamp(1, UserProfile.maxMealsPerDay)),
+        changed: 'mealsPerDay',
+      );
 
   Future<void> setBudget(double budget) =>
       _update(state.profile.copyWith(budget: budget), changed: 'budget');
 
-  Future<void> setStore(String store) =>
+  Future<void> setStore(Store store) =>
       _update(state.profile.copyWith(store: store), changed: 'store');
 
   Future<void> setCountry(Country country) =>
@@ -100,55 +106,30 @@ class ProfileCubit extends Cubit<ProfileState> {
   Future<void> setWeeklyReminder(bool enabled) =>
       _update(state.profile.copyWith(weeklyReminder: enabled), changed: 'weeklyReminder');
 
-  /// Cravings cap at three, matching the design's "choisis jusqu'à 3".
-  Future<void> toggleCraving(Craving craving) {
-    final next = _toggleCapped(state.profile.cravings, craving, max: 3);
-    return _update(state.profile.copyWith(cravings: next), changed: 'cravings');
-  }
+  /// Cravings cap at three, matching the design's "Choisis jusqu'à 3".
+  Future<void> toggleCraving(Craving craving) => _update(
+        state.profile.copyWith(cravings: Selection.toggleCapped(state.profile.cravings, craving, max: 3)),
+        changed: 'cravings',
+      );
 
   Future<void> toggleDiet(Diet diet) => _update(
-        state.profile.copyWith(diets: _toggleWithNone(state.profile.diets, diet, Diet.none)),
+        state.profile.copyWith(diets: Selection.toggleWithNone(state.profile.diets, diet, Diet.none)),
         changed: 'diets',
       );
 
   Future<void> toggleAllergy(Allergy allergy) => _update(
-        state.profile.copyWith(
-          allergies: _toggleWithNone(state.profile.allergies, allergy, Allergy.none),
-        ),
+        state.profile.copyWith(allergies: Selection.toggleWithNone(state.profile.allergies, allergy, Allergy.none)),
         changed: 'allergies',
       );
 
   Future<void> toggleProtein(Protein protein) =>
-      _update(state.profile.copyWith(proteins: _toggle(state.profile.proteins, protein)), changed: 'proteins');
+      _update(state.profile.copyWith(proteins: Selection.toggle(state.profile.proteins, protein)), changed: 'proteins');
 
-  /// Appliances must keep at least one selected — the planner needs somewhere to cook.
-  Future<void> toggleAppliance(Appliance appliance) {
-    final next = _toggle(state.profile.appliances, appliance);
-    if (next.isEmpty) return Future.value();
-    return _update(state.profile.copyWith(appliances: next), changed: 'appliances');
-  }
-
-  Set<T> _toggle<T>(Set<T> current, T value) {
-    final next = Set<T>.from(current);
-    next.contains(value) ? next.remove(value) : next.add(value);
-    return next;
-  }
-
-  /// Adds up to [max] entries; selecting beyond the cap is ignored.
-  Set<T> _toggleCapped<T>(Set<T> current, T value, {required int max}) {
-    if (current.contains(value)) return _toggle(current, value);
-    if (current.length >= max) return current;
-    return _toggle(current, value);
-  }
-
-  /// "None" is exclusive: picking it clears the rest, and clearing everything
-  /// falls back to it.
-  Set<T> _toggleWithNone<T>(Set<T> current, T value, T none) {
-    if (value == none) return {none};
-    final next = Set<T>.from(current)..remove(none);
-    next.contains(value) ? next.remove(value) : next.add(value);
-    return next.isEmpty ? {none} : next;
-  }
+  /// At least one appliance stays selected — the planner needs somewhere to cook.
+  Future<void> toggleAppliance(Appliance appliance) => _update(
+        state.profile.copyWith(appliances: Selection.toggleKeepOne(state.profile.appliances, appliance)),
+        changed: 'appliances',
+      );
 
   void errorShown() => emit(state.copyWith(clearError: true));
 

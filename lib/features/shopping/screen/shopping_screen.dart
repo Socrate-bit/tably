@@ -7,8 +7,8 @@ import '../../../core/theme/app_theme.dart';
 import '../../../core/util/error_feedback.dart';
 import '../../../core/util/haptics.dart';
 import '../../../core/widget/check_circle.dart';
-import '../../../core/widget/circle_icon_button.dart';
 import '../../../core/widget/primary_button.dart';
+import '../../../core/widget/sub_screen_header.dart';
 import '../../../core/widget/surface_card.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../preferences/cubit/profile_cubit.dart';
@@ -18,6 +18,9 @@ import '../model/shopping_item.dart';
 /// The full shopping list, grouped by aisle. Ticking an item is optimistic.
 class ShoppingScreen extends StatelessWidget {
   const ShoppingScreen({super.key});
+
+  static Future<void> open(BuildContext context) =>
+      Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const ShoppingScreen()));
 
   @override
   Widget build(BuildContext context) {
@@ -41,14 +44,18 @@ class ShoppingScreen extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    _Header(onBack: () => Navigator.of(context).pop()),
-                    SizedBox(height: 14.h),
-                    Center(
-                      child: _StorePill(
-                        store: store,
-                        checked: state.checkedCount,
-                        total: state.total,
-                      ),
+                    SubScreenHeader(
+                      eyebrow: l10n.shoppingEyebrow,
+                      title: l10n.shoppingList,
+                      onBack: () => Navigator.of(context).pop(),
+                    ),
+                    SizedBox(height: 18.h),
+                    Row(
+                      children: [
+                        _Pill(text: store.displayName, tinted: true),
+                        SizedBox(width: 10.w),
+                        _Pill(text: l10n.shoppingDoneCount(state.checkedCount, state.total)),
+                      ],
                     ),
                     SizedBox(height: 16.h),
                     Row(
@@ -98,84 +105,30 @@ class ShoppingScreen extends StatelessWidget {
   }
 }
 
-class _Header extends StatelessWidget {
-  const _Header({required this.onBack});
+/// A rounded label: the store (tinted) or the done count (outlined).
+class _Pill extends StatelessWidget {
+  const _Pill({required this.text, this.tinted = false});
 
-  final VoidCallback onBack;
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = AppL10n.of(context);
-    return Row(
-      children: [
-        CircleIconButton(glyph: '←', onPressed: onBack),
-        Expanded(
-          child: Padding(
-            // Balances the back button so the title stays optically centred.
-            padding: EdgeInsets.only(right: 42.w),
-            child: Column(
-              children: [
-                Text(l10n.shoppingEyebrow, style: AppTextStyles.eyebrow.copyWith(letterSpacing: 1.8.sp)),
-                SizedBox(height: 2.h),
-                Text(
-                  l10n.shoppingList,
-                  style: AppTextStyles.screenTitle.copyWith(fontSize: 29.sp),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-/// "Lidl · 4/34 faits"
-class _StorePill extends StatelessWidget {
-  const _StorePill({required this.store, required this.checked, required this.total});
-
-  final String store;
-  final int checked;
-  final int total;
+  final String text;
+  final bool tinted;
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.fromLTRB(16.w, 8.h, 8.w, 8.h),
+      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
       decoration: BoxDecoration(
-        color: AppColors.surface,
-        border: Border.all(color: AppColors.border),
-        borderRadius: BorderRadius.circular(26.r),
+        color: tinted ? AppColors.brandSoft : AppColors.surface,
+        border: tinted ? null : Border.all(color: AppColors.border),
+        borderRadius: BorderRadius.circular(22.r),
       ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(store, style: AppTextStyles.meta.copyWith(
-            fontWeight: FontWeight.w800,
-            color: AppColors.ink,
-          )),
-          SizedBox(width: 10.w),
-          Container(
-            padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 5.h),
-            decoration: BoxDecoration(
-              color: AppColors.info,
-              borderRadius: BorderRadius.circular(20.r),
-            ),
-            child: Text(
-              AppL10n.of(context).shoppingDoneCount(checked, total),
-              style: AppTextStyles.meta.copyWith(
-                fontWeight: FontWeight.w700,
-                color: AppColors.infoInk,
-              ),
-            ),
-          ),
-        ],
+      child: Text(
+        text,
+        style: AppTextStyles.storePill.copyWith(color: tinted ? AppColors.brandDark : AppColors.ink),
       ),
     );
   }
 }
 
-/// One aisle: a label above a card of rows.
 class _CategorySection extends StatelessWidget {
   const _CategorySection({required this.category});
 
@@ -226,7 +179,7 @@ class _ItemRow extends StatelessWidget {
         ),
         child: Row(
           children: [
-            Text(item.icon, style: TextStyle(fontSize: 22.sp)),
+            Text(item.icon, style: AppTextStyles.emojiIcon.copyWith(fontSize: 22.sp)),
             SizedBox(width: 14.w),
             Expanded(
               child: Column(

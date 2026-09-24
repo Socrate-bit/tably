@@ -3,15 +3,20 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../../core/model/preference_option.dart';
+import '../../../core/model/store.dart';
 import '../../../core/model/weekday.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/util/error_feedback.dart';
 import '../../../core/util/haptics.dart';
 import '../../../core/util/option_labels.dart';
+import '../../../core/widget/app_slider.dart';
+import '../../../core/widget/household_stepper.dart';
+import '../../../core/widget/store_pill.dart';
 import '../../../core/widget/surface_card.dart';
 import '../../../l10n/app_localizations.dart';
+import '../../home/cubit/home_cubit.dart';
 import '../../onboarding/cubit/onboarding_cubit.dart';
-import '../../onboarding/widget/steps/simple_steps.dart';
+import '../../plan/widget/meals_per_day_options.dart';
 import '../cubit/profile_cubit.dart';
 import '../widget/preference_grid.dart';
 
@@ -34,20 +39,20 @@ class PreferencesScreen extends StatelessWidget {
         builder: (context, state) {
           final cubit = context.read<ProfileCubit>();
           final profile = state.profile;
+          void openStores() => context.read<HomeCubit>().open(HomeSub.stores);
 
           return SingleChildScrollView(
             padding: EdgeInsets.fromLTRB(20.w, 8.h, 20.w, 12.h),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Text(l10n.prefsEyebrow, textAlign: TextAlign.center, style: AppTextStyles.eyebrow),
-                SizedBox(height: 4.h),
-                Text(
-                  l10n.prefsTitle,
-                  textAlign: TextAlign.center,
-                  style: AppTextStyles.screenTitle,
+                Row(
+                  children: [
+                    Expanded(child: Text(l10n.prefsTitle, style: AppTextStyles.tabTitle)),
+                    StorePill(store: profile.store, onTap: openStores),
+                  ],
                 ),
-                SizedBox(height: 26.h),
+                SizedBox(height: 16.h),
 
                 PreferenceSectionHeader(title: l10n.prefsCountry),
                 SizedBox(height: 10.h),
@@ -56,7 +61,7 @@ class PreferencesScreen extends StatelessWidget {
 
                 PreferenceSectionHeader(title: l10n.prefsStore),
                 SizedBox(height: 10.h),
-                _StoreRow(store: profile.store, onSelected: cubit.setStore),
+                _StoreRow(store: profile.store, onTap: openStores),
                 SizedBox(height: 26.h),
 
                 PreferenceSectionHeader(
@@ -64,10 +69,23 @@ class PreferencesScreen extends StatelessWidget {
                   subtitle: l10n.prefsHouseholdSub,
                 ),
                 SizedBox(height: 14.h),
-                _HouseholdStepper(
+                HouseholdStepper(
+                  compact: true,
                   count: profile.household,
                   onIncrement: cubit.incrementHousehold,
                   onDecrement: cubit.decrementHousehold,
+                ),
+                SizedBox(height: 28.h),
+
+                PreferenceSectionHeader(
+                  title: l10n.prefsMealsPerDay,
+                  subtitle: l10n.prefsMealsPerDaySub,
+                ),
+                SizedBox(height: 14.h),
+                MealsPerDayOptions(
+                  selected: profile.mealsPerDay,
+                  spacing: 10.h,
+                  onSelected: cubit.setMealsPerDay,
                 ),
                 SizedBox(height: 28.h),
 
@@ -87,19 +105,29 @@ class PreferencesScreen extends StatelessWidget {
                   days: profile.daysCount,
                 ),
                 SizedBox(height: 4.h),
-                BudgetSlider(
-                  budget: profile.budget,
-                  minBudget: OnboardingCubit.minBudget,
-                  maxBudget: OnboardingCubit.maxBudget,
-                  country: profile.country,
-                  onChanged: cubit.setBudget,
-                  labelStyle: AppTextStyles.caption.copyWith(color: AppColors.textQuaternary),
+                Row(
+                  children: [
+                    Expanded(
+                      child: AppSlider(
+                        value: profile.budget,
+                        min: OnboardingCubit.minBudget,
+                        max: OnboardingCubit.maxBudget,
+                        step: 0.5,
+                        onChanged: cubit.setBudget,
+                      ),
+                    ),
+                    SizedBox(width: 13.w),
+                    Text(
+                      formatMoney(profile.country, OnboardingCubit.maxBudget),
+                      style: AppTextStyles.caption.copyWith(color: AppColors.textQuaternary),
+                    ),
+                  ],
                 ),
                 SizedBox(height: 28.h),
 
                 PreferenceSectionHeader(
                   title: l10n.prefsCravings,
-                  subtitle: l10n.prefsChooseUpToThree,
+                  subtitle: l10n.chooseUpToThree,
                 ),
                 SizedBox(height: 14.h),
                 PreferenceGrid<Craving>(
@@ -113,7 +141,7 @@ class PreferencesScreen extends StatelessWidget {
 
                 PreferenceSectionHeader(
                   title: l10n.prefsDiet,
-                  subtitle: l10n.prefsChooseAllThatApply,
+                  subtitle: l10n.chooseAllThatApply,
                 ),
                 SizedBox(height: 14.h),
                 PreferenceGrid<Diet>(
@@ -127,7 +155,7 @@ class PreferencesScreen extends StatelessWidget {
 
                 PreferenceSectionHeader(
                   title: l10n.prefsAllergens,
-                  subtitle: l10n.prefsChooseAllThatApply,
+                  subtitle: l10n.chooseAllThatApply,
                 ),
                 SizedBox(height: 14.h),
                 PreferenceGrid<Allergy>(
@@ -188,7 +216,7 @@ class _CountryRow extends StatelessWidget {
       padding: EdgeInsets.symmetric(horizontal: 18.w, vertical: 16.h),
       child: Row(
         children: [
-          Text(country.flag, style: TextStyle(fontSize: 23.sp)),
+          Text(country.flag, style: AppTextStyles.emojiIcon.copyWith(fontSize: 23.sp)),
           SizedBox(width: 14.w),
           Expanded(child: Text(l10n.optionLabel(country.id), style: AppTextStyles.listItemTitle)),
           Container(
@@ -203,152 +231,39 @@ class _CountryRow extends StatelessWidget {
             ),
           ),
           SizedBox(width: 8.w),
-          Text('⌄', style: TextStyle(color: AppColors.chevron, fontSize: 15.sp)),
+          Text('⌄', style: AppTextStyles.emojiIcon.copyWith(color: AppColors.chevron, fontSize: 15.sp)),
         ],
       ),
     );
   }
 }
 
-/// Tapping opens a sheet listing every supported supermarket.
+/// The current store; tapping opens the price comparison to switch.
 class _StoreRow extends StatelessWidget {
-  const _StoreRow({required this.store, required this.onSelected});
+  const _StoreRow({required this.store, required this.onTap});
 
-  final String store;
-  final ValueChanged<String> onSelected;
+  final Store store;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
     return SurfaceCard(
       radius: 20.r,
       padding: EdgeInsets.symmetric(horizontal: 18.w, vertical: 16.h),
-      onTap: () => _pickStore(context),
+      onTap: onTap,
       child: Row(
         children: [
           Container(
             width: 30.r,
             height: 30.r,
             alignment: Alignment.center,
-            decoration: BoxDecoration(
-              color: AppColors.fill,
-              borderRadius: BorderRadius.circular(8.r),
-            ),
-            child: Text('🛒', style: TextStyle(fontSize: 14.sp)),
+            decoration: BoxDecoration(color: AppColors.fill, borderRadius: BorderRadius.circular(8.r)),
+            child: Text('🛒', style: AppTextStyles.emojiIcon.copyWith(fontSize: 14.sp)),
           ),
           SizedBox(width: 14.w),
-          Expanded(child: Text(store, style: AppTextStyles.listItemTitle)),
-          Text('⌄', style: TextStyle(color: AppColors.chevron, fontSize: 15.sp)),
+          Expanded(child: Text(store.displayName, style: AppTextStyles.listItemTitle)),
+          Text('⌄', style: AppTextStyles.emojiIcon.copyWith(color: AppColors.chevron, fontSize: 15.sp)),
         ],
-      ),
-    );
-  }
-
-  Future<void> _pickStore(BuildContext context) async {
-    final selection = await showModalBottomSheet<String>(
-      context: context,
-      backgroundColor: Colors.transparent,
-      barrierColor: AppColors.scrim,
-      builder: (sheetContext) => Container(
-        padding: EdgeInsets.fromLTRB(18.w, 20.h, 18.w, 20.h),
-        decoration: BoxDecoration(
-          color: AppColors.surface,
-          borderRadius: BorderRadius.vertical(top: Radius.circular(30.r)),
-        ),
-        child: SafeArea(
-          top: false,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              for (final option in Stores.all)
-                Padding(
-                  padding: EdgeInsets.only(bottom: 10.h),
-                  child: SurfaceCard(
-                    radius: 18.r,
-                    borderColor: option == store ? AppColors.brand : AppColors.border,
-                    padding: EdgeInsets.symmetric(horizontal: 18.w, vertical: 15.h),
-                    onTap: () => Navigator.of(sheetContext).pop(option),
-                    child: Text(option, style: AppTextStyles.listItemTitle),
-                  ),
-                ),
-            ],
-          ),
-        ),
-      ),
-    );
-    if (selection != null) onSelected(selection);
-  }
-}
-
-/// Compact +/− stepper for the household size.
-class _HouseholdStepper extends StatelessWidget {
-  const _HouseholdStepper({
-    required this.count,
-    required this.onIncrement,
-    required this.onDecrement,
-  });
-
-  final int count;
-  final VoidCallback onIncrement;
-  final VoidCallback onDecrement;
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = AppL10n.of(context);
-    return Column(
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            _RoundButton(glyph: '−', enabled: count > 1, onTap: onDecrement),
-            SizedBox(width: 30.w),
-            SizedBox(
-              width: 44.w,
-              child: Text('$count', textAlign: TextAlign.center, style: AppTextStyles.numeralSmall),
-            ),
-            SizedBox(width: 30.w),
-            _RoundButton(glyph: '+', enabled: true, onTap: onIncrement),
-          ],
-        ),
-        SizedBox(height: 8.h),
-        Text(
-          l10n.peopleCount(count),
-          style: AppTextStyles.caption.copyWith(color: AppColors.textQuaternary),
-        ),
-      ],
-    );
-  }
-}
-
-class _RoundButton extends StatelessWidget {
-  const _RoundButton({required this.glyph, required this.enabled, required this.onTap});
-
-  final String glyph;
-  final bool enabled;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: enabled
-          ? () {
-              Haptics.toggle();
-              onTap();
-            }
-          : null,
-      child: Container(
-        width: 46.r,
-        height: 46.r,
-        alignment: Alignment.center,
-        decoration: const BoxDecoration(color: AppColors.fill, shape: BoxShape.circle),
-        child: Text(
-          glyph,
-          style: TextStyle(
-            fontSize: 22.sp,
-            height: 1,
-            color: enabled ? AppColors.inkStrong : AppColors.chevron,
-          ),
-        ),
       ),
     );
   }

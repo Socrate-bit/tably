@@ -21,29 +21,20 @@ class ProgressBar extends StatelessWidget {
       child: Container(
         height: 7.h,
         color: trackColor ?? AppColors.track,
-        child: Align(
-          alignment: Alignment.centerLeft,
-          child: LayoutBuilder(
-            builder: (context, constraints) {
-              final width = constraints.maxWidth * value.clamp(0.0, 1.0);
-              final bar = Container(
-                width: width,
-                decoration: BoxDecoration(
-                  color: AppColors.brand,
-                  borderRadius: BorderRadius.circular(7.r),
-                ),
-              );
-              if (!animate) return bar;
-              return AnimatedContainer(
-                duration: const Duration(milliseconds: 600),
-                curve: Curves.easeOut,
-                width: width,
-                decoration: BoxDecoration(
-                  color: AppColors.brand,
-                  borderRadius: BorderRadius.circular(7.r),
-                ),
-              );
-            },
+        // Fractional sizing (not LayoutBuilder) so parents can measure intrinsics.
+        child: TweenAnimationBuilder<double>(
+          tween: Tween(end: value.clamp(0.0, 1.0)),
+          duration: animate ? const Duration(milliseconds: 600) : Duration.zero,
+          curve: Curves.easeOut,
+          builder: (context, fraction, _) => FractionallySizedBox(
+            alignment: Alignment.centerLeft,
+            widthFactor: fraction,
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                color: AppColors.brand,
+                borderRadius: BorderRadius.circular(7.r),
+              ),
+            ),
           ),
         ),
       ),

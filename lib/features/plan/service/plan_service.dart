@@ -1,64 +1,32 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 
-import '../../../core/model/weekday.dart';
-import '../model/planned_meal.dart';
+import '../model/plan_settings.dart';
 
-/// Reads and writes the weekly plan at `users/{uid}/plan/{day}`.
+/// Reads and writes the user's plan settings at `users/{uid}/plan/week`.
 class PlanService {
-  PlanService({FirebaseFirestore? firestore})
-      : _db = firestore ?? FirebaseFirestore.instance;
+  PlanService({FirebaseFirestore? firestore}) : _firestore = firestore;
 
-  final FirebaseFirestore _db;
+  final FirebaseFirestore? _firestore;
 
-  CollectionReference<Map<String, dynamic>> _col(String uid) =>
-      _db.collection('users').doc(uid).collection('plan');
+  /// Resolved on first use, so the service can be built before Firebase is.
+  FirebaseFirestore get _db => _firestore ?? FirebaseFirestore.instance;
 
-  /// Live plan, ordered by day of week.
-  Stream<List<PlannedMeal>> watch(String uid) => _col(uid).snapshots().map((snap) {
-        final meals = snap.docs.map((d) => PlannedMeal.fromMap(d.data())).toList();
-        meals.sort((a, b) => a.day.index.compareTo(b.day.index));
-        return meals;
-      }).handleError((Object e) {
-        debugPrint('[PlanService] watch failed: $e');
+  DocumentReference<Map<String, dynamic>> _doc(String uid) =>
+      _db.collection('users').doc(uid).collection('plan').doc('week');
+
+  /// Live settings; a user who never regenerated or swapped gets the defaults.
+  Stream<PlanSettings> watch(String uid) => _doc(uid).snapshots().map((snap) {
+        final data = snap.data();
+        return data == null ? const PlanSettings() : PlanSettings.fromMap(data);
       });
 
-  /// Replaces the whole week atomically so the UI never shows a half-written plan.
-  Future<void> replaceWeek(String uid, List<PlannedMeal> meals) async {
+  Future<void> save(String uid, PlanSettings settings) async {
     try {
-      final col = _col(uid);
-      final existing = await col.get();
-      final batch = _db.batch();
-      for (final doc in existing.docs) {
-        batch.delete(doc.reference);
-      }
-      for (final meal in meals) {
-        batch.set(col.doc(meal.day.id), meal.toMap());
-      }
-      await batch.commit();
-      debugPrint('[PlanService] wrote ${meals.length} meals for $uid');
+      await _doc(uid).set(settings.toMap());
+      debugPrint('[PlanService] saved plan (seed ${settings.seed}, ${settings.overrides.length} swaps)');
     } catch (e) {
-      debugPrint('[PlanService] replaceWeek failed: $e');
-      rethrow;
-    }
-  }
-
-  /// Swaps a single day's dinner.
-  Future<void> setMeal(String uid, PlannedMeal meal) async {
-    try {
-      await _col(uid).doc(meal.day.id).set(meal.toMap());
-      debugPrint('[PlanService] set meal for ${meal.day.id}');
-    } catch (e) {
-      debugPrint('[PlanService] setMeal failed: $e');
-      rethrow;
-    }
-  }
-
-  Future<void> removeDay(String uid, Weekday day) async {
-    try {
-      await _col(uid).doc(day.id).delete();
-    } catch (e) {
-      debugPrint('[PlanService] removeDay failed: $e');
+      debugPrint('[PlanService] save failed: $e');
       rethrow;
     }
   }

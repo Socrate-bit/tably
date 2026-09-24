@@ -5,41 +5,53 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../core/analytics/analytics_service.dart';
-import '../../preferences/model/user_profile.dart';
-import '../../recipe/model/recipe.dart';
-import '../../recipe/service/recipe_catalogue.dart';
-import '../../shopping/service/shopping_catalogue.dart';
-import '../../shopping/service/shopping_service.dart';
-import '../model/planned_meal.dart';
-import '../service/plan_generator.dart';
+import '../../preferences/cubit/profile_cubit.dart';
+import '../model/plan_settings.dart';
+import '../model/week_plan.dart';
 import '../service/plan_service.dart';
+import '../service/week_planner.dart';
 
 part 'plan_state.dart';
 
-/// Owns the weekly plan: streams it from Firestore and regenerates it on demand.
+/// Owns the week. Recomputes it whenever the profile (days, meals per day) or
+/// the plan settings (seed, swaps) change, so the menu is always current.
 class PlanCubit extends Cubit<PlanState> {
   PlanCubit({
-    required PlanService planService,
-    required ShoppingService shoppingService,
+    required PlanService service,
+    required ProfileCubit profileCubit,
     required AnalyticsService analytics,
-  })  : _plans = planService,
-        _shopping = shoppingService,
+  })  : _service = service,
+        _profileCubit = profileCubit,
         _analytics = analytics,
-        super(const PlanState());
+        super(const PlanState()) {
+    _profileSubscription = profileCubit.stream
+        .map((s) => s.profile)
+        .distinct()
+        .listen((_) => emit(state.copyWith(week: _build(state.settings))));
+  }
 
-  final PlanService _plans;
-  final ShoppingService _shopping;
+  /// How long the regenerate icon spins before the new week appears.
+  static const regenerateDelay = Duration(milliseconds: 700);
+
+  final PlanService _service;
+  final ProfileCubit _profileCubit;
   final AnalyticsService _analytics;
-  StreamSubscription<List<PlannedMeal>>? _subscription;
+  late final StreamSubscription<Object?> _profileSubscription;
+  StreamSubscription<PlanSettings>? _settingsSubscription;
   String? _uid;
 
   void bind(String uid) {
     if (_uid == uid) return;
     _uid = uid;
-    _subscription?.cancel();
+    _settingsSubscription?.cancel();
     emit(state.copyWith(status: PlanStatus.loading, clearError: true));
-    _subscription = _plans.watch(uid).listen(
-      (meals) => emit(state.copyWith(status: PlanStatus.ready, meals: meals, clearError: true)),
+    _settingsSubscription = _service.watch(uid).listen(
+      (settings) => emit(state.copyWith(
+        status: PlanStatus.ready,
+        settings: settings,
+        week: _build(settings),
+        clearError: true,
+      )),
       onError: (Object e) {
         debugPrint('[PlanCubit] stream error: $e');
         emit(state.copyWith(status: PlanStatus.failed, error: e));
@@ -47,42 +59,62 @@ class PlanCubit extends Cubit<PlanState> {
     );
   }
 
-  /// Builds a fresh week plus its shopping list and writes both.
-  Future<void> generate({
-    required UserProfile profile,
-    List<Recipe>? catalogue,
-    bool isRegeneration = false,
-  }) async {
+  /// Reshuffles the week and drops every swap, after a short spin.
+  Future<void> regenerate() async {
+    if (state.regenerating) return;
+    emit(state.copyWith(regenerating: true, clearError: true));
+    await Future<void>.delayed(regenerateDelay);
+    if (isClosed) return;
+    await _apply(PlanSettings(seed: state.settings.seed + 1));
+    emit(state.copyWith(regenerating: false));
+    unawaited(_analytics.capture(AnalyticsEvents.planRegenerated, properties: {'seed': state.settings.seed}));
+  }
+
+  /// Swaps the meal in [slotKey] for [recipeId].
+  Future<void> replace(String slotKey, String recipeId) async {
+    await _apply(state.settings.copyWith(overrides: {...state.settings.overrides, slotKey: recipeId}));
+    unawaited(_analytics.capture(
+      AnalyticsEvents.mealReplaced,
+      properties: {'slot': slotKey, 'recipe_id': recipeId},
+    ));
+  }
+
+  /// Puts [recipeId] in place of [replacedRecipeId] wherever that dish is
+  /// cooked this week; its leftovers follow.
+  Future<void> replaceRecipe(String replacedRecipeId, String recipeId) async {
+    final keys = state.week.slots
+        .where((s) => !s.isLeftover && s.recipe.id == replacedRecipeId)
+        .map((s) => s.key);
+    await _apply(state.settings.copyWith(overrides: {
+      ...state.settings.overrides,
+      for (final key in keys) key: recipeId,
+    }));
+    unawaited(_analytics.capture(AnalyticsEvents.mealReplaced, properties: {'recipe_id': recipeId}));
+  }
+
+  /// Shows the change immediately, persists it, and rolls back on failure.
+  Future<void> _apply(PlanSettings next) async {
+    final previous = state.settings;
+    emit(state.copyWith(settings: next, week: _build(next)));
     final uid = _uid;
     if (uid == null) return;
-
-    emit(state.copyWith(generating: true, clearError: true));
     try {
-      final meals = PlanGenerator.generate(
-        profile: profile,
-        catalogue: catalogue ?? RecipeCatalogue.recipes,
-      );
-      // Show the new week straight away, then persist it.
-      emit(state.copyWith(meals: meals, status: PlanStatus.ready));
-      await _plans.replaceWeek(uid, meals);
-      await _shopping.replaceList(uid, ShoppingCatalogue.buildList());
-      emit(state.copyWith(generating: false));
-      unawaited(_analytics.capture(
-        isRegeneration ? AnalyticsEvents.planRegenerated : AnalyticsEvents.planGenerated,
-        properties: {'meals': meals.length, 'household': profile.household},
-      ));
-      debugPrint('[PlanCubit] generated ${meals.length} meals');
+      await _service.save(uid, next);
     } catch (e) {
-      debugPrint('[PlanCubit] generate failed: $e');
-      emit(state.copyWith(generating: false, error: e));
+      debugPrint('[PlanCubit] save failed: $e');
+      emit(state.copyWith(settings: previous, week: _build(previous), regenerating: false, error: e));
     }
   }
+
+  WeekPlan _build(PlanSettings settings) =>
+      WeekPlanner.build(profile: _profileCubit.state.profile, settings: settings);
 
   void errorShown() => emit(state.copyWith(clearError: true));
 
   @override
   Future<void> close() {
-    _subscription?.cancel();
+    _profileSubscription.cancel();
+    _settingsSubscription?.cancel();
     return super.close();
   }
 }

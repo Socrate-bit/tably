@@ -1,11 +1,8 @@
-import 'dart:async';
-
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:posthog_flutter/posthog_flutter.dart';
 
 import 'app.dart';
-import 'features/recipe/service/recipe_service.dart';
 import 'firebase_options.dart';
 
 /// PostHog project credentials. Override at build time:
@@ -27,9 +24,6 @@ Future<void> main() async {
   }
 
   await _initAnalytics();
-
-  // Publish the bundled recipes once so every client reads the same catalogue.
-  unawaited(RecipeService().seedCatalogueIfEmpty());
 
   runApp(const TablyApp());
 }
