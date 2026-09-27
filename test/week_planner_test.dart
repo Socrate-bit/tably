@@ -1,7 +1,9 @@
 import 'dart:convert';
 import 'dart:io';
+import 'dart:math';
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:tably/core/model/preference_option.dart';
 import 'package:tably/core/model/store.dart';
 import 'package:tably/core/model/weekday.dart';
 import 'package:tably/features/plan/model/plan_settings.dart';
@@ -10,8 +12,9 @@ import 'package:tably/features/plan/service/week_planner.dart';
 import 'package:tably/features/preferences/model/user_profile.dart';
 import 'package:tably/features/recipe/service/recipe_catalogue.dart';
 
-UserProfile _profile(int mealsPerDay, List<int> dayIndexes) => UserProfile(
+UserProfile _profile(int mealsPerDay, List<int> dayIndexes, {Variety variety = Variety.high}) => UserProfile(
       mealsPerDay: mealsPerDay,
+      variety: variety,
       days: {for (final i in dayIndexes) Weekday.values[i]},
     );
 
@@ -20,8 +23,10 @@ void main() {
   // so this proves the port produces the exact weeks the design shows.
   final cases = jsonDecode(File('test/fixtures/design_plans.json').readAsStringSync()) as List;
 
-  test('matches the design for ${cases.length} seed/meals/day combinations', () {
-    for (final c in cases.cast<Map<String, dynamic>>()) {
+  test('matches the design for ${cases.length} one-meal-a-day combinations', () {
+    // Only one meal a day with a new dish each night still follows the design;
+    // leftovers are now planned from the chosen recipe count.
+    for (final c in cases.cast<Map<String, dynamic>>().where((c) => c['perDay'] == 1)) {
       final mealsPerDay = c['perDay'] as int;
       final plan = WeekPlanner.build(
         profile: _profile(mealsPerDay, (c['mask'] as List).cast<int>()),
@@ -42,8 +47,26 @@ void main() {
     }
   });
 
+  test('the recipe count is exactly what the variety level promises', () {
+    for (final (variety, recipes) in [(Variety.high, 14), (Variety.balanced, 7), (Variety.low, 4)]) {
+      final plan = WeekPlanner.build(
+        profile: _profile(2, [0, 1, 2, 3, 4, 5, 6], variety: variety),
+        settings: const PlanSettings(),
+      );
+      expect(plan.slotCount, 14);
+      // Every chosen dish is cooked; past the catalogue's size some come back.
+      expect(plan.slots.where((s) => !s.isLeftover).length, recipes);
+      expect(plan.recipeCount, min(recipes, RecipeCatalogue.recipes.length));
+    }
+  });
+
+  test('one meal a day offers 7, 4 and 2 recipes', () {
+    int recipes(Variety v) => _profile(1, [0, 1, 2, 3, 4, 5, 6], variety: v).recipesToCook;
+    expect([recipes(Variety.high), recipes(Variety.balanced), recipes(Variety.low)], [7, 4, 2]);
+  });
+
   test('a swapped meal carries through to its leftover', () {
-    final profile = _profile(2, [0, 1, 2, 3, 4, 5, 6]);
+    final profile = _profile(2, [0, 1, 2, 3, 4, 5, 6], variety: Variety.balanced);
     final base = WeekPlanner.build(profile: profile, settings: const PlanSettings());
     final mondayLunch = base.slotByKey('monday|lunch')!;
     final other = RecipeCatalogue.recipes.firstWhere((r) => r.id != mondayLunch.recipe.id);
@@ -54,14 +77,14 @@ void main() {
     );
 
     expect(swapped.slotByKey('monday|lunch')!.recipe, other);
-    final tuesdayLunch = swapped.slotByKey('tuesday|lunch')!;
-    expect(tuesdayLunch.isLeftover, isTrue);
-    expect(tuesdayLunch.recipe, other, reason: 'the leftover must be what was cooked');
+    final mondayDinner = swapped.slotByKey('monday|dinner')!;
+    expect(mondayDinner.isLeftover, isTrue);
+    expect(mondayDinner.recipe, other, reason: 'the leftover must be what was cooked');
   });
 
   test('leftovers are free and counted once in the recipe total', () {
     final plan = WeekPlanner.build(
-      profile: _profile(2, [0, 1, 2, 3, 4, 5, 6]),
+      profile: _profile(2, [0, 1, 2, 3, 4, 5, 6], variety: Variety.balanced),
       settings: const PlanSettings(),
     );
     final cooked = plan.slots.where((s) => !s.isLeftover);

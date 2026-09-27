@@ -1,7 +1,7 @@
 {
   "@@locale": "fr",
   "appName": "Tably",
-  "tagline": "Planifie tes dîners selon ton budget,\ntes envies et ce qu'il y a dans ta cuisine",
+  "tagline": "Planifie tes repas selon ton budget,\ntes envies et ce qu'il y a dans ta cuisine",
   "actionContinue": "Continuer",
   "actionStart": "Commencer →",
   "actionGeneratePlan": "Générer le plan",
@@ -81,8 +81,8 @@
       }
     }
   },
-  "onbBudgetTitle": "Quel est ton budget hebdo ?",
-  "onbBudgetSubtitle": "Choisis ce que tu veux dépenser ces jours-là",
+  "onbBudgetTitle": "Quel est ton budget hebdo habituel ?",
+  "onbBudgetSubtitle": "Combien tu veux dépenser cette semaine ?",
   "thisWeek": "cette semaine",
   "onbInfoMoneySubtitle": "Sur les courses chaque semaine, en optimisant tes repas et comparant les prix en magasin",
   "onbInfoMoneyFooter": "Soit {amount} par an !",
@@ -109,6 +109,7 @@
   "dietVegetarian": "Végétarien",
   "dietVegan": "Végan",
   "dietPescatarian": "Pescétarien",
+  "dietHalal": "Halal",
   "onbAllergiesTitle": "Des allergies ?",
   "allergyGlutenFree": "Sans gluten",
   "allergyLactoseFree": "Sans lactose",
@@ -130,16 +131,16 @@
   "applianceOven": "Four",
   "applianceAirFryer": "Friteuse à air chaud",
   "onbTestimonialTitle": "Déjà 500 000 personnes ne s'en passent plus",
-  "onbTestimonialSubtitle": "Des vraies personnes, de vrais progrès chaque semaine",
+  "onbTestimonialSubtitle": "Moins de charge mentale, moins de gaspillage, plus de bons repas",
   "reviewOneName": "Nicolas",
-  "reviewOneTitle": "Nourrir trois avec un petit budget",
-  "reviewOneBody": "Les recettes ne sont pas fancy mais rassasiantes. On dépense moins chaque semaine.",
+  "reviewOneTitle": "Toute la famille à table, sans exploser le budget",
+  "reviewOneBody": "Des plats généreux que les enfants finissent, et un ticket de caisse qui baisse chaque semaine. Je ne fais plus mes courses sans Tably.",
   "reviewTwoName": "Léa",
-  "reviewTwoTitle": "Dîners rapides après le travail",
-  "reviewTwoBody": "La plupart des repas prennent moins d'une demi-heure. C'est pour ça que je reste.",
+  "reviewTwoTitle": "Le dîner prêt avant d'avoir faim",
+  "reviewTwoBody": "En rentrant du boulot, je sais déjà quoi cuisiner. 30 minutes max, et c'est délicieux. Mes soirées sont enfin reposantes.",
   "reviewThreeName": "Thomas",
-  "reviewThreeTitle": "De vrais progrès chaque semaine",
-  "reviewThreeBody": "Simple après quelques réglages, sans conditions ni surprises.",
+  "reviewThreeTitle": "Fini le « on mange quoi ce soir ? »",
+  "reviewThreeBody": "Mon menu de la semaine et ma liste de courses sont prêts en un clic. Je n'y pense plus, et je mange mieux qu'avant.",
   "ratingTitle": "Enjoying Tably?",
   "ratingSubtitle": "Tap a star to rate it on the\nApp Store.",
   "ratingNotNow": "Not Now",
@@ -154,7 +155,6 @@
   "generatingTaskMatch": "Accord des repas avec ton magasin et ton budget",
   "generatingTaskOrganise": "Organisation des dîners de la semaine",
   "generatingTaskShopping": "Création de ta liste de courses",
-  "generatingTapToContinue": "Appuie pour continuer",
   "generatingReady": "Ton plan est prêt",
   "defaultChefName": "Chef",
   "plannedFor": "prévu pour {store}",
@@ -333,7 +333,7 @@
   "onbPlanStartTitle": "On attaque ton plan de la semaine",
   "onbPlanStartSubtitle": "Quelques questions sur ta cuisine et ton budget, et ton plan est prêt.",
   "onbMealsTitle": "Combien de repas par jour ?",
-  "onbMealsSubtitle": "On réutilise certains plats en restes pour t'éviter de cuisiner tous les jours",
+  "onbMealsSubtitle": "On adapte ton plan à ton rythme",
   "mealsPerDayOption": "{count, plural, =1{1 repas par jour} other{{count} repas par jour}}",
   "@mealsPerDayOption": {
     "placeholders": {
@@ -344,30 +344,23 @@
   },
   "mealsPerDayDinnerOnly": "Dîner seulement",
   "mealsPerDayLunchDinner": "Déjeuner + dîner",
-  "mealsPerDayAll": "Matin, midi et soir",
-  "planSummarySingle": "Un plat différent chaque soir — {slots} repas, {recipes} recettes à cuisiner.",
-  "@planSummarySingle": {
+  "onbDiversityTitle": "Combien de variété ?",
+  "onbDiversitySubtitle": "On réutilise certains plats en restes pour t'éviter de cuisiner tous les jours",
+  "diversityAllDifferent": "On cuisine à chaque repas",
+  "varietyHigh": "Un max de variété",
+  "varietyBalanced": "Équilibré",
+  "varietyLow": "Batch cooking",
+  "diversityDetailReuse": "Seulement {recipes} recettes à cuisiner pour {slots} repas",
+  "@diversityDetailReuse": {
     "placeholders": {
-      "slots": {
+      "recipes": {
         "type": "int"
       },
-      "recipes": {
+      "slots": {
         "type": "int"
       }
     }
   },
-  "planSummaryReuse": "{slots} repas prévus, seulement {recipes} recettes à cuisiner : chaque plat est prévu pour deux services.",
-  "@planSummaryReuse": {
-    "placeholders": {
-      "slots": {
-        "type": "int"
-      },
-      "recipes": {
-        "type": "int"
-      }
-    }
-  },
-  "slotBreakfast": "Petit-déjeuner",
   "slotLunch": "Déjeuner",
   "slotDinner": "Dîner",
   "switchEyebrow": "BONNE NOUVELLE",

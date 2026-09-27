@@ -106,7 +106,7 @@ abstract class AppL10n {
   /// No description provided for @tagline.
   ///
   /// In fr, this message translates to:
-  /// **'Planifie tes dîners selon ton budget,\ntes envies et ce qu\'il y a dans ta cuisine'**
+  /// **'Planifie tes repas selon ton budget,\ntes envies et ce qu\'il y a dans ta cuisine'**
   String get tagline;
 
   /// No description provided for @actionContinue.
@@ -502,13 +502,13 @@ abstract class AppL10n {
   /// No description provided for @onbBudgetTitle.
   ///
   /// In fr, this message translates to:
-  /// **'Quel est ton budget hebdo ?'**
+  /// **'Quel est ton budget hebdo habituel ?'**
   String get onbBudgetTitle;
 
   /// No description provided for @onbBudgetSubtitle.
   ///
   /// In fr, this message translates to:
-  /// **'Choisis ce que tu veux dépenser ces jours-là'**
+  /// **'Combien tu veux dépenser cette semaine ?'**
   String get onbBudgetSubtitle;
 
   /// No description provided for @thisWeek.
@@ -624,6 +624,12 @@ abstract class AppL10n {
   /// In fr, this message translates to:
   /// **'Pescétarien'**
   String get dietPescatarian;
+
+  /// No description provided for @dietHalal.
+  ///
+  /// In fr, this message translates to:
+  /// **'Halal'**
+  String get dietHalal;
 
   /// No description provided for @onbAllergiesTitle.
   ///
@@ -754,7 +760,7 @@ abstract class AppL10n {
   /// No description provided for @onbTestimonialSubtitle.
   ///
   /// In fr, this message translates to:
-  /// **'Des vraies personnes, de vrais progrès chaque semaine'**
+  /// **'Moins de charge mentale, moins de gaspillage, plus de bons repas'**
   String get onbTestimonialSubtitle;
 
   /// No description provided for @reviewOneName.
@@ -766,13 +772,13 @@ abstract class AppL10n {
   /// No description provided for @reviewOneTitle.
   ///
   /// In fr, this message translates to:
-  /// **'Nourrir trois avec un petit budget'**
+  /// **'Toute la famille à table, sans exploser le budget'**
   String get reviewOneTitle;
 
   /// No description provided for @reviewOneBody.
   ///
   /// In fr, this message translates to:
-  /// **'Les recettes ne sont pas fancy mais rassasiantes. On dépense moins chaque semaine.'**
+  /// **'Des plats généreux que les enfants finissent, et un ticket de caisse qui baisse chaque semaine. Je ne fais plus mes courses sans Tably.'**
   String get reviewOneBody;
 
   /// No description provided for @reviewTwoName.
@@ -784,13 +790,13 @@ abstract class AppL10n {
   /// No description provided for @reviewTwoTitle.
   ///
   /// In fr, this message translates to:
-  /// **'Dîners rapides après le travail'**
+  /// **'Le dîner prêt avant d\'avoir faim'**
   String get reviewTwoTitle;
 
   /// No description provided for @reviewTwoBody.
   ///
   /// In fr, this message translates to:
-  /// **'La plupart des repas prennent moins d\'une demi-heure. C\'est pour ça que je reste.'**
+  /// **'En rentrant du boulot, je sais déjà quoi cuisiner. 30 minutes max, et c\'est délicieux. Mes soirées sont enfin reposantes.'**
   String get reviewTwoBody;
 
   /// No description provided for @reviewThreeName.
@@ -802,13 +808,13 @@ abstract class AppL10n {
   /// No description provided for @reviewThreeTitle.
   ///
   /// In fr, this message translates to:
-  /// **'De vrais progrès chaque semaine'**
+  /// **'Fini le « on mange quoi ce soir ? »'**
   String get reviewThreeTitle;
 
   /// No description provided for @reviewThreeBody.
   ///
   /// In fr, this message translates to:
-  /// **'Simple après quelques réglages, sans conditions ni surprises.'**
+  /// **'Mon menu de la semaine et ma liste de courses sont prêts en un clic. Je n\'y pense plus, et je mange mieux qu\'avant.'**
   String get reviewThreeBody;
 
   /// No description provided for @ratingTitle.
@@ -852,12 +858,6 @@ abstract class AppL10n {
   /// In fr, this message translates to:
   /// **'Création de ta liste de courses'**
   String get generatingTaskShopping;
-
-  /// No description provided for @generatingTapToContinue.
-  ///
-  /// In fr, this message translates to:
-  /// **'Appuie pour continuer'**
-  String get generatingTapToContinue;
 
   /// No description provided for @generatingReady.
   ///
@@ -1540,7 +1540,7 @@ abstract class AppL10n {
   /// No description provided for @onbMealsSubtitle.
   ///
   /// In fr, this message translates to:
-  /// **'On réutilise certains plats en restes pour t\'éviter de cuisiner tous les jours'**
+  /// **'On adapte ton plan à ton rythme'**
   String get onbMealsSubtitle;
 
   /// No description provided for @mealsPerDayOption.
@@ -1561,29 +1561,47 @@ abstract class AppL10n {
   /// **'Déjeuner + dîner'**
   String get mealsPerDayLunchDinner;
 
-  /// No description provided for @mealsPerDayAll.
+  /// No description provided for @onbDiversityTitle.
   ///
   /// In fr, this message translates to:
-  /// **'Matin, midi et soir'**
-  String get mealsPerDayAll;
+  /// **'Combien de variété ?'**
+  String get onbDiversityTitle;
 
-  /// No description provided for @planSummarySingle.
+  /// No description provided for @onbDiversitySubtitle.
   ///
   /// In fr, this message translates to:
-  /// **'Un plat différent chaque soir — {slots} repas, {recipes} recettes à cuisiner.'**
-  String planSummarySingle(int slots, int recipes);
+  /// **'On réutilise certains plats en restes pour t\'éviter de cuisiner tous les jours'**
+  String get onbDiversitySubtitle;
 
-  /// No description provided for @planSummaryReuse.
+  /// No description provided for @diversityAllDifferent.
   ///
   /// In fr, this message translates to:
-  /// **'{slots} repas prévus, seulement {recipes} recettes à cuisiner : chaque plat est prévu pour deux services.'**
-  String planSummaryReuse(int slots, int recipes);
+  /// **'On cuisine à chaque repas'**
+  String get diversityAllDifferent;
 
-  /// No description provided for @slotBreakfast.
+  /// No description provided for @varietyHigh.
   ///
   /// In fr, this message translates to:
-  /// **'Petit-déjeuner'**
-  String get slotBreakfast;
+  /// **'Un max de variété'**
+  String get varietyHigh;
+
+  /// No description provided for @varietyBalanced.
+  ///
+  /// In fr, this message translates to:
+  /// **'Équilibré'**
+  String get varietyBalanced;
+
+  /// No description provided for @varietyLow.
+  ///
+  /// In fr, this message translates to:
+  /// **'Batch cooking'**
+  String get varietyLow;
+
+  /// No description provided for @diversityDetailReuse.
+  ///
+  /// In fr, this message translates to:
+  /// **'Seulement {recipes} recettes à cuisiner pour {slots} repas'**
+  String diversityDetailReuse(int recipes, int slots);
 
   /// No description provided for @slotLunch.
   ///

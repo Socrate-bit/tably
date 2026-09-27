@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:tably/core/model/preference_option.dart';
 import 'package:tably/core/analytics/analytics_service.dart';
 import 'package:tably/features/plan/cubit/plan_cubit.dart';
 import 'package:tably/features/plan/service/plan_service.dart';
@@ -22,7 +23,7 @@ void main() {
   }
 
   test('replacing a slot changes only that meal and its leftover', () async {
-    final plan = await build(const UserProfile(mealsPerDay: 2));
+    final plan = await build(const UserProfile(mealsPerDay: 2, variety: Variety.balanced));
     final before = plan.state.week;
     final lunch = before.slotByKey('monday|lunch')!;
     final other = RecipeCatalogue.recipes.firstWhere((r) => before.slots.every((s) => s.recipe.id != r.id));
@@ -31,13 +32,13 @@ void main() {
 
     final after = plan.state.week;
     expect(after.slotByKey('monday|lunch')!.recipe, other);
-    expect(after.slotByKey('tuesday|lunch')!.recipe, other, reason: 'leftover follows the swap');
-    expect(after.slotByKey('monday|dinner'), before.slotByKey('monday|dinner'));
+    expect(after.slotByKey('monday|dinner')!.recipe, other, reason: 'leftover follows the swap');
+    expect(after.slotByKey('tuesday|lunch'), before.slotByKey('tuesday|lunch'));
     expect(lunch.recipe, isNot(other));
   });
 
   test('adding a recipe to the week takes the place of a chosen dish everywhere', () async {
-    final plan = await build(const UserProfile(mealsPerDay: 3));
+    final plan = await build(const UserProfile(mealsPerDay: 2, variety: Variety.balanced));
     final week = plan.state.week;
     final replaced = week.slots.firstWhere((s) => !s.isLeftover).recipe;
     final incoming = RecipeCatalogue.recipes.firstWhere((r) => r.id != replaced.id);

@@ -12,6 +12,7 @@ class UserProfile extends Equatable {
     this.name = '',
     this.household = 1,
     this.mealsPerDay = 1,
+    this.variety = Variety.high,
     this.days = const {
       Weekday.monday,
       Weekday.tuesday,
@@ -42,12 +43,13 @@ class UserProfile extends Equatable {
   static const minHousehold = 1;
   static const maxHousehold = 12;
 
-  /// Meals planned per cooking day: dinner, then lunch, then breakfast.
-  static const maxMealsPerDay = 3;
+  /// Meals planned per cooking day: dinner, then lunch.
+  static const maxMealsPerDay = 2;
 
   final String name;
   final int household;
   final int mealsPerDay;
+  final Variety variety;
   final Set<Weekday> days;
   final double budget;
   final Country country;
@@ -73,6 +75,16 @@ class UserProfile extends Equatable {
 
   int get daysCount => days.length;
 
+  /// Meals planned in the week.
+  int get mealCount => days.length * mealsPerDay;
+
+  /// Recipes to cook for [variety]: one per meal, per two meals, or per four.
+  int get recipesToCook => switch (variety) {
+        Variety.high => mealCount,
+        Variety.balanced => (mealCount + 1) ~/ 2,
+        Variety.low => (mealCount + 3) ~/ 4,
+      };
+
   /// The name to greet the user with, falling back to a generic chef.
   String displayName(String fallback) => name.trim().isEmpty ? fallback : name.trim();
 
@@ -80,6 +92,7 @@ class UserProfile extends Equatable {
     String? name,
     int? household,
     int? mealsPerDay,
+    Variety? variety,
     Set<Weekday>? days,
     double? budget,
     Country? country,
@@ -101,6 +114,7 @@ class UserProfile extends Equatable {
       name: name ?? this.name,
       household: household ?? this.household,
       mealsPerDay: mealsPerDay ?? this.mealsPerDay,
+      variety: variety ?? this.variety,
       days: days ?? this.days,
       budget: budget ?? this.budget,
       country: country ?? this.country,
@@ -124,6 +138,7 @@ class UserProfile extends Equatable {
         'name': name,
         'household': household,
         'mealsPerDay': mealsPerDay,
+        'variety': variety.id,
         'days': orderedDays.map((d) => d.id).toList(),
         'budget': budget,
         'country': country.id,
@@ -158,10 +173,14 @@ class UserProfile extends Equatable {
     Set<String> strings(String key) => (map[key] as List? ?? const []).whereType<String>().toSet();
 
     const fallback = UserProfile();
+    final mealsPerDay = ((map['mealsPerDay'] as num?)?.toInt() ?? fallback.mealsPerDay).clamp(1, maxMealsPerDay);
     return UserProfile(
       name: map['name'] as String? ?? fallback.name,
       household: ((map['household'] as num?)?.toInt() ?? fallback.household).clamp(minHousehold, maxHousehold),
-      mealsPerDay: ((map['mealsPerDay'] as num?)?.toInt() ?? fallback.mealsPerDay).clamp(1, maxMealsPerDay),
+      mealsPerDay: mealsPerDay,
+      // Profiles saved before this setting existed reused dishes only with two meals a day.
+      variety: Variety.values.where((v) => v.id == map['variety']).firstOrNull ??
+          (mealsPerDay == 1 ? Variety.high : Variety.balanced),
       days: parse('days', Weekday.values, (d) => d.id, fallback.days),
       budget: (map['budget'] as num?)?.toDouble() ?? fallback.budget,
       country: Country.fromId(map['country'] as String? ?? fallback.country.id),
@@ -186,6 +205,7 @@ class UserProfile extends Equatable {
         name,
         household,
         mealsPerDay,
+        variety,
         days,
         budget,
         country,

@@ -47,8 +47,6 @@ class OnboardingScreen extends StatelessWidget {
                       AppL10n.of(context).defaultChefName,
                     ),
                     generationStep: state.generationStep,
-                    onSkip: context.read<OnboardingCubit>().finishGeneration,
-                    onBack: context.read<OnboardingCubit>().back,
                   ),
                   _ => _StepsView(state: state),
                 },
@@ -103,7 +101,7 @@ class _StepsView extends StatelessWidget {
               constraints: BoxConstraints(minHeight: constraints.maxHeight),
               child: IntrinsicHeight(
                 child: Padding(
-                  padding: EdgeInsets.fromLTRB(24.w, 14.h, 24.w, 22.h),
+                  padding: EdgeInsets.fromLTRB(24.w, 14.h, 24.w, 32.h),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
@@ -116,7 +114,7 @@ class _StepsView extends StatelessWidget {
                           label: step.continueLabelOverride == 'generate'
                               ? l10n.actionGeneratePlan
                               : l10n.actionContinue,
-                          onPressed: cubit.next,
+                          onPressed: state.canContinue ? cubit.next : null,
                         ),
                       ],
                     ],
@@ -164,9 +162,13 @@ class _StepsView extends StatelessWidget {
       ),
       StepKind.meals => MealsStep(
         mealsPerDay: state.draft.mealsPerDay,
-        slotCount: state.previewWeek.slotCount,
-        recipeCount: state.previewWeek.recipeCount,
         onSelected: cubit.setMealsPerDay,
+      ),
+      StepKind.diversity => DiversityStep(
+        recipes: state.varietyRecipes,
+        selectedCount: state.draft.recipesToCook,
+        mealCount: state.draft.mealCount,
+        onSelected: cubit.setVariety,
       ),
       StepKind.slider => BudgetStep(
         budget: state.draft.budget,

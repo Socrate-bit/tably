@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:tably/core/model/preference_option.dart';
 import 'package:tably/core/analytics/analytics_service.dart';
 import 'package:tably/core/theme/app_theme.dart';
 import 'package:tably/features/home/cubit/home_cubit.dart';
@@ -66,15 +67,15 @@ void main() {
   // The design frame, and the short viewport that once hid every meal card.
   for (final size in const [Size(804, 1748), Size(688, 672)]) {
     testWidgets('lays out lunch, dinner and leftovers at $size', (tester) async {
-      await _pumpMenu(tester, physicalSize: size, profile: const UserProfile(mealsPerDay: 2));
+      await _pumpMenu(tester, physicalSize: size, profile: const UserProfile(mealsPerDay: 2, variety: Variety.balanced));
 
       expect(tester.takeException(), isNull);
       expect(find.text('LUNDI'), findsOneWidget);
       expect(find.text('DIMANCHE'), findsOneWidget);
       expect(find.text('DÉJEUNER'), findsNWidgets(7));
       expect(find.text('DÎNER'), findsNWidgets(7));
-      // Every other day reheats the previous day's lunch and dinner.
-      expect(find.text('♻ Reste'), findsNWidgets(6));
+      // Seven recipes over fourteen meals: every dinner reheats that day's lunch.
+      expect(find.text('♻ Reste'), findsNWidgets(7));
       expect(find.textContaining('14 repas ·'), findsOneWidget);
 
       final cards = find.byType(MealSlotCard);
@@ -100,10 +101,10 @@ void main() {
     final profile = await _pumpMenu(tester, physicalSize: const Size(804, 1748), profile: const UserProfile());
     expect(find.byType(MealSlotCard), findsNWidgets(7));
 
-    await profile.setMealsPerDay(3);
+    await profile.setMealsPerDay(2);
     await tester.pumpAndSettle();
 
-    expect(find.byType(MealSlotCard), findsNWidgets(21));
-    expect(find.text('PETIT-DÉJEUNER'), findsNWidgets(7));
+    expect(find.byType(MealSlotCard), findsNWidgets(14));
+    expect(find.text('DÉJEUNER'), findsNWidgets(7));
   });
 }

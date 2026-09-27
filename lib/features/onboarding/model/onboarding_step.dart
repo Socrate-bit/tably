@@ -11,6 +11,7 @@ enum StepKind {
   counter,
   days,
   meals,
+  diversity,
   slider,
   info,
   infoBars,
@@ -107,6 +108,7 @@ abstract final class StepIds {
   static const household = 'household';
   static const days = 'days';
   static const mealsPerDay = 'meals_per_day';
+  static const diversity = 'diversity';
   static const budget = 'budget';
   static const cravings = 'cravings';
   static const diet = 'diet';
@@ -116,12 +118,13 @@ abstract final class StepIds {
   static const testimonial = 'testimonial';
 }
 
-/// The onboarding flow, in order and with the exact progress values from the design.
+/// The onboarding flow, in order. Progress is spread evenly over the visible steps.
 abstract final class OnboardingFlow {
   /// Preference steps reuse the shared enums so ids and icons live in one place.
   static List<OptionSpec> _specs<T extends Enum>(List<T> values, String Function(T) id, String Function(T) icon) =>
       [for (final v in values) OptionSpec(id(v), icon: icon(v))];
 
+  // ignore: unused_element — used by the hidden country steps.
   static List<OptionSpec> _countries(List<Country> countries) =>
       [for (final c in countries) OptionSpec(c.id, icon: c.flag, chip: c.currencyCode)];
 
@@ -131,7 +134,7 @@ abstract final class OnboardingFlow {
     const OnboardingStep(
       id: StepIds.age,
       kind: StepKind.options,
-      progress: 9,
+      progress: 10,
       options: [
         OptionSpec('under_24'),
         OptionSpec('25_34'),
@@ -143,7 +146,7 @@ abstract final class OnboardingFlow {
     const OnboardingStep(
       id: StepIds.goal,
       kind: StepKind.options,
-      progress: 13,
+      progress: 14,
       multi: true,
       options: [
         OptionSpec('meal_prep', icon: '📅'),
@@ -156,7 +159,7 @@ abstract final class OnboardingFlow {
     const OnboardingStep(
       id: StepIds.blocker,
       kind: StepKind.options,
-      progress: 17,
+      progress: 19,
       multi: true,
       options: [
         OptionSpec('no_time', icon: '⏱️'),
@@ -166,14 +169,14 @@ abstract final class OnboardingFlow {
         OptionSpec('saving', icon: '💰'),
       ],
     ),
-    const OnboardingStep(id: StepIds.infoPlanning, kind: StepKind.info, progress: 21),
-    const OnboardingStep(id: StepIds.infoBars, kind: StepKind.infoBars, progress: 24),
-    const OnboardingStep(id: StepIds.infoMoney, kind: StepKind.infoMoney, progress: 28),
-    const OnboardingStep(id: StepIds.planStart, kind: StepKind.planStart, progress: 31),
+    const OnboardingStep(id: StepIds.infoPlanning, kind: StepKind.info, progress: 23),
+    const OnboardingStep(id: StepIds.infoBars, kind: StepKind.infoBars, progress: 28),
+    const OnboardingStep(id: StepIds.infoMoney, kind: StepKind.infoMoney, progress: 32),
+    const OnboardingStep(id: StepIds.planStart, kind: StepKind.planStart, progress: 37),
     const OnboardingStep(
       id: StepIds.cookTime,
       kind: StepKind.options,
-      progress: 32,
+      progress: 41,
       options: [
         OptionSpec('15_30'),
         OptionSpec('30_45'),
@@ -181,51 +184,53 @@ abstract final class OnboardingFlow {
         OptionSpec('60_plus'),
       ],
     ),
-    OnboardingStep(
-      id: StepIds.country,
-      kind: StepKind.options,
-      progress: 43,
-      serif: true,
-      options: _countries(const [
-        Country.unitedStates,
-        Country.europe,
-        Country.unitedKingdom,
-        Country.australia,
-        Country.canada,
-        Country.newZealand,
-        Country.brazil,
-      ]),
-    ),
-    OnboardingStep(
-      id: StepIds.europeCountry,
-      kind: StepKind.options,
-      progress: 47,
-      serif: true,
-      options: _countries(const [
-        Country.germany,
-        Country.ireland,
-        Country.sweden,
-        Country.netherlands,
-        Country.france,
-        Country.spain,
-        Country.restOfEurope,
-      ]),
-    ),
+    // Region and country steps hidden for now — everyone defaults to France.
+    // OnboardingStep(
+    //   id: StepIds.country,
+    //   kind: StepKind.options,
+    //   progress: 43,
+    //   serif: true,
+    //   options: _countries(const [
+    //     Country.unitedStates,
+    //     Country.europe,
+    //     Country.unitedKingdom,
+    //     Country.australia,
+    //     Country.canada,
+    //     Country.newZealand,
+    //     Country.brazil,
+    //   ]),
+    // ),
+    // OnboardingStep(
+    //   id: StepIds.europeCountry,
+    //   kind: StepKind.options,
+    //   progress: 47,
+    //   serif: true,
+    //   options: _countries(const [
+    //     Country.germany,
+    //     Country.ireland,
+    //     Country.sweden,
+    //     Country.netherlands,
+    //     Country.france,
+    //     Country.spain,
+    //     Country.restOfEurope,
+    //   ]),
+    // ),
     OnboardingStep(
       id: StepIds.store,
       kind: StepKind.options,
-      progress: 51,
+      progress: 46,
       layout: OptionLayout.tiles,
       options: [for (final s in Store.values) OptionSpec(s.id, logoAsset: s.logoAsset)],
     ),
-    const OnboardingStep(id: StepIds.household, kind: StepKind.counter, progress: 56),
-    const OnboardingStep(id: StepIds.days, kind: StepKind.days, progress: 60),
-    const OnboardingStep(id: StepIds.mealsPerDay, kind: StepKind.meals, progress: 62),
-    const OnboardingStep(id: StepIds.budget, kind: StepKind.slider, progress: 64),
+    const OnboardingStep(id: StepIds.household, kind: StepKind.counter, progress: 50),
+    const OnboardingStep(id: StepIds.days, kind: StepKind.days, progress: 55),
+    const OnboardingStep(id: StepIds.mealsPerDay, kind: StepKind.meals, progress: 60),
+    const OnboardingStep(id: StepIds.diversity, kind: StepKind.diversity, progress: 64),
+    const OnboardingStep(id: StepIds.budget, kind: StepKind.slider, progress: 69),
     OnboardingStep(
       id: StepIds.cravings,
       kind: StepKind.options,
-      progress: 74,
+      progress: 73,
       layout: OptionLayout.grid,
       multi: true,
       maxSelections: 3,
@@ -243,7 +248,7 @@ abstract final class OnboardingFlow {
     OnboardingStep(
       id: StepIds.allergies,
       kind: StepKind.options,
-      progress: 83,
+      progress: 82,
       layout: OptionLayout.grid,
       multi: true,
       hasNone: true,

@@ -7,18 +7,12 @@ import '../../../../core/widget/surface_card.dart';
 import '../../../../l10n/app_localizations.dart';
 
 /// A language offered by the picker. Names are shown in their own language.
-typedef AppLanguage = ({String code, String flag, String name, String? english});
+typedef AppLanguage = ({String code, String flag, String name});
 
-/// Languages in the design's order. Only French and English ship translations;
-/// the rest fall back to French until translated.
+/// Languages offered by the picker — only those that ship translations.
 const appLanguages = <AppLanguage>[
-  (code: 'fr', flag: '🇫🇷', name: 'Français', english: 'French'),
-  (code: 'en', flag: '🇬🇧', name: 'English', english: null),
-  (code: 'de', flag: '🇩🇪', name: 'Deutsch', english: 'German'),
-  (code: 'sv', flag: '🇸🇪', name: 'Svenska', english: 'Swedish'),
-  (code: 'nl', flag: '🇳🇱', name: 'Nederlands', english: 'Dutch'),
-  (code: 'pt', flag: '🇵🇹', name: 'Português', english: 'Portuguese'),
-  (code: 'es', flag: '🇪🇸', name: 'Español', english: 'Spanish'),
+  (code: 'fr', flag: '🇫🇷', name: 'Français'),
+  (code: 'en', flag: '🇬🇧', name: 'English'),
 ];
 
 AppLanguage languageFor(String code) => appLanguages.firstWhere((l) => l.code == code, orElse: () => appLanguages.first);
@@ -51,18 +45,7 @@ class LanguagePicker extends StatelessWidget {
                 children: [
                   Text(language.flag, style: AppTextStyles.emojiIcon.copyWith(fontSize: 25.sp)),
                   SizedBox(width: 18.w),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(language.name, style: AppTextStyles.languageName),
-                      if (language.english != null)
-                        Padding(
-                          padding: EdgeInsets.only(top: 2.h),
-                          child: Text(language.english!, style: AppTextStyles.metaMuted),
-                        ),
-                    ],
-                  ),
+                  Text(language.name, style: AppTextStyles.languageName),
                 ],
               ),
             ),

@@ -294,6 +294,10 @@ class _DayChips extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: AppColors.surface,
                   borderRadius: BorderRadius.circular(12.r),
+                ),
+                // Painted over the label so a thicker selected border never reflows it.
+                foregroundDecoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(12.r),
                   border: Border.all(
                     color: selected.contains(day) ? AppColors.brand : AppColors.border,
                     width: selected.contains(day) ? 2.5 : 1,

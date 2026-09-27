@@ -31,12 +31,52 @@ class OnboardingState extends Equatable {
 
   OnboardingStep get currentStep => steps[stepIndex.clamp(0, steps.length - 1)];
 
+  /// Steps that ask for an answer stay locked until one is given.
+  bool get canContinue => switch (currentStep.id) {
+        StepIds.name => draft.name.trim().isNotEmpty,
+        StepIds.age => draft.ageRange != null,
+        StepIds.goal => draft.goals.isNotEmpty,
+        StepIds.blocker => draft.blockers.isNotEmpty,
+        StepIds.cookTime => draft.cookTime != null,
+        StepIds.days => draft.days.isNotEmpty,
+        StepIds.cravings => draft.cravings.isNotEmpty,
+        StepIds.diet => draft.diets.isNotEmpty,
+        StepIds.allergies => draft.allergies.isNotEmpty,
+        StepIds.proteins => draft.proteins.isNotEmpty,
+        StepIds.appliances => draft.appliances.isNotEmpty,
+        _ => true,
+      };
+
   bool get isLastStep => stepIndex >= steps.length - 1;
 
   bool get generationComplete => generationStep >= OnboardingCubit.generationTasks;
 
   /// The week the answers so far would produce, before any regeneration.
   WeekPlan get previewWeek => WeekPlanner.build(profile: draft, settings: const PlanSettings());
+
+  /// Dishes each variety level would cook this week. Levels that land on the
+  /// same count as a higher one are dropped, so every choice differs.
+  Map<Variety, int> get varietyRecipes {
+    final counts = <Variety, int>{};
+    for (final v in Variety.values) {
+      final count = draft.copyWith(variety: v).recipesToCook;
+      if (!counts.containsValue(count)) counts[v] = count;
+    }
+    return counts;
+  }
+
+  /// Weekly groceries beyond the planned meals: breakfasts, snacks, pantry.
+  static const _everydayGroceries = 1.3;
+
+  /// A realistic weekly budget: every planned portion, leftovers included since
+  /// they are cooked in the same pot, for the whole household at the chosen
+  /// store, plus everyday groceries. Rounded to 5 and kept within the slider.
+  double get estimatedBudget {
+    final week = previewWeek;
+    final perPortion = week.slots.fold<double>(0, (sum, s) => sum + s.recipe.price) * draft.store.priceFactor;
+    final cost = perPortion * draft.household * _everydayGroceries;
+    return ((cost / 5).round() * 5.0).clamp(OnboardingCubit.minBudget, OnboardingCubit.maxBudget);
+  }
 
   Store get cheaperStore => draft.store.cheapestAlternative;
 

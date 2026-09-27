@@ -13,7 +13,7 @@ class AppL10nFr extends AppL10n {
 
   @override
   String get tagline =>
-      'Planifie tes dîners selon ton budget,\ntes envies et ce qu\'il y a dans ta cuisine';
+      'Planifie tes repas selon ton budget,\ntes envies et ce qu\'il y a dans ta cuisine';
 
   @override
   String get actionContinue => 'Continuer';
@@ -234,11 +234,10 @@ class AppL10nFr extends AppL10n {
   }
 
   @override
-  String get onbBudgetTitle => 'Quel est ton budget hebdo ?';
+  String get onbBudgetTitle => 'Quel est ton budget hebdo habituel ?';
 
   @override
-  String get onbBudgetSubtitle =>
-      'Choisis ce que tu veux dépenser ces jours-là';
+  String get onbBudgetSubtitle => 'Combien tu veux dépenser cette semaine ?';
 
   @override
   String get thisWeek => 'cette semaine';
@@ -300,6 +299,9 @@ class AppL10nFr extends AppL10n {
 
   @override
   String get dietPescatarian => 'Pescétarien';
+
+  @override
+  String get dietHalal => 'Halal';
 
   @override
   String get onbAllergiesTitle => 'Des allergies ?';
@@ -367,37 +369,38 @@ class AppL10nFr extends AppL10n {
 
   @override
   String get onbTestimonialSubtitle =>
-      'Des vraies personnes, de vrais progrès chaque semaine';
+      'Moins de charge mentale, moins de gaspillage, plus de bons repas';
 
   @override
   String get reviewOneName => 'Nicolas';
 
   @override
-  String get reviewOneTitle => 'Nourrir trois avec un petit budget';
+  String get reviewOneTitle =>
+      'Toute la famille à table, sans exploser le budget';
 
   @override
   String get reviewOneBody =>
-      'Les recettes ne sont pas fancy mais rassasiantes. On dépense moins chaque semaine.';
+      'Des plats généreux que les enfants finissent, et un ticket de caisse qui baisse chaque semaine. Je ne fais plus mes courses sans Tably.';
 
   @override
   String get reviewTwoName => 'Léa';
 
   @override
-  String get reviewTwoTitle => 'Dîners rapides après le travail';
+  String get reviewTwoTitle => 'Le dîner prêt avant d\'avoir faim';
 
   @override
   String get reviewTwoBody =>
-      'La plupart des repas prennent moins d\'une demi-heure. C\'est pour ça que je reste.';
+      'En rentrant du boulot, je sais déjà quoi cuisiner. 30 minutes max, et c\'est délicieux. Mes soirées sont enfin reposantes.';
 
   @override
   String get reviewThreeName => 'Thomas';
 
   @override
-  String get reviewThreeTitle => 'De vrais progrès chaque semaine';
+  String get reviewThreeTitle => 'Fini le « on mange quoi ce soir ? »';
 
   @override
   String get reviewThreeBody =>
-      'Simple après quelques réglages, sans conditions ni surprises.';
+      'Mon menu de la semaine et ma liste de courses sont prêts en un clic. Je n\'y pense plus, et je mange mieux qu\'avant.';
 
   @override
   String get ratingTitle => 'Enjoying Tably?';
@@ -422,9 +425,6 @@ class AppL10nFr extends AppL10n {
 
   @override
   String get generatingTaskShopping => 'Création de ta liste de courses';
-
-  @override
-  String get generatingTapToContinue => 'Appuie pour continuer';
 
   @override
   String get generatingReady => 'Ton plan est prêt';
@@ -790,8 +790,7 @@ class AppL10nFr extends AppL10n {
   String get onbMealsTitle => 'Combien de repas par jour ?';
 
   @override
-  String get onbMealsSubtitle =>
-      'On réutilise certains plats en restes pour t\'éviter de cuisiner tous les jours';
+  String get onbMealsSubtitle => 'On adapte ton plan à ton rythme';
 
   @override
   String mealsPerDayOption(int count) {
@@ -811,20 +810,28 @@ class AppL10nFr extends AppL10n {
   String get mealsPerDayLunchDinner => 'Déjeuner + dîner';
 
   @override
-  String get mealsPerDayAll => 'Matin, midi et soir';
+  String get onbDiversityTitle => 'Combien de variété ?';
 
   @override
-  String planSummarySingle(int slots, int recipes) {
-    return 'Un plat différent chaque soir — $slots repas, $recipes recettes à cuisiner.';
+  String get onbDiversitySubtitle =>
+      'On réutilise certains plats en restes pour t\'éviter de cuisiner tous les jours';
+
+  @override
+  String get diversityAllDifferent => 'On cuisine à chaque repas';
+
+  @override
+  String get varietyHigh => 'Un max de variété';
+
+  @override
+  String get varietyBalanced => 'Équilibré';
+
+  @override
+  String get varietyLow => 'Batch cooking';
+
+  @override
+  String diversityDetailReuse(int recipes, int slots) {
+    return 'Seulement $recipes recettes à cuisiner pour $slots repas';
   }
-
-  @override
-  String planSummaryReuse(int slots, int recipes) {
-    return '$slots repas prévus, seulement $recipes recettes à cuisiner : chaque plat est prévu pour deux services.';
-  }
-
-  @override
-  String get slotBreakfast => 'Petit-déjeuner';
 
   @override
   String get slotLunch => 'Déjeuner';

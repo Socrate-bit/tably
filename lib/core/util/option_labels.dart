@@ -56,6 +56,7 @@ extension OptionLabels on AppL10n {
         'vegetarian' => dietVegetarian,
         'vegan' => dietVegan,
         'pescatarian' => dietPescatarian,
+        'halal' => dietHalal,
         'gluten_free' => allergyGlutenFree,
         'lactose_free' => allergyLactoseFree,
         'nut_free' => allergyNutFree,
@@ -99,17 +100,18 @@ extension OptionLabels on AppL10n {
   String cravingLabel(Craving craving) => optionLabel(craving.id);
 
   String slotName(MealSlot slot) => switch (slot) {
-        MealSlot.breakfast => slotBreakfast,
         MealSlot.lunch => slotLunch,
         MealSlot.dinner => slotDinner,
       };
 
-  /// The line under each meals-per-day option.
-  String mealsPerDayDetail(int mealsPerDay) => switch (mealsPerDay) {
-        1 => mealsPerDayDinnerOnly,
-        2 => mealsPerDayLunchDinner,
-        _ => mealsPerDayAll,
+  String varietyName(Variety variety) => switch (variety) {
+        Variety.high => varietyHigh,
+        Variety.balanced => varietyBalanced,
+        Variety.low => varietyLow,
       };
+
+  /// The line under each meals-per-day option.
+  String mealsPerDayDetail(int mealsPerDay) => mealsPerDay == 1 ? mealsPerDayDinnerOnly : mealsPerDayLunchDinner;
 
   String cuisineName(Cuisine cuisine) => switch (cuisine) {
         Cuisine.italian => cuisineItalian,

@@ -4,6 +4,17 @@ abstract final class OptionIds {
   static const none = 'none';
 }
 
+/// How many different recipes the week is planned with; the rest are leftovers.
+enum Variety {
+  high('high', '🌈'),
+  balanced('balanced', '⚖️'),
+  low('low', '🍲');
+
+  const Variety(this.id, this.icon);
+  final String id;
+  final String icon;
+}
+
 enum Craving {
   quick('quick', '⚡'),
   highProtein('high_protein', '💪'),
@@ -23,7 +34,8 @@ enum Diet {
   none(OptionIds.none, '🚫'),
   vegetarian('vegetarian', '🥕'),
   vegan('vegan', '🌱'),
-  pescatarian('pescatarian', '🐟');
+  pescatarian('pescatarian', '🐟'),
+  halal('halal', '🌙');
 
   const Diet(this.id, this.icon);
   final String id;

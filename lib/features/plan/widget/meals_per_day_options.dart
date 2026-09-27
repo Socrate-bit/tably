@@ -8,7 +8,7 @@ import '../../../core/widget/surface_card.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../preferences/model/user_profile.dart';
 
-/// The three "N repas par jour" choices, each with what it covers.
+/// The two "N repas par jour" choices, each with what it covers.
 class MealsPerDayOptions extends StatelessWidget {
   const MealsPerDayOptions({super.key, required this.selected, required this.onSelected, this.spacing});
 

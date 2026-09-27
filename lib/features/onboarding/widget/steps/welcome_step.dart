@@ -42,8 +42,8 @@ class WelcomeStep extends StatelessWidget {
           alignment: Alignment.centerRight,
           child: _LanguagePill(language: languageFor(languageCode), onTap: onOpenLanguage),
         ),
-        SizedBox(height: 38.h),
-        AppLogo(size: 46.r),
+        SizedBox(height: 24.h),
+        AppLogo(size: 64.r),
         SizedBox(height: 2.h),
         Text(l10n.appName, textAlign: TextAlign.center, style: AppTextStyles.wordmarkLarge),
         SizedBox(height: 16.h),
@@ -51,18 +51,7 @@ class WelcomeStep extends StatelessWidget {
         SizedBox(height: 18.h),
         _PhoneMockup(store: store, country: country),
         SizedBox(height: 20.h),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            for (var i = 0; i < 3; i++)
-              Container(
-                width: 7.r,
-                height: 7.r,
-                margin: EdgeInsets.symmetric(horizontal: 3.5.w),
-                decoration: BoxDecoration(shape: BoxShape.circle, color: i == 0 ? AppColors.inkStrong : AppColors.neutralBar),
-              ),
-          ],
-        ),
+
         const Spacer(),
         PrimaryButton(label: l10n.actionStart, onPressed: onNext),
         SizedBox(height: 16.h),
@@ -257,14 +246,19 @@ class _SidePanel extends StatelessWidget {
   }
 }
 
+/// A miniature of the real [CostCard]: spend against budget and the savings line.
 /// The illustrative figures are part of the artwork, not the user's data.
 class _MockCostCard extends StatelessWidget {
   const _MockCostCard({required this.country});
 
   final Country country;
 
+  static const _total = 33.70;
+  static const _budget = 55.0;
+
   @override
   Widget build(BuildContext context) {
+    final l10n = AppL10n.of(context);
     return Container(
       padding: EdgeInsets.all(5.r),
       decoration: BoxDecoration(
@@ -275,17 +269,32 @@ class _MockCostCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(AppL10n.of(context).mockCostShort, style: AppTextStyles.mock(5, color: AppColors.textPlaceholder, letterSpacing: 0.4)),
+          Text(l10n.mockCostShort, style: AppTextStyles.mock(5, color: AppColors.textPlaceholder, letterSpacing: 0.4)),
           SizedBox(height: 2.h),
-          Text(formatMoney(country, 33.70), style: AppTextStyles.mock(9)),
+          FittedBox(
+            fit: BoxFit.scaleDown,
+            alignment: Alignment.centerLeft,
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.baseline,
+              textBaseline: TextBaseline.alphabetic,
+              children: [
+                Text(formatMoney(country, _total), style: AppTextStyles.mock(9, letterSpacing: -0.3)),
+                Text(
+                  ' / ${formatMoney(country, _budget, decimals: 0)}',
+                  style: AppTextStyles.mock(6, color: AppColors.textDisabled, weight: FontWeight.w700),
+                ),
+              ],
+            ),
+          ),
           SizedBox(height: 3.h),
-          ClipRRect(
-            borderRadius: BorderRadius.circular(3.r),
-            child: LinearProgressIndicator(
-              value: 0.62,
-              minHeight: 3.h,
-              backgroundColor: AppColors.fill,
-              valueColor: const AlwaysStoppedAnimation(AppColors.brand),
+          _MockProgress(value: _total / _budget, track: AppColors.divider),
+          SizedBox(height: 3.h),
+          FittedBox(
+            fit: BoxFit.scaleDown,
+            alignment: Alignment.centerLeft,
+            child: Text(
+              l10n.budgetSavings(formatMoney(country, _budget - _total, decimals: 0)),
+              style: AppTextStyles.mock(6, color: AppColors.brandDark),
             ),
           ),
         ],
@@ -294,6 +303,7 @@ class _MockCostCard extends StatelessWidget {
   }
 }
 
+/// A miniature of the real [ShoppingSummaryCard].
 class _MockShoppingCard extends StatelessWidget {
   const _MockShoppingCard();
 
@@ -308,10 +318,33 @@ class _MockShoppingCard extends StatelessWidget {
         children: [
           Text(l10n.mockTapShort, style: AppTextStyles.mock(5, color: AppColors.infoLabel, letterSpacing: 0.4)),
           SizedBox(height: 2.h),
-          Text(l10n.shoppingList, style: AppTextStyles.mock(8, height: 1.15)),
+          Text(l10n.shoppingList, style: AppTextStyles.mock(8, height: 1.15, letterSpacing: -0.3)),
           SizedBox(height: 2.h),
           Text(l10n.shoppingBoughtCount(0, 25), style: AppTextStyles.mock(6, color: AppColors.inkBody, weight: FontWeight.w700)),
+          const Spacer(),
+          const _MockProgress(value: 0, track: AppColors.infoTrack),
         ],
+      ),
+    );
+  }
+}
+
+/// The thin brand progress bar used by both summary cards.
+class _MockProgress extends StatelessWidget {
+  const _MockProgress({required this.value, required this.track});
+
+  final double value;
+  final Color track;
+
+  @override
+  Widget build(BuildContext context) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(3.r),
+      child: LinearProgressIndicator(
+        value: value,
+        minHeight: 3.h,
+        backgroundColor: track,
+        valueColor: const AlwaysStoppedAnimation(AppColors.brand),
       ),
     );
   }

@@ -6,20 +6,14 @@ import '../../recipe/model/recipe.dart';
 
 /// A meal of the day. Order matters: it is the order slots are listed in a day.
 enum MealSlot {
-  breakfast('breakfast'),
   lunch('lunch'),
   dinner('dinner');
 
   const MealSlot(this.id);
   final String id;
 
-  /// The slots planned for [mealsPerDay]: dinner only, then lunch + dinner,
-  /// then all three — exactly as the design names them.
-  static List<MealSlot> forMealsPerDay(int mealsPerDay) => switch (mealsPerDay) {
-        1 => const [dinner],
-        2 => const [lunch, dinner],
-        _ => const [breakfast, lunch, dinner],
-      };
+  /// The slots planned for [mealsPerDay]: dinner only, then lunch + dinner.
+  static List<MealSlot> forMealsPerDay(int mealsPerDay) => mealsPerDay == 1 ? const [dinner] : const [lunch, dinner];
 }
 
 /// One meal in the week.

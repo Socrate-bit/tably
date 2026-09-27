@@ -39,6 +39,7 @@ class OnboardingCubit extends Cubit<OnboardingState> {
   // ---- Navigation ----
 
   void next() {
+    if (!state.canContinue) return;
     final current = state.currentStep;
     unawaited(_analytics.capture(
       AnalyticsEvents.onboardingStepCompleted,
@@ -49,7 +50,11 @@ class OnboardingCubit extends Cubit<OnboardingState> {
       emit(state.copyWith(phase: OnboardingPhase.rating));
       return;
     }
-    emit(state.copyWith(stepIndex: state.stepIndex + 1));
+    final nextState = state.copyWith(stepIndex: state.stepIndex + 1);
+    // Arriving on the budget step preselects what the planned week would cost.
+    emit(nextState.currentStep.id == StepIds.budget
+        ? nextState.copyWith(draft: nextState.draft.copyWith(budget: nextState.estimatedBudget))
+        : nextState);
   }
 
   void openLanguage() => emit(state.copyWith(showLanguage: true));
@@ -61,11 +66,6 @@ class OnboardingCubit extends Cubit<OnboardingState> {
       emit(state.copyWith(showLanguage: false, draft: state.draft.copyWith(languageCode: languageCode)));
 
   void back() {
-    if (state.phase == OnboardingPhase.generating) {
-      _cancelGeneration();
-      emit(state.copyWith(phase: OnboardingPhase.steps, stepIndex: state.steps.length - 1));
-      return;
-    }
     if (state.stepIndex == 0) return;
     emit(state.copyWith(stepIndex: state.stepIndex - 1));
   }
@@ -131,6 +131,8 @@ class OnboardingCubit extends Cubit<OnboardingState> {
 
   void setMealsPerDay(int mealsPerDay) => emit(state.copyWith(draft: state.draft.copyWith(mealsPerDay: mealsPerDay)));
 
+  void setVariety(Variety variety) => emit(state.copyWith(draft: state.draft.copyWith(variety: variety)));
+
   void setBudget(double budget) => emit(
         state.copyWith(draft: state.draft.copyWith(budget: budget.clamp(minBudget, maxBudget))),
       );
@@ -159,14 +161,14 @@ class OnboardingCubit extends Cubit<OnboardingState> {
     }
     _generationTimers.add(Timer(const Duration(milliseconds: 6200), () {
       if (isClosed || state.phase != OnboardingPhase.generating) return;
-      finishGeneration();
+      _finishGeneration();
     }));
   }
 
   /// Ends the build, then offers a cheaper store if one exists. Users already
   /// at the cheapest store go straight in, rather than being told a pricier
   /// store would save them money.
-  void finishGeneration() {
+  void _finishGeneration() {
     _cancelGeneration();
     if (!state.hasCheaperStore) {
       _complete(state.draft);
@@ -195,6 +197,7 @@ class OnboardingCubit extends Cubit<OnboardingState> {
         'household': draft.household,
         'days': draft.daysCount,
         'meals_per_day': draft.mealsPerDay,
+        'variety': draft.variety.id,
         'budget': draft.budget,
         'store': draft.store.id,
       },

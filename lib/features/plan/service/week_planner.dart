@@ -15,33 +15,38 @@ abstract final class WeekPlanner {
     final days = profile.orderedDays;
     final mealSlots = MealSlot.forMealsPerDay(profile.mealsPerDay);
     if (days.isEmpty || catalogue.isEmpty) return const WeekPlan();
-
-    // With more than one meal a day each dish is cooked for two services: it
-    // comes back as leftovers on the next cooking day, in the same slot.
-    final reuse = mealSlots.length == 1 ? 1 : 2;
     final shuffled = _shuffle(catalogue, settings.seed);
     Recipe? byId(String? id) => id == null ? null : catalogue.where((r) => r.id == id).firstOrNull;
 
+    // Meals in eating order, split into [recipesToCook] consecutive runs as
+    // even as possible. Each run is one dish: cooked at its first meal, then
+    // served as leftovers for the rest. Past the catalogue's size a dish
+    // comes back, cooked fresh again.
+    final meals = [for (final day in days) for (final slot in mealSlots) (day, slot)];
+    final recipes = profile.recipesToCook;
+    int runOf(int meal) => meal * recipes ~/ meals.length;
+    final firstMealOfRun = <int, int>{};
+    for (var i = 0; i < meals.length; i++) {
+      firstMealOfRun.putIfAbsent(runOf(i), () => i);
+    }
+
     return WeekPlan(slots: [
-      for (final (slotIndex, slot) in mealSlots.indexed)
-        for (final (dayIndex, day) in days.indexed)
-          () {
-            final override = byId(settings.overrides[PlanSlot.keyFor(day, slot)]);
-            final cookedOn = dayIndex - dayIndex % reuse;
-            final isLeftover = override == null && cookedOn != dayIndex;
-            // A leftover is whatever was cooked that day, including a swap.
-            final cookedOverride =
-                isLeftover ? byId(settings.overrides[PlanSlot.keyFor(days[cookedOn], slot)]) : null;
-            return PlanSlot(
-              day: day,
-              slot: slot,
-              recipe: override ??
-                  cookedOverride ??
-                  shuffled[(slotIndex * 4 + dayIndex ~/ reuse) % shuffled.length],
-              isLeftover: isLeftover,
-              showSlotLabel: mealSlots.length > 1,
-            );
-          }(),
+      for (final (i, (day, slot)) in meals.indexed)
+        () {
+          final run = runOf(i);
+          final (cookedDay, cookedSlot) = meals[firstMealOfRun[run]!];
+          final override = byId(settings.overrides[PlanSlot.keyFor(day, slot)]);
+          final isLeftover = override == null && firstMealOfRun[run] != i;
+          // A leftover is whatever was cooked for its run, including a swap.
+          final cookedOverride = isLeftover ? byId(settings.overrides[PlanSlot.keyFor(cookedDay, cookedSlot)]) : null;
+          return PlanSlot(
+            day: day,
+            slot: slot,
+            recipe: override ?? cookedOverride ?? shuffled[run % shuffled.length],
+            isLeftover: isLeftover,
+            showSlotLabel: mealSlots.length > 1,
+          );
+        }(),
     ]);
   }
 

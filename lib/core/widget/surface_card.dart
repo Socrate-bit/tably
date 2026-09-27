@@ -44,11 +44,17 @@ class SurfaceCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: color,
         borderRadius: borderRadius,
-        border: borderColor == null ? null : Border.all(color: borderColor!, width: borderWidth),
         boxShadow: shadow
             ? [BoxShadow(color: Colors.black.withValues(alpha: 0.02), blurRadius: 2.r, offset: Offset(0, 1.h))]
             : null,
       ),
+      // Painted over the content so a thicker selected border never reflows it.
+      foregroundDecoration: borderColor == null
+          ? null
+          : BoxDecoration(
+              borderRadius: borderRadius,
+              border: Border.all(color: borderColor!, width: borderWidth),
+            ),
       child: child,
     );
 

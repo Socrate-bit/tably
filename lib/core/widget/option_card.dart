@@ -46,10 +46,6 @@ class OptionCard extends StatelessWidget {
         decoration: BoxDecoration(
           color: AppColors.surface,
           borderRadius: BorderRadius.circular(_radius),
-          border: Border.all(
-            color: selected ? AppColors.brand : AppColors.border,
-            width: selected ? 2.5 : 1,
-          ),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withValues(alpha: selected ? 0.03 : 0.02),
@@ -57,6 +53,15 @@ class OptionCard extends StatelessWidget {
               offset: Offset(0, 1.h),
             ),
           ],
+        ),
+        // The border is painted over the content so thickening it on selection
+        // never shrinks the text area and rewraps the label.
+        foregroundDecoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(_radius),
+          border: Border.all(
+            color: selected ? AppColors.brand : AppColors.border,
+            width: selected ? 2.5 : 1,
+          ),
         ),
         child: switch (layout) {
           OptionLayout.rows => _rowContent,

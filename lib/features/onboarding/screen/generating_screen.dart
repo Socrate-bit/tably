@@ -5,29 +5,23 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../../core/theme/app_theme.dart';
 import '../../../core/widget/app_logo.dart';
-import '../../../core/util/haptics.dart';
-import '../../../core/widget/circle_icon_button.dart';
 import '../../../core/widget/progress_bar.dart';
 import '../../../core/widget/surface_card.dart';
 import '../../../l10n/app_localizations.dart';
 
 /// The "on prépare ta semaine" screen: an orbiting ingredient ring above a
-/// checklist that ticks off as the plan is built. Tapping anywhere skips ahead.
+/// checklist that ticks off as the plan is built.
 class GeneratingScreen extends StatefulWidget {
   const GeneratingScreen({
     super.key,
     required this.displayName,
     required this.generationStep,
-    required this.onSkip,
-    required this.onBack,
   });
 
   final String displayName;
 
   /// 0–3; drives the checklist and the progress bar.
   final int generationStep;
-  final VoidCallback onSkip;
-  final VoidCallback onBack;
 
   @override
   State<GeneratingScreen> createState() => _GeneratingScreenState();
@@ -62,58 +56,48 @@ class _GeneratingScreenState extends State<GeneratingScreen> with TickerProvider
       l10n.generatingTaskShopping,
     ];
 
-    return GestureDetector(
-      onTap: () {
-        Haptics.tap();
-        widget.onSkip();
-      },
-      behavior: HitTestBehavior.opaque,
-      child: Padding(
-        padding: EdgeInsets.fromLTRB(24.w, 14.h, 24.w, 26.h),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Align(
-              alignment: Alignment.centerLeft,
-              child: Padding(
-                padding: EdgeInsets.only(bottom: 22.h),
-                child: CircleIconButton(glyph: '←', onPressed: widget.onBack),
-              ),
-            ),
-            Text(
-              l10n.generatingTitle(widget.displayName),
-              style: AppTextStyles.h1.copyWith(height: 1.15),
-            ),
-            Expanded(child: _orbitRing),
-            Padding(
-              padding: EdgeInsets.only(bottom: 18.h),
-              child: ProgressBar(value: widget.generationStep / 3, animate: true),
-            ),
-            SurfaceCard(
-              radius: 24.r,
-              padding: EdgeInsets.symmetric(horizontal: 18.w, vertical: 20.h),
-              child: Column(
-                children: [
-                  for (final (index, task) in tasks.indexed) ...[
-                    _TaskRow(
-                      label: task,
-                      done: widget.generationStep > index,
-                      active: widget.generationStep == index,
-                      pulse: _pulse,
-                    ),
-                    if (index < tasks.length - 1) SizedBox(height: 16.h),
-                  ],
+    return Padding(
+      padding: EdgeInsets.fromLTRB(24.w, 48.h, 24.w, 26.h),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Text(
+            l10n.generatingTitle(widget.displayName),
+            style: AppTextStyles.h1.copyWith(height: 1.15),
+          ),
+          Expanded(child: _orbitRing),
+          Padding(
+            padding: EdgeInsets.only(bottom: 18.h),
+            child: ProgressBar(value: widget.generationStep / 3, animate: true),
+          ),
+          SurfaceCard(
+            radius: 24.r,
+            padding: EdgeInsets.symmetric(horizontal: 18.w, vertical: 20.h),
+            child: Column(
+              children: [
+                for (final (index, task) in tasks.indexed) ...[
+                  _TaskRow(
+                    label: task,
+                    done: widget.generationStep > index,
+                    active: widget.generationStep == index,
+                    pulse: _pulse,
+                  ),
+                  if (index < tasks.length - 1) SizedBox(height: 16.h),
                 ],
-              ),
+              ],
             ),
-            SizedBox(height: 14.h),
-            Text(
-              widget.generationStep >= 3 ? l10n.generatingReady : l10n.generatingTapToContinue,
+          ),
+          SizedBox(height: 14.h),
+          // Kept in the layout while building so nothing shifts when it appears.
+          Opacity(
+            opacity: widget.generationStep >= 3 ? 1 : 0,
+            child: Text(
+              l10n.generatingReady,
               textAlign: TextAlign.center,
               style: AppTextStyles.metaSmall.copyWith(color: AppColors.textDisabled),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

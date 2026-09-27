@@ -112,19 +112,11 @@ class CounterStep extends StatelessWidget {
   }
 }
 
-/// "Combien de repas par jour ?" — the meal-count choice and what it means.
+/// "Combien de repas par jour ?" — the meal-count choice.
 class MealsStep extends StatelessWidget {
-  const MealsStep({
-    super.key,
-    required this.mealsPerDay,
-    required this.slotCount,
-    required this.recipeCount,
-    required this.onSelected,
-  });
+  const MealsStep({super.key, required this.mealsPerDay, required this.onSelected});
 
   final int mealsPerDay;
-  final int slotCount;
-  final int recipeCount;
   final ValueChanged<int> onSelected;
 
   @override
@@ -141,45 +133,119 @@ class MealsStep extends StatelessWidget {
         ),
         SizedBox(height: 30.h),
         Expanded(
+          child: Center(
+            child: MealsPerDayOptions(selected: mealsPerDay, onSelected: onSelected),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+/// "Combien de variété ?" — up to three levels, each showing how many
+/// recipes it means cooking; the other meals are leftovers.
+class DiversityStep extends StatelessWidget {
+  const DiversityStep({
+    super.key,
+    required this.recipes,
+    required this.selectedCount,
+    required this.mealCount,
+    required this.onSelected,
+  });
+
+  /// Recipes to cook for each level offered.
+  final Map<Variety, int> recipes;
+
+  /// Recipes the current choice cooks; a merged level is checked through it.
+  final int selectedCount;
+  final int mealCount;
+  final ValueChanged<Variety> onSelected;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppL10n.of(context);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Text(l10n.onbDiversityTitle, style: AppTextStyles.h1),
+        SizedBox(height: 10.h),
+        Text(l10n.onbDiversitySubtitle, style: AppTextStyles.subtitleTight.copyWith(height: 1.4)),
+        SizedBox(height: 30.h),
+        Expanded(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              MealsPerDayOptions(selected: mealsPerDay, onSelected: onSelected),
-              SizedBox(height: 26.h),
-              Container(
-                padding: EdgeInsets.all(18.r),
-                decoration: BoxDecoration(
-                  color: AppColors.brandSoft,
-                  borderRadius: BorderRadius.circular(20.r),
+              for (final (index, MapEntry(key: variety, value: count)) in recipes.entries.indexed) ...[
+                if (index > 0) SizedBox(height: 14.h),
+                _VarietyCard(
+                  variety: variety,
+                  count: count,
+                  mealCount: mealCount,
+                  checked: count == selectedCount,
+                  onTap: () => onSelected(variety),
                 ),
-                child: Row(
-                  children: [
-                    Text(
-                      '♻',
-                      style: AppTextStyles.emojiIcon.copyWith(fontSize: 22.sp),
-                    ),
-                    SizedBox(width: 13.w),
-                    Expanded(
-                      child: Text(
-                        mealsPerDay == 1
-                            ? l10n.planSummarySingle(slotCount, recipeCount)
-                            : l10n.planSummaryReuse(slotCount, recipeCount),
-                        style: AppTextStyles.savings.copyWith(
-                          fontSize: 14.5.sp,
-                          fontWeight: FontWeight.w600,
-                          height: 1.35,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              SizedBox(height: 10.h),
+              ],
             ],
           ),
         ),
       ],
+    );
+  }
+}
+
+/// One variety level: emoji, name, what it means for the week, and a big
+/// recipe count on the right.
+class _VarietyCard extends StatelessWidget {
+  const _VarietyCard({
+    required this.variety,
+    required this.count,
+    required this.mealCount,
+    required this.checked,
+    required this.onTap,
+  });
+
+  final Variety variety;
+  final int count;
+  final int mealCount;
+  final bool checked;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppL10n.of(context);
+    return SurfaceCard(
+      onTap: onTap,
+      padding: EdgeInsets.symmetric(horizontal: 18.w, vertical: 18.h),
+      borderColor: checked ? AppColors.brand : AppColors.border,
+      borderWidth: checked ? 2.5 : 1,
+      child: Row(
+        children: [
+          Text(variety.icon, style: AppTextStyles.emojiIcon.copyWith(fontSize: 26.sp)),
+          SizedBox(width: 14.w),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(l10n.varietyName(variety), style: AppTextStyles.optionRow),
+                SizedBox(height: 2.h),
+                Text(
+                  count == mealCount ? l10n.diversityAllDifferent : l10n.diversityDetailReuse(count, mealCount),
+                  style: AppTextStyles.metaMuted.copyWith(color: AppColors.textQuaternary),
+                ),
+              ],
+            ),
+          ),
+          SizedBox(width: 12.w),
+          Text(
+            '$count',
+            style: AppTextStyles.optionRow.copyWith(
+              fontSize: 26.sp,
+              color: checked ? AppColors.brand : AppColors.textQuaternary,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -258,6 +324,10 @@ class _DayCard extends StatelessWidget {
         alignment: Alignment.center,
         decoration: BoxDecoration(
           color: AppColors.surface,
+          borderRadius: BorderRadius.circular(20.r),
+        ),
+        // Painted over the label so a thicker selected border never reflows it.
+        foregroundDecoration: BoxDecoration(
           borderRadius: BorderRadius.circular(20.r),
           border: Border.all(
             color: selected ? AppColors.brand : AppColors.border,
