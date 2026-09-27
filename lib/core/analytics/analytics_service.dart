@@ -64,4 +64,12 @@ abstract final class AnalyticsEvents {
   static const addRecipeSheetOpened = 'add_recipe_sheet_opened';
   static const signInStarted = 'sign_in_started';
   static const signInCompleted = 'sign_in_completed';
+  static const referralRedeemAttempt = 'referral_redeem_attempt';
+  static const referralRedeemSuccess = 'referral_redeem_success';
+  static const referralRedeemFailed = 'referral_redeem_failed';
+  static const paywallShown = 'paywall_shown';
+  static const paywallBypassed = 'paywall_bypassed';
+  static const subscriptionActivated = 'subscription_activated';
+  static const subscriptionLost = 'subscription_lost';
+  static const onboardingReplayed = 'onboarding_replayed';
 }

@@ -13,11 +13,30 @@ service cloud.firestore {
     }
 
     match /users/{uid} {
-      allow read, write: if isOwner(uid);
+      allow read, delete: if isOwner(uid);
+
+      // userType is the paywall entitlement, so only the redeemReferralCode
+      // function may set it. UserProfile.toMap() never emits the key, so a
+      // legitimate client save always leaves it untouched.
+      allow create: if isOwner(uid)
+        && !('userType' in request.resource.data);
+
+      // On an update request.resource.data is the document *after* the merge,
+      // so it still carries an existing userType — checking the key is absent
+      // would lock admins out of their own profile. Compare instead.
+      allow update: if isOwner(uid)
+        && !request.resource.data.diff(resource.data).affectedKeys().hasAny(['userType']);
 
       match /{subcollection}/{docId} {
         allow read, write: if isOwner(uid);
       }
+    }
+
+    // Referral codes are readable so the client can pre-validate a code and
+    // show a precise error; redemption itself is server-only.
+    match /referralCodes/{code} {
+      allow read: if request.auth != null;
+      allow write: if false;
     }
   }
 }

@@ -24,6 +24,8 @@ class WelcomeStep extends StatelessWidget {
     required this.country,
     required this.onOpenLanguage,
     required this.onNext,
+    required this.onEnterCode,
+    required this.codeApplied,
   });
 
   final String languageCode;
@@ -31,6 +33,11 @@ class WelcomeStep extends StatelessWidget {
   final Country country;
   final VoidCallback onOpenLanguage;
   final VoidCallback onNext;
+  final VoidCallback onEnterCode;
+
+  /// True once a referral code has been redeemed, which is the only signal the
+  /// user gets here that their code took effect.
+  final bool codeApplied;
 
   @override
   Widget build(BuildContext context) {
@@ -55,11 +62,30 @@ class WelcomeStep extends StatelessWidget {
         const Spacer(),
         PrimaryButton(label: l10n.actionStart, onPressed: onNext),
         SizedBox(height: 16.h),
-        Text(
-          l10n.haveACode,
-          textAlign: TextAlign.center,
-          style: AppTextStyles.metaSmall.copyWith(fontSize: 14.sp, color: AppColors.textDisabled),
-        ),
+        if (codeApplied)
+          Text(
+            l10n.haveACodeApplied,
+            textAlign: TextAlign.center,
+            style: AppTextStyles.metaSmall.copyWith(fontSize: 14.sp, color: AppColors.brand),
+          )
+        else
+          GestureDetector(
+            onTap: () {
+              Haptics.tap();
+              onEnterCode();
+            },
+            behavior: HitTestBehavior.opaque,
+            child: Text(
+              l10n.haveACode,
+              textAlign: TextAlign.center,
+              style: AppTextStyles.metaSmall.copyWith(
+                fontSize: 14.sp,
+                color: AppColors.brand,
+                decoration: TextDecoration.underline,
+                decorationColor: AppColors.brand,
+              ),
+            ),
+          ),
       ],
     );
   }

@@ -130,8 +130,14 @@ abstract class AppL10n {
   /// No description provided for @haveACode.
   ///
   /// In fr, this message translates to:
-  /// **'Vous avez un code ?'**
+  /// **'Tu as un code ?'**
   String get haveACode;
+
+  /// No description provided for @haveACodeApplied.
+  ///
+  /// In fr, this message translates to:
+  /// **'Code appliqué ✓'**
+  String get haveACodeApplied;
 
   /// No description provided for @onbLanguageTitle.
   ///
@@ -1368,6 +1374,102 @@ abstract class AppL10n {
   /// In fr, this message translates to:
   /// **'Se déconnecter'**
   String get accountSignOut;
+
+  /// No description provided for @accountEnterReferralCode.
+  ///
+  /// In fr, this message translates to:
+  /// **'Saisir un code de parrainage'**
+  String get accountEnterReferralCode;
+
+  /// No description provided for @accountSectionCreator.
+  ///
+  /// In fr, this message translates to:
+  /// **'CRÉATEUR'**
+  String get accountSectionCreator;
+
+  /// No description provided for @accountReplayOnboarding.
+  ///
+  /// In fr, this message translates to:
+  /// **'Revoir l\'onboarding'**
+  String get accountReplayOnboarding;
+
+  /// No description provided for @accountReplayOnboardingSub.
+  ///
+  /// In fr, this message translates to:
+  /// **'Relance le questionnaire depuis le début'**
+  String get accountReplayOnboardingSub;
+
+  /// No description provided for @accountPlanFree.
+  ///
+  /// In fr, this message translates to:
+  /// **'Gratuit'**
+  String get accountPlanFree;
+
+  /// No description provided for @accountPlanAdmin.
+  ///
+  /// In fr, this message translates to:
+  /// **'Admin'**
+  String get accountPlanAdmin;
+
+  /// No description provided for @accountPlanUgc.
+  ///
+  /// In fr, this message translates to:
+  /// **'Créateur'**
+  String get accountPlanUgc;
+
+  /// No description provided for @referralTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Code de parrainage'**
+  String get referralTitle;
+
+  /// No description provided for @referralSubtitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Saisis ton code pour débloquer l\'accès.'**
+  String get referralSubtitle;
+
+  /// No description provided for @referralPlaceholder.
+  ///
+  /// In fr, this message translates to:
+  /// **'TON CODE'**
+  String get referralPlaceholder;
+
+  /// No description provided for @referralSubmit.
+  ///
+  /// In fr, this message translates to:
+  /// **'Valider'**
+  String get referralSubmit;
+
+  /// No description provided for @referralCancel.
+  ///
+  /// In fr, this message translates to:
+  /// **'Annuler'**
+  String get referralCancel;
+
+  /// No description provided for @referralInvalid.
+  ///
+  /// In fr, this message translates to:
+  /// **'Code invalide'**
+  String get referralInvalid;
+
+  /// No description provided for @referralLimit.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ce code a atteint sa limite d\'utilisation'**
+  String get referralLimit;
+
+  /// No description provided for @referralAlreadyUsed.
+  ///
+  /// In fr, this message translates to:
+  /// **'Tu as déjà utilisé ce code'**
+  String get referralAlreadyUsed;
+
+  /// No description provided for @referralError.
+  ///
+  /// In fr, this message translates to:
+  /// **'Une erreur est survenue, réessaie'**
+  String get referralError;
 
   /// No description provided for @tabMenu.
   ///

@@ -1,0 +1,8 @@
+# Compiled JavaScript files — rebuilt by the deploy predeploy hook.
+lib/
+
+# Node.js dependency directory
+node_modules/
+
+# Local config
+*.local

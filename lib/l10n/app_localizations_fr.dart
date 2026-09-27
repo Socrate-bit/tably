@@ -25,7 +25,10 @@ class AppL10nFr extends AppL10n {
   String get actionGeneratePlan => 'Générer le plan';
 
   @override
-  String get haveACode => 'Vous avez un code ?';
+  String get haveACode => 'Tu as un code ?';
+
+  @override
+  String get haveACodeApplied => 'Code appliqué ✓';
 
   @override
   String get onbLanguageTitle => 'Choose your language';
@@ -702,6 +705,55 @@ class AppL10nFr extends AppL10n {
 
   @override
   String get accountSignOut => 'Se déconnecter';
+
+  @override
+  String get accountEnterReferralCode => 'Saisir un code de parrainage';
+
+  @override
+  String get accountSectionCreator => 'CRÉATEUR';
+
+  @override
+  String get accountReplayOnboarding => 'Revoir l\'onboarding';
+
+  @override
+  String get accountReplayOnboardingSub =>
+      'Relance le questionnaire depuis le début';
+
+  @override
+  String get accountPlanFree => 'Gratuit';
+
+  @override
+  String get accountPlanAdmin => 'Admin';
+
+  @override
+  String get accountPlanUgc => 'Créateur';
+
+  @override
+  String get referralTitle => 'Code de parrainage';
+
+  @override
+  String get referralSubtitle => 'Saisis ton code pour débloquer l\'accès.';
+
+  @override
+  String get referralPlaceholder => 'TON CODE';
+
+  @override
+  String get referralSubmit => 'Valider';
+
+  @override
+  String get referralCancel => 'Annuler';
+
+  @override
+  String get referralInvalid => 'Code invalide';
+
+  @override
+  String get referralLimit => 'Ce code a atteint sa limite d\'utilisation';
+
+  @override
+  String get referralAlreadyUsed => 'Tu as déjà utilisé ce code';
+
+  @override
+  String get referralError => 'Une erreur est survenue, réessaie';
 
   @override
   String get tabMenu => 'Semaine';

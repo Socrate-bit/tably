@@ -7,8 +7,11 @@ import '../../../core/theme/app_theme.dart';
 import '../../../core/util/error_feedback.dart';
 import '../../../core/util/haptics.dart';
 import '../../../l10n/app_localizations.dart';
+import '../../onboarding/cubit/onboarding_cubit.dart';
 import '../../preferences/cubit/profile_cubit.dart';
 import '../../recipe/cubit/recipe_cubit.dart';
+import '../../subscription/cubit/subscription_cubit.dart';
+import '../../subscription/widget/referral_code_dialog.dart';
 import '../cubit/auth_cubit.dart';
 import '../widget/account_rows.dart';
 
@@ -32,6 +35,7 @@ class AccountScreen extends StatelessWidget {
             builder: (context, profileState) {
               final profile = profileState.profile;
               final recipeCubit = context.read<RecipeCubit>();
+              final userType = context.watch<SubscriptionCubit>().state.userType;
 
               return SingleChildScrollView(
                 padding: EdgeInsets.fromLTRB(20.w, 8.h, 20.w, 12.h),
@@ -96,6 +100,11 @@ class AccountScreen extends StatelessWidget {
                           arrow: true,
                           onTap: () => recipeCubit.reset(favouritesOnly: false),
                         ),
+                        AccountRow(
+                          title: l10n.accountEnterReferralCode,
+                          arrow: true,
+                          onTap: () => ReferralCodeDialog.show(context),
+                        ),
                       ],
                     ),
                     AccountSection(
@@ -124,6 +133,19 @@ class AccountScreen extends StatelessWidget {
                         AccountRow(title: l10n.accountTerms, arrow: true, onTap: () {}),
                       ],
                     ),
+                    // Only admins and creators, granted by a referral code.
+                    if (userType.canReplayOnboarding)
+                      AccountSection(
+                        label: l10n.accountSectionCreator,
+                        rows: [
+                          AccountRow(
+                            title: l10n.accountReplayOnboarding,
+                            subtitle: l10n.accountReplayOnboardingSub,
+                            arrow: true,
+                            onTap: () => _replayOnboarding(context, profile.languageCode),
+                          ),
+                        ],
+                      ),
                     AccountSection(
                       label: l10n.accountSectionAccount,
                       rows: [
@@ -155,6 +177,14 @@ class AccountScreen extends StatelessWidget {
       !kIsWeb &&
       (defaultTargetPlatform == TargetPlatform.iOS ||
           defaultTargetPlatform == TargetPlatform.macOS);
+
+  /// Resets the funnel before clearing the flag: [RootScreen] swaps screens the
+  /// moment the profile stream reports it, and a stale cubit would flash the
+  /// last step the user saw.
+  void _replayOnboarding(BuildContext context, String languageCode) {
+    context.read<OnboardingCubit>().restart(languageCode);
+    context.read<ProfileCubit>().replayOnboarding();
+  }
 
   String _languageName(String code) => switch (code) {
         'en' => 'English',
