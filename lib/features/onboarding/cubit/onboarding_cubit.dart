@@ -60,6 +60,15 @@ class OnboardingCubit extends Cubit<OnboardingState> {
   void setLanguage(String languageCode) =>
       emit(state.copyWith(showLanguage: false, draft: state.draft.copyWith(languageCode: languageCode)));
 
+  /// Rewinds to the welcome screen so the funnel can be walked again. The
+  /// language carries over because it drives the app's locale while onboarding
+  /// is unfinished — a blank state would snap the user back to French.
+  void restart(String languageCode) {
+    _cancelGeneration();
+    emit(OnboardingState(draft: UserProfile(languageCode: languageCode)));
+    unawaited(_analytics.capture(AnalyticsEvents.onboardingReplayed));
+  }
+
   void back() {
     if (state.phase == OnboardingPhase.generating) {
       _cancelGeneration();

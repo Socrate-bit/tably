@@ -9,6 +9,7 @@ import 'features/plan/cubit/plan_cubit.dart';
 import 'features/preferences/cubit/profile_cubit.dart';
 import 'features/recipe/cubit/recipe_cubit.dart';
 import 'features/shopping/cubit/shopping_cubit.dart';
+import 'features/subscription/cubit/subscription_cubit.dart';
 
 /// Decides what the user sees: the native splash while auth resolves, onboarding for a
 /// new user, or the app. Also binds every cubit to the signed-in uid.
@@ -27,6 +28,9 @@ class RootScreen extends StatelessWidget {
         context.read<PlanCubit>().bind(uid);
         context.read<ShoppingCubit>().bind(uid);
         context.read<RecipeCubit>().bind(uid);
+        // Ties the paywall to the same user, so purchases and the referral
+        // grant follow them across launches.
+        context.read<SubscriptionCubit>().identify(uid);
       },
       child: BlocBuilder<AuthCubit, AuthState>(
         builder: (context, authState) {

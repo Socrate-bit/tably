@@ -1,0 +1,12 @@
+{
+  "name": "tably-rules-test",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "cd .. && firebase emulators:exec --only firestore --project tably-rules-test \"node firestore_test/rules_test.mjs\""
+  },
+  "dependencies": {
+    "@firebase/rules-unit-testing": "^4.0.1",
+    "firebase": "^12.0.0"
+  }
+}

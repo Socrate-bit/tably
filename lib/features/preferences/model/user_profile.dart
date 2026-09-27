@@ -3,6 +3,7 @@ import 'package:equatable/equatable.dart';
 
 import '../../../core/model/preference_option.dart';
 import '../../../core/model/store.dart';
+import '../../../core/model/user_type.dart';
 import '../../../core/model/weekday.dart';
 
 /// Everything the planner needs about a user. Stored at `users/{uid}` and
@@ -36,6 +37,7 @@ class UserProfile extends Equatable {
     this.cookTime,
     this.onboardingComplete = false,
     this.weeklyReminder = false,
+    this.userType = UserType.normal,
   });
 
   /// Household size bounds, matching the design's stepper.
@@ -68,6 +70,11 @@ class UserProfile extends Equatable {
   final bool onboardingComplete;
   final bool weeklyReminder;
 
+  /// Paywall entitlement, granted by redeeming a referral code. Read-only here:
+  /// [toMap] deliberately omits it so a client save can never change it, which
+  /// is what the `users/{uid}` security rule relies on.
+  final UserType userType;
+
   /// Days kept in calendar order, which is how the plan is rendered.
   List<Weekday> get orderedDays => Weekday.values.where(days.contains).toList();
 
@@ -96,6 +103,7 @@ class UserProfile extends Equatable {
     String? cookTime,
     bool? onboardingComplete,
     bool? weeklyReminder,
+    UserType? userType,
   }) {
     return UserProfile(
       name: name ?? this.name,
@@ -117,9 +125,12 @@ class UserProfile extends Equatable {
       cookTime: cookTime ?? this.cookTime,
       onboardingComplete: onboardingComplete ?? this.onboardingComplete,
       weeklyReminder: weeklyReminder ?? this.weeklyReminder,
+      userType: userType ?? this.userType,
     );
   }
 
+  /// Note: `userType` is intentionally absent — it is server-owned, and the
+  /// merge write leaves the stored value untouched.
   Map<String, dynamic> toMap() => {
         'name': name,
         'household': household,
@@ -178,6 +189,7 @@ class UserProfile extends Equatable {
       cookTime: map['cookTime'] as String?,
       onboardingComplete: map['onboardingComplete'] as bool? ?? false,
       weeklyReminder: map['weeklyReminder'] as bool? ?? false,
+      userType: UserType.fromId(map['userType'] as String?),
     );
   }
 
@@ -202,5 +214,6 @@ class UserProfile extends Equatable {
         cookTime,
         onboardingComplete,
         weeklyReminder,
+        userType,
       ];
 }

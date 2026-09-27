@@ -72,6 +72,11 @@ class ProfileCubit extends Cubit<ProfileState> {
   Future<void> completeOnboarding(UserProfile profile) =>
       _update(profile.copyWith(onboardingComplete: true), changed: 'onboarding');
 
+  /// Sends the user back through onboarding, which is how [RootScreen] decides
+  /// what to show. Reserved for admins and creators reviewing the funnel.
+  Future<void> replayOnboarding() =>
+      _update(state.profile.copyWith(onboardingComplete: false), changed: 'replayOnboarding');
+
   Future<void> setName(String name) => _update(state.profile.copyWith(name: name), changed: 'name');
 
   Future<void> setHousehold(int household) => _update(

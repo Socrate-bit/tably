@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
+import '../../../core/model/user_type.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/util/haptics.dart';
 import '../../../core/widget/surface_card.dart';
 import '../../../l10n/app_localizations.dart';
+import '../../subscription/cubit/subscription_cubit.dart';
 
 /// Black pill button for Apple sign-in.
 class AppleSignInButton extends StatelessWidget {
@@ -165,7 +168,7 @@ class ProfileSummaryCard extends StatelessWidget {
   }
 }
 
-/// The "Actif" subscription pill.
+/// The subscription pill: what the user is currently entitled to.
 class ActivePill extends StatelessWidget {
   const ActivePill({super.key, this.compact = false});
 
@@ -173,12 +176,24 @@ class ActivePill extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppL10n.of(context);
+    final state = context.watch<SubscriptionCubit>().state;
+
+    // A referral grant outranks the subscription, and reads more usefully.
+    final (label, background, foreground) = switch (state.userType) {
+      UserType.admin => (l10n.accountPlanAdmin, AppColors.brandChip, AppColors.brandDarker),
+      UserType.ugc => (l10n.accountPlanUgc, AppColors.brandChip, AppColors.brandDarker),
+      UserType.normal when state.isActive =>
+        (l10n.accountActive, AppColors.brandChip, AppColors.brandDarker),
+      UserType.normal => (l10n.accountPlanFree, AppColors.fill, AppColors.textPlaceholder),
+    };
+
     return Container(
       padding: EdgeInsets.symmetric(horizontal: (compact ? 13 : 14).w, vertical: (compact ? 5 : 6).h),
-      decoration: BoxDecoration(color: AppColors.brandChip, borderRadius: BorderRadius.circular(20.r)),
+      decoration: BoxDecoration(color: background, borderRadius: BorderRadius.circular(20.r)),
       child: Text(
-        AppL10n.of(context).accountActive,
-        style: AppTextStyles.chip.copyWith(color: AppColors.brandDarker, fontWeight: FontWeight.w800, letterSpacing: 0),
+        label,
+        style: AppTextStyles.chip.copyWith(color: foreground, fontWeight: FontWeight.w800, letterSpacing: 0),
       ),
     );
   }

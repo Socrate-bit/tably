@@ -18,6 +18,9 @@ import 'features/recipe/cubit/recipe_cubit.dart';
 import 'features/recipe/service/recipe_service.dart';
 import 'features/shopping/cubit/shopping_cubit.dart';
 import 'features/shopping/service/shopping_service.dart';
+import 'features/subscription/cubit/subscription_cubit.dart';
+import 'features/subscription/service/paywall_service.dart';
+import 'features/subscription/service/referral_service.dart';
 import 'l10n/app_localizations.dart';
 import 'root.dart';
 
@@ -38,6 +41,8 @@ class TablyApp extends StatelessWidget {
         RepositoryProvider(create: (_) => PlanService()),
         RepositoryProvider(create: (_) => ShoppingService()),
         RepositoryProvider<RecipeService>.value(value: recipeService),
+        RepositoryProvider(create: (_) => const PaywallService()),
+        RepositoryProvider(create: (_) => ReferralService()),
       ],
       child: MultiBlocProvider(
         providers: [
@@ -50,6 +55,14 @@ class TablyApp extends StatelessWidget {
           BlocProvider(
             create: (context) => ProfileCubit(
               service: context.read<ProfileService>(),
+              analytics: analytics,
+            ),
+          ),
+          BlocProvider(
+            create: (context) => SubscriptionCubit(
+              paywall: context.read<PaywallService>(),
+              referral: context.read<ReferralService>(),
+              profileCubit: context.read<ProfileCubit>(),
               analytics: analytics,
             ),
           ),

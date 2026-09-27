@@ -28,6 +28,9 @@ class AppL10nEn extends AppL10n {
   String get haveACode => 'Have a code?';
 
   @override
+  String get haveACodeApplied => 'Code applied ✓';
+
+  @override
   String get onbLanguageTitle => 'Choose your language';
 
   @override
@@ -693,6 +696,55 @@ class AppL10nEn extends AppL10n {
 
   @override
   String get accountSignOut => 'Sign out';
+
+  @override
+  String get accountEnterReferralCode => 'Enter a referral code';
+
+  @override
+  String get accountSectionCreator => 'CREATOR';
+
+  @override
+  String get accountReplayOnboarding => 'Replay onboarding';
+
+  @override
+  String get accountReplayOnboardingSub =>
+      'Run the questionnaire again from the start';
+
+  @override
+  String get accountPlanFree => 'Free';
+
+  @override
+  String get accountPlanAdmin => 'Admin';
+
+  @override
+  String get accountPlanUgc => 'Creator';
+
+  @override
+  String get referralTitle => 'Referral code';
+
+  @override
+  String get referralSubtitle => 'Enter your code to unlock access.';
+
+  @override
+  String get referralPlaceholder => 'YOUR CODE';
+
+  @override
+  String get referralSubmit => 'Redeem';
+
+  @override
+  String get referralCancel => 'Cancel';
+
+  @override
+  String get referralInvalid => 'Invalid code';
+
+  @override
+  String get referralLimit => 'This code has reached its usage limit';
+
+  @override
+  String get referralAlreadyUsed => 'You have already used this code';
+
+  @override
+  String get referralError => 'Something went wrong, please try again';
 
   @override
   String get tabMenu => 'Week';

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -9,6 +11,8 @@ import '../../../core/widget/progress_bar.dart';
 import '../../../core/widget/slide_in.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../preferences/cubit/profile_cubit.dart';
+import '../../subscription/cubit/subscription_cubit.dart';
+import '../../subscription/widget/referral_code_dialog.dart';
 import '../cubit/onboarding_cubit.dart';
 import '../model/onboarding_step.dart';
 import '../widget/rating_modal.dart';
@@ -31,8 +35,13 @@ class OnboardingScreen extends StatelessWidget {
       listenWhen: (previous, current) =>
           previous.phase != current.phase &&
           current.phase == OnboardingPhase.done,
-      listener: (context, state) =>
-          context.read<ProfileCubit>().completeOnboarding(state.draft),
+      listener: (context, state) {
+        // Not awaited: the paywall floats over the app, so dismissing it lands
+        // the user on Home rather than stranding them in onboarding. Users with
+        // a redeemed referral code never see it.
+        unawaited(context.read<SubscriptionCubit>().presentPaywallAfterOnboarding());
+        context.read<ProfileCubit>().completeOnboarding(state.draft);
+      },
       builder: (context, state) {
         return Scaffold(
           backgroundColor: AppColors.scaffold,
@@ -78,6 +87,9 @@ class _StepsView extends StatelessWidget {
     final cubit = context.read<OnboardingCubit>();
     final l10n = AppL10n.of(context);
     final step = state.currentStep;
+    // Watched out here rather than inside the LayoutBuilder below, which would
+    // re-register the dependency on every layout pass.
+    final codeApplied = context.select<SubscriptionCubit, bool>((c) => c.state.skipsPaywall);
 
     // The language picker replaces the welcome screen until a language is chosen.
     if (state.showLanguage) {
@@ -109,7 +121,7 @@ class _StepsView extends StatelessWidget {
                     children: [
                       if (step.showTopBar)
                         _TopBar(step: step, onBack: cubit.back),
-                      Expanded(child: _stepBody(context, cubit, step)),
+                      Expanded(child: _stepBody(context, cubit, step, codeApplied)),
                       if (step.showContinueButton) ...[
                         SizedBox(height: 16.h),
                         PrimaryButton(
@@ -134,6 +146,7 @@ class _StepsView extends StatelessWidget {
     BuildContext context,
     OnboardingCubit cubit,
     OnboardingStep step,
+    bool codeApplied,
   ) {
     final l10n = AppL10n.of(context);
     return switch (step.kind) {
@@ -143,6 +156,8 @@ class _StepsView extends StatelessWidget {
         country: state.draft.country,
         onOpenLanguage: cubit.openLanguage,
         onNext: cubit.next,
+        onEnterCode: () => ReferralCodeDialog.show(context),
+        codeApplied: codeApplied,
       ),
       StepKind.text => NameStep(
         initialValue: state.draft.name,
