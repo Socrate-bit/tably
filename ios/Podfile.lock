@@ -1408,6 +1408,8 @@ PODS:
   - superwallkit_flutter (0.0.1):
     - Flutter
     - SuperwallKit (= 4.17.0)
+  - url_launcher_ios (0.0.1):
+    - Flutter
 
 DEPENDENCIES:
   - cloud_firestore (from `.symlinks/plugins/cloud_firestore/ios`)
@@ -1420,6 +1422,7 @@ DEPENDENCIES:
   - share_plus (from `.symlinks/plugins/share_plus/ios`)
   - sign_in_with_apple (from `.symlinks/plugins/sign_in_with_apple/ios`)
   - superwallkit_flutter (from `.symlinks/plugins/superwallkit_flutter/ios`)
+  - url_launcher_ios (from `.symlinks/plugins/url_launcher_ios/ios`)
 
 SPEC REPOS:
   trunk:
@@ -1469,6 +1472,8 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/sign_in_with_apple/ios"
   superwallkit_flutter:
     :path: ".symlinks/plugins/superwallkit_flutter/ios"
+  url_launcher_ios:
+    :path: ".symlinks/plugins/url_launcher_ios/ios"
 
 SPEC CHECKSUMS:
   abseil: a05cc83bf02079535e17169a73c5be5ba47f714b
@@ -1505,6 +1510,7 @@ SPEC CHECKSUMS:
   Superscript: 55de63e7dc445d0f095c44f25d446889c7ba851d
   SuperwallKit: 3e013cb58ac8c1f37b5311b77cedd32b7938a0cc
   superwallkit_flutter: 66adf57e7bc55ca535c243a1652cb7d03abb7528
+  url_launcher_ios: 7a95fa5b60cc718a708b8f2966718e93db0cef1b
 
 PODFILE CHECKSUM: 53a6aebc29ccee84c41f92f409fc20cd4ca011f1
 

@@ -28,11 +28,11 @@ class HomeScreen extends StatelessWidget {
           HomeSub.favourites => const FavouritesScreen(),
           HomeSub.stores => const StoresScreen(),
           HomeSub.none => switch (home.tab) {
-              HomeTab.menu => const MenuScreen(),
-              HomeTab.recipes => const RecipesScreen(),
-              HomeTab.preferences => const PreferencesScreen(),
-              HomeTab.account => const AccountScreen(),
-            },
+            HomeTab.menu => const MenuScreen(),
+            HomeTab.recipes => const RecipesScreen(),
+            HomeTab.preferences => const PreferencesScreen(),
+            HomeTab.account => const AccountScreen(),
+          },
         };
 
         return Scaffold(
@@ -49,7 +49,9 @@ class HomeScreen extends StatelessWidget {
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-                Expanded(child: AppTabBar(current: home.tab, onSelected: context.read<HomeCubit>().select)),
+                Expanded(
+                  child: AppTabBar(current: home.tab, onSelected: context.read<HomeCubit>().select),
+                ),
                 _AddRecipeSlot(visible: home.tab == HomeTab.recipes && home.sub == HomeSub.none),
               ],
             ),
@@ -100,7 +102,13 @@ class _AddRecipeSlotState extends State<_AddRecipeSlot> with SingleTickerProvide
     final slot = AppDimens.fab + 12.w;
     return AnimatedBuilder(
       animation: _size,
-      builder: (context, child) => SizedBox(width: slot * _size.value.clamp(0.0, 1.0), child: child),
+      builder: (context, child) => SizedBox(
+        width: slot * _size.value.clamp(0.0, 1.0),
+        // A fixed height stops the OverflowBox from filling the screen, which
+        // made the bottom bar full-height and pushed SnackBars off screen.
+        height: AppDimens.fab,
+        child: child,
+      ),
       child: OverflowBox(
         minWidth: slot,
         maxWidth: slot,
@@ -144,7 +152,7 @@ class _AddRecipeButton extends StatelessWidget {
             BoxShadow(color: AppColors.brand.withValues(alpha: 0.42), blurRadius: 24.r, offset: Offset(0, 10.h)),
           ],
         ),
-        child: Text('+', style: AppTextStyles.fabGlyph),
+        child: Icon(Icons.add_rounded, size: 60.r, color: AppColors.surface),
       ),
     );
   }

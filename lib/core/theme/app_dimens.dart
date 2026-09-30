@@ -26,7 +26,7 @@ abstract final class AppDimens {
   static double get circleButtonLarge => 44.r;
   static double get counterButton => 56.r;
   static double get counterButtonSmall => 46.r;
-  static double get fab => 62.r;
+  static double get fab => 90.r;
   static double get trackHeight => 7.h;
 
   /// Clearance under scrollable content for the floating glass tab bar.

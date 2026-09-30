@@ -83,7 +83,7 @@ abstract final class AppTextStyles {
   static TextStyle get emojiIcon => _sans(20, FontWeight.w700, height: 1);
 
   /// The "+" on the floating add button.
-  static TextStyle get fabGlyph => _sans(32, FontWeight.w500, color: AppColors.surface, height: 1);
+  static TextStyle get fabGlyph => _sans(64, FontWeight.w500, color: AppColors.surface, height: 1);
 
   /// "3 résultats" above search results.
   static TextStyle get resultCount => _sans(19, FontWeight.w800, letterSpacing: -0.4);

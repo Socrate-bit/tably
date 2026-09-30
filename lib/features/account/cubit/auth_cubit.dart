@@ -5,6 +5,7 @@ import 'package:equatable/equatable.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 
 import '../../../core/analytics/analytics_service.dart';
 import '../service/auth_service.dart';
@@ -14,12 +15,15 @@ part 'auth_state.dart';
 /// Keeps the app's notion of "who am I" in sync with Firebase Auth.
 class AuthCubit extends Cubit<AuthState> {
   AuthCubit({required AuthService authService, required AnalyticsService analytics})
-      : _auth = authService,
-        _analytics = analytics,
-        super(const AuthState()) {
-    _subscription = _auth.userChanges.listen(_onUserChanged, onError: (Object e) {
-      debugPrint('[AuthCubit] userChanges error: $e');
-    });
+    : _auth = authService,
+      _analytics = analytics,
+      super(const AuthState()) {
+    _subscription = _auth.userChanges.listen(
+      _onUserChanged,
+      onError: (Object e) {
+        debugPrint('[AuthCubit] userChanges error: $e');
+      },
+    );
   }
 
   final AuthService _auth;
@@ -75,13 +79,15 @@ class AuthCubit extends Cubit<AuthState> {
     }
     _hadUser = true;
     final signedIn = !user.isAnonymous;
-    emit(state.copyWith(
-      status: signedIn ? AuthStatus.signedIn : AuthStatus.anonymous,
-      uid: user.uid,
-      displayName: user.displayName,
-      busy: false,
-      clearError: true,
-    ));
+    emit(
+      state.copyWith(
+        status: signedIn ? AuthStatus.signedIn : AuthStatus.anonymous,
+        uid: user.uid,
+        displayName: user.displayName,
+        busy: false,
+        clearError: true,
+      ),
+    );
     unawaited(_analytics.identify(user.uid, properties: {'signed_in': signedIn}));
   }
 
@@ -92,6 +98,12 @@ class AuthCubit extends Cubit<AuthState> {
       await _auth.signInWithApple();
       unawaited(_analytics.capture(AnalyticsEvents.signInCompleted));
     } catch (e) {
+      // Closing the Apple sheet is a choice, not a failure — no banner.
+      if (e is SignInWithAppleAuthorizationException && e.code == AuthorizationErrorCode.canceled) {
+        debugPrint('[AuthCubit] signInWithApple canceled');
+        emit(state.copyWith(busy: false));
+        return;
+      }
       debugPrint('[AuthCubit] signInWithApple failed: $e');
       emit(state.copyWith(busy: false, error: e));
     }
