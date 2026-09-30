@@ -961,6 +961,10 @@ class AppL10nFr extends AppL10n {
   String get storesCurrentTag => 'ACTUEL';
 
   @override
+  String get storesDisclaimer =>
+      'Estimation basée sur les prix moyens en France. Les prix peuvent varier légèrement selon le magasin et la région.';
+
+  @override
   String storesFootnote(int count) {
     return 'Les prix sont estimés à partir des $count recettes de ta semaine et des relevés en magasin.';
   }
@@ -1108,7 +1112,10 @@ class AppL10nFr extends AppL10n {
   String get recipeCreatedBy => 'RECETTE DE';
 
   @override
-  String get recipeReplaceMeal => 'Remplacer ce repas';
+  String get recipeReplaceMeal => 'Choisir un autre repas';
+
+  @override
+  String get recipeRegenerateMeal => 'Régénérer';
 
   @override
   String get prefsMealsPerDay => 'Repas par jour';

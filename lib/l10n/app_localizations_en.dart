@@ -953,6 +953,10 @@ class AppL10nEn extends AppL10n {
   String get storesCurrentTag => 'CURRENT';
 
   @override
+  String get storesDisclaimer =>
+      'Estimate based on average prices in France. Prices may vary slightly by store and region.';
+
+  @override
   String storesFootnote(int count) {
     return 'Prices are estimated from your week\'s $count recipes and in-store price checks.';
   }
@@ -1097,7 +1101,10 @@ class AppL10nEn extends AppL10n {
   String get recipeCreatedBy => 'RECIPE BY';
 
   @override
-  String get recipeReplaceMeal => 'Replace this meal';
+  String get recipeReplaceMeal => 'Choose another meal';
+
+  @override
+  String get recipeRegenerateMeal => 'Regenerate';
 
   @override
   String get prefsMealsPerDay => 'Meals per day';

@@ -32,6 +32,7 @@ class MenuScreen extends StatelessWidget {
     final shopping = context.watch<ShoppingCubit>().state;
     final week = plan.week;
     final total = week.totalAt(profile.store);
+    void openStores() => context.read<HomeCubit>().open(HomeSub.stores);
 
     return BlocListener<PlanCubit, PlanState>(
       listenWhen: (previous, current) => current.error != null && previous.error != current.error,
@@ -49,7 +50,7 @@ class MenuScreen extends StatelessWidget {
                 AppLogo(size: 38.r),
                 SizedBox(width: 8.w),
                 Expanded(child: Text(l10n.appName, style: AppTextStyles.tabTitle)),
-                StorePill(store: profile.store, onTap: () => context.read<HomeCubit>().open(HomeSub.stores)),
+                StorePill(store: profile.store, onTap: openStores),
               ],
             ),
             SizedBox(height: 16.h),
@@ -59,7 +60,14 @@ class MenuScreen extends StatelessWidget {
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  Expanded(child: CostCard(total: total, budget: profile.budget, country: profile.country)),
+                  Expanded(
+                    child: CostCard(
+                      total: total,
+                      budget: profile.budget,
+                      country: profile.country,
+                      onTap: openStores,
+                    ),
+                  ),
                   SizedBox(width: 13.w),
                   Expanded(
                     child: ShoppingSummaryCard(
