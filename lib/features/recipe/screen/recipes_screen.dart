@@ -43,7 +43,7 @@ class RecipesScreen extends StatelessWidget {
         );
 
     return SingleChildScrollView(
-      padding: EdgeInsets.fromLTRB(20.w, 8.h, 20.w, 100.h),
+      padding: EdgeInsets.fromLTRB(20.w, 8.h, 20.w, AppDimens.tabBarInset),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [

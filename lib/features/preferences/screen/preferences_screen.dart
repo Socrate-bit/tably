@@ -42,7 +42,7 @@ class PreferencesScreen extends StatelessWidget {
           void openStores() => context.read<HomeCubit>().open(HomeSub.stores);
 
           return SingleChildScrollView(
-            padding: EdgeInsets.fromLTRB(20.w, 8.h, 20.w, 12.h),
+            padding: EdgeInsets.fromLTRB(20.w, 8.h, 20.w, AppDimens.tabBarInset),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [

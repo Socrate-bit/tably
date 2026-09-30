@@ -37,24 +37,85 @@ class HomeScreen extends StatelessWidget {
 
         return Scaffold(
           backgroundColor: AppColors.scaffold,
+          // Content scrolls beneath the floating glass bar.
+          extendBody: true,
           body: SafeArea(
             bottom: false,
-            child: Stack(
+            // A fresh key per destination replays the slide and resets scroll.
+            child: SlideIn(key: ValueKey(home), child: body),
+          ),
+          bottomNavigationBar: Padding(
+            padding: EdgeInsets.only(left: 16.w, right: 16.w, bottom: 10.h),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-                // A fresh key per destination replays the slide and resets scroll.
-                SlideIn(key: ValueKey(home), child: body),
-                if (home.tab == HomeTab.recipes && home.sub == HomeSub.none)
-                  Positioned(
-                    right: 22.w,
-                    bottom: 22.h,
-                    child: _AddRecipeButton(onTap: () => AddRecipeSheet.show(context)),
-                  ),
+                Expanded(child: AppTabBar(current: home.tab, onSelected: context.read<HomeCubit>().select)),
+                _AddRecipeSlot(visible: home.tab == HomeTab.recipes && home.sub == HomeSub.none),
               ],
             ),
           ),
-          bottomNavigationBar: AppTabBar(current: home.tab, onSelected: context.read<HomeCubit>().select),
         );
       },
+    );
+  }
+}
+
+/// Reserves space beside the tab bar for the add-recipe button, collapsing its
+/// width when hidden so the bar re-centres. An [OverflowBox] keeps the button
+/// at full size throughout, so it slides out rather than shrinking.
+class _AddRecipeSlot extends StatefulWidget {
+  const _AddRecipeSlot({required this.visible});
+
+  final bool visible;
+
+  @override
+  State<_AddRecipeSlot> createState() => _AddRecipeSlotState();
+}
+
+class _AddRecipeSlotState extends State<_AddRecipeSlot> with SingleTickerProviderStateMixin {
+  late final AnimationController _controller = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 300),
+    value: widget.visible ? 1 : 0,
+  );
+  late final Animation<double> _size = CurvedAnimation(parent: _controller, curve: Curves.easeOutCubic);
+  late final Animation<double> _scale = CurvedAnimation(parent: _controller, curve: Curves.easeOutBack);
+
+  @override
+  void didUpdateWidget(_AddRecipeSlot oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.visible != oldWidget.visible) {
+      widget.visible ? _controller.forward() : _controller.reverse();
+    }
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final slot = AppDimens.fab + 12.w;
+    return AnimatedBuilder(
+      animation: _size,
+      builder: (context, child) => SizedBox(width: slot * _size.value.clamp(0.0, 1.0), child: child),
+      child: OverflowBox(
+        minWidth: slot,
+        maxWidth: slot,
+        alignment: Alignment.bottomRight,
+        child: Padding(
+          padding: EdgeInsets.only(left: 12.w),
+          child: ScaleTransition(
+            scale: _scale,
+            child: FadeTransition(
+              opacity: _size,
+              child: _AddRecipeButton(onTap: () => AddRecipeSheet.show(context)),
+            ),
+          ),
+        ),
+      ),
     );
   }
 }
@@ -73,8 +134,8 @@ class _AddRecipeButton extends StatelessWidget {
         onTap();
       },
       child: Container(
-        width: 62.r,
-        height: 62.r,
+        width: AppDimens.fab,
+        height: AppDimens.fab,
         alignment: Alignment.center,
         decoration: BoxDecoration(
           color: AppColors.brand,

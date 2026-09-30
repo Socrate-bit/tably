@@ -24,7 +24,7 @@ class FavouritesScreen extends StatelessWidget {
     final favourites = context.watch<RecipeCubit>().state.favourites;
 
     return SingleChildScrollView(
-      padding: EdgeInsets.fromLTRB(20.w, 6.h, 20.w, 26.h),
+      padding: EdgeInsets.fromLTRB(20.w, 6.h, 20.w, AppDimens.tabBarInset),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [

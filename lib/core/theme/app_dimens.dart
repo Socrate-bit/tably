@@ -29,6 +29,9 @@ abstract final class AppDimens {
   static double get fab => 62.r;
   static double get trackHeight => 7.h;
 
+  /// Clearance under scrollable content for the floating glass tab bar.
+  static double get tabBarInset => 104.h;
+
   // Common gaps
   static double get gapXs => 4.h;
   static double get gapS => 8.h;
