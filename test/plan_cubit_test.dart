@@ -48,6 +48,19 @@ void main() {
     expect(plan.state.week.slots.where((s) => s.recipe.id == replaced.id), isEmpty);
   });
 
+  test('regenerating a meal swaps in a dish not already in the week', () async {
+    final plan = await build(const UserProfile(mealsPerDay: 2, variety: Variety.balanced));
+    final before = plan.state.week;
+    final inWeek = before.slots.map((s) => s.recipe.id).toSet();
+
+    final next = await plan.regenerateMeal(before.slotByKey('monday|lunch')!);
+
+    expect(next, isNotNull);
+    expect(inWeek, isNot(contains(next!.recipe.id)));
+    expect(plan.state.week.slotByKey('monday|dinner')!.recipe, next.recipe, reason: 'leftover follows the swap');
+    expect(plan.state.week.slotByKey('tuesday|lunch'), before.slotByKey('tuesday|lunch'));
+  });
+
   test('regenerating reshuffles the week and clears swaps', () async {
     final plan = await build(const UserProfile());
     await plan.replace('monday|dinner', RecipeCatalogue.recipes.last.id);

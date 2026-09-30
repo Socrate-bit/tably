@@ -550,9 +550,6 @@ class AppL10nFr extends AppL10n {
   String get shoppingShare => 'Partager';
 
   @override
-  String get shoppingAddItems => 'Ajouter des courses';
-
-  @override
   String shoppingNeeded(String amount) {
     return '($amount nécessaire)';
   }
@@ -765,6 +762,9 @@ class AppL10nFr extends AppL10n {
   String get errorShoppingUpdate => 'Impossible de mettre à jour ta liste.';
 
   @override
+  String get errorShoppingShare => 'Impossible de partager ta liste.';
+
+  @override
   String get blockerSaving => 'J\'essaye de faire des économies';
 
   @override
@@ -884,7 +884,8 @@ class AppL10nFr extends AppL10n {
   String get storesTitle => 'Supermarché';
 
   @override
-  String get storesSubtitle => 'Prix estimé de ton plan cette semaine';
+  String get storesSubtitle =>
+      'Estimation France, peut varier selon le magasin et la région';
 
   @override
   String get storesCurrent => 'Ton magasin actuel';
@@ -901,11 +902,6 @@ class AppL10nFr extends AppL10n {
 
   @override
   String get storesCurrentTag => 'ACTUEL';
-
-  @override
-  String storesFootnote(int count) {
-    return 'Les prix sont estimés à partir des $count recettes de ta semaine et des relevés en magasin.';
-  }
 
   @override
   String get recipesTitle => 'Recettes';
@@ -1050,7 +1046,10 @@ class AppL10nFr extends AppL10n {
   String get recipeCreatedBy => 'RECETTE DE';
 
   @override
-  String get recipeReplaceMeal => 'Remplacer ce repas';
+  String get recipeReplaceMeal => 'Choisir un autre repas';
+
+  @override
+  String get recipeRegenerateMeal => 'Régénérer';
 
   @override
   String get prefsMealsPerDay => 'Repas par jour';
@@ -1058,6 +1057,9 @@ class AppL10nFr extends AppL10n {
   @override
   String get prefsMealsPerDaySub =>
       'Les plats sont réutilisés en restes pour limiter le nombre de recettes';
+
+  @override
+  String get prefsVariety => 'Variété';
 
   @override
   String get mockCostShort => 'COÛT EST.';

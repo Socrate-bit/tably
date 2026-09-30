@@ -48,8 +48,6 @@ class StoresScreen extends StatelessWidget {
             ),
             SizedBox(height: 11.h),
           ],
-          SizedBox(height: 7.h),
-          Text(l10n.storesFootnote(week.recipeCount), style: AppTextStyles.subScreenSubtitle.copyWith(height: 1.5, fontSize: 13.sp)),
         ],
       ),
     );

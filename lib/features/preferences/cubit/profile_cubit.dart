@@ -91,6 +91,9 @@ class ProfileCubit extends Cubit<ProfileState> {
         changed: 'mealsPerDay',
       );
 
+  Future<void> setVariety(Variety variety) =>
+      _update(state.profile.copyWith(variety: variety), changed: 'variety');
+
   Future<void> setBudget(double budget) =>
       _update(state.profile.copyWith(budget: budget), changed: 'budget');
 

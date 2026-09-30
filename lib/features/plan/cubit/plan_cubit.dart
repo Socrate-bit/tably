@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
@@ -6,6 +7,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../core/analytics/analytics_service.dart';
 import '../../preferences/cubit/profile_cubit.dart';
+import '../../recipe/service/recipe_catalogue.dart';
 import '../model/plan_settings.dart';
 import '../model/week_plan.dart';
 import '../service/plan_service.dart';
@@ -77,6 +79,25 @@ class PlanCubit extends Cubit<PlanState> {
       AnalyticsEvents.mealReplaced,
       properties: {'slot': slotKey, 'recipe_id': recipeId},
     ));
+  }
+
+  /// Swaps the meal in [slot] for a random dish not already in the week, and
+  /// returns the updated slot so the caller can show it.
+  Future<PlanSlot?> regenerateMeal(PlanSlot slot) async {
+    const catalogue = RecipeCatalogue.recipes;
+    final inWeek = state.week.slots.map((s) => s.recipe.id).toSet();
+    var pool = catalogue.where((r) => !inWeek.contains(r.id)).toList();
+    if (pool.isEmpty) pool = catalogue.where((r) => r.id != slot.recipe.id).toList();
+    if (pool.isEmpty) return null;
+    final recipeId = pool[Random().nextInt(pool.length)].id;
+
+    await _apply(state.settings.copyWith(overrides: {...state.settings.overrides, slot.key: recipeId}));
+    debugPrint('[PlanCubit] meal regenerated: ${slot.key} → $recipeId');
+    unawaited(_analytics.capture(
+      AnalyticsEvents.mealRegenerated,
+      properties: {'slot': slot.key, 'recipe_id': recipeId},
+    ));
+    return state.week.slotByKey(slot.key);
   }
 
   /// Puts [recipeId] in place of [replacedRecipeId] wherever that dish is

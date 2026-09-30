@@ -13,6 +13,7 @@ import '../../../core/widget/segmented_toggle.dart';
 import '../../../core/widget/surface_card.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../home/cubit/home_cubit.dart';
+import '../../plan/cubit/plan_cubit.dart';
 import '../../plan/model/week_plan.dart';
 import '../../preferences/cubit/profile_cubit.dart';
 import '../cubit/recipe_cubit.dart';
@@ -32,12 +33,13 @@ class RecipeScreen extends StatefulWidget {
   /// The planned meal this recipe was opened from, which enables "Remplacer".
   final PlanSlot? slot;
 
-  /// Opens a recipe full-screen and records it as recently viewed.
-  static Future<void> open(BuildContext context, {required String recipeId, PlanSlot? slot}) {
+  /// Opens a recipe full-screen and records it as recently viewed. With
+  /// [replace], it takes the place of the current screen instead.
+  static Future<void> open(BuildContext context, {required String recipeId, PlanSlot? slot, bool replace = false}) {
     context.read<RecipeCubit>().markViewed(recipeId);
-    return Navigator.of(context).push(
-      MaterialPageRoute<void>(builder: (_) => RecipeScreen(recipeId: recipeId, slot: slot)),
-    );
+    final route = MaterialPageRoute<void>(builder: (_) => RecipeScreen(recipeId: recipeId, slot: slot));
+    final navigator = Navigator.of(context);
+    return replace ? navigator.pushReplacement(route) : navigator.push(route);
   }
 
   @override
@@ -49,17 +51,26 @@ class _RecipeScreenState extends State<RecipeScreen> {
   bool _showIngredients = true;
   late final TextEditingController _noteController;
 
+  /// Kept from initState — the context can't look up providers in dispose.
+  late final RecipeCubit _recipeCubit;
+
+  /// The note as loaded, so leaving without editing never overwrites it.
+  late final String _initialNote;
+
   @override
   void initState() {
     super.initState();
-    final note = context.read<RecipeCubit>().state.interactionFor(widget.recipeId).note;
-    _noteController = TextEditingController(text: note);
+    _recipeCubit = context.read<RecipeCubit>();
+    _initialNote = _recipeCubit.state.interactionFor(widget.recipeId).note;
+    _noteController = TextEditingController(text: _initialNote);
   }
 
   @override
   void dispose() {
-    // Persist whatever the user typed when they leave the screen.
-    context.read<RecipeCubit>().setNote(widget.recipeId, _noteController.text);
+    // Persist the note when the user leaves, if they changed it.
+    if (_noteController.text != _initialNote) {
+      _recipeCubit.setNote(widget.recipeId, _noteController.text);
+    }
     _noteController.dispose();
     super.dispose();
   }
@@ -69,6 +80,13 @@ class _RecipeScreenState extends State<RecipeScreen> {
     if (!changed || !mounted) return;
     context.read<HomeCubit>().select(HomeTab.menu);
     Navigator.of(context).pop();
+  }
+
+  /// Rerolls this planned meal and shows the new dish in place of this one.
+  Future<void> _regenerate() async {
+    final next = await context.read<PlanCubit>().regenerateMeal(widget.slot!);
+    if (next == null || !mounted) return;
+    RecipeScreen.open(context, recipeId: next.recipe.id, slot: next, replace: true);
   }
 
   @override
@@ -141,12 +159,37 @@ class _RecipeScreenState extends State<RecipeScreen> {
                   SizedBox(height: 12.h),
                   _NoteField(controller: _noteController),
                   SizedBox(height: 18.h),
-                  PrimaryButton(
-                    label: widget.slot != null ? l10n.recipeReplaceMeal : l10n.recipeAddToWeek,
-                    fontSize: 17,
-                    verticalPadding: 19.h,
-                    onPressed: () => _replace(recipe),
-                  ),
+                  if (widget.slot != null)
+                    Row(
+                      children: [
+                        Expanded(
+                          child: PrimaryButton(
+                            label: l10n.recipeRegenerateMeal,
+                            gradient: true,
+                            leading: Text('↻', style: AppTextStyles.regenerate),
+                            fontSize: 15,
+                            verticalPadding: 19.h,
+                            onPressed: _regenerate,
+                          ),
+                        ),
+                        SizedBox(width: 10.w),
+                        Expanded(
+                          child: PrimaryButton(
+                            label: l10n.recipeReplaceMeal,
+                            fontSize: 15,
+                            verticalPadding: 19.h,
+                            onPressed: () => _replace(recipe),
+                          ),
+                        ),
+                      ],
+                    )
+                  else
+                    PrimaryButton(
+                      label: l10n.recipeAddToWeek,
+                      fontSize: 17,
+                      verticalPadding: 19.h,
+                      onPressed: () => _replace(recipe),
+                    ),
                 ],
               ),
             );

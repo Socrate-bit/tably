@@ -7,13 +7,15 @@ import '../../../core/util/option_labels.dart';
 import '../../../core/widget/surface_card.dart';
 import '../../../l10n/app_localizations.dart';
 
-/// The cost card: spend so far against the weekly budget.
+/// The cost card: spend so far against the weekly budget. Tapping it opens
+/// the store price comparison.
 class CostCard extends StatelessWidget {
-  const CostCard({super.key, required this.total, required this.budget, required this.country});
+  const CostCard({super.key, required this.total, required this.budget, required this.country, required this.onTap});
 
   final double total;
   final double budget;
   final Country country;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -22,6 +24,7 @@ class CostCard extends StatelessWidget {
 
     return SurfaceCard(
       padding: EdgeInsets.all(16.r),
+      onTap: onTap,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,

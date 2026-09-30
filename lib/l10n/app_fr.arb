@@ -230,7 +230,6 @@
   "shoppingEyebrow": "CETTE SEMAINE",
   "shoppingCopyList": "Copier la liste",
   "shoppingShare": "Partager",
-  "shoppingAddItems": "Ajouter des courses",
   "shoppingNeeded": "({amount} nécessaire)",
   "@shoppingNeeded": {
     "placeholders": {
@@ -326,6 +325,7 @@
   "errorSignIn": "Connexion impossible. Réessaie.",
   "errorOpenLink": "Impossible d'ouvrir le lien.",
   "errorShoppingUpdate": "Impossible de mettre à jour ta liste.",
+  "errorShoppingShare": "Impossible de partager ta liste.",
   "blockerSaving": "J'essaye de faire des économies",
   "onbInfoMoneyEyebrow": "AVEC TABLY, ON ÉCONOMISE EN MOYENNE",
   "onbInfoMoneyPerWeek": "par semaine",
@@ -426,7 +426,7 @@
   "leftoverBadge": "♻ Reste",
   "regeneratingPlan": "nouveau plan en cours…",
   "storesTitle": "Supermarché",
-  "storesSubtitle": "Prix estimé de ton plan cette semaine",
+  "storesSubtitle": "Estimation France, peut varier selon le magasin et la région",
   "storesCurrent": "Ton magasin actuel",
   "storesCheaper": "{amount} de moins que {store}",
   "@storesCheaper": {
@@ -448,14 +448,6 @@
     }
   },
   "storesCurrentTag": "ACTUEL",
-  "storesFootnote": "Les prix sont estimés à partir des {count} recettes de ta semaine et des relevés en magasin.",
-  "@storesFootnote": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
   "recipesTitle": "Recettes",
   "searchResultCount": "{count, plural, =1{1 résultat} other{{count} résultats}}",
   "@searchResultCount": {
@@ -539,9 +531,11 @@
   "replaceEmptyFavourites": "Aucun favori pour l'instant.",
   "replaceEmptySearch": "Aucun repas ne correspond à cette recherche.",
   "recipeCreatedBy": "RECETTE DE",
-  "recipeReplaceMeal": "Remplacer ce repas",
+  "recipeReplaceMeal": "Choisir un autre repas",
+  "recipeRegenerateMeal": "Régénérer",
   "prefsMealsPerDay": "Repas par jour",
   "prefsMealsPerDaySub": "Les plats sont réutilisés en restes pour limiter le nombre de recettes",
+  "prefsVariety": "Variété",
   "mockCostShort": "COÛT EST.",
   "mockTapShort": "APPUYER"
 }

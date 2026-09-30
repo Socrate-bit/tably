@@ -1087,12 +1087,6 @@ abstract class AppL10n {
   /// **'Partager'**
   String get shoppingShare;
 
-  /// No description provided for @shoppingAddItems.
-  ///
-  /// In fr, this message translates to:
-  /// **'Ajouter des courses'**
-  String get shoppingAddItems;
-
   /// No description provided for @shoppingNeeded.
   ///
   /// In fr, this message translates to:
@@ -1495,6 +1489,12 @@ abstract class AppL10n {
   /// **'Impossible de mettre à jour ta liste.'**
   String get errorShoppingUpdate;
 
+  /// No description provided for @errorShoppingShare.
+  ///
+  /// In fr, this message translates to:
+  /// **'Impossible de partager ta liste.'**
+  String get errorShoppingShare;
+
   /// No description provided for @blockerSaving.
   ///
   /// In fr, this message translates to:
@@ -1684,7 +1684,7 @@ abstract class AppL10n {
   /// No description provided for @storesSubtitle.
   ///
   /// In fr, this message translates to:
-  /// **'Prix estimé de ton plan cette semaine'**
+  /// **'Estimation France, peut varier selon le magasin et la région'**
   String get storesSubtitle;
 
   /// No description provided for @storesCurrent.
@@ -1710,12 +1710,6 @@ abstract class AppL10n {
   /// In fr, this message translates to:
   /// **'ACTUEL'**
   String get storesCurrentTag;
-
-  /// No description provided for @storesFootnote.
-  ///
-  /// In fr, this message translates to:
-  /// **'Les prix sont estimés à partir des {count} recettes de ta semaine et des relevés en magasin.'**
-  String storesFootnote(int count);
 
   /// No description provided for @recipesTitle.
   ///
@@ -1948,8 +1942,14 @@ abstract class AppL10n {
   /// No description provided for @recipeReplaceMeal.
   ///
   /// In fr, this message translates to:
-  /// **'Remplacer ce repas'**
+  /// **'Choisir un autre repas'**
   String get recipeReplaceMeal;
+
+  /// No description provided for @recipeRegenerateMeal.
+  ///
+  /// In fr, this message translates to:
+  /// **'Régénérer'**
+  String get recipeRegenerateMeal;
 
   /// No description provided for @prefsMealsPerDay.
   ///
@@ -1962,6 +1962,12 @@ abstract class AppL10n {
   /// In fr, this message translates to:
   /// **'Les plats sont réutilisés en restes pour limiter le nombre de recettes'**
   String get prefsMealsPerDaySub;
+
+  /// No description provided for @prefsVariety.
+  ///
+  /// In fr, this message translates to:
+  /// **'Variété'**
+  String get prefsVariety;
 
   /// No description provided for @mockCostShort.
   ///

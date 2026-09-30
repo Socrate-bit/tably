@@ -51,6 +51,7 @@ abstract final class AnalyticsEvents {
   static const onboardingCompleted = 'onboarding_completed';
   static const planRegenerated = 'plan_regenerated';
   static const mealReplaced = 'meal_replaced';
+  static const mealRegenerated = 'meal_regenerated';
   static const storeSwitchAccepted = 'store_switch_accepted';
   static const storeSwitchDeclined = 'store_switch_declined';
   static const recipeOpened = 'recipe_opened';
@@ -58,6 +59,7 @@ abstract final class AnalyticsEvents {
   static const recipeFavouriteToggled = 'recipe_favourite_toggled';
   static const shoppingItemToggled = 'shopping_item_toggled';
   static const shoppingListOpened = 'shopping_list_opened';
+  static const shoppingListShared = 'shopping_list_shared';
   static const preferenceChanged = 'preference_changed';
   static const tabSelected = 'tab_selected';
   static const recipeFiltersChanged = 'recipe_filters_changed';

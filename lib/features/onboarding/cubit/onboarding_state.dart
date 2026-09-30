@@ -54,17 +54,6 @@ class OnboardingState extends Equatable {
   /// The week the answers so far would produce, before any regeneration.
   WeekPlan get previewWeek => WeekPlanner.build(profile: draft, settings: const PlanSettings());
 
-  /// Dishes each variety level would cook this week. Levels that land on the
-  /// same count as a higher one are dropped, so every choice differs.
-  Map<Variety, int> get varietyRecipes {
-    final counts = <Variety, int>{};
-    for (final v in Variety.values) {
-      final count = draft.copyWith(variety: v).recipesToCook;
-      if (!counts.containsValue(count)) counts[v] = count;
-    }
-    return counts;
-  }
-
   /// Weekly groceries beyond the planned meals: breakfasts, snacks, pantry.
   static const _everydayGroceries = 1.3;
 

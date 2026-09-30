@@ -180,9 +180,7 @@ class _StepsView extends StatelessWidget {
         onSelected: cubit.setMealsPerDay,
       ),
       StepKind.diversity => DiversityStep(
-        recipes: state.varietyRecipes,
-        selectedCount: state.draft.recipesToCook,
-        mealCount: state.draft.mealCount,
+        profile: state.draft,
         onSelected: cubit.setVariety,
       ),
       StepKind.slider => BudgetStep(

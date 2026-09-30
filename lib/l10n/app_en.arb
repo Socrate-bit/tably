@@ -230,7 +230,6 @@
   "shoppingEyebrow": "THIS WEEK",
   "shoppingCopyList": "Copy the list",
   "shoppingShare": "Share",
-  "shoppingAddItems": "Add groceries",
   "shoppingNeeded": "({amount} needed)",
   "@shoppingNeeded": {
     "placeholders": {
@@ -326,6 +325,7 @@
   "errorSignIn": "Couldn't sign in. Try again.",
   "errorOpenLink": "Couldn't open the link.",
   "errorShoppingUpdate": "Couldn't update your list.",
+  "errorShoppingShare": "Couldn't share your list.",
   "blockerSaving": "I'm trying to save money",
   "onbInfoMoneyEyebrow": "WITH TABLY, PEOPLE SAVE ON AVERAGE",
   "onbInfoMoneyPerWeek": "per week",
@@ -357,12 +357,11 @@
   "leftoverBadge": "♻ Leftover",
   "regeneratingPlan": "new plan on its way…",
   "storesTitle": "Supermarket",
-  "storesSubtitle": "Estimated price of this week's plan",
+  "storesSubtitle": "French estimate, may vary by store and region",
   "storesCurrent": "Your current store",
   "storesCheaper": "{amount} less than {store}",
   "storesPricier": "{amount} more",
   "storesCurrentTag": "CURRENT",
-  "storesFootnote": "Prices are estimated from your week's {count} recipes and in-store price checks.",
   "recipesTitle": "Recipes",
   "searchResultCount": "{count, plural, =1{1 result} other{{count} results}}",
   "searchEmpty": "No meals match “{query}”.\nTry an ingredient or a type of dish.",
@@ -401,9 +400,11 @@
   "replaceEmptyFavourites": "No favourites yet.",
   "replaceEmptySearch": "No meals match this search.",
   "recipeCreatedBy": "RECIPE BY",
-  "recipeReplaceMeal": "Replace this meal",
+  "recipeReplaceMeal": "Choose another meal",
+  "recipeRegenerateMeal": "Regenerate",
   "prefsMealsPerDay": "Meals per day",
   "prefsMealsPerDaySub": "Dishes are reused as leftovers to keep the number of recipes down",
+  "prefsVariety": "Variety",
   "mockCostShort": "EST. COST",
   "mockTapShort": "TAP"
 }
