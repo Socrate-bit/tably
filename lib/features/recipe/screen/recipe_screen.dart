@@ -49,17 +49,26 @@ class _RecipeScreenState extends State<RecipeScreen> {
   bool _showIngredients = true;
   late final TextEditingController _noteController;
 
+  /// Kept from initState — the context can't look up providers in dispose.
+  late final RecipeCubit _recipeCubit;
+
+  /// The note as loaded, so leaving without editing never overwrites it.
+  late final String _initialNote;
+
   @override
   void initState() {
     super.initState();
-    final note = context.read<RecipeCubit>().state.interactionFor(widget.recipeId).note;
-    _noteController = TextEditingController(text: note);
+    _recipeCubit = context.read<RecipeCubit>();
+    _initialNote = _recipeCubit.state.interactionFor(widget.recipeId).note;
+    _noteController = TextEditingController(text: _initialNote);
   }
 
   @override
   void dispose() {
-    // Persist whatever the user typed when they leave the screen.
-    context.read<RecipeCubit>().setNote(widget.recipeId, _noteController.text);
+    // Persist the note when the user leaves, if they changed it.
+    if (_noteController.text != _initialNote) {
+      _recipeCubit.setNote(widget.recipeId, _noteController.text);
+    }
     _noteController.dispose();
     super.dispose();
   }
