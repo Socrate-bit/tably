@@ -611,15 +611,6 @@ class AppL10nEn extends AppL10n {
       'Sign in to save your\npreferences to the cloud.';
 
   @override
-  String get accountFamilyPlan => 'Family plan';
-
-  @override
-  String get accountFamilyPlanSub => 'Share access to your account.';
-
-  @override
-  String get accountInvite => 'Invite friends and family';
-
-  @override
   String accountGreeting(String name) {
     return 'Hi, $name ✎';
   }
@@ -636,47 +627,7 @@ class AppL10nEn extends AppL10n {
   String get accountSectionApp => 'APP';
 
   @override
-  String get accountRateTably => 'Rate Tably';
-
-  @override
-  String get accountSuggestFeature => 'Suggest a feature';
-
-  @override
   String get accountLanguage => 'Language';
-
-  @override
-  String get accountResetSaved => 'Reset saved meals';
-
-  @override
-  String get accountResetSavedSub => 'Clear your favourites list';
-
-  @override
-  String get accountResetHistory => 'Reset suggestion history';
-
-  @override
-  String get accountResetHistorySub =>
-      'Fresher suggestions when you regenerate';
-
-  @override
-  String get accountSectionAlerts => 'ALERTS';
-
-  @override
-  String get accountWeeklyReminder => 'Weekly plan reminder';
-
-  @override
-  String get accountWeeklyReminderSub => 'Sunday at 10:00 — plan your week';
-
-  @override
-  String get accountSectionHelp => 'HELP';
-
-  @override
-  String get accountShareTably => 'Share Tably';
-
-  @override
-  String get accountContactUs => 'Contact us';
-
-  @override
-  String get accountManageSubscription => 'Manage subscription';
 
   @override
   String get accountSectionLegal => 'LEGAL';
@@ -698,16 +649,6 @@ class AppL10nEn extends AppL10n {
 
   @override
   String get accountEnterReferralCode => 'Enter a referral code';
-
-  @override
-  String get accountSectionCreator => 'CREATOR';
-
-  @override
-  String get accountReplayOnboarding => 'Replay onboarding';
-
-  @override
-  String get accountReplayOnboardingSub =>
-      'Run the questionnaire again from the start';
 
   @override
   String get accountPlanFree => 'Free';
@@ -807,6 +748,9 @@ class AppL10nEn extends AppL10n {
 
   @override
   String get errorSignIn => 'Couldn\'t sign in. Try again.';
+
+  @override
+  String get errorOpenLink => 'Couldn\'t open the link.';
 
   @override
   String get errorShoppingUpdate => 'Couldn\'t update your list.';
