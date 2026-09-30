@@ -26,6 +26,7 @@ class StoresScreen extends StatelessWidget {
     final week = context.select<PlanCubit, WeekPlan>((c) => c.state.week);
     final home = context.read<HomeCubit>();
     final current = week.totalAt(profile.store);
+    final footnoteStyle = AppTextStyles.subScreenSubtitle.copyWith(height: 1.5, fontSize: 13.sp);
 
     return SingleChildScrollView(
       padding: EdgeInsets.fromLTRB(20.w, 6.h, 20.w, AppDimens.tabBarInset),
@@ -49,7 +50,10 @@ class StoresScreen extends StatelessWidget {
             SizedBox(height: 11.h),
           ],
           SizedBox(height: 7.h),
-          Text(l10n.storesFootnote(week.recipeCount), style: AppTextStyles.subScreenSubtitle.copyWith(height: 1.5, fontSize: 13.sp)),
+          Text(l10n.storesFootnote(week.recipeCount), style: footnoteStyle),
+          SizedBox(height: 8.h),
+          // Prices are French averages; each shop and region differs a little.
+          Text(l10n.storesDisclaimer, style: footnoteStyle),
         ],
       ),
     );

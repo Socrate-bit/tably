@@ -1819,6 +1819,12 @@ abstract class AppL10n {
   /// **'ACTUEL'**
   String get storesCurrentTag;
 
+  /// No description provided for @storesDisclaimer.
+  ///
+  /// In fr, this message translates to:
+  /// **'Estimation basée sur les prix moyens en France. Les prix peuvent varier légèrement selon le magasin et la région.'**
+  String get storesDisclaimer;
+
   /// No description provided for @storesFootnote.
   ///
   /// In fr, this message translates to:
@@ -2056,8 +2062,14 @@ abstract class AppL10n {
   /// No description provided for @recipeReplaceMeal.
   ///
   /// In fr, this message translates to:
-  /// **'Remplacer ce repas'**
+  /// **'Choisir un autre repas'**
   String get recipeReplaceMeal;
+
+  /// No description provided for @recipeRegenerateMeal.
+  ///
+  /// In fr, this message translates to:
+  /// **'Régénérer'**
+  String get recipeRegenerateMeal;
 
   /// No description provided for @prefsMealsPerDay.
   ///

@@ -466,6 +466,7 @@
     }
   },
   "storesCurrentTag": "ACTUEL",
+  "storesDisclaimer": "Estimation basée sur les prix moyens en France. Les prix peuvent varier légèrement selon le magasin et la région.",
   "storesFootnote": "Les prix sont estimés à partir des {count} recettes de ta semaine et des relevés en magasin.",
   "@storesFootnote": {
     "placeholders": {
@@ -557,7 +558,8 @@
   "replaceEmptyFavourites": "Aucun favori pour l'instant.",
   "replaceEmptySearch": "Aucun repas ne correspond à cette recherche.",
   "recipeCreatedBy": "RECETTE DE",
-  "recipeReplaceMeal": "Remplacer ce repas",
+  "recipeReplaceMeal": "Choisir un autre repas",
+  "recipeRegenerateMeal": "Régénérer",
   "prefsMealsPerDay": "Repas par jour",
   "prefsMealsPerDaySub": "Les plats sont réutilisés en restes pour limiter le nombre de recettes",
   "prefsVariety": "Variété",
