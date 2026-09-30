@@ -34,10 +34,10 @@ void main() {
   });
 
   test('price limit uses the store price the cards show', () {
-    // Wraps are €6.40 at reference prices: in at Lidl (×0.88 = €5.63), out at Monoprix (×1.21 = €7.74).
-    const state = RecipeBrowseState(maxPrice: 6, cravings: {Craving.indulgent});
+    // Wraps are €6.40 at reference prices: in at Lidl (×0.975 = €6.24), out at Franprix (×1.25 = €8.00).
+    const state = RecipeBrowseState(maxPrice: 6.5, cravings: {Craving.indulgent});
     expect(_ids(state, store: Store.lidl), ['wraps_big_mac']);
-    expect(_ids(state, store: Store.monoprix), isEmpty);
+    expect(_ids(state, store: Store.franprix), isEmpty);
   });
 
   test('filter count counts chips plus one for a price limit', () {

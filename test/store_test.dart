@@ -13,14 +13,14 @@ void main() {
 
   test('no switch is offered at the cheapest store', () {
     const state = OnboardingState(draft: UserProfile(store: Store.lidl));
-    expect(state.hasCheaperStore, isFalse, reason: 'Aldi costs more than Lidl');
+    expect(state.hasCheaperStore, isFalse, reason: 'Leclerc costs more than Lidl');
   });
 
   test('a pricier store is offered the cheapest one, with the real saving', () {
     const state = OnboardingState(draft: UserProfile(store: Store.carrefour));
     expect(state.hasCheaperStore, isTrue);
     expect(state.cheaperStore, Store.lidl);
-    expect(state.switchSavingPercent, 12);
+    expect(state.switchSavingPercent, 9);
     expect(state.previewWeek.totalAt(Store.lidl), lessThan(state.previewWeek.totalAt(Store.carrefour)));
   });
 }
