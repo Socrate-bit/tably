@@ -197,35 +197,10 @@ class AccountScreen extends StatelessWidget {
       };
 
   Future<void> _editName(BuildContext context, String current) async {
-    final controller = TextEditingController(text: current);
-    final l10n = AppL10n.of(context);
     final result = await showDialog<String>(
       context: context,
-      builder: (dialogContext) => AlertDialog(
-        backgroundColor: AppColors.surface,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(22.r)),
-        content: TextField(
-          controller: controller,
-          autofocus: true,
-          style: AppTextStyles.searchInput,
-          decoration: InputDecoration(hintText: l10n.onbNamePlaceholder),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(dialogContext).pop(),
-            child: Text(l10n.ratingNotNow, style: AppTextStyles.secondaryButton),
-          ),
-          TextButton(
-            onPressed: () => Navigator.of(dialogContext).pop(controller.text),
-            child: Text(
-              l10n.actionContinue,
-              style: AppTextStyles.secondaryButton.copyWith(color: AppColors.brand),
-            ),
-          ),
-        ],
-      ),
+      builder: (_) => _NameDialog(initial: current),
     );
-    controller.dispose();
     if (result != null && context.mounted) {
       await context.read<ProfileCubit>().setName(result);
     }
@@ -259,5 +234,54 @@ class AccountScreen extends StatelessWidget {
       Haptics.notify();
       await context.read<AuthCubit>().deleteAccount();
     }
+  }
+}
+
+/// Name editor. Owns its controller so it is disposed only after the dialog's
+/// close animation — disposing it when showDialog returns crashes the TextField.
+class _NameDialog extends StatefulWidget {
+  const _NameDialog({required this.initial});
+
+  final String initial;
+
+  @override
+  State<_NameDialog> createState() => _NameDialogState();
+}
+
+class _NameDialogState extends State<_NameDialog> {
+  late final _controller = TextEditingController(text: widget.initial);
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppL10n.of(context);
+    return AlertDialog(
+      backgroundColor: AppColors.surface,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(22.r)),
+      content: TextField(
+        controller: _controller,
+        autofocus: true,
+        style: AppTextStyles.searchInput,
+        decoration: InputDecoration(hintText: l10n.onbNamePlaceholder),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: Text(l10n.ratingNotNow, style: AppTextStyles.secondaryButton),
+        ),
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(_controller.text),
+          child: Text(
+            l10n.actionContinue,
+            style: AppTextStyles.secondaryButton.copyWith(color: AppColors.brand),
+          ),
+        ),
+      ],
+    );
   }
 }

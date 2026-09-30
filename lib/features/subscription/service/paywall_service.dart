@@ -10,6 +10,14 @@ enum SubscriptionGateStatus { unknown, active, inactive }
 class PaywallService {
   const PaywallService();
 
+  /// Superwall publishable key, which owns the paywall remotely. Override with
+  /// `flutter run --dart-define=SUPERWALL_API_KEY=pk_...`
+  static const apiKey = String.fromEnvironment('SUPERWALL_API_KEY');
+
+  /// Touching `Superwall.shared` before `configure()` is a native assertion
+  /// that Dart can't catch, so every call is skipped without a key.
+  static bool get isEnabled => apiKey.isNotEmpty;
+
   /// Placement configured in the Superwall dashboard, fired once when the user
   /// finishes onboarding.
   static const onboardingCompletePlacement = 'onboarding_complete';
@@ -18,6 +26,7 @@ class PaywallService {
   /// Superwall is unconfigured, leaving the gate [SubscriptionGateStatus.unknown]
   /// so a missing key can never break the app.
   Stream<SubscriptionGateStatus> get status {
+    if (!isEnabled) return const Stream.empty();
     try {
       return Superwall.shared.subscriptionStatus.map(_map).handleError((Object e) {
         debugPrint('[PaywallService] status stream failed: $e');
@@ -36,6 +45,7 @@ class PaywallService {
 
   /// Ties paywall and purchases to the Firebase uid, the same id PostHog uses.
   Future<void> identify(String uid) async {
+    if (!isEnabled) return;
     try {
       await Superwall.shared.identify(uid);
       debugPrint('[PaywallService] identified $uid');
@@ -46,6 +56,7 @@ class PaywallService {
 
   /// Clears the identity so a new anonymous user starts clean.
   Future<void> reset() async {
+    if (!isEnabled) return;
     try {
       await Superwall.shared.reset();
     } catch (e) {
@@ -56,6 +67,7 @@ class PaywallService {
   /// Asks Superwall to show the paywall for a placement. A no-op when no key is
   /// configured or the dashboard has no paywall for this placement.
   Future<void> present(String placement) async {
+    if (!isEnabled) return;
     try {
       await Superwall.shared.registerPlacement(placement);
       debugPrint('[PaywallService] presented "$placement"');
