@@ -1,8 +1,10 @@
 import 'dart:async';
+import 'dart:ui' show Rect;
 
 import 'package:equatable/equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:share_plus/share_plus.dart';
 
 import '../../../core/analytics/analytics_service.dart';
 import '../model/shopping_item.dart';
@@ -91,6 +93,26 @@ class ShoppingCubit extends Cubit<ShoppingState> {
           '',
         ],
       ].join('\n').trim();
+
+  /// Opens the native share sheet with the list as text. Returns false on failure.
+  Future<bool> share({required String subject, Rect? origin}) async {
+    try {
+      final result = await SharePlus.instance.share(ShareParams(
+        text: asPlainText(),
+        subject: subject,
+        sharePositionOrigin: origin,
+      ));
+      debugPrint('[ShoppingCubit] share sheet closed: ${result.status}');
+      unawaited(_analytics.capture(
+        AnalyticsEvents.shoppingListShared,
+        properties: {'status': result.status.name},
+      ));
+      return true;
+    } catch (e) {
+      debugPrint('[ShoppingCubit] share failed: $e');
+      return false;
+    }
+  }
 
   void errorShown() => emit(state.copyWith(clearError: true));
 

@@ -230,7 +230,6 @@
   "shoppingEyebrow": "CETTE SEMAINE",
   "shoppingCopyList": "Copier la liste",
   "shoppingShare": "Partager",
-  "shoppingAddItems": "Ajouter des courses",
   "shoppingNeeded": "({amount} nécessaire)",
   "@shoppingNeeded": {
     "placeholders": {
@@ -344,6 +343,7 @@
   "errorGeneratePlan": "Impossible de générer ton plan.",
   "errorSignIn": "Connexion impossible. Réessaie.",
   "errorShoppingUpdate": "Impossible de mettre à jour ta liste.",
+  "errorShoppingShare": "Impossible de partager ta liste.",
   "blockerSaving": "J'essaye de faire des économies",
   "onbInfoMoneyEyebrow": "AVEC TABLY, ON ÉCONOMISE EN MOYENNE",
   "onbInfoMoneyPerWeek": "par semaine",

@@ -38,6 +38,7 @@ dependencies:
   intl: any
   flutter_svg: ^2.3.0
   flutter_native_splash: ^2.4.7
+  share_plus: ^13.3.0
 
 dev_dependencies:
   flutter_test:

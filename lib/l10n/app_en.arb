@@ -230,7 +230,6 @@
   "shoppingEyebrow": "THIS WEEK",
   "shoppingCopyList": "Copy the list",
   "shoppingShare": "Share",
-  "shoppingAddItems": "Add groceries",
   "shoppingNeeded": "({amount} needed)",
   "@shoppingNeeded": {
     "placeholders": {
@@ -344,6 +343,7 @@
   "errorGeneratePlan": "Couldn't generate your plan.",
   "errorSignIn": "Couldn't sign in. Try again.",
   "errorShoppingUpdate": "Couldn't update your list.",
+  "errorShoppingShare": "Couldn't share your list.",
   "blockerSaving": "I'm trying to save money",
   "onbInfoMoneyEyebrow": "WITH TABLY, PEOPLE SAVE ON AVERAGE",
   "onbInfoMoneyPerWeek": "per week",
