@@ -1792,7 +1792,7 @@ abstract class AppL10n {
   /// No description provided for @storesSubtitle.
   ///
   /// In fr, this message translates to:
-  /// **'Prix estimé de ton plan cette semaine'**
+  /// **'Estimation France, peut varier selon le magasin et la région'**
   String get storesSubtitle;
 
   /// No description provided for @storesCurrent.
@@ -1818,18 +1818,6 @@ abstract class AppL10n {
   /// In fr, this message translates to:
   /// **'ACTUEL'**
   String get storesCurrentTag;
-
-  /// No description provided for @storesDisclaimer.
-  ///
-  /// In fr, this message translates to:
-  /// **'Estimation basée sur les prix moyens en France. Les prix peuvent varier légèrement selon le magasin et la région.'**
-  String get storesDisclaimer;
-
-  /// No description provided for @storesFootnote.
-  ///
-  /// In fr, this message translates to:
-  /// **'Les prix sont estimés à partir des {count} recettes de ta semaine et des relevés en magasin.'**
-  String storesFootnote(int count);
 
   /// No description provided for @recipesTitle.
   ///

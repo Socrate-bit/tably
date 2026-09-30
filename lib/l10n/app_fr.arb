@@ -444,7 +444,7 @@
   "leftoverBadge": "♻ Reste",
   "regeneratingPlan": "nouveau plan en cours…",
   "storesTitle": "Supermarché",
-  "storesSubtitle": "Prix estimé de ton plan cette semaine",
+  "storesSubtitle": "Estimation France, peut varier selon le magasin et la région",
   "storesCurrent": "Ton magasin actuel",
   "storesCheaper": "{amount} de moins que {store}",
   "@storesCheaper": {
@@ -466,15 +466,6 @@
     }
   },
   "storesCurrentTag": "ACTUEL",
-  "storesDisclaimer": "Estimation basée sur les prix moyens en France. Les prix peuvent varier légèrement selon le magasin et la région.",
-  "storesFootnote": "Les prix sont estimés à partir des {count} recettes de ta semaine et des relevés en magasin.",
-  "@storesFootnote": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
   "recipesTitle": "Recettes",
   "searchResultCount": "{count, plural, =1{1 résultat} other{{count} résultats}}",
   "@searchResultCount": {
