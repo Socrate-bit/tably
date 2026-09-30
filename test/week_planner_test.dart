@@ -10,7 +10,8 @@ import 'package:tably/features/plan/model/plan_settings.dart';
 import 'package:tably/features/plan/model/week_plan.dart';
 import 'package:tably/features/plan/service/week_planner.dart';
 import 'package:tably/features/preferences/model/user_profile.dart';
-import 'package:tably/features/recipe/service/recipe_catalogue.dart';
+
+import 'fixtures/recipe_fixtures.dart';
 
 UserProfile _profile(int mealsPerDay, List<int> dayIndexes, {Variety variety = Variety.high}) => UserProfile(
       mealsPerDay: mealsPerDay,
@@ -31,6 +32,7 @@ void main() {
       final plan = WeekPlanner.build(
         profile: _profile(mealsPerDay, (c['mask'] as List).cast<int>()),
         settings: PlanSettings(seed: c['seed'] as int),
+        catalogue: RecipeFixtures.recipes,
       );
       final slots = MealSlot.forMealsPerDay(mealsPerDay);
       final expected = (c['slots'] as List).cast<Map<String, dynamic>>();
@@ -52,11 +54,12 @@ void main() {
       final plan = WeekPlanner.build(
         profile: _profile(2, [0, 1, 2, 3, 4, 5, 6], variety: variety),
         settings: const PlanSettings(),
+        catalogue: RecipeFixtures.recipes,
       );
       expect(plan.slotCount, 14);
       // Every chosen dish is cooked; past the catalogue's size some come back.
       expect(plan.slots.where((s) => !s.isLeftover).length, recipes);
-      expect(plan.recipeCount, min(recipes, RecipeCatalogue.recipes.length));
+      expect(plan.recipeCount, min(recipes, RecipeFixtures.recipes.length));
     }
   });
 
@@ -67,13 +70,14 @@ void main() {
 
   test('a swapped meal carries through to its leftover', () {
     final profile = _profile(2, [0, 1, 2, 3, 4, 5, 6], variety: Variety.balanced);
-    final base = WeekPlanner.build(profile: profile, settings: const PlanSettings());
+    final base = WeekPlanner.build(profile: profile, settings: const PlanSettings(), catalogue: RecipeFixtures.recipes);
     final mondayLunch = base.slotByKey('monday|lunch')!;
-    final other = RecipeCatalogue.recipes.firstWhere((r) => r.id != mondayLunch.recipe.id);
+    final other = RecipeFixtures.recipes.firstWhere((r) => r.id != mondayLunch.recipe.id);
 
     final swapped = WeekPlanner.build(
       profile: profile,
       settings: PlanSettings(overrides: {'monday|lunch': other.id}),
+      catalogue: RecipeFixtures.recipes,
     );
 
     expect(swapped.slotByKey('monday|lunch')!.recipe, other);
@@ -86,6 +90,7 @@ void main() {
     final plan = WeekPlanner.build(
       profile: _profile(2, [0, 1, 2, 3, 4, 5, 6], variety: Variety.balanced),
       settings: const PlanSettings(),
+      catalogue: RecipeFixtures.recipes,
     );
     final cooked = plan.slots.where((s) => !s.isLeftover);
     expect(plan.slotCount, 14);
@@ -94,7 +99,7 @@ void main() {
   });
 
   test('an empty week has no slots and costs nothing', () {
-    final plan = WeekPlanner.build(profile: _profile(1, []), settings: const PlanSettings());
+    final plan = WeekPlanner.build(profile: _profile(1, []), settings: const PlanSettings(), catalogue: RecipeFixtures.recipes);
     expect(plan.slots, isEmpty);
     expect(plan.baseTotal, 0);
   });

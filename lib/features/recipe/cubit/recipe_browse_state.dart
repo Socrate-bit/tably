@@ -42,7 +42,7 @@ class RecipeBrowseState extends Equatable {
       if (cuisines.isNotEmpty && !cuisines.contains(r.cuisine)) return false;
       if (proteins.isNotEmpty && !proteins.contains(r.protein)) return false;
       if (hasPriceLimit && r.price * store.priceFactor > maxPrice) return false;
-      final haystack = '${r.title} ${cravingLabel(r.craving)} ${r.photoKey}'.toLowerCase();
+      final haystack = '${r.title} ${cravingLabel(r.craving)}'.toLowerCase();
       return words.every(haystack.contains);
     }).toList();
   }

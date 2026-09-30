@@ -3,7 +3,8 @@ import 'package:tably/core/model/preference_option.dart';
 import 'package:tably/core/model/store.dart';
 import 'package:tably/features/recipe/cubit/recipe_browse_cubit.dart';
 import 'package:tably/features/recipe/model/recipe.dart';
-import 'package:tably/features/recipe/service/recipe_catalogue.dart';
+
+import 'fixtures/recipe_fixtures.dart';
 
 String _label(Craving c) => switch (c) {
       Craving.quick => 'Repas express',
@@ -13,14 +14,14 @@ String _label(Craving c) => switch (c) {
     };
 
 List<String> _ids(RecipeBrowseState state, {Store store = Store.carrefour}) =>
-    state.apply(RecipeCatalogue.recipes, store: store, cravingLabel: _label).map((r) => r.id).toList();
+    state.apply(RecipeFixtures.recipes, store: store, cravingLabel: _label).map((r) => r.id).toList();
 
 void main() {
   test('no filters and no search shows the whole catalogue', () {
-    expect(_ids(const RecipeBrowseState()), hasLength(RecipeCatalogue.recipes.length));
+    expect(_ids(const RecipeBrowseState()), hasLength(RecipeFixtures.recipes.length));
   });
 
-  test('search matches every word across title, badge and photo keyword', () {
+  test('search matches every word across title and badge', () {
     expect(_ids(const RecipeBrowseState(query: 'poulet riz')), containsAll(['riz_poulet_cajun', 'riz_frit_poulet']));
     expect(_ids(const RecipeBrowseState(query: 'gourmand')), ['wraps_big_mac']);
     expect(_ids(const RecipeBrowseState(query: 'zzz')), isEmpty);

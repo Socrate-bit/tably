@@ -2,9 +2,9 @@ rules_version = '2';
 
 // Tably security rules.
 // A user may only read and write their own document and subcollections:
-// profile, plan settings, shopping list and per-recipe state.
-// The recipe catalogue ships inside the app, so no shared collection is
-// readable or writable by clients — everything else is denied by default.
+// profile, plan settings, recipe catalogue, shopping list and per-recipe
+// state. Each user's recipes are built for their own preferences, so there
+// is no shared catalogue — everything else is denied by default.
 service cloud.firestore {
   match /databases/{database}/documents {
 

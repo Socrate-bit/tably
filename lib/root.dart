@@ -7,6 +7,7 @@ import 'features/home/screen/home_screen.dart';
 import 'features/onboarding/screen/onboarding_screen.dart';
 import 'features/plan/cubit/plan_cubit.dart';
 import 'features/preferences/cubit/profile_cubit.dart';
+import 'features/recipe/cubit/catalogue_cubit.dart';
 import 'features/recipe/cubit/recipe_cubit.dart';
 import 'features/shopping/cubit/shopping_cubit.dart';
 import 'features/subscription/cubit/subscription_cubit.dart';
@@ -44,6 +45,7 @@ class RootScreen extends StatelessWidget {
   static void _bind(BuildContext context, String? uid) {
     if (uid == null) return;
     context.read<ProfileCubit>().bind(uid);
+    context.read<CatalogueCubit>().bind(uid);
     context.read<PlanCubit>().bind(uid);
     context.read<ShoppingCubit>().bind(uid);
     context.read<RecipeCubit>().bind(uid);

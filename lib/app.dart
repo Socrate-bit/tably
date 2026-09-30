@@ -13,8 +13,11 @@ import 'features/plan/cubit/plan_cubit.dart';
 import 'features/plan/service/plan_service.dart';
 import 'features/preferences/cubit/profile_cubit.dart';
 import 'features/preferences/service/profile_service.dart';
+import 'features/recipe/cubit/catalogue_cubit.dart';
 import 'features/recipe/cubit/recipe_browse_cubit.dart';
 import 'features/recipe/cubit/recipe_cubit.dart';
+import 'features/recipe/service/recipe_ai_service.dart';
+import 'features/recipe/service/recipe_search_service.dart';
 import 'features/recipe/service/recipe_service.dart';
 import 'features/shopping/cubit/shopping_cubit.dart';
 import 'features/shopping/service/shopping_service.dart';
@@ -41,6 +44,8 @@ class TablyApp extends StatelessWidget {
         RepositoryProvider(create: (_) => PlanService()),
         RepositoryProvider(create: (_) => ShoppingService()),
         RepositoryProvider<RecipeService>.value(value: recipeService),
+        RepositoryProvider(create: (_) => RecipeSearchService()),
+        RepositoryProvider(create: (_) => RecipeAiService()),
         RepositoryProvider(create: (_) => const PaywallService()),
         RepositoryProvider(create: (_) => ReferralService()),
       ],
@@ -67,23 +72,38 @@ class TablyApp extends StatelessWidget {
             ),
           ),
           BlocProvider(
-            create: (context) => PlanCubit(
-              service: context.read<PlanService>(),
+            create: (context) => CatalogueCubit(
+              service: recipeService,
+              search: context.read<RecipeSearchService>(),
+              ai: context.read<RecipeAiService>(),
               profileCubit: context.read<ProfileCubit>(),
-              analytics: analytics,
-            ),
-          ),
-          BlocProvider(
-            create: (context) => ShoppingCubit(
-              service: context.read<ShoppingService>(),
               analytics: analytics,
             ),
           ),
           BlocProvider(
             create: (context) => RecipeCubit(service: recipeService, analytics: analytics),
           ),
+          BlocProvider(
+            create: (context) => PlanCubit(
+              service: context.read<PlanService>(),
+              profileCubit: context.read<ProfileCubit>(),
+              catalogueCubit: context.read<CatalogueCubit>(),
+              recipeCubit: context.read<RecipeCubit>(),
+              analytics: analytics,
+            ),
+          ),
+          BlocProvider(
+            create: (context) => ShoppingCubit(
+              service: context.read<ShoppingService>(),
+              planCubit: context.read<PlanCubit>(),
+              profileCubit: context.read<ProfileCubit>(),
+              analytics: analytics,
+            ),
+          ),
           BlocProvider(create: (_) => RecipeBrowseCubit(analytics: analytics)),
-          BlocProvider(create: (_) => OnboardingCubit(analytics: analytics)),
+          BlocProvider(
+            create: (context) => OnboardingCubit(catalogueCubit: context.read<CatalogueCubit>(), analytics: analytics),
+          ),
           BlocProvider(create: (_) => HomeCubit(analytics: analytics)),
         ],
         child: ScreenUtilInit(

@@ -7,7 +7,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../core/analytics/analytics_service.dart';
 import '../model/recipe.dart';
 import '../model/recipe_interaction.dart';
-import '../service/recipe_catalogue.dart';
 import '../service/recipe_service.dart';
 
 part 'recipe_state.dart';
@@ -44,13 +43,18 @@ class RecipeCubit extends Cubit<RecipeState> {
     return _save(state.interactionFor(recipeId).copyWith(viewedAt: DateTime.now()));
   }
 
-  Future<void> toggleFavourite(String recipeId) {
-    final next = state.interactionFor(recipeId);
+  /// Favouriting saves a copy of [recipe], so it stays in the favourites even
+  /// after a preferences change rebuilds the catalogue without it.
+  Future<void> toggleFavourite(Recipe recipe) {
+    final current = state.interactionFor(recipe.id);
+    final favourite = !current.favourite;
     unawaited(_analytics.capture(
       AnalyticsEvents.recipeFavouriteToggled,
-      properties: {'recipe_id': recipeId, 'favourite': !next.favourite},
+      properties: {'recipe_id': recipe.id, 'favourite': favourite},
     ));
-    return _save(next.copyWith(favourite: !next.favourite));
+    return _save(favourite
+        ? current.copyWith(favourite: true, recipe: recipe)
+        : current.copyWith(favourite: false, clearRecipe: true));
   }
 
   Future<void> toggleCooked(String recipeId) {

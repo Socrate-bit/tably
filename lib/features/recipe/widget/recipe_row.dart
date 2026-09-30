@@ -45,7 +45,7 @@ class RecipeRow extends StatelessWidget {
       color: bordered ? Colors.transparent : AppColors.surface,
       child: Row(
         children: [
-          RecipePhoto(photoKey: recipe.photoKey, height: photo, width: photo, radius: 14.r),
+          RecipePhoto(url: recipe.photoUrl, height: photo, width: photo, radius: 14.r),
           SizedBox(width: large ? 14.w : 13.w),
           Expanded(
             child: Column(
@@ -70,7 +70,7 @@ class RecipeRow extends StatelessWidget {
             ),
           ),
           SizedBox(width: 8.w),
-          FavouriteButton(recipeId: recipe.id),
+          FavouriteButton(recipe: recipe),
         ],
       ),
     );

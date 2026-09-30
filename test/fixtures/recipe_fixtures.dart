@@ -1,15 +1,32 @@
-import '../../../core/model/preference_option.dart';
-import '../model/recipe.dart';
+import 'package:tably/core/analytics/analytics_service.dart';
+import 'package:tably/core/model/aisle.dart';
+import 'package:tably/core/model/preference_option.dart';
+import 'package:tably/features/preferences/cubit/profile_cubit.dart';
+import 'package:tably/features/recipe/cubit/catalogue_cubit.dart';
+import 'package:tably/features/recipe/model/recipe.dart';
+import 'package:tably/features/recipe/service/recipe_ai_service.dart';
+import 'package:tably/features/recipe/service/recipe_search_service.dart';
+import 'package:tably/features/recipe/service/recipe_service.dart';
 
-/// The bundled recipe catalogue, taken verbatim from the design. It is the
-/// single source of truth: the planner, search, filters and favourites all
-/// read from here.
-abstract final class RecipeCatalogue {
-  static const recipes = <Recipe>[
+/// A catalogue cubit holding the fixtures. Never bound to a user, so it makes
+/// no Firebase, Spoonacular or Gemini call.
+CatalogueCubit seededCatalogue(ProfileCubit profileCubit) => CatalogueCubit(
+      service: RecipeService(),
+      search: RecipeSearchService(),
+      ai: RecipeAiService(),
+      profileCubit: profileCubit,
+      analytics: const AnalyticsService(),
+      recipes: RecipeFixtures.recipes,
+    );
+
+/// The design's original 11 recipes, kept as test data: the planner fixtures
+/// in design_plans.json were recorded against exactly this list and order.
+abstract final class RecipeFixtures {
+  static final recipes = <Recipe>[
     Recipe(
       id: 'riz_poulet_cajun',
       title: 'Riz au poulet à la cajun',
-      photoKey: 'cajun',
+      photoUrl: '',
       macros: Macros(kcal: 612, protein: 41, carbs: 74, fat: 16),
       time: '25m',
       cookTime: '20-25m',
@@ -17,17 +34,14 @@ abstract final class RecipeCatalogue {
       craving: Craving.quick,
       protein: RecipeProtein.chicken,
       ingredients: [
-        Ingredient(icon: '🍗', name: 'Poitrine de poulet', quantity: '150g'),
-        Ingredient(icon: '🍚', name: 'Riz', quantity: '75g'),
-        Ingredient(
-          icon: '🥣',
-          name: "Mélange d'épices cajun",
-          quantity: '½tbsp',
+        _ingredient('🍗', 'Poitrine de poulet', '150g'),
+        _ingredient('🍚', 'Riz', '75g'),
+        _ingredient('🥣', "Mélange d'épices cajun", '½tbsp',
         ),
-        Ingredient(icon: '🫑', name: 'Poivron', quantity: '1'),
-        Ingredient(icon: '🧅', name: 'Oignon rouge', quantity: '½'),
-        Ingredient(icon: '🧄', name: 'Ail', quantity: '2 gousses'),
-        Ingredient(icon: '🫒', name: "Huile d'olive", quantity: '1tbsp'),
+        _ingredient('🫑', 'Poivron', '1'),
+        _ingredient('🧅', 'Oignon rouge', '½'),
+        _ingredient('🧄', 'Ail', '2 gousses'),
+        _ingredient('🫒', "Huile d'olive", '1tbsp'),
       ],
       steps: [
         "Faites cuire le riz selon les instructions de l'emballage.",
@@ -41,7 +55,7 @@ abstract final class RecipeCatalogue {
     Recipe(
       id: 'nouilles_tofu_satay',
       title: 'Nouilles au tofu et au satay',
-      photoKey: 'noodle',
+      photoUrl: '',
       macros: Macros(kcal: 698, protein: 38, carbs: 71, fat: 29),
       time: '25m',
       cookTime: '20-25m',
@@ -50,13 +64,13 @@ abstract final class RecipeCatalogue {
       protein: RecipeProtein.tofu,
       cuisine: Cuisine.asian,
       ingredients: [
-        Ingredient(icon: '🍜', name: 'Nouilles', quantity: '90g'),
-        Ingredient(icon: '🧈', name: 'Tofu extra-ferme', quantity: '150g'),
-        Ingredient(icon: '🥜', name: 'Beurre de cacahuètes', quantity: '20g'),
-        Ingredient(icon: '🍶', name: 'Sauce soja claire', quantity: '15ml'),
-        Ingredient(icon: '🍈', name: 'Citron vert', quantity: '½'),
-        Ingredient(icon: '🥕', name: 'Carottes', quantity: '65g'),
-        Ingredient(icon: '🧅', name: 'Cébette', quantity: '2 tiges'),
+        _ingredient('🍜', 'Nouilles', '90g'),
+        _ingredient('🧈', 'Tofu extra-ferme', '150g'),
+        _ingredient('🥜', 'Beurre de cacahuètes', '20g'),
+        _ingredient('🍶', 'Sauce soja claire', '15ml'),
+        _ingredient('🍈', 'Citron vert', '½'),
+        _ingredient('🥕', 'Carottes', '65g'),
+        _ingredient('🧅', 'Cébette', '2 tiges'),
       ],
       steps: [
         'Égouttez le tofu et coupez-le en cubes.',
@@ -70,7 +84,7 @@ abstract final class RecipeCatalogue {
     Recipe(
       id: 'boites_riz_poulet_piment_doux',
       title: 'Boîtes de riz au poulet au piment doux',
-      photoKey: 'handi',
+      photoUrl: '',
       macros: Macros(kcal: 640, protein: 43, carbs: 78, fat: 15),
       time: '25m',
       cookTime: '20-25m',
@@ -79,12 +93,12 @@ abstract final class RecipeCatalogue {
       protein: RecipeProtein.chicken,
       cuisine: Cuisine.asian,
       ingredients: [
-        Ingredient(icon: '🍗', name: 'Poitrine de poulet', quantity: '150g'),
-        Ingredient(icon: '🍚', name: 'Riz', quantity: '75g'),
-        Ingredient(icon: '🌶️', name: 'Sauce au piment doux', quantity: '20ml'),
-        Ingredient(icon: '🥦', name: 'Brocoli', quantity: '100g'),
-        Ingredient(icon: '🍶', name: 'Sauce soja claire', quantity: '15ml'),
-        Ingredient(icon: '🧄', name: 'Ail', quantity: '1 gousse'),
+        _ingredient('🍗', 'Poitrine de poulet', '150g'),
+        _ingredient('🍚', 'Riz', '75g'),
+        _ingredient('🌶️', 'Sauce au piment doux', '20ml'),
+        _ingredient('🥦', 'Brocoli', '100g'),
+        _ingredient('🍶', 'Sauce soja claire', '15ml'),
+        _ingredient('🧄', 'Ail', '1 gousse'),
       ],
       steps: [
         'Faites cuire le riz et laissez-le refroidir légèrement.',
@@ -98,7 +112,7 @@ abstract final class RecipeCatalogue {
     Recipe(
       id: 'farfalle_feta_feves',
       title: 'Farfalle à la feta et aux fèves',
-      photoKey: 'pasta',
+      photoUrl: '',
       macros: Macros(kcal: 684, protein: 31, carbs: 88, fat: 23),
       time: '25m',
       cookTime: '20-25m',
@@ -107,12 +121,12 @@ abstract final class RecipeCatalogue {
       protein: RecipeProtein.vegetarian,
       cuisine: Cuisine.italian,
       ingredients: [
-        Ingredient(icon: '🎀', name: 'Farfalle', quantity: '95g'),
-        Ingredient(icon: '🧀', name: 'Feta', quantity: '50g'),
-        Ingredient(icon: '🫘', name: 'Fèves surgelées', quantity: '125g'),
-        Ingredient(icon: '🍋', name: 'Citron', quantity: '½'),
-        Ingredient(icon: '🌿', name: 'Persil', quantity: '10g'),
-        Ingredient(icon: '🫒', name: "Huile d'olive", quantity: '1½tbsp'),
+        _ingredient('🎀', 'Farfalle', '95g'),
+        _ingredient('🧀', 'Feta', '50g'),
+        _ingredient('🫘', 'Fèves surgelées', '125g'),
+        _ingredient('🍋', 'Citron', '½'),
+        _ingredient('🌿', 'Persil', '10g'),
+        _ingredient('🫒', "Huile d'olive", '1½tbsp'),
       ],
       steps: [
         'Faites cuire les farfalle en eau bouillante salée.',
@@ -126,7 +140,7 @@ abstract final class RecipeCatalogue {
     Recipe(
       id: 'riz_frit_poulet',
       title: 'Riz frit au poulet',
-      photoKey: 'friedrice',
+      photoUrl: '',
       macros: Macros(kcal: 623, protein: 39, carbs: 76, fat: 17),
       time: '25m',
       cookTime: '20m',
@@ -135,12 +149,12 @@ abstract final class RecipeCatalogue {
       protein: RecipeProtein.chicken,
       cuisine: Cuisine.asian,
       ingredients: [
-        Ingredient(icon: '🍚', name: 'Riz', quantity: '75g'),
-        Ingredient(icon: '🍗', name: 'Poitrine de poulet', quantity: '150g'),
-        Ingredient(icon: '🥚', name: 'Œufs', quantity: '1'),
-        Ingredient(icon: '🫛', name: 'Pois', quantity: '40g'),
-        Ingredient(icon: '🍶', name: 'Sauce soja claire', quantity: '15ml'),
-        Ingredient(icon: '🧅', name: 'Cébette', quantity: '2 tiges'),
+        _ingredient('🍚', 'Riz', '75g'),
+        _ingredient('🍗', 'Poitrine de poulet', '150g'),
+        _ingredient('🥚', 'Œufs', '1'),
+        _ingredient('🫛', 'Pois', '40g'),
+        _ingredient('🍶', 'Sauce soja claire', '15ml'),
+        _ingredient('🧅', 'Cébette', '2 tiges'),
       ],
       steps: [
         'Utilisez du riz cuit la veille, bien froid.',
@@ -154,7 +168,7 @@ abstract final class RecipeCatalogue {
     Recipe(
       id: 'carbonara_haricots_asperges',
       title: "Carbonara aux haricots beurre et aux asperges à l'ail",
-      photoKey: 'carbonara',
+      photoUrl: '',
       macros: Macros(kcal: 742, protein: 34, carbs: 69, fat: 36),
       time: '35m',
       cookTime: '30-35m',
@@ -163,12 +177,12 @@ abstract final class RecipeCatalogue {
       protein: RecipeProtein.pork,
       cuisine: Cuisine.italian,
       ingredients: [
-        Ingredient(icon: '🫘', name: 'Haricots beurre', quantity: '200g'),
-        Ingredient(icon: '🥓', name: 'Pancetta non fumée', quantity: '42.5g'),
-        Ingredient(icon: '🌿', name: "Pointes d'asperges", quantity: '50g'),
-        Ingredient(icon: '🥚', name: "Jaunes d'œufs", quantity: '1'),
-        Ingredient(icon: '🧈', name: 'Parmesan', quantity: '20g'),
-        Ingredient(icon: '🧄', name: 'Ail', quantity: '1 gousse'),
+        _ingredient('🫘', 'Haricots beurre', '200g'),
+        _ingredient('🥓', 'Pancetta non fumée', '42.5g'),
+        _ingredient('🌿', "Pointes d'asperges", '50g'),
+        _ingredient('🥚', "Jaunes d'œufs", '1'),
+        _ingredient('🧈', 'Parmesan', '20g'),
+        _ingredient('🧄', 'Ail', '1 gousse'),
       ],
       steps: [
         "Faites dorer la pancetta jusqu'à ce qu'elle soit croustillante.",
@@ -182,7 +196,7 @@ abstract final class RecipeCatalogue {
     Recipe(
       id: 'ragout_haricots_chorizo',
       title: 'Ragoût de haricots beurre au chorizo',
-      photoKey: 'stew',
+      photoUrl: '',
       macros: Macros(kcal: 588, protein: 29, carbs: 58, fat: 26),
       time: '35m',
       cookTime: '30-35m',
@@ -191,16 +205,13 @@ abstract final class RecipeCatalogue {
       protein: RecipeProtein.pork,
       cuisine: Cuisine.mediterranean,
       ingredients: [
-        Ingredient(icon: '🫘', name: 'Haricots beurre', quantity: '200g'),
-        Ingredient(icon: '🌭', name: 'Chorizo', quantity: '50g'),
-        Ingredient(
-          icon: '🥫',
-          name: 'Tomates coupées en morceaux',
-          quantity: '100ml',
+        _ingredient('🫘', 'Haricots beurre', '200g'),
+        _ingredient('🌭', 'Chorizo', '50g'),
+        _ingredient('🥫', 'Tomates coupées en morceaux', '100ml',
         ),
-        Ingredient(icon: '🧅', name: 'Oignon rouge', quantity: '½'),
-        Ingredient(icon: '🧄', name: 'Ail', quantity: '2 gousses'),
-        Ingredient(icon: '🌿', name: 'Persil', quantity: '10g'),
+        _ingredient('🧅', 'Oignon rouge', '½'),
+        _ingredient('🧄', 'Ail', '2 gousses'),
+        _ingredient('🌿', 'Persil', '10g'),
       ],
       steps: [
         'Faites rendre sa graisse au chorizo coupé en dés.',
@@ -214,7 +225,7 @@ abstract final class RecipeCatalogue {
     Recipe(
       id: 'soupe_lasagnes_boeuf',
       title: 'Soupe aux lasagnes au bœuf',
-      photoKey: 'lasagne',
+      photoUrl: '',
       macros: Macros(kcal: 566, protein: 35, carbs: 52, fat: 22),
       time: '20m',
       cookTime: '20m',
@@ -223,16 +234,13 @@ abstract final class RecipeCatalogue {
       protein: RecipeProtein.beef,
       cuisine: Cuisine.italian,
       ingredients: [
-        Ingredient(icon: '🥩', name: 'Bœuf haché', quantity: '125g'),
-        Ingredient(
-          icon: '🥫',
-          name: 'Tomates coupées en morceaux',
-          quantity: '200ml',
+        _ingredient('🥩', 'Bœuf haché', '125g'),
+        _ingredient('🥫', 'Tomates coupées en morceaux', '200ml',
         ),
-        Ingredient(icon: '🍝', name: 'Feuilles de lasagne', quantity: '2'),
-        Ingredient(icon: '🧅', name: 'Oignon rouge', quantity: '½'),
-        Ingredient(icon: '🧄', name: 'Ail', quantity: '2 gousses'),
-        Ingredient(icon: '🧀', name: 'Parmesan', quantity: '15g'),
+        _ingredient('🍝', 'Feuilles de lasagne', '2'),
+        _ingredient('🧅', 'Oignon rouge', '½'),
+        _ingredient('🧄', 'Ail', '2 gousses'),
+        _ingredient('🧀', 'Parmesan', '15g'),
       ],
       steps: [
         'Faites colorer le bœuf haché dans une casserole.',
@@ -246,7 +254,7 @@ abstract final class RecipeCatalogue {
     Recipe(
       id: 'fusilli_pois_lard_ricotta',
       title: 'Fusilli aux petits pois, au lard et à la ricotta',
-      photoKey: 'fettucine',
+      photoUrl: '',
       macros: Macros(kcal: 753, protein: 35, carbs: 97, fat: 25),
       time: '25m',
       cookTime: '20-25m',
@@ -255,13 +263,13 @@ abstract final class RecipeCatalogue {
       protein: RecipeProtein.pork,
       cuisine: Cuisine.italian,
       ingredients: [
-        Ingredient(icon: '🍝', name: 'Fusilli', quantity: '100g'),
-        Ingredient(icon: '🫛', name: 'Petits pois', quantity: '60g'),
-        Ingredient(icon: '🥓', name: 'Lardons', quantity: '37.5g'),
-        Ingredient(icon: '🧀', name: 'Ricotta', quantity: '50g'),
-        Ingredient(icon: '🧄', name: 'Ail', quantity: '½ gousse'),
-        Ingredient(icon: '🍋', name: 'Citron', quantity: '¼'),
-        Ingredient(icon: '🧈', name: 'Parmesan', quantity: '15g'),
+        _ingredient('🍝', 'Fusilli', '100g'),
+        _ingredient('🫛', 'Petits pois', '60g'),
+        _ingredient('🥓', 'Lardons', '37.5g'),
+        _ingredient('🧀', 'Ricotta', '50g'),
+        _ingredient('🧄', 'Ail', '½ gousse'),
+        _ingredient('🍋', 'Citron', '¼'),
+        _ingredient('🧈', 'Parmesan', '15g'),
       ],
       steps: [
         "Portez à ébullition une grande casserole d'eau salée et faites cuire les fusilli jusqu'à ce qu'ils soient al dente.",
@@ -277,7 +285,7 @@ abstract final class RecipeCatalogue {
     Recipe(
       id: 'wraps_big_mac',
       title: 'Wraps façon Big Mac',
-      photoKey: 'bigmac',
+      photoUrl: '',
       macros: Macros(kcal: 712, protein: 38, carbs: 46, fat: 41),
       time: '25m',
       cookTime: '20-25m',
@@ -286,25 +294,19 @@ abstract final class RecipeCatalogue {
       protein: RecipeProtein.beef,
       creator: "C'est Tarpin Bon",
       ingredients: [
-        Ingredient(icon: '🥫', name: 'Moutarde', quantity: '1 c. à café'),
-        Ingredient(icon: '🥣', name: 'Mayonnaise', quantity: '2 c. à café'),
-        Ingredient(icon: '🍅', name: 'Ketchup', quantity: '2 c. à café'),
-        Ingredient(icon: '🥒', name: 'Cornichons', quantity: 'au goût'),
-        Ingredient(icon: '🥒', name: 'Jus de cornichons', quantity: '1 filet'),
-        Ingredient(
-          icon: '🌯',
-          name: 'Mini crêpes (petits wraps)',
-          quantity: '4',
+        _ingredient('🥫', 'Moutarde', '1 c. à café'),
+        _ingredient('🥣', 'Mayonnaise', '2 c. à café'),
+        _ingredient('🍅', 'Ketchup', '2 c. à café'),
+        _ingredient('🥒', 'Cornichons', 'au goût'),
+        _ingredient('🥒', 'Jus de cornichons', '1 filet'),
+        _ingredient('🌯', 'Mini crêpes (petits wraps)', '4',
         ),
-        Ingredient(icon: '🥩', name: 'Bœuf haché cru', quantity: '400g'),
-        Ingredient(icon: '🧂', name: 'Sel', quantity: 'au goût'),
-        Ingredient(
-          icon: '🫗',
-          name: 'Spray de cuisson',
-          quantity: '1 pulvérisation',
+        _ingredient('🥩', 'Bœuf haché cru', '400g'),
+        _ingredient('🧂', 'Sel', 'au goût'),
+        _ingredient('🫗', 'Spray de cuisson', '1 pulvérisation',
         ),
-        Ingredient(icon: '🧀', name: 'Cheddar en tranches', quantity: '4'),
-        Ingredient(icon: '🥬', name: 'Laitue', quantity: '½'),
+        _ingredient('🧀', 'Cheddar en tranches', '4'),
+        _ingredient('🥬', 'Laitue', '½'),
       ],
       steps: [
         'Mélangez la moutarde, la mayonnaise, le ketchup, les cornichons et un peu de jus de cornichons pour faire la sauce Big Mac.',
@@ -319,7 +321,7 @@ abstract final class RecipeCatalogue {
     Recipe(
       id: 'poulet_saute_sesame',
       title: 'Poulet sauté au sésame',
-      photoKey: 'sesame',
+      photoUrl: '',
       macros: Macros(kcal: 604, protein: 45, carbs: 58, fat: 19),
       time: '22m',
       cookTime: '20-22m',
@@ -328,12 +330,12 @@ abstract final class RecipeCatalogue {
       protein: RecipeProtein.chicken,
       cuisine: Cuisine.asian,
       ingredients: [
-        Ingredient(icon: '🍗', name: 'Poitrine de poulet', quantity: '150g'),
-        Ingredient(icon: '🍚', name: 'Riz', quantity: '75g'),
-        Ingredient(icon: '🍶', name: 'Sauce soja claire', quantity: '20ml'),
-        Ingredient(icon: '🫓', name: 'Graines de sésame', quantity: '1tbsp'),
-        Ingredient(icon: '🥦', name: 'Brocoli', quantity: '100g'),
-        Ingredient(icon: '🧄', name: 'Ail', quantity: '1 gousse'),
+        _ingredient('🍗', 'Poitrine de poulet', '150g'),
+        _ingredient('🍚', 'Riz', '75g'),
+        _ingredient('🍶', 'Sauce soja claire', '20ml'),
+        _ingredient('🫓', 'Graines de sésame', '1tbsp'),
+        _ingredient('🥦', 'Brocoli', '100g'),
+        _ingredient('🧄', 'Ail', '1 gousse'),
       ],
       steps: [
         'Faites cuire le riz.',
@@ -346,13 +348,22 @@ abstract final class RecipeCatalogue {
     ),
   ];
 
-  /// The "recently viewed" rail before the user has opened anything.
-  static const recentIds = <String>[
-    'soupe_lasagnes_boeuf',
-    'fusilli_pois_lard_ricotta',
-    'poulet_saute_sesame',
-  ];
+}
 
-  static Recipe? byId(String id) =>
-      recipes.where((r) => r.id == id).firstOrNull;
+final _ids = <String, int>{};
+
+/// Builds an ingredient from the design's free-text quantity ("150g",
+/// "½tbsp", "2 gousses"). Ids are stable per name, as Spoonacular's are.
+Ingredient _ingredient(String icon, String name, String quantity) {
+  final match = RegExp(r'^([\d.]*)([¼½¾]?)\s*(.*)$').firstMatch(quantity)!;
+  const fractions = {'¼': 0.25, '½': 0.5, '¾': 0.75};
+  final amount = (double.tryParse(match[1]!) ?? 0) + (fractions[match[2]] ?? 0);
+  return Ingredient(
+    id: _ids.putIfAbsent(name, () => _ids.length + 1),
+    icon: icon,
+    name: name,
+    amount: amount,
+    unit: match[3]!,
+    aisle: Aisle.herbsGrocery,
+  );
 }

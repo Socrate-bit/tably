@@ -17,8 +17,8 @@ class ShoppingState extends Equatable {
 
   int get checkedCount => items.where((i) => i.checked).length;
 
-  /// Items grouped into aisle cards, in catalogue order.
-  List<ShoppingCategory> get categories => ShoppingCatalogue.groupByCategory(items);
+  /// Items grouped into aisle cards, in aisle order.
+  List<ShoppingCategory> get categories => ShoppingListBuilder.groupByAisle(items);
 
   ShoppingState copyWith({
     ShoppingStatus? status,

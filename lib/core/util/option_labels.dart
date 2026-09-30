@@ -1,6 +1,7 @@
 import '../../features/plan/model/week_plan.dart';
 import '../../features/recipe/model/recipe.dart';
 import '../../l10n/app_localizations.dart';
+import '../model/aisle.dart';
 import '../model/preference_option.dart';
 import '../model/weekday.dart';
 
@@ -130,6 +131,14 @@ extension OptionLabels on AppL10n {
       };
 
   String proteinName(RecipeProtein protein) => optionLabel(protein.id);
+
+  String aisleName(Aisle aisle) => switch (aisle) {
+        Aisle.produce => aisleProduce,
+        Aisle.meatFish => aisleMeatFish,
+        Aisle.pastaRice => aislePastaRice,
+        Aisle.tinsSauces => aisleTinsSauces,
+        Aisle.herbsGrocery => aisleHerbsGrocery,
+      };
 }
 
 /// Formats an amount with the profile's currency symbol.

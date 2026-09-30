@@ -35,6 +35,42 @@ Deploy rule changes with:
 firebase deploy --only firestore:rules --project tably-9f3c2
 ```
 
+### Recipes: Spoonacular + Gemini
+
+Each user's recipes are built from their onboarding answers, at the end of
+onboarding and again whenever a preference they depend on changes (diets,
+allergies, proteins, appliances, cook time, language):
+
+1. The `searchRecipes` Cloud Function (`functions/src/index.ts`) queries
+   Spoonacular's `complexSearch` through RapidAPI and trims the results. The key
+   stays server-side as a secret. **Every build spends one request of the daily
+   quota (40 on the free plan) — there is no cache yet.** Reshuffling the week
+   or swapping a meal never calls it.
+2. `RecipeAiService` sends the candidates to Gemini (`gemini-3.1-flash-lite`,
+   Firebase AI Logic, Gemini Developer API) in parallel chunks. Gemini drops any
+   recipe that breaks a diet, allergy, protein or appliance constraint, and
+   translates the rest into the user's language. Numbers, photos and sources
+   always come from Spoonacular, never from the model.
+3. `CatalogueCubit` stores the result at `users/{uid}/recipes`. The plan and the
+   shopping list are derived from it.
+
+Set the key and deploy the function:
+
+```bash
+firebase functions:secrets:set SPOONACULAR_API_KEY --project tably-9f3c2
+firebase deploy --only functions:searchRecipes --project tably-9f3c2
+# The org policy blocks public invokers, so the deploy reports an IAM error;
+# the function is deployed, it just needs this once per new function:
+gcloud run services update searchrecipes --region europe-west1 --project tably-9f3c2 --no-invoker-iam-check
+```
+
+For the emulator, put `SPOONACULAR_API_KEY=...` in `functions/.secret.local`
+(ignored by git). Quota use is logged on every call:
+`firebase functions:log --only searchRecipes`.
+
+App Check is not enforced yet, so the Gemini endpoint is reachable by anyone
+holding the app's Firebase config; enable it before release.
+
 ### Data model
 
 ```
@@ -42,18 +78,21 @@ users/{uid}                     profile: name, household, meals per day, days,
                                 budget, country, store, cravings, diets,
                                 allergies, proteins, appliances, survey answers
 users/{uid}/plan/week           plan settings: shuffle seed + swapped meals
-users/{uid}/shopping/{itemId}   ShoppingItem with its checked state
+users/{uid}/plan/catalogue      key of the preferences the recipes were built for
+users/{uid}/recipes/{id}        Recipe, id = Spoonacular id, text in the user's language
+users/{uid}/shopping/{itemId}   ShoppingItem derived from the week, with its checked state
 users/{uid}/recipeState/{id}    favourite, cooked, rating, note, viewedAt
 ```
 
 The week itself is never stored. `WeekPlanner` derives it from the profile
-(cooking days, meals per day) and the plan settings, so changing a preference
+(cooking days, meals per day), the user's recipes and the plan settings, so changing a preference
 reflows the menu instantly and every device shows the same week. It reproduces
 the design prototype's algorithm exactly — `test/week_planner_test.dart` checks
 45 configurations against fixtures generated from the prototype itself.
 
-The recipe catalogue ships inside the app (`RecipeCatalogue`); no shared
-collection is readable or writable by clients.
+The shopping list is derived from the week too (`ShoppingListBuilder`): every
+portion eaten, for the whole household, merged per ingredient and grouped by
+aisle. It is rewritten when the week or the household changes; ticks survive.
 
 ## Architecture
 
@@ -75,7 +114,7 @@ lib/
     onboarding/             24-step flow, rating prompt, generating screen
     plan/                   week tab, week planner, supermarket comparison
     recipe/                 recipes tab, filters, favourites, recipe detail,
-                            replace sheet, catalogue
+                            replace sheet, catalogue (Spoonacular + Gemini)
     shopping/               shopping list
     preferences/            preferences tab, UserProfile
     account/                account tab, auth
@@ -95,7 +134,8 @@ lib/
   `core/theme/`.
 - **Localisation**: all UI copy is in `l10n/`. Persisted values are stable ids
   (`high_protein`, `gluten_free`), resolved to labels via `OptionLabels`.
-  Recipe and grocery content is data, and lives in Firestore.
+  Recipe and grocery content is data: it lives in Firestore, already in the
+  user's language.
 - **Haptics**: every interaction calls `Haptics.tap/toggle/confirm/notify`.
 - **Logging**: `debugPrint` with a class tag, e.g. `[PlanCubit]`. Users only see
   UI feedback on errors, never on success.

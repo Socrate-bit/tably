@@ -1066,4 +1066,49 @@ class AppL10nFr extends AppL10n {
 
   @override
   String get mockTapShort => 'APPUYER';
+
+  @override
+  String get mockMealCajun => 'Riz au poulet à la cajun';
+
+  @override
+  String get mockMealSatay => 'Nouilles au tofu et au satay';
+
+  @override
+  String get mockMealSweetChilli => 'Boîtes de riz au poulet au piment doux';
+
+  @override
+  String get aisleProduce => 'FRUITS ET LÉGUMES';
+
+  @override
+  String get aisleMeatFish => 'VIANDE ET POISSON';
+
+  @override
+  String get aislePastaRice => 'PÂTES, RIZ ET NOUILLES';
+
+  @override
+  String get aisleTinsSauces => 'CONSERVES, BOCAUX ET SAUCES';
+
+  @override
+  String get aisleHerbsGrocery => 'HERBES, ÉPICES ET ÉPICERIE';
+
+  @override
+  String get actionRetry => 'Réessayer';
+
+  @override
+  String get generatingFailed =>
+      'Impossible de préparer tes recettes pour le moment.';
+
+  @override
+  String get catalogueBuilding => 'On prépare tes recettes…';
+
+  @override
+  String get errorCatalogue => 'Impossible de charger tes recettes.';
+
+  @override
+  String get errorCatalogueQuota =>
+      'La limite de recherche de recettes est atteinte pour aujourd\'hui.';
+
+  @override
+  String get errorCatalogueEmpty =>
+      'Aucune recette ne correspond à tes préférences.';
 }

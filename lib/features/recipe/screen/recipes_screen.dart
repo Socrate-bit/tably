@@ -13,10 +13,10 @@ import '../../../l10n/app_localizations.dart';
 import '../../home/cubit/home_cubit.dart';
 import '../../preferences/cubit/profile_cubit.dart';
 import '../../preferences/model/user_profile.dart';
+import '../cubit/catalogue_cubit.dart';
 import '../cubit/recipe_browse_cubit.dart';
 import '../cubit/recipe_cubit.dart';
 import '../model/recipe.dart';
-import '../service/recipe_catalogue.dart';
 import '../widget/filter_button.dart';
 import '../widget/recipe_row.dart';
 import 'filters_screen.dart';
@@ -32,7 +32,10 @@ class RecipesScreen extends StatelessWidget {
     final profile = context.select<ProfileCubit, UserProfile>((c) => c.state.profile);
     final browse = context.watch<RecipeBrowseCubit>().state;
     final recipeState = context.watch<RecipeCubit>().state;
-    final results = browse.apply(RecipeCatalogue.recipes, store: profile.store, cravingLabel: l10n.cravingLabel);
+    final catalogue = context.watch<CatalogueCubit>().state.recipes;
+    final results = browse.apply(catalogue, store: profile.store, cravingLabel: l10n.cravingLabel);
+    final favourites = recipeState.favouritesIn(catalogue);
+    final recentlyViewed = recipeState.recentlyViewedIn(catalogue);
 
     Widget row(Recipe recipe, {bool large = false}) => RecipeRow(
           recipe: recipe,
@@ -51,7 +54,7 @@ class RecipesScreen extends StatelessWidget {
             children: [
               Expanded(child: Text(l10n.recipesTitle, style: AppTextStyles.tabTitle)),
               CountBadge(
-                count: recipeState.favourites.length,
+                count: favourites.length,
                 child: CircleIconButton(
                   icon: LineIcon(LineGlyph.heart, size: 20.r, color: AppColors.ink),
                   onPressed: () => context.read<HomeCubit>().open(HomeSub.favourites),
@@ -82,19 +85,22 @@ class RecipesScreen extends StatelessWidget {
             else
               ..._separated([for (final r in results) row(r)], 11.h),
           ] else ...[
-            Text(l10n.exploreRecent, style: AppTextStyles.sectionTitle),
-            SizedBox(height: 14.h),
-            SizedBox(
-              // Photo, a two-line name and the time line.
-              height: 184.h,
-              child: ListView.separated(
-                scrollDirection: Axis.horizontal,
-                itemCount: recipeState.recentlyViewed.length,
-                separatorBuilder: (_, _) => SizedBox(width: 14.w),
-                itemBuilder: (context, i) => _RecentCard(recipe: recipeState.recentlyViewed[i]),
+            // Hidden until the user has opened a recipe.
+            if (recentlyViewed.isNotEmpty) ...[
+              Text(l10n.exploreRecent, style: AppTextStyles.sectionTitle),
+              SizedBox(height: 14.h),
+              SizedBox(
+                // Photo, a two-line name and the time line.
+                height: 184.h,
+                child: ListView.separated(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: recentlyViewed.length,
+                  separatorBuilder: (_, _) => SizedBox(width: 14.w),
+                  itemBuilder: (context, i) => _RecentCard(recipe: recentlyViewed[i]),
+                ),
               ),
-            ),
-            SizedBox(height: 30.h),
+              SizedBox(height: 30.h),
+            ],
             Text(l10n.recipesAll, style: AppTextStyles.sectionTitle),
             SizedBox(height: 14.h),
             if (results.isEmpty)
@@ -127,7 +133,7 @@ class _RecentCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            RecipePhoto(photoKey: recipe.photoKey, height: 104.h, width: 162.w, radius: 16.r),
+            RecipePhoto(url: recipe.photoUrl, height: 104.h, width: 162.w, radius: 16.r),
             SizedBox(height: 8.h),
             Text(recipe.title, style: AppTextStyles.recentName, maxLines: 2, overflow: TextOverflow.ellipsis),
             SizedBox(height: 2.h),

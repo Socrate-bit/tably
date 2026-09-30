@@ -1980,6 +1980,90 @@ abstract class AppL10n {
   /// In fr, this message translates to:
   /// **'APPUYER'**
   String get mockTapShort;
+
+  /// No description provided for @mockMealCajun.
+  ///
+  /// In fr, this message translates to:
+  /// **'Riz au poulet à la cajun'**
+  String get mockMealCajun;
+
+  /// No description provided for @mockMealSatay.
+  ///
+  /// In fr, this message translates to:
+  /// **'Nouilles au tofu et au satay'**
+  String get mockMealSatay;
+
+  /// No description provided for @mockMealSweetChilli.
+  ///
+  /// In fr, this message translates to:
+  /// **'Boîtes de riz au poulet au piment doux'**
+  String get mockMealSweetChilli;
+
+  /// No description provided for @aisleProduce.
+  ///
+  /// In fr, this message translates to:
+  /// **'FRUITS ET LÉGUMES'**
+  String get aisleProduce;
+
+  /// No description provided for @aisleMeatFish.
+  ///
+  /// In fr, this message translates to:
+  /// **'VIANDE ET POISSON'**
+  String get aisleMeatFish;
+
+  /// No description provided for @aislePastaRice.
+  ///
+  /// In fr, this message translates to:
+  /// **'PÂTES, RIZ ET NOUILLES'**
+  String get aislePastaRice;
+
+  /// No description provided for @aisleTinsSauces.
+  ///
+  /// In fr, this message translates to:
+  /// **'CONSERVES, BOCAUX ET SAUCES'**
+  String get aisleTinsSauces;
+
+  /// No description provided for @aisleHerbsGrocery.
+  ///
+  /// In fr, this message translates to:
+  /// **'HERBES, ÉPICES ET ÉPICERIE'**
+  String get aisleHerbsGrocery;
+
+  /// No description provided for @actionRetry.
+  ///
+  /// In fr, this message translates to:
+  /// **'Réessayer'**
+  String get actionRetry;
+
+  /// No description provided for @generatingFailed.
+  ///
+  /// In fr, this message translates to:
+  /// **'Impossible de préparer tes recettes pour le moment.'**
+  String get generatingFailed;
+
+  /// No description provided for @catalogueBuilding.
+  ///
+  /// In fr, this message translates to:
+  /// **'On prépare tes recettes…'**
+  String get catalogueBuilding;
+
+  /// No description provided for @errorCatalogue.
+  ///
+  /// In fr, this message translates to:
+  /// **'Impossible de charger tes recettes.'**
+  String get errorCatalogue;
+
+  /// No description provided for @errorCatalogueQuota.
+  ///
+  /// In fr, this message translates to:
+  /// **'La limite de recherche de recettes est atteinte pour aujourd\'hui.'**
+  String get errorCatalogueQuota;
+
+  /// No description provided for @errorCatalogueEmpty.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucune recette ne correspond à tes préférences.'**
+  String get errorCatalogueEmpty;
 }
 
 class _AppL10nDelegate extends LocalizationsDelegate<AppL10n> {

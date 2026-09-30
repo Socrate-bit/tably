@@ -6,6 +6,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/util/error_feedback.dart';
 import '../../../core/util/haptics.dart';
+import '../../../core/util/option_labels.dart';
 import '../../../core/widget/check_circle.dart';
 import '../../../core/widget/primary_button.dart';
 import '../../../core/widget/sub_screen_header.dart';
@@ -97,7 +98,7 @@ class ShoppingScreen extends StatelessWidget {
   /// Puts the list on the clipboard.
   void _copyList(BuildContext context) {
     Haptics.confirm();
-    Clipboard.setData(ClipboardData(text: context.read<ShoppingCubit>().asPlainText()));
+    Clipboard.setData(ClipboardData(text: context.read<ShoppingCubit>().asPlainText(AppL10n.of(context).aisleName)));
   }
 
   /// Opens the native share sheet, anchored to the share button.
@@ -107,6 +108,7 @@ class ShoppingScreen extends StatelessWidget {
     final box = context.findRenderObject() as RenderBox?;
     final shared = await context.read<ShoppingCubit>().share(
           subject: l10n.shoppingList,
+          aisleName: l10n.aisleName,
           origin: box == null ? null : box.localToGlobal(Offset.zero) & box.size,
         );
     if (!shared && context.mounted) showErrorBanner(context, l10n.errorShoppingShare);
@@ -149,7 +151,7 @@ class _CategorySection extends StatelessWidget {
       children: [
         Padding(
           padding: EdgeInsets.only(bottom: 10.h),
-          child: Text(category.name, style: AppTextStyles.groupLabel),
+          child: Text(AppL10n.of(context).aisleName(category.aisle), style: AppTextStyles.groupLabel),
         ),
         SurfaceCard(
           clip: true,
@@ -202,17 +204,11 @@ class _ItemRow extends StatelessWidget {
                       decorationColor: AppColors.textDisabled,
                     ),
                   ),
-                  SizedBox(height: 1.h),
-                  Text(l10n.shoppingNeeded(item.needed), style: AppTextStyles.metaMuted),
+                  if (item.needed.isNotEmpty) ...[
+                    SizedBox(height: 1.h),
+                    Text(l10n.shoppingNeeded(item.needed), style: AppTextStyles.metaMuted),
+                  ],
                 ],
-              ),
-            ),
-            SizedBox(width: 10.w),
-            Text(
-              item.quantity,
-              style: AppTextStyles.secondaryButton.copyWith(
-                fontSize: 16.sp,
-                color: AppColors.inkMuted,
               ),
             ),
             SizedBox(width: 12.w),

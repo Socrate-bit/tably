@@ -11,7 +11,6 @@ import '../../../../core/widget/primary_button.dart';
 import '../../../../core/widget/recipe_photo.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../recipe/model/recipe.dart';
-import '../../../recipe/service/recipe_catalogue.dart';
 import '../../../recipe/widget/craving_badge.dart';
 import 'language_step.dart';
 
@@ -205,9 +204,14 @@ class _PhoneMockup extends StatelessWidget {
                   ],
                 ),
               ),
-              for (final recipe in RecipeCatalogue.recipes.take(3)) ...[
+              // Illustration only: three dishes drawn from the bundled photos.
+              for (final (title, photoKey, craving) in [
+                (l10n.mockMealCajun, 'cajun', Craving.quick),
+                (l10n.mockMealSatay, 'noodle', Craving.highProtein),
+                (l10n.mockMealSweetChilli, 'handi', Craving.quick),
+              ]) ...[
                 SizedBox(height: 6.h),
-                _MockMealRow(recipe: recipe),
+                _MockMealRow(title: title, photoKey: photoKey, craving: craving),
               ],
               SizedBox(height: 6.h),
               Container(
@@ -377,13 +381,15 @@ class _MockProgress extends StatelessWidget {
 }
 
 class _MockMealRow extends StatelessWidget {
-  const _MockMealRow({required this.recipe});
+  const _MockMealRow({required this.title, required this.photoKey, required this.craving});
 
-  final Recipe recipe;
+  final String title;
+  final String photoKey;
+  final Craving craving;
 
   @override
   Widget build(BuildContext context) {
-    final (background, ink) = CravingBadge.colorsFor(recipe.craving);
+    final (background, ink) = CravingBadge.colorsFor(craving);
     return Container(
       padding: EdgeInsets.all(5.r),
       decoration: BoxDecoration(
@@ -393,18 +399,18 @@ class _MockMealRow extends StatelessWidget {
       ),
       child: Row(
         children: [
-          RecipePhoto(photoKey: recipe.photoKey, height: 30.r, width: 30.r, radius: 8.r),
+          RecipePhoto(photoKey: photoKey, height: 30.r, width: 30.r, radius: 8.r),
           SizedBox(width: 6.w),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(recipe.title, maxLines: 1, overflow: TextOverflow.ellipsis, style: AppTextStyles.mock(8, height: 1.2)),
+                Text(title, maxLines: 1, overflow: TextOverflow.ellipsis, style: AppTextStyles.mock(8, height: 1.2)),
                 SizedBox(height: 3.h),
                 Container(
                   padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 2.h),
                   decoration: BoxDecoration(color: background, borderRadius: BorderRadius.circular(20.r)),
-                  child: Text(AppL10n.of(context).cravingLabel(recipe.craving), style: AppTextStyles.mock(6, color: ink)),
+                  child: Text(AppL10n.of(context).cravingLabel(craving), style: AppTextStyles.mock(6, color: ink)),
                 ),
               ],
             ),

@@ -10,6 +10,8 @@ class OnboardingState extends Equatable {
     this.showLanguage = false,
     this.draft = const UserProfile(),
     this.generationStep = 0,
+    this.generationFailed = false,
+    this.catalogue = const [],
   });
 
   final OnboardingPhase phase;
@@ -23,6 +25,12 @@ class OnboardingState extends Equatable {
 
   /// 0–3, driving the generating screen's checklist and progress bar.
   final int generationStep;
+
+  /// The recipe build failed; the generating screen offers a retry.
+  final bool generationFailed;
+
+  /// The recipes built for [draft], empty until generation succeeds.
+  final List<Recipe> catalogue;
 
   /// The Europe follow-up only appears when the user picked Europe.
   List<OnboardingStep> get steps => OnboardingFlow.steps
@@ -52,17 +60,24 @@ class OnboardingState extends Equatable {
   bool get generationComplete => generationStep >= OnboardingCubit.generationTasks;
 
   /// The week the answers so far would produce, before any regeneration.
-  WeekPlan get previewWeek => WeekPlanner.build(profile: draft, settings: const PlanSettings());
+  WeekPlan get previewWeek => WeekPlanner.build(profile: draft, settings: const PlanSettings(), catalogue: catalogue);
 
   /// Weekly groceries beyond the planned meals: breakfasts, snacks, pantry.
   static const _everydayGroceries = 1.3;
 
+  /// A typical portion price (EUR), for estimates made before any recipe exists.
+  static const referencePortionPrice = 3.0;
+
   /// A realistic weekly budget: every planned portion, leftovers included since
   /// they are cooked in the same pot, for the whole household at the chosen
   /// store, plus everyday groceries. Rounded to 5 and kept within the slider.
+  /// Before the recipes are built, each meal counts [referencePortionPrice].
   double get estimatedBudget {
     final week = previewWeek;
-    final perPortion = week.slots.fold<double>(0, (sum, s) => sum + s.recipe.price) * draft.store.priceFactor;
+    final portions = catalogue.isEmpty
+        ? draft.mealCount * referencePortionPrice
+        : week.slots.fold<double>(0, (sum, s) => sum + s.recipe.price);
+    final perPortion = portions * draft.store.priceFactor;
     final cost = perPortion * draft.household * _everydayGroceries;
     return ((cost / 5).round() * 5.0).clamp(OnboardingCubit.minBudget, OnboardingCubit.maxBudget);
   }
@@ -80,6 +95,8 @@ class OnboardingState extends Equatable {
     bool? showLanguage,
     UserProfile? draft,
     int? generationStep,
+    bool? generationFailed,
+    List<Recipe>? catalogue,
   }) =>
       OnboardingState(
         phase: phase ?? this.phase,
@@ -87,8 +104,10 @@ class OnboardingState extends Equatable {
         showLanguage: showLanguage ?? this.showLanguage,
         draft: draft ?? this.draft,
         generationStep: generationStep ?? this.generationStep,
+        generationFailed: generationFailed ?? this.generationFailed,
+        catalogue: catalogue ?? this.catalogue,
       );
 
   @override
-  List<Object?> get props => [phase, stepIndex, showLanguage, draft, generationStep];
+  List<Object?> get props => [phase, stepIndex, showLanguage, draft, generationStep, generationFailed, catalogue];
 }

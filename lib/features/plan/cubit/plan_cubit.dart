@@ -7,7 +7,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../core/analytics/analytics_service.dart';
 import '../../preferences/cubit/profile_cubit.dart';
-import '../../recipe/service/recipe_catalogue.dart';
+import '../../recipe/cubit/catalogue_cubit.dart';
+import '../../recipe/cubit/recipe_cubit.dart';
 import '../model/plan_settings.dart';
 import '../model/week_plan.dart';
 import '../service/plan_service.dart';
@@ -15,20 +16,34 @@ import '../service/week_planner.dart';
 
 part 'plan_state.dart';
 
-/// Owns the week. Recomputes it whenever the profile (days, meals per day) or
-/// the plan settings (seed, swaps) change, so the menu is always current.
+/// Owns the week. Recomputes it whenever the profile (days, meals per day),
+/// the recipe catalogue, the saved favourites or the plan settings (seed,
+/// swaps) change, so the menu is always current.
 class PlanCubit extends Cubit<PlanState> {
   PlanCubit({
     required PlanService service,
     required ProfileCubit profileCubit,
+    required CatalogueCubit catalogueCubit,
+    required RecipeCubit recipeCubit,
     required AnalyticsService analytics,
   })  : _service = service,
         _profileCubit = profileCubit,
+        _catalogueCubit = catalogueCubit,
+        _recipeCubit = recipeCubit,
         _analytics = analytics,
         super(const PlanState()) {
     _profileSubscription = profileCubit.stream
         .map((s) => s.profile)
         .distinct()
+        .listen((_) => emit(state.copyWith(week: _build(state.settings))));
+    _catalogueSubscription = catalogueCubit.stream
+        .map((s) => s.recipes)
+        .distinct()
+        .listen((_) => emit(state.copyWith(week: _build(state.settings))));
+    // A swapped-in favourite that left the catalogue resolves from its copy.
+    _favouritesSubscription = recipeCubit.stream
+        .map((s) => s.savedFavourites)
+        .distinct(listEquals)
         .listen((_) => emit(state.copyWith(week: _build(state.settings))));
   }
 
@@ -37,8 +52,12 @@ class PlanCubit extends Cubit<PlanState> {
 
   final PlanService _service;
   final ProfileCubit _profileCubit;
+  final CatalogueCubit _catalogueCubit;
+  final RecipeCubit _recipeCubit;
   final AnalyticsService _analytics;
   late final StreamSubscription<Object?> _profileSubscription;
+  late final StreamSubscription<Object?> _catalogueSubscription;
+  late final StreamSubscription<Object?> _favouritesSubscription;
   StreamSubscription<PlanSettings>? _settingsSubscription;
   String? _uid;
 
@@ -84,7 +103,7 @@ class PlanCubit extends Cubit<PlanState> {
   /// Swaps the meal in [slot] for a random dish not already in the week, and
   /// returns the updated slot so the caller can show it.
   Future<PlanSlot?> regenerateMeal(PlanSlot slot) async {
-    const catalogue = RecipeCatalogue.recipes;
+    final catalogue = _catalogueCubit.state.recipes;
     final inWeek = state.week.slots.map((s) => s.recipe.id).toSet();
     var pool = catalogue.where((r) => !inWeek.contains(r.id)).toList();
     if (pool.isEmpty) pool = catalogue.where((r) => r.id != slot.recipe.id).toList();
@@ -127,14 +146,20 @@ class PlanCubit extends Cubit<PlanState> {
     }
   }
 
-  WeekPlan _build(PlanSettings settings) =>
-      WeekPlanner.build(profile: _profileCubit.state.profile, settings: settings);
+  WeekPlan _build(PlanSettings settings) => WeekPlanner.build(
+        profile: _profileCubit.state.profile,
+        settings: settings,
+        catalogue: _catalogueCubit.state.recipes,
+        favourites: _recipeCubit.state.savedFavourites,
+      );
 
   void errorShown() => emit(state.copyWith(clearError: true));
 
   @override
   Future<void> close() {
     _profileSubscription.cancel();
+    _catalogueSubscription.cancel();
+    _favouritesSubscription.cancel();
     _settingsSubscription?.cancel();
     return super.close();
   }

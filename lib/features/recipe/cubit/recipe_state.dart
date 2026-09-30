@@ -12,17 +12,38 @@ class RecipeState extends Equatable {
 
   bool isFavourite(String recipeId) => interactionFor(recipeId).favourite;
 
-  /// Favourites in catalogue order.
-  List<Recipe> get favourites =>
-      RecipeCatalogue.recipes.where((r) => isFavourite(r.id)).toList();
+  /// The saved copy of every favourite, including those no longer in the
+  /// catalogue. The planner can place these when the user picks one, but
+  /// never picks them itself.
+  List<Recipe> get savedFavourites => [
+        for (final i in interactions.values)
+          if (i.favourite && i.recipe != null) i.recipe!,
+      ];
 
-  /// Most recently opened first, falling back to the design's picks before the
-  /// user has opened anything.
-  List<Recipe> get recentlyViewed {
+  /// The user's favourites, preferring the [catalogue]'s copy when it has
+  /// one (it may be newer, e.g. after a language change).
+  List<Recipe> favouritesIn(List<Recipe> catalogue) {
+    final current = {for (final r in catalogue) r.id: r};
+    final saved = {for (final r in savedFavourites) r.id: current[r.id] ?? r};
+    // Favourites saved before copies existed can only come from the catalogue.
+    for (final r in catalogue) {
+      if (isFavourite(r.id)) saved.putIfAbsent(r.id, () => r);
+    }
+    return saved.values.toList()..sort((a, b) => a.title.toLowerCase().compareTo(b.title.toLowerCase()));
+  }
+
+  /// A favourite's saved copy, for opening it once it has left the catalogue.
+  Recipe? savedRecipe(String recipeId) {
+    final interaction = interactions[recipeId];
+    return interaction != null && interaction.favourite ? interaction.recipe : null;
+  }
+
+  /// Recipes of [catalogue] the user opened, most recent first.
+  List<Recipe> recentlyViewedIn(List<Recipe> catalogue) {
     final viewed = interactions.values.where((i) => i.viewedAt != null).toList()
       ..sort((a, b) => b.viewedAt!.compareTo(a.viewedAt!));
-    final ids = viewed.isEmpty ? RecipeCatalogue.recentIds : viewed.map((i) => i.recipeId);
-    return ids.map(RecipeCatalogue.byId).whereType<Recipe>().take(10).toList();
+    final byId = {for (final r in catalogue) r.id: r};
+    return viewed.map((i) => byId[i.recipeId]).whereType<Recipe>().take(10).toList();
   }
 
   RecipeState copyWith({

@@ -9,6 +9,7 @@ import '../../../l10n/app_localizations.dart';
 import '../../home/cubit/home_cubit.dart';
 import '../../preferences/cubit/profile_cubit.dart';
 import '../../preferences/model/user_profile.dart';
+import '../cubit/catalogue_cubit.dart';
 import '../cubit/recipe_cubit.dart';
 import '../widget/recipe_row.dart';
 import 'recipe_screen.dart';
@@ -21,7 +22,8 @@ class FavouritesScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppL10n.of(context);
     final profile = context.select<ProfileCubit, UserProfile>((c) => c.state.profile);
-    final favourites = context.watch<RecipeCubit>().state.favourites;
+    final catalogue = context.watch<CatalogueCubit>().state.recipes;
+    final favourites = context.watch<RecipeCubit>().state.favouritesIn(catalogue);
 
     return SingleChildScrollView(
       padding: EdgeInsets.fromLTRB(20.w, 6.h, 20.w, AppDimens.tabBarInset),
