@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
 
 import '../../../core/theme/app_theme.dart';
 import '../../../core/util/haptics.dart';
@@ -7,12 +8,16 @@ import '../../../core/widget/line_icon.dart';
 import '../../../l10n/app_localizations.dart';
 import '../cubit/home_cubit.dart';
 
-/// The bottom navigation bar: a line glyph over a bold label.
+/// The bottom navigation bar: a floating liquid-glass pill holding a line
+/// glyph over a bold label per tab.
 class AppTabBar extends StatelessWidget {
   const AppTabBar({super.key, required this.current, required this.onSelected});
 
   final HomeTab current;
   final ValueChanged<HomeTab> onSelected;
+
+  /// Icon size inside the pill.
+  static double get _iconSize => 23.r;
 
   @override
   Widget build(BuildContext context) {
@@ -23,60 +28,41 @@ class AppTabBar extends StatelessWidget {
       (HomeTab.preferences, LineGlyph.heart, l10n.tabPreferences),
       (HomeTab.account, LineGlyph.user, l10n.tabAccount),
     ];
+    // Inactive tabs are ink at a third strength, as in the design.
+    final idle = AppColors.ink.withValues(alpha: 0.34);
 
-    return Container(
-      decoration: const BoxDecoration(
-        color: AppColors.scaffold,
-        border: Border(top: BorderSide(color: AppColors.border)),
-      ),
-      padding: EdgeInsets.fromLTRB(8.w, 11.h, 8.w, 8.h),
-      child: SafeArea(
-        top: false,
-        minimum: EdgeInsets.only(bottom: 14.h),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            for (final (tab, glyph, label) in tabs)
-              _TabButton(glyph: glyph, label: label, selected: tab == current, onTap: () => onSelected(tab)),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _TabButton extends StatelessWidget {
-  const _TabButton({required this.glyph, required this.label, required this.selected, required this.onTap});
-
-  final LineGlyph glyph;
-  final String label;
-  final bool selected;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final color = selected ? AppColors.brand : AppColors.ink;
-    return GestureDetector(
-      onTap: () {
+    return GlassTabBar.bottom(
+      selectedIndex: tabs.indexWhere((t) => t.$1 == current),
+      onTabSelected: (index) {
         Haptics.tap();
-        onTap();
+        onSelected(tabs[index].$1);
       },
-      behavior: HitTestBehavior.opaque,
-      child: Opacity(
-        // Inactive tabs are ink at a third strength, as in the design.
-        opacity: selected ? 1 : 0.34,
-        child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 6.w, vertical: 2.h),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              LineIcon(glyph, size: 23.r, color: color),
-              SizedBox(height: 4.h),
-              Text(label, style: AppTextStyles.tabLabel.copyWith(color: color)),
-            ],
-          ),
-        ),
+      // The shell owns the margins around the pill.
+      horizontalPadding: 0,
+      verticalPadding: 0,
+      barHeight: 72.h,
+      barBorderRadius: 32.r,
+      iconSize: _iconSize,
+      textStyle: AppTextStyles.tabLabel,
+      selectedLabelColor: AppColors.brand,
+      unselectedLabelColor: idle,
+      indicatorColor: AppColors.brand.withValues(alpha: 0.10),
+      quality: GlassQuality.premium,
+      interactionBehavior: GlassInteractionBehavior.full,
+      settings: LiquidGlassSettings(
+        glassColor: Colors.white.withValues(alpha: 0.85),
+        thickness: 20,
+        blur: 2,
       ),
+      tabs: [
+        for (final (_, glyph, label) in tabs)
+          GlassTab(
+            label: label,
+            // LineIcon draws an SVG, so it tints itself rather than inheriting.
+            icon: LineIcon(glyph, size: _iconSize, color: idle),
+            activeIcon: LineIcon(glyph, size: _iconSize, color: AppColors.brand),
+          ),
+      ],
     );
   }
 }

@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
+import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
 import 'package:posthog_flutter/posthog_flutter.dart';
 import 'package:superwallkit_flutter/superwallkit_flutter.dart';
 
@@ -32,10 +33,24 @@ Future<void> main() async {
 
   await _initAnalytics();
   _initPaywall();
+  await _initGlass();
 
-  runApp(const TablyApp());
+  // `brightnessResolver` lets the glass follow the app theme rather than the
+  // raw OS brightness, which MaterialApp would otherwise win.
+  runApp(LiquidGlassWidgets.wrap(brightnessResolver: Theme.maybeBrightnessOf, child: const TablyApp()));
   // Anything slower (auth, profile) shows a spinner in RootScreen instead.
   FlutterNativeSplash.remove();
+}
+
+/// Pre-warms the liquid-glass shaders so the tab bar renders on its first
+/// frame. Failure only costs a brief placeholder, so it never blocks launch.
+Future<void> _initGlass() async {
+  try {
+    await LiquidGlassWidgets.initialize(enablePerformanceMonitor: false);
+    debugPrint('[main] Liquid glass shaders warmed');
+  } catch (e) {
+    debugPrint('[main] Liquid glass warm-up failed: $e');
+  }
 }
 
 /// Starts Superwall when a key is configured; without one the paywall simply
