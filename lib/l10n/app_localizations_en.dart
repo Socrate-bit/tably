@@ -1107,6 +1107,9 @@ class AppL10nEn extends AppL10n {
       'Dishes are reused as leftovers to keep the number of recipes down';
 
   @override
+  String get prefsVariety => 'Variety';
+
+  @override
   String get mockCostShort => 'EST. COST';
 
   @override

@@ -11,6 +11,8 @@ import '../../../../core/widget/household_stepper.dart';
 import '../../../../core/widget/surface_card.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../plan/widget/meals_per_day_options.dart';
+import '../../../plan/widget/variety_options.dart';
+import '../../../preferences/model/user_profile.dart';
 
 /// "comment tu t'appelles ?" — a single rounded text field.
 class NameStep extends StatefulWidget {
@@ -145,20 +147,9 @@ class MealsStep extends StatelessWidget {
 /// "Combien de variété ?" — up to three levels, each showing how many
 /// recipes it means cooking; the other meals are leftovers.
 class DiversityStep extends StatelessWidget {
-  const DiversityStep({
-    super.key,
-    required this.recipes,
-    required this.selectedCount,
-    required this.mealCount,
-    required this.onSelected,
-  });
+  const DiversityStep({super.key, required this.profile, required this.onSelected});
 
-  /// Recipes to cook for each level offered.
-  final Map<Variety, int> recipes;
-
-  /// Recipes the current choice cooks; a merged level is checked through it.
-  final int selectedCount;
-  final int mealCount;
+  final UserProfile profile;
   final ValueChanged<Variety> onSelected;
 
   @override
@@ -175,77 +166,10 @@ class DiversityStep extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              for (final (index, MapEntry(key: variety, value: count)) in recipes.entries.indexed) ...[
-                if (index > 0) SizedBox(height: 14.h),
-                _VarietyCard(
-                  variety: variety,
-                  count: count,
-                  mealCount: mealCount,
-                  checked: count == selectedCount,
-                  onTap: () => onSelected(variety),
-                ),
-              ],
-            ],
+            children: [VarietyOptions(profile: profile, onSelected: onSelected)],
           ),
         ),
       ],
-    );
-  }
-}
-
-/// One variety level: emoji, name, what it means for the week, and a big
-/// recipe count on the right.
-class _VarietyCard extends StatelessWidget {
-  const _VarietyCard({
-    required this.variety,
-    required this.count,
-    required this.mealCount,
-    required this.checked,
-    required this.onTap,
-  });
-
-  final Variety variety;
-  final int count;
-  final int mealCount;
-  final bool checked;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final l10n = AppL10n.of(context);
-    return SurfaceCard(
-      onTap: onTap,
-      padding: EdgeInsets.symmetric(horizontal: 18.w, vertical: 18.h),
-      borderColor: checked ? AppColors.brand : AppColors.border,
-      borderWidth: checked ? 2.5 : 1,
-      child: Row(
-        children: [
-          Text(variety.icon, style: AppTextStyles.emojiIcon.copyWith(fontSize: 26.sp)),
-          SizedBox(width: 14.w),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(l10n.varietyName(variety), style: AppTextStyles.optionRow),
-                SizedBox(height: 2.h),
-                Text(
-                  count == mealCount ? l10n.diversityAllDifferent : l10n.diversityDetailReuse(count, mealCount),
-                  style: AppTextStyles.metaMuted.copyWith(color: AppColors.textQuaternary),
-                ),
-              ],
-            ),
-          ),
-          SizedBox(width: 12.w),
-          Text(
-            '$count',
-            style: AppTextStyles.optionRow.copyWith(
-              fontSize: 26.sp,
-              color: checked ? AppColors.brand : AppColors.textQuaternary,
-            ),
-          ),
-        ],
-      ),
     );
   }
 }

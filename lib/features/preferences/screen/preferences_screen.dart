@@ -17,6 +17,7 @@ import '../../../l10n/app_localizations.dart';
 import '../../home/cubit/home_cubit.dart';
 import '../../onboarding/cubit/onboarding_cubit.dart';
 import '../../plan/widget/meals_per_day_options.dart';
+import '../../plan/widget/variety_options.dart';
 import '../cubit/profile_cubit.dart';
 import '../widget/preference_grid.dart';
 
@@ -86,6 +87,18 @@ class PreferencesScreen extends StatelessWidget {
                   selected: profile.mealsPerDay,
                   spacing: 10.h,
                   onSelected: cubit.setMealsPerDay,
+                ),
+                SizedBox(height: 28.h),
+
+                PreferenceSectionHeader(
+                  title: l10n.prefsVariety,
+                  subtitle: l10n.onbDiversitySubtitle,
+                ),
+                SizedBox(height: 14.h),
+                VarietyOptions(
+                  profile: profile,
+                  spacing: 10.h,
+                  onSelected: cubit.setVariety,
                 ),
                 SizedBox(height: 28.h),
 

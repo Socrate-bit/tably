@@ -92,6 +92,17 @@ class UserProfile extends Equatable {
         Variety.low => (mealCount + 3) ~/ 4,
       };
 
+  /// Dishes each variety level would cook this week. Levels that land on the
+  /// same count as a higher one are dropped, so every choice differs.
+  Map<Variety, int> get varietyRecipes {
+    final counts = <Variety, int>{};
+    for (final v in Variety.values) {
+      final count = copyWith(variety: v).recipesToCook;
+      if (!counts.containsValue(count)) counts[v] = count;
+    }
+    return counts;
+  }
+
   /// The name to greet the user with, falling back to a generic chef.
   String displayName(String fallback) => name.trim().isEmpty ? fallback : name.trim();
 

@@ -2071,6 +2071,12 @@ abstract class AppL10n {
   /// **'Les plats sont réutilisés en restes pour limiter le nombre de recettes'**
   String get prefsMealsPerDaySub;
 
+  /// No description provided for @prefsVariety.
+  ///
+  /// In fr, this message translates to:
+  /// **'Variété'**
+  String get prefsVariety;
+
   /// No description provided for @mockCostShort.
   ///
   /// In fr, this message translates to:
