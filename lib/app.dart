@@ -103,6 +103,13 @@ class TablyApp extends StatelessWidget {
                 GlobalCupertinoLocalizations.delegate,
               ],
               supportedLocales: AppL10n.supportedLocales,
+              // Tapping anywhere outside a text field dismisses the keyboard,
+              // on every route and sheet.
+              builder: (context, child) => GestureDetector(
+                behavior: HitTestBehavior.opaque,
+                onTap: () => FocusManager.instance.primaryFocus?.unfocus(),
+                child: child,
+              ),
               home: const RootScreen(),
             ),
           ),
