@@ -7,6 +7,7 @@ import 'package:posthog_flutter/posthog_flutter.dart';
 import 'package:superwallkit_flutter/superwallkit_flutter.dart';
 
 import 'app.dart';
+import 'features/subscription/service/paywall_service.dart';
 import 'firebase_options.dart';
 
 /// PostHog project credentials. Override at build time:
@@ -17,13 +18,9 @@ const _posthogHost = String.fromEnvironment(
   defaultValue: 'https://eu.i.posthog.com',
 );
 
-/// Superwall publishable key, which owns the paywall remotely. Override with
-/// `flutter run --dart-define=SUPERWALL_API_KEY=pk_...`
-const _superwallApiKey = String.fromEnvironment('SUPERWALL_API_KEY');
-
 Future<void> main() async {
   final binding = WidgetsFlutterBinding.ensureInitialized();
-  // Keep the native splash up until RootScreen knows what to show.
+  // Keep the native splash up only through basic initialisation below.
   FlutterNativeSplash.preserve(widgetsBinding: binding);
 
   try {
@@ -37,19 +34,21 @@ Future<void> main() async {
   _initPaywall();
 
   runApp(const TablyApp());
+  // Anything slower (auth, profile) shows a spinner in RootScreen instead.
+  FlutterNativeSplash.remove();
 }
 
 /// Starts Superwall when a key is configured; without one the paywall simply
 /// never shows and the rest of the app is unaffected.
 void _initPaywall() {
-  if (_superwallApiKey.isEmpty) {
+  if (!PaywallService.isEnabled) {
     debugPrint('[main] Superwall key not set — paywall disabled');
     return;
   }
   try {
     // Match paywall copy to the device locale (e.g. "fr_FR", "en_US").
     final options = SuperwallOptions()..localeIdentifier = Platform.localeName;
-    Superwall.configure(_superwallApiKey, options: options);
+    Superwall.configure(PaywallService.apiKey, options: options);
     debugPrint('[main] Superwall initialised');
   } catch (e) {
     debugPrint('[main] Superwall initialisation failed: $e');
