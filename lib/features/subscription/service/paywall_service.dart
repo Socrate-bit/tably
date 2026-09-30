@@ -43,7 +43,7 @@ class PaywallService {
         SubscriptionStatusUnknown() => SubscriptionGateStatus.unknown,
       };
 
-  /// Ties paywall and purchases to the Firebase uid, the same id PostHog uses.
+  /// Ties paywall and purchases to the Firebase uid, the same id Mixpanel uses.
   Future<void> identify(String uid) async {
     if (!isEnabled) return;
     try {

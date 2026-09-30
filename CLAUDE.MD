@@ -19,5 +19,5 @@
 - **Theme**: Single theme file for all colors, text styles, etc. No hardcoded colors or text styles in widgets.
 - **Localization**: Use `l10n` for all user-facing strings. No hardcoded text.
 - **Haptic Feedback**: All user interactions must trigger haptic feedback.
-- **Analytics**: Use PostHog for all event tracking.
+- **Analytics**: Use Mixpanel for all event tracking.
 - **Responsive**: Use `ScreenUtil` for all responsive sizing (dimensions, fonts, spacing).
