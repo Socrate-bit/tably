@@ -1,6 +1,8 @@
 import 'dart:io';
 
+import 'package:firebase_app_check/firebase_app_check.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
@@ -19,6 +21,14 @@ const _posthogHost = String.fromEnvironment(
   defaultValue: 'https://eu.i.posthog.com',
 );
 
+/// A debug token registered in the Firebase console (App Check → Manage debug
+/// tokens), for simulators and the web build:
+/// `flutter run --dart-define=APP_CHECK_DEBUG_TOKEN=...`
+const _appCheckDebugToken = String.fromEnvironment('APP_CHECK_DEBUG_TOKEN');
+
+/// reCAPTCHA v3 site key for release web builds.
+const _recaptchaSiteKey = String.fromEnvironment('RECAPTCHA_SITE_KEY');
+
 Future<void> main() async {
   final binding = WidgetsFlutterBinding.ensureInitialized();
   // Keep the native splash up only through basic initialisation below.
@@ -31,6 +41,7 @@ Future<void> main() async {
     debugPrint('[main] Firebase initialisation failed: $e');
   }
 
+  await _initAppCheck();
   await _initAnalytics();
   _initPaywall();
   await _initGlass();
@@ -40,6 +51,22 @@ Future<void> main() async {
   runApp(LiquidGlassWidgets.wrap(brightnessResolver: Theme.maybeBrightnessOf, child: const TablyApp()));
   // Anything slower (auth, profile) shows a spinner in RootScreen instead.
   FlutterNativeSplash.remove();
+}
+
+/// Firebase AI Logic enforces App Check, so Gemini calls fail without it.
+/// Debug builds use the debug provider (register its token in the console);
+/// release builds attest with DeviceCheck on iOS and reCAPTCHA on the web.
+Future<void> _initAppCheck() async {
+  final debugToken = _appCheckDebugToken.isEmpty ? null : _appCheckDebugToken;
+  try {
+    await FirebaseAppCheck.instance.activate(
+      providerApple: kDebugMode ? AppleDebugProvider(debugToken: debugToken) : const AppleDeviceCheckProvider(),
+      providerWeb: kDebugMode ? WebDebugProvider(debugToken: debugToken) : ReCaptchaV3Provider(_recaptchaSiteKey),
+    );
+    debugPrint('[main] App Check activated (${kDebugMode ? 'debug' : 'release'} provider)');
+  } catch (e) {
+    debugPrint('[main] App Check activation failed: $e');
+  }
 }
 
 /// Pre-warms the liquid-glass shaders so the tab bar renders on its first

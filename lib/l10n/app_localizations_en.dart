@@ -1056,4 +1056,47 @@ class AppL10nEn extends AppL10n {
 
   @override
   String get mockTapShort => 'TAP';
+
+  @override
+  String get mockMealCajun => 'Cajun chicken rice';
+
+  @override
+  String get mockMealSatay => 'Tofu satay noodles';
+
+  @override
+  String get mockMealSweetChilli => 'Sweet chilli chicken rice boxes';
+
+  @override
+  String get aisleProduce => 'FRUIT & VEG';
+
+  @override
+  String get aisleMeatFish => 'MEAT & FISH';
+
+  @override
+  String get aislePastaRice => 'PASTA, RICE & NOODLES';
+
+  @override
+  String get aisleTinsSauces => 'TINS, JARS & SAUCES';
+
+  @override
+  String get aisleHerbsGrocery => 'HERBS, SPICES & PANTRY';
+
+  @override
+  String get actionRetry => 'Try again';
+
+  @override
+  String get generatingFailed => 'We couldn\'t prepare your recipes right now.';
+
+  @override
+  String get catalogueBuilding => 'Preparing your recipes…';
+
+  @override
+  String get errorCatalogue => 'Couldn\'t load your recipes.';
+
+  @override
+  String get errorCatalogueQuota =>
+      'Today\'s recipe search limit has been reached.';
+
+  @override
+  String get errorCatalogueEmpty => 'No recipes match your preferences.';
 }

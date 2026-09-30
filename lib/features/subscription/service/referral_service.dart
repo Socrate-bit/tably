@@ -3,6 +3,7 @@ import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter/foundation.dart';
 
 import '../../../core/model/user_type.dart';
+import '../../../core/util/functions_region.dart';
 
 /// Reads referral codes and redeems them through the `redeemReferralCode`
 /// Cloud Function, which is the only writer of `users/{uid}.userType`.
@@ -10,9 +11,6 @@ class ReferralService {
   ReferralService({FirebaseFirestore? firestore, FirebaseFunctions? functions})
       : _firestore = firestore,
         _functions = functions;
-
-  /// Must match the region the function is deployed to (see functions/src).
-  static const region = 'europe-west1';
 
   /// Sentinel returned by [validateCode] when the code is out of uses.
   static const exhausted = 'exhausted';
@@ -23,7 +21,7 @@ class ReferralService {
   /// Resolved on first use, so the service can be built before Firebase is.
   FirebaseFirestore get _db => _firestore ?? FirebaseFirestore.instance;
 
-  FirebaseFunctions get _fn => _functions ?? FirebaseFunctions.instanceFor(region: region);
+  FirebaseFunctions get _fn => _functions ?? FirebaseFunctions.instanceFor(region: functionsRegion);
 
   /// Codes are stored uppercase, so entry is case-insensitive.
   static String normalise(String code) => code.trim().toUpperCase();

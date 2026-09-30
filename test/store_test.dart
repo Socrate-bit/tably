@@ -3,6 +3,8 @@ import 'package:tably/core/model/store.dart';
 import 'package:tably/features/onboarding/cubit/onboarding_cubit.dart';
 import 'package:tably/features/preferences/model/user_profile.dart';
 
+import 'fixtures/recipe_fixtures.dart';
+
 void main() {
   test('profiles saved with a brand name still resolve', () {
     expect(Store.fromId('Lidl'), Store.lidl);
@@ -17,7 +19,7 @@ void main() {
   });
 
   test('a pricier store is offered the cheapest one, with the real saving', () {
-    const state = OnboardingState(draft: UserProfile(store: Store.carrefour));
+    final state = OnboardingState(draft: const UserProfile(store: Store.carrefour), catalogue: RecipeFixtures.recipes);
     expect(state.hasCheaperStore, isTrue);
     expect(state.cheaperStore, Store.lidl);
     expect(state.switchSavingPercent, 9);

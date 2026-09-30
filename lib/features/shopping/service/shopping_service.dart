@@ -15,25 +15,28 @@ class ShoppingService {
   CollectionReference<Map<String, dynamic>> _col(String uid) =>
       _db.collection('users').doc(uid).collection('shopping');
 
-  /// Live list in catalogue order.
+  /// Live list, in list order.
   Stream<List<ShoppingItem>> watch(String uid) => _col(uid).snapshots().map((snap) {
         final items = snap.docs.map((d) => ShoppingItem.fromMap(d.id, d.data())).toList();
         items.sort((a, b) => a.order.compareTo(b.order));
         return items;
       });
 
-  /// Writes a user's first list.
-  Future<void> createList(String uid, List<ShoppingItem> items) async {
+  /// Writes [items] and deletes [removedIds] in one batch.
+  Future<void> replaceList(String uid, List<ShoppingItem> items, Iterable<String> removedIds) async {
     try {
       final col = _col(uid);
       final batch = _db.batch();
+      for (final id in removedIds) {
+        batch.delete(col.doc(id));
+      }
       for (final item in items) {
         batch.set(col.doc(item.id), item.toMap());
       }
       await batch.commit();
-      debugPrint('[ShoppingService] created ${items.length} items for $uid');
+      debugPrint('[ShoppingService] list replaced with ${items.length} items for $uid');
     } catch (e) {
-      debugPrint('[ShoppingService] createList failed: $e');
+      debugPrint('[ShoppingService] replaceList failed: $e');
       rethrow;
     }
   }

@@ -16,9 +16,9 @@ import '../../home/cubit/home_cubit.dart';
 import '../../plan/cubit/plan_cubit.dart';
 import '../../plan/model/week_plan.dart';
 import '../../preferences/cubit/profile_cubit.dart';
+import '../cubit/catalogue_cubit.dart';
 import '../cubit/recipe_cubit.dart';
 import '../model/recipe.dart';
-import '../service/recipe_catalogue.dart';
 import '../widget/macro_card.dart';
 import '../widget/recipe_tabs.dart';
 import '../widget/replace_sheet.dart';
@@ -98,7 +98,9 @@ class _RecipeScreenState extends State<RecipeScreen> {
       body: SafeArea(
         child: BlocBuilder<RecipeCubit, RecipeState>(
           builder: (context, state) {
-            final recipe = RecipeCatalogue.byId(widget.recipeId);
+            // A favourite stays openable after it leaves the catalogue.
+            final recipe =
+                context.watch<CatalogueCubit>().state.byId(widget.recipeId) ?? state.savedRecipe(widget.recipeId);
             if (recipe == null) {
               return Center(
                 child: CircleIconButton(
@@ -118,7 +120,7 @@ class _RecipeScreenState extends State<RecipeScreen> {
                     recipe: recipe,
                     favourite: interaction.favourite,
                     onBack: () => Navigator.of(context).pop(),
-                    onFavourite: () => context.read<RecipeCubit>().toggleFavourite(recipe.id),
+                    onFavourite: () => context.read<RecipeCubit>().toggleFavourite(recipe),
                   ),
                   Padding(
                     padding: EdgeInsets.fromLTRB(6.w, 22.h, 6.w, 18.h),
@@ -218,7 +220,7 @@ class _PhotoHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     return Stack(
       children: [
-        RecipePhoto(photoKey: recipe.photoKey, height: 300.h, width: double.infinity, radius: 22.r),
+        RecipePhoto(url: recipe.photoUrl, height: 300.h, width: double.infinity, radius: 22.r),
         if (recipe.creator != null)
           Positioned(left: 16.w, bottom: 16.h, child: _CreatorBadge(name: recipe.creator!)),
         Positioned(

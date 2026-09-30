@@ -56,6 +56,8 @@ class OnboardingScreen extends StatelessWidget {
                       AppL10n.of(context).defaultChefName,
                     ),
                     generationStep: state.generationStep,
+                    failed: state.generationFailed,
+                    onRetry: context.read<OnboardingCubit>().retryGeneration,
                   ),
                   _ => _StepsView(state: state),
                 },

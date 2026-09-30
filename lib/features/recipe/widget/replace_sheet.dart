@@ -13,11 +13,11 @@ import '../../plan/cubit/plan_cubit.dart';
 import '../../plan/model/week_plan.dart';
 import '../../preferences/cubit/profile_cubit.dart';
 import '../../preferences/model/user_profile.dart';
+import '../cubit/catalogue_cubit.dart';
 import '../cubit/recipe_browse_cubit.dart';
 import '../cubit/recipe_cubit.dart';
 import '../model/recipe.dart';
 import '../screen/filters_screen.dart';
-import '../service/recipe_catalogue.dart';
 import 'filter_button.dart';
 import 'recipe_row.dart';
 
@@ -54,9 +54,13 @@ class _ReplaceSheetState extends State<ReplaceSheet> {
     final week = context.select<PlanCubit, WeekPlan>((c) => c.state.week);
     final slot = widget.slot;
 
-    // Without a slot, the candidates are the dishes already in the week.
+    // For a slot, the catalogue plus saved favourites the user may pick even
+    // if they left it; without a slot, the dishes already in the week.
     final pool = slot != null
-        ? RecipeCatalogue.recipes
+        ? {
+            for (final r in context.watch<CatalogueCubit>().state.recipes) r.id: r,
+            for (final r in recipes.savedFavourites) r.id: r,
+          }.values.toList()
         : {for (final s in week.slots.where((s) => !s.isLeftover)) s.recipe.id: s.recipe}.values.toList();
     final options = browse
         .apply(pool, store: profile.store, cravingLabel: l10n.cravingLabel, searchText: _query)

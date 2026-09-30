@@ -45,7 +45,7 @@ class MealSlotCard extends StatelessWidget {
       child: Row(
         children: [
           RecipePhoto(
-            photoKey: recipe.photoKey,
+            url: recipe.photoUrl,
             height: 104.r,
             width: 104.r,
             radius: 18.r,

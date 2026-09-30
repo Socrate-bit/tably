@@ -15,9 +15,13 @@ import 'package:tably/features/plan/widget/plan_summary_cards.dart';
 import 'package:tably/features/preferences/cubit/profile_cubit.dart';
 import 'package:tably/features/preferences/model/user_profile.dart';
 import 'package:tably/features/preferences/service/profile_service.dart';
+import 'package:tably/features/recipe/cubit/recipe_cubit.dart';
+import 'package:tably/features/recipe/service/recipe_service.dart';
 import 'package:tably/features/shopping/cubit/shopping_cubit.dart';
 import 'package:tably/features/shopping/service/shopping_service.dart';
 import 'package:tably/l10n/app_localizations.dart';
+
+import 'fixtures/recipe_fixtures.dart';
 
 /// Pumps the real menu with real cubits; nothing is bound to a user, so no
 /// Firebase call is made.
@@ -28,16 +32,34 @@ Future<ProfileCubit> _pumpMenu(WidgetTester tester, {required Size physicalSize,
 
   const analytics = AnalyticsService();
   final profileCubit = ProfileCubit(service: ProfileService(), analytics: analytics);
-  final planCubit = PlanCubit(service: PlanService(), profileCubit: profileCubit, analytics: analytics);
+  final catalogueCubit = seededCatalogue(profileCubit);
+  final recipeCubit = RecipeCubit(service: RecipeService(), analytics: analytics);
+  final planCubit = PlanCubit(
+    service: PlanService(),
+    profileCubit: profileCubit,
+    catalogueCubit: catalogueCubit,
+    recipeCubit: recipeCubit,
+    analytics: analytics,
+  );
   addTearDown(planCubit.close);
+  addTearDown(recipeCubit.close);
+  addTearDown(catalogueCubit.close);
   addTearDown(profileCubit.close);
 
   await tester.pumpWidget(
     MultiBlocProvider(
       providers: [
         BlocProvider.value(value: profileCubit),
+        BlocProvider.value(value: catalogueCubit),
         BlocProvider.value(value: planCubit),
-        BlocProvider(create: (_) => ShoppingCubit(service: ShoppingService(), analytics: analytics)),
+        BlocProvider(
+          create: (_) => ShoppingCubit(
+            service: ShoppingService(),
+            planCubit: planCubit,
+            profileCubit: profileCubit,
+            analytics: analytics,
+          ),
+        ),
         BlocProvider(create: (_) => HomeCubit(analytics: analytics)),
       ],
       child: ScreenUtilInit(

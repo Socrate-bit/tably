@@ -6,7 +6,10 @@ import 'package:tably/features/plan/service/plan_service.dart';
 import 'package:tably/features/preferences/cubit/profile_cubit.dart';
 import 'package:tably/features/preferences/model/user_profile.dart';
 import 'package:tably/features/preferences/service/profile_service.dart';
-import 'package:tably/features/recipe/service/recipe_catalogue.dart';
+import 'package:tably/features/recipe/cubit/recipe_cubit.dart';
+import 'package:tably/features/recipe/service/recipe_service.dart';
+
+import 'fixtures/recipe_fixtures.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -14,8 +17,18 @@ void main() {
   Future<PlanCubit> build(UserProfile profile) async {
     const analytics = AnalyticsService();
     final profileCubit = ProfileCubit(service: ProfileService(), analytics: analytics);
-    final plan = PlanCubit(service: PlanService(), profileCubit: profileCubit, analytics: analytics);
+    final catalogue = seededCatalogue(profileCubit);
+    final recipes = RecipeCubit(service: RecipeService(), analytics: analytics);
+    final plan = PlanCubit(
+      service: PlanService(),
+      profileCubit: profileCubit,
+      catalogueCubit: catalogue,
+      recipeCubit: recipes,
+      analytics: analytics,
+    );
     addTearDown(plan.close);
+    addTearDown(recipes.close);
+    addTearDown(catalogue.close);
     addTearDown(profileCubit.close);
     await profileCubit.completeOnboarding(profile);
     await Future<void>.delayed(Duration.zero);
@@ -26,7 +39,7 @@ void main() {
     final plan = await build(const UserProfile(mealsPerDay: 2, variety: Variety.balanced));
     final before = plan.state.week;
     final lunch = before.slotByKey('monday|lunch')!;
-    final other = RecipeCatalogue.recipes.firstWhere((r) => before.slots.every((s) => s.recipe.id != r.id));
+    final other = RecipeFixtures.recipes.firstWhere((r) => before.slots.every((s) => s.recipe.id != r.id));
 
     await plan.replace('monday|lunch', other.id);
 
@@ -41,7 +54,7 @@ void main() {
     final plan = await build(const UserProfile(mealsPerDay: 2, variety: Variety.balanced));
     final week = plan.state.week;
     final replaced = week.slots.firstWhere((s) => !s.isLeftover).recipe;
-    final incoming = RecipeCatalogue.recipes.firstWhere((r) => r.id != replaced.id);
+    final incoming = RecipeFixtures.recipes.firstWhere((r) => r.id != replaced.id);
 
     await plan.replaceRecipe(replaced.id, incoming.id);
 
@@ -63,7 +76,7 @@ void main() {
 
   test('regenerating reshuffles the week and clears swaps', () async {
     final plan = await build(const UserProfile());
-    await plan.replace('monday|dinner', RecipeCatalogue.recipes.last.id);
+    await plan.replace('monday|dinner', RecipeFixtures.recipes.last.id);
     final seed = plan.state.settings.seed;
 
     await plan.regenerate();

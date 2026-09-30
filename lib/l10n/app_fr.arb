@@ -537,5 +537,19 @@
   "prefsMealsPerDaySub": "Les plats sont réutilisés en restes pour limiter le nombre de recettes",
   "prefsVariety": "Variété",
   "mockCostShort": "COÛT EST.",
-  "mockTapShort": "APPUYER"
+  "mockTapShort": "APPUYER",
+  "mockMealCajun": "Riz au poulet à la cajun",
+  "mockMealSatay": "Nouilles au tofu et au satay",
+  "mockMealSweetChilli": "Boîtes de riz au poulet au piment doux",
+  "aisleProduce": "FRUITS ET LÉGUMES",
+  "aisleMeatFish": "VIANDE ET POISSON",
+  "aislePastaRice": "PÂTES, RIZ ET NOUILLES",
+  "aisleTinsSauces": "CONSERVES, BOCAUX ET SAUCES",
+  "aisleHerbsGrocery": "HERBES, ÉPICES ET ÉPICERIE",
+  "actionRetry": "Réessayer",
+  "generatingFailed": "Impossible de préparer tes recettes pour le moment.",
+  "catalogueBuilding": "On prépare tes recettes…",
+  "errorCatalogue": "Impossible de charger tes recettes.",
+  "errorCatalogueQuota": "La limite de recherche de recettes est atteinte pour aujourd'hui.",
+  "errorCatalogueEmpty": "Aucune recette ne correspond à tes préférences."
 }

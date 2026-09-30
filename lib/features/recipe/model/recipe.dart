@@ -1,17 +1,56 @@
 import 'package:equatable/equatable.dart';
 
+import '../../../core/model/aisle.dart';
 import '../../../core/model/preference_option.dart';
+import '../../../core/util/quantity.dart';
 
 /// One ingredient line on a recipe.
 class Ingredient extends Equatable {
-  const Ingredient({required this.icon, required this.name, required this.quantity});
+  const Ingredient({
+    required this.id,
+    required this.icon,
+    required this.name,
+    required this.amount,
+    required this.unit,
+    required this.aisle,
+  });
 
+  /// Spoonacular's ingredient id. The same food shares it across recipes,
+  /// which is how the shopping list merges them.
+  final int id;
   final String icon;
   final String name;
-  final String quantity;
+
+  /// How much one portion needs, in [unit].
+  final double amount;
+
+  /// Translated unit label, e.g. "g", "c. à s.", or empty for a plain count.
+  final String unit;
+  final Aisle aisle;
+
+  /// What the recipe screen shows, e.g. "150g" or "2 gousses".
+  String get quantity => formatQuantity(amount, unit);
+
+  Map<String, dynamic> toMap() => {
+        'id': id,
+        'icon': icon,
+        'name': name,
+        'amount': amount,
+        'unit': unit,
+        'aisle': aisle.id,
+      };
+
+  factory Ingredient.fromMap(Map<String, dynamic> map) => Ingredient(
+        id: (map['id'] as num?)?.toInt() ?? 0,
+        icon: map['icon'] as String? ?? '🍽️',
+        name: map['name'] as String? ?? '',
+        amount: (map['amount'] as num?)?.toDouble() ?? 0,
+        unit: map['unit'] as String? ?? '',
+        aisle: Aisle.fromId(map['aisle'] as String?),
+      );
 
   @override
-  List<Object?> get props => [icon, name, quantity];
+  List<Object?> get props => [id, icon, name, amount, unit, aisle];
 }
 
 /// Per-serving macro breakdown shown on the recipe screen.
@@ -27,6 +66,13 @@ class Macros extends Equatable {
   final int protein;
   final int carbs;
   final int fat;
+
+  Map<String, dynamic> toMap() => {'kcal': kcal, 'protein': protein, 'carbs': carbs, 'fat': fat};
+
+  factory Macros.fromMap(Map<String, dynamic> map) {
+    int read(String key) => (map[key] as num?)?.toInt() ?? 0;
+    return Macros(kcal: read('kcal'), protein: read('protein'), carbs: read('carbs'), fat: read('fat'));
+  }
 
   @override
   List<Object?> get props => [kcal, protein, carbs, fat];
@@ -44,6 +90,9 @@ enum RecipeProtein {
   const RecipeProtein(this.id, this.icon);
   final String id;
   final String icon;
+
+  static RecipeProtein fromId(String? id) =>
+      values.firstWhere((p) => p.id == id, orElse: () => vegetarian);
 }
 
 /// A cuisine the filters screen can narrow recipes to.
@@ -57,14 +106,17 @@ enum Cuisine {
   const Cuisine(this.id, this.photoKey);
   final String id;
   final String photoKey;
+
+  /// Null for anything outside the five the filters offer.
+  static Cuisine? fromId(String? id) => values.where((c) => c.id == id).firstOrNull;
 }
 
-/// A recipe in the bundled catalogue.
+/// A recipe in the user's catalogue, stored at `users/{uid}/recipes/{id}`.
 class Recipe extends Equatable {
   const Recipe({
     required this.id,
     required this.title,
-    required this.photoKey,
+    required this.photoUrl,
     required this.macros,
     required this.time,
     required this.cookTime,
@@ -80,8 +132,8 @@ class Recipe extends Equatable {
   final String id;
   final String title;
 
-  /// Key into the bundled photo set (see [RecipePhotos]); also a search keyword.
-  final String photoKey;
+  /// Remote photo; empty shows the neutral placeholder.
+  final String photoUrl;
   final Macros macros;
 
   /// Total time shown on cards, e.g. "25m".
@@ -98,17 +150,51 @@ class Recipe extends Equatable {
   final RecipeProtein protein;
   final Cuisine? cuisine;
 
-  /// Credited author, shown over the photo when the recipe comes from a creator.
+  /// Credited source, shown over the photo.
   final String? creator;
   final List<Ingredient> ingredients;
   final List<String> steps;
 
+  Map<String, dynamic> toMap() => {
+        'title': title,
+        'photoUrl': photoUrl,
+        'macros': macros.toMap(),
+        'time': time,
+        'cookTime': cookTime,
+        'price': price,
+        'craving': craving.id,
+        'protein': protein.id,
+        'cuisine': cuisine?.id,
+        'creator': creator,
+        'ingredients': [for (final i in ingredients) i.toMap()],
+        'steps': steps,
+      };
+
+  factory Recipe.fromMap(String id, Map<String, dynamic> map) => Recipe(
+        id: id,
+        title: map['title'] as String? ?? '',
+        photoUrl: map['photoUrl'] as String? ?? '',
+        macros: Macros.fromMap(Map<String, dynamic>.from(map['macros'] as Map? ?? const {})),
+        time: map['time'] as String? ?? '',
+        cookTime: map['cookTime'] as String? ?? '',
+        price: (map['price'] as num?)?.toDouble() ?? 0,
+        craving: Craving.values.firstWhere((c) => c.id == map['craving'], orElse: () => Craving.quick),
+        protein: RecipeProtein.fromId(map['protein'] as String?),
+        cuisine: Cuisine.fromId(map['cuisine'] as String?),
+        creator: map['creator'] as String?,
+        ingredients: [
+          for (final i in map['ingredients'] as List? ?? const [])
+            if (i is Map) Ingredient.fromMap(Map<String, dynamic>.from(i)),
+        ],
+        steps: (map['steps'] as List? ?? const []).whereType<String>().toList(),
+      );
+
   @override
   List<Object?> get props =>
-      [id, title, photoKey, macros, time, cookTime, price, craving, protein, cuisine, creator, ingredients, steps];
+      [id, title, photoUrl, macros, time, cookTime, price, craving, protein, cuisine, creator, ingredients, steps];
 }
 
-/// Maps a recipe's [Recipe.photoKey] to the bundled asset backing it.
+/// Maps a bundled photo key (cuisine tiles, onboarding art) to its asset.
 abstract final class RecipePhotos {
   static const _base = 'assets/photos/';
   static const _keys = {

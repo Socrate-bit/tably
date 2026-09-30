@@ -5,23 +5,30 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../../core/theme/app_theme.dart';
 import '../../../core/widget/app_logo.dart';
+import '../../../core/widget/primary_button.dart';
 import '../../../core/widget/progress_bar.dart';
 import '../../../core/widget/surface_card.dart';
 import '../../../l10n/app_localizations.dart';
 
 /// The "on prépare ta semaine" screen: an orbiting ingredient ring above a
-/// checklist that ticks off as the plan is built.
+/// checklist that ticks off as the recipes are searched, checked and saved.
 class GeneratingScreen extends StatefulWidget {
   const GeneratingScreen({
     super.key,
     required this.displayName,
     required this.generationStep,
+    this.failed = false,
+    this.onRetry,
   });
 
   final String displayName;
 
   /// 0–3; drives the checklist and the progress bar.
   final int generationStep;
+
+  /// The build failed: the ready line becomes an error with a retry button.
+  final bool failed;
+  final VoidCallback? onRetry;
 
   @override
   State<GeneratingScreen> createState() => _GeneratingScreenState();
@@ -88,15 +95,24 @@ class _GeneratingScreenState extends State<GeneratingScreen> with TickerProvider
             ),
           ),
           SizedBox(height: 14.h),
-          // Kept in the layout while building so nothing shifts when it appears.
-          Opacity(
-            opacity: widget.generationStep >= 3 ? 1 : 0,
-            child: Text(
-              l10n.generatingReady,
+          if (widget.failed) ...[
+            Text(
+              l10n.generatingFailed,
               textAlign: TextAlign.center,
-              style: AppTextStyles.metaSmall.copyWith(color: AppColors.textDisabled),
+              style: AppTextStyles.metaSmall.copyWith(color: AppColors.danger),
             ),
-          ),
+            SizedBox(height: 12.h),
+            PrimaryButton(label: l10n.actionRetry, onPressed: widget.onRetry),
+          ] else
+            // Kept in the layout while building so nothing shifts when it appears.
+            Opacity(
+              opacity: widget.generationStep >= 3 ? 1 : 0,
+              child: Text(
+                l10n.generatingReady,
+                textAlign: TextAlign.center,
+                style: AppTextStyles.metaSmall.copyWith(color: AppColors.textDisabled),
+              ),
+            ),
         ],
       ),
     );

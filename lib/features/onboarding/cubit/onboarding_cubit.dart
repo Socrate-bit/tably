@@ -13,6 +13,8 @@ import '../../plan/model/plan_settings.dart';
 import '../../plan/model/week_plan.dart';
 import '../../plan/service/week_planner.dart';
 import '../../preferences/model/user_profile.dart';
+import '../../recipe/cubit/catalogue_cubit.dart';
+import '../../recipe/model/recipe.dart';
 import '../model/onboarding_step.dart';
 
 part 'onboarding_state.dart';
@@ -20,14 +22,21 @@ part 'onboarding_state.dart';
 /// Drives the onboarding flow and assembles the profile as the user answers.
 /// Nothing is written to Firestore until the store-switch offer is answered.
 class OnboardingCubit extends Cubit<OnboardingState> {
-  OnboardingCubit({required AnalyticsService analytics})
-      : _analytics = analytics,
+  OnboardingCubit({required CatalogueCubit catalogueCubit, required AnalyticsService analytics})
+      : _catalogueCubit = catalogueCubit,
+        _analytics = analytics,
         super(const OnboardingState()) {
     unawaited(_analytics.capture(AnalyticsEvents.onboardingStarted));
   }
 
+  final CatalogueCubit _catalogueCubit;
   final AnalyticsService _analytics;
-  final List<Timer> _generationTimers = [];
+
+  /// Follows the catalogue build to tick the generating checklist.
+  StreamSubscription<CatalogueState>? _buildProgress;
+
+  /// Lets the last checklist item land before moving on.
+  static const _readyPause = Duration(milliseconds: 700);
 
   /// Budget slider bounds, matching the design.
   static const minBudget = 40.0;
@@ -140,36 +149,38 @@ class OnboardingCubit extends Cubit<OnboardingState> {
   // ---- Rating prompt & generation ----
 
   /// Dismissing the rating prompt starts the plan build, exactly as in the design.
-  void dismissRating() {
-    emit(state.copyWith(phase: OnboardingPhase.generating, generationStep: 0));
-    _runGeneration();
-  }
+  void dismissRating() => _runGeneration();
 
-  /// Steps the checklist on a timer so the build reads as real work.
-  void _runGeneration() {
-    _cancelGeneration();
-    const beats = [
-      (Duration(milliseconds: 1500), 1),
-      (Duration(milliseconds: 3200), 2),
-      (Duration(milliseconds: 4900), 3),
-    ];
-    for (final (delay, step) in beats) {
-      _generationTimers.add(Timer(delay, () {
-        if (isClosed || state.phase != OnboardingPhase.generating) return;
-        emit(state.copyWith(generationStep: step));
-      }));
+  /// After a failed build, tries again with the same answers.
+  void retryGeneration() => _runGeneration();
+
+  /// Builds the user's real recipe catalogue from their answers, ticking the
+  /// checklist as the search, the Gemini check and the save complete.
+  Future<void> _runGeneration() async {
+    emit(state.copyWith(phase: OnboardingPhase.generating, generationStep: 0, generationFailed: false));
+    await _buildProgress?.cancel();
+    _buildProgress = _catalogueCubit.stream.listen((catalogue) {
+      if (isClosed || !catalogue.isBuilding) return;
+      emit(state.copyWith(generationStep: catalogue.step.index));
+    });
+
+    final built = await _catalogueCubit.build(state.draft);
+    await _buildProgress?.cancel();
+    if (isClosed || state.phase != OnboardingPhase.generating) return;
+    if (!built) {
+      emit(state.copyWith(generationFailed: true));
+      return;
     }
-    _generationTimers.add(Timer(const Duration(milliseconds: 6200), () {
-      if (isClosed || state.phase != OnboardingPhase.generating) return;
-      _finishGeneration();
-    }));
+    emit(state.copyWith(generationStep: generationTasks, catalogue: _catalogueCubit.state.recipes));
+    await Future<void>.delayed(_readyPause);
+    if (isClosed || state.phase != OnboardingPhase.generating) return;
+    _finishGeneration();
   }
 
   /// Ends the build, then offers a cheaper store if one exists. Users already
   /// at the cheapest store go straight in, rather than being told a pricier
   /// store would save them money.
   void _finishGeneration() {
-    _cancelGeneration();
     if (!state.hasCheaperStore) {
       _complete(state.draft);
       return;
@@ -206,16 +217,9 @@ class OnboardingCubit extends Cubit<OnboardingState> {
     debugPrint('[OnboardingCubit] onboarding complete');
   }
 
-  void _cancelGeneration() {
-    for (final timer in _generationTimers) {
-      timer.cancel();
-    }
-    _generationTimers.clear();
-  }
-
   @override
   Future<void> close() {
-    _cancelGeneration();
+    _buildProgress?.cancel();
     return super.close();
   }
 }

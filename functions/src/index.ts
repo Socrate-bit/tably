@@ -1,4 +1,6 @@
 import {onCall, HttpsError} from "firebase-functions/v2/https";
+import {defineSecret} from "firebase-functions/params";
+import * as logger from "firebase-functions/logger";
 import {initializeApp} from "firebase-admin/app";
 import {getFirestore, FieldValue} from "firebase-admin/firestore";
 
@@ -7,6 +9,9 @@ const db = getFirestore();
 
 /** Deployed next to the eur3 Firestore instance; the client must match. */
 const REGION = "europe-west1";
+
+/** RapidAPI key for Spoonacular, set with `firebase functions:secrets:set`. */
+const spoonacularKey = defineSecret("SPOONACULAR_API_KEY");
 
 /** The only grants a referral code may hand out. */
 const GRANTABLE_TYPES = ["admin", "ugc"];
@@ -79,3 +84,185 @@ export const redeemReferralCode = onCall({region: REGION}, async (request) => {
 
   return {userType};
 });
+
+const SPOONACULAR_HOST = "spoonacular-recipe-food-nutrition-v1.p.rapidapi.com";
+
+/** Candidates fetched per build; Gemini then drops any that break a constraint. */
+const SEARCH_SIZE = 24;
+
+/** Spoonacular prices are US cents; everyone is on EUR for now. Approximate. */
+const USD_TO_EUR = 0.86;
+
+/** Profile diet ids → Spoonacular diets. Halal has none, see HALAL_EXCLUDES. */
+const DIETS: Record<string, string> = {
+  vegetarian: "vegetarian",
+  vegan: "vegan",
+  pescatarian: "pescetarian",
+};
+const HALAL_EXCLUDES = ["pork", "bacon", "ham", "wine", "beer"];
+
+/** Profile allergy ids → Spoonacular intolerances. */
+const INTOLERANCES: Record<string, string[]> = {
+  gluten_free: ["Gluten"],
+  lactose_free: ["Dairy"],
+  nut_free: ["Peanut", "Tree Nut"],
+  egg_free: ["Egg"],
+  shellfish_free: ["Shellfish"],
+  sesame_free: ["Sesame"],
+  soy_free: ["Soy"],
+};
+
+/** Ingredients excluded when the user did not pick that protein. */
+const PROTEIN_EXCLUDES: Record<string, string[]> = {
+  beef: ["beef"],
+  pork: ["pork", "bacon", "ham", "prosciutto", "pancetta", "chorizo"],
+  chicken: ["chicken"],
+  fish: ["fish", "salmon", "tuna", "cod"],
+};
+
+/** Profile cook-time ids → Spoonacular maxReadyTime in minutes. */
+const MAX_READY_TIME: Record<string, number> = {
+  "15_30": 30,
+  "30_45": 45,
+  "45_60": 60,
+};
+
+/** Keeps only string items, so bad input can't reach the query. */
+const stringList = (value: unknown): string[] =>
+  Array.isArray(value) ? value.filter((v): v is string => typeof v === "string") : [];
+
+const round = (value: number, decimals = 2): number =>
+  Math.round(value * 10 ** decimals) / 10 ** decimals;
+
+/**
+ * Builds the complexSearch query from the profile's constraint ids.
+ * Meat exclusions only apply when no diet already rules meat out.
+ */
+function searchParams(data: Record<string, unknown>): URLSearchParams {
+  const diets = stringList(data.diets);
+  const allergies = stringList(data.allergies);
+  const proteins = stringList(data.proteins);
+  const cookTime = typeof data.cookTime === "string" ? data.cookTime : null;
+
+  const diet = diets.map((d) => DIETS[d]).filter(Boolean);
+  const intolerances = allergies.flatMap((a) => INTOLERANCES[a] ?? []);
+  const excludes = diets.includes("halal") ? [...HALAL_EXCLUDES] : [];
+  if (diet.length === 0) {
+    for (const [protein, names] of Object.entries(PROTEIN_EXCLUDES)) {
+      if (!proteins.includes(protein)) excludes.push(...names);
+    }
+  }
+
+  const params = new URLSearchParams({
+    type: "main course",
+    instructionsRequired: "true",
+    addRecipeInformation: "true",
+    addRecipeNutrition: "true",
+    fillIngredients: "true",
+    sort: "random",
+    number: String(SEARCH_SIZE),
+  });
+  if (diet.length > 0) params.set("diet", diet.join(","));
+  if (intolerances.length > 0) params.set("intolerances", intolerances.join(","));
+  if (excludes.length > 0) params.set("excludeIngredients", [...new Set(excludes)].join(","));
+  const maxReadyTime = cookTime ? MAX_READY_TIME[cookTime] : undefined;
+  if (maxReadyTime) params.set("maxReadyTime", String(maxReadyTime));
+  return params;
+}
+
+/**
+ * Reduces a Spoonacular result to what the app and Gemini need (~26 KB → ~3 KB).
+ * Ingredient amounts are per portion, prices are EUR per portion. Returns null
+ * for results too thin to cook from.
+ */
+function trimRecipe(r: any): Record<string, unknown> | null {
+  const servings = Math.max(1, Number(r.servings) || 1);
+  const rawSteps: any[] = (r.analyzedInstructions ?? []).flatMap((a: any) => a.steps ?? []);
+  const steps = rawSteps.map((s) => String(s.step ?? "").trim()).filter((s) => s.length > 0);
+  if (typeof r.image !== "string" || steps.length < 2) return null;
+
+  const nutrient = (name: string): number =>
+    Math.round(r.nutrition?.nutrients?.find((n: any) => n.name === name)?.amount ?? 0);
+  const equipment = new Set<string>(
+    rawSteps.flatMap((s) => (s.equipment ?? []).map((e: any) => String(e.name)))
+  );
+
+  return {
+    id: r.id,
+    title: r.title,
+    // The largest size Spoonacular serves; the search returns a smaller one.
+    image: r.image.replace(/-\d+x\d+\.(\w+)$/, "-636x393.$1"),
+    readyInMinutes: r.readyInMinutes,
+    price: round((Number(r.pricePerServing) || 0) / 100 * USD_TO_EUR),
+    sourceName: r.sourceName ?? null,
+    sourceUrl: r.sourceUrl ?? null,
+    macros: {
+      kcal: nutrient("Calories"),
+      protein: nutrient("Protein"),
+      carbs: nutrient("Carbohydrates"),
+      fat: nutrient("Fat"),
+    },
+    ingredients: (r.extendedIngredients ?? []).map((i: any, index: number) => ({
+      // A few ingredients have no id; a negative index keeps them distinct.
+      id: typeof i.id === "number" ? i.id : -(index + 1),
+      name: i.nameClean || i.name,
+      aisle: i.aisle ?? null,
+      amount: round((Number(i.measures?.metric?.amount) || 0) / servings),
+      unit: i.measures?.metric?.unitShort ?? "",
+    })),
+    steps,
+    equipment: [...equipment],
+  };
+}
+
+/**
+ * Searches Spoonacular for main courses matching the caller's constraints.
+ * 1. Maps diets, allergies, proteins and cook time to query parameters
+ * 2. Calls complexSearch with the secret RapidAPI key (1 request of the quota)
+ * 3. Trims each result to the fields the app and Gemini use
+ * Live and uncached for now: every call spends quota.
+ */
+export const searchRecipes = onCall(
+  {region: REGION, secrets: [spoonacularKey], timeoutSeconds: 60},
+  async (request) => {
+    if (!request.auth) {
+      throw new HttpsError("unauthenticated", "Must be signed in.");
+    }
+    const data = (request.data ?? {}) as Record<string, unknown>;
+    const url = `https://${SPOONACULAR_HOST}/recipes/complexSearch?${searchParams(data)}`;
+
+    let response: Response;
+    try {
+      response = await fetch(url, {
+        headers: {
+          "x-rapidapi-key": spoonacularKey.value(),
+          "x-rapidapi-host": SPOONACULAR_HOST,
+        },
+        signal: AbortSignal.timeout(30_000),
+      });
+    } catch (e) {
+      logger.error("searchRecipes: request failed", e);
+      throw new HttpsError("unavailable", "Recipe search is unavailable.");
+    }
+
+    logger.info("searchRecipes: quota", {
+      uid: request.auth.uid,
+      status: response.status,
+      requestsRemaining: response.headers.get("x-ratelimit-requests-remaining"),
+    });
+    if (response.status === 402 || response.status === 429) {
+      throw new HttpsError("resource-exhausted", "Recipe search quota reached.");
+    }
+    if (!response.ok) {
+      logger.error("searchRecipes: bad status", {status: response.status, body: await response.text()});
+      throw new HttpsError("unavailable", "Recipe search is unavailable.");
+    }
+
+    const body = await response.json();
+    const recipes = (body.results ?? [])
+      .map(trimRecipe)
+      .filter((r: unknown) => r !== null);
+    logger.info("searchRecipes: done", {total: body.totalResults, returned: recipes.length});
+    return {recipes};
+  }
+);

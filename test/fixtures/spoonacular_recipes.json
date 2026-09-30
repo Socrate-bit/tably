@@ -1,0 +1,182 @@
+[
+ {
+  "id": 644761,
+  "title": "Glazed pork chops",
+  "image": "https://img.spoonacular.com/recipes/644761-636x393.jpg",
+  "readyInMinutes": 45,
+  "price": 1.77,
+  "sourceName": "foodista.com",
+  "sourceUrl": "https://www.foodista.com/recipe/HZVLJQMT/glazed-pork-chops",
+  "macros": {
+   "kcal": 459,
+   "protein": 31,
+   "carbs": 11,
+   "fat": 32
+  },
+  "ingredients": [
+   {
+    "id": 2069,
+    "name": "balsamic vinegar",
+    "aisle": "Oil, Vinegar, Salad Dressing",
+    "amount": 0.25,
+    "unit": "Tbsp"
+   },
+   {
+    "id": 1002030,
+    "name": "pepper",
+    "aisle": "Spices and Seasonings",
+    "amount": 0.06,
+    "unit": "tsps"
+   },
+   {
+    "id": 1001,
+    "name": "butter",
+    "aisle": "Milk, Eggs, Other Dairy",
+    "amount": 28.38,
+    "unit": "g"
+   },
+   {
+    "id": 20027,
+    "name": "cornstarch",
+    "aisle": "Baking",
+    "amount": 0.13,
+    "unit": "tsps"
+   },
+   {
+    "id": 10211215,
+    "name": "garlic cloves",
+    "aisle": "Produce",
+    "amount": 0.5,
+    "unit": ""
+   },
+   {
+    "id": 11156,
+    "name": "green onions",
+    "aisle": "Produce",
+    "amount": 1,
+    "unit": "servings"
+   },
+   {
+    "id": 19296,
+    "name": "honey",
+    "aisle": "Nut butters, Jams, and Honey",
+    "amount": 0.5,
+    "unit": "Tbsps"
+   },
+   {
+    "id": 10010062,
+    "name": "pork chops",
+    "aisle": "Meat",
+    "amount": 1,
+    "unit": ""
+   },
+   {
+    "id": 16124,
+    "name": "soy sauce",
+    "aisle": "Ethnic Foods",
+    "amount": 14.5,
+    "unit": "ml"
+   }
+  ],
+  "steps": [
+   "Press one side of each chop into the black pepper.",
+   "Heat nonstick grill skillet until hot.",
+   "Add pork chops, pepper side down, and cook about 4 minutes or until browned.Reduce heat to medium, turn pork chops and cook 6-8 minutes longer.When done, take the skillet from the heat, cover the pork chops and set aside.Meanwhile, mix honey, soy sauce, balsamic vinegar and cornstarch until smooth.",
+   "Add the cracked pepper, stir.Melt the butter in a small pan, add garlic and cook for 30 seconds, stirring.Stir honey mixture into pan, let it boil, cook for 1 minute, stirring.Spoon sauce over pork chops, sprinkle with fresh chives or green onions.",
+   "Serve with polenta and green salad."
+  ],
+  "equipment": [
+   "frying pan",
+   "grill"
+  ]
+ },
+ {
+  "id": 663392,
+  "title": "Three-Cup Chicken",
+  "image": "https://img.spoonacular.com/recipes/663392-636x393.jpg",
+  "readyInMinutes": 45,
+  "price": 2.35,
+  "sourceName": "Foodista",
+  "sourceUrl": "https://www.foodista.com/recipe/436T6V4Y/3-cups-chicken",
+  "macros": {
+   "kcal": 435,
+   "protein": 28,
+   "carbs": 9,
+   "fat": 26
+  },
+  "ingredients": [
+   {
+    "id": 2044,
+    "name": "basil",
+    "aisle": "Produce",
+    "amount": 0.33,
+    "unit": "leaf"
+   },
+   {
+    "id": 11215,
+    "name": "bulb garlic",
+    "aisle": "Produce",
+    "amount": 0.17,
+    "unit": ""
+   },
+   {
+    "id": 11216,
+    "name": "old ginger",
+    "aisle": "Produce",
+    "amount": 0.5,
+    "unit": "slice"
+   },
+   {
+    "id": 43479,
+    "name": "rice wine",
+    "aisle": "Alcoholic Beverages",
+    "amount": 40,
+    "unit": "g"
+   },
+   {
+    "id": 4058,
+    "name": "sesame oil",
+    "aisle": "Ethnic Foods",
+    "amount": 36.33,
+    "unit": "ml"
+   },
+   {
+    "id": 16124,
+    "name": "soy sauce",
+    "aisle": "Ethnic Foods",
+    "amount": 38.67,
+    "unit": "ml"
+   },
+   {
+    "id": 11291,
+    "name": "spring onions",
+    "aisle": "Produce",
+    "amount": 0.5,
+    "unit": "large bunches"
+   },
+   {
+    "id": 19335,
+    "name": "sugar",
+    "aisle": "Baking",
+    "amount": 0.33,
+    "unit": "Tbsps"
+   },
+   {
+    "id": 5006,
+    "name": "chicken",
+    "aisle": "Meat",
+    "amount": 0.17,
+    "unit": ""
+   }
+  ],
+  "steps": [
+   "Marinate chicken with soy, sesame oil and rice wine. At least for 6 hours, although overnight is best.Take the chill off the meat.",
+   "Heat up some sesame oil in a wok or claypot until it is sizzling hot.Throw in garlic, ginger and spring onions. Fry briefly till fragrant.",
+   "Add in chicken and sear.Keep stir-frying.",
+   "Pour in the marinade liquid and the sugar. Continue to cook on medium.Once you have a rolling boil, cover the wok/claypot and let it simmer over a small flame, until all the liquid has disappeared and the chicken is on the cusp of burning.There should hardly be any gravy left. The chicken should be caramelised (charred at parts, even) and sizzling when served."
+  ],
+  "equipment": [
+   "wok"
+  ]
+ }
+]

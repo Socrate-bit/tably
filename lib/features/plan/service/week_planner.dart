@@ -1,6 +1,5 @@
 import '../../preferences/model/user_profile.dart';
 import '../../recipe/model/recipe.dart';
-import '../../recipe/service/recipe_catalogue.dart';
 import '../model/plan_settings.dart';
 import '../model/week_plan.dart';
 
@@ -10,13 +9,18 @@ abstract final class WeekPlanner {
   static WeekPlan build({
     required UserProfile profile,
     required PlanSettings settings,
-    List<Recipe> catalogue = RecipeCatalogue.recipes,
+    required List<Recipe> catalogue,
+    List<Recipe> favourites = const [],
   }) {
     final days = profile.orderedDays;
     final mealSlots = MealSlot.forMealsPerDay(profile.mealsPerDay);
     if (days.isEmpty || catalogue.isEmpty) return const WeekPlan();
     final shuffled = _shuffle(catalogue, settings.seed);
-    Recipe? byId(String? id) => id == null ? null : catalogue.where((r) => r.id == id).firstOrNull;
+    // Swaps may name a saved favourite that has left the catalogue; the
+    // shuffle itself only ever draws from the catalogue.
+    Recipe? byId(String? id) => id == null
+        ? null
+        : catalogue.where((r) => r.id == id).firstOrNull ?? favourites.where((r) => r.id == id).firstOrNull;
 
     // Meals in eating order, split into [recipesToCook] consecutive runs as
     // even as possible. Each run is one dish: cooked at its first meal, then

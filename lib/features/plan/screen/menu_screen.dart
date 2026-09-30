@@ -6,11 +6,13 @@ import '../../../core/theme/app_theme.dart';
 import '../../../core/util/error_feedback.dart';
 import '../../../core/util/option_labels.dart';
 import '../../../core/widget/app_logo.dart';
+import '../../../core/widget/primary_button.dart';
 import '../../../core/widget/store_pill.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../home/cubit/home_cubit.dart';
 import '../../preferences/cubit/profile_cubit.dart';
 import '../../preferences/model/user_profile.dart';
+import '../../recipe/cubit/catalogue_cubit.dart';
 import '../../recipe/screen/recipe_screen.dart';
 import '../../shopping/cubit/shopping_cubit.dart';
 import '../../shopping/screen/shopping_screen.dart';
@@ -29,17 +31,31 @@ class MenuScreen extends StatelessWidget {
     final l10n = AppL10n.of(context);
     final profile = context.select<ProfileCubit, UserProfile>((c) => c.state.profile);
     final plan = context.watch<PlanCubit>().state;
+    final catalogue = context.watch<CatalogueCubit>().state;
     final shopping = context.watch<ShoppingCubit>().state;
     final week = plan.week;
     final total = week.totalAt(profile.store);
     void openStores() => context.read<HomeCubit>().open(HomeSub.stores);
 
-    return BlocListener<PlanCubit, PlanState>(
-      listenWhen: (previous, current) => current.error != null && previous.error != current.error,
-      listener: (context, state) {
-        showErrorBanner(context, l10n.errorGeneratePlan);
-        context.read<PlanCubit>().errorShown();
-      },
+    return MultiBlocListener(
+      listeners: [
+        BlocListener<PlanCubit, PlanState>(
+          listenWhen: (previous, current) => current.error != null && previous.error != current.error,
+          listener: (context, state) {
+            showErrorBanner(context, l10n.errorGeneratePlan);
+            context.read<PlanCubit>().errorShown();
+          },
+        ),
+        // A rebuild after a preferences change failed; the old recipes stay.
+        BlocListener<CatalogueCubit, CatalogueState>(
+          listenWhen: (previous, current) =>
+              current.error != null && previous.error != current.error && current.recipes.isNotEmpty,
+          listener: (context, state) {
+            showErrorBanner(context, catalogueErrorText(l10n, state.error));
+            context.read<CatalogueCubit>().errorShown();
+          },
+        ),
+      ],
       child: SingleChildScrollView(
         padding: EdgeInsets.fromLTRB(20.w, 8.h, 20.w, AppDimens.tabBarInset),
         child: Column(
@@ -86,6 +102,7 @@ class MenuScreen extends StatelessWidget {
               textAlign: TextAlign.center,
             ),
             SizedBox(height: 20.h),
+            if (catalogue.recipes.isEmpty) _CatalogueStatus(state: catalogue),
             // Keyed by the week so a regenerated plan slides in afresh.
             AnimatedOpacity(
               opacity: plan.regenerating ? 0.5 : 1,
@@ -122,6 +139,50 @@ class MenuScreen extends StatelessWidget {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+/// The message for a failed catalogue build.
+String catalogueErrorText(AppL10n l10n, Object? error) => switch (CatalogueCubit.reasonFor(error)) {
+      'quota' => l10n.errorCatalogueQuota,
+      'no_match' => l10n.errorCatalogueEmpty,
+      _ => l10n.errorCatalogue,
+    };
+
+/// Stands in for the week while there are no recipes yet: a spinner while
+/// they are built, or the reason and a retry when the build failed.
+class _CatalogueStatus extends StatelessWidget {
+  const _CatalogueStatus({required this.state});
+
+  final CatalogueState state;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppL10n.of(context);
+    final failed = state.status == CatalogueStatus.failed;
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: 40.h),
+      child: Column(
+        children: [
+          if (!failed)
+            SizedBox(
+              width: 28.r,
+              height: 28.r,
+              child: const CircularProgressIndicator(strokeWidth: 2.5, color: AppColors.brand),
+            ),
+          SizedBox(height: 16.h),
+          Text(
+            failed ? catalogueErrorText(l10n, state.error) : l10n.catalogueBuilding,
+            textAlign: TextAlign.center,
+            style: AppTextStyles.bodyMuted,
+          ),
+          if (failed) ...[
+            SizedBox(height: 18.h),
+            PrimaryButton(label: l10n.actionRetry, onPressed: context.read<CatalogueCubit>().retry),
+          ],
+        ],
       ),
     );
   }

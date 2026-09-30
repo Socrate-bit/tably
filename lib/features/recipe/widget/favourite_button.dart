@@ -6,20 +6,21 @@ import '../../../core/theme/app_theme.dart';
 import '../../../core/util/haptics.dart';
 import '../../../core/widget/line_icon.dart';
 import '../cubit/recipe_cubit.dart';
+import '../model/recipe.dart';
 
 /// The heart on a recipe row: tinted and filled when the recipe is a favourite.
 class FavouriteButton extends StatelessWidget {
-  const FavouriteButton({super.key, required this.recipeId});
+  const FavouriteButton({super.key, required this.recipe});
 
-  final String recipeId;
+  final Recipe recipe;
 
   @override
   Widget build(BuildContext context) {
-    final favourite = context.select<RecipeCubit, bool>((c) => c.state.isFavourite(recipeId));
+    final favourite = context.select<RecipeCubit, bool>((c) => c.state.isFavourite(recipe.id));
     return GestureDetector(
       onTap: () {
         Haptics.toggle();
-        context.read<RecipeCubit>().toggleFavourite(recipeId);
+        context.read<RecipeCubit>().toggleFavourite(recipe);
       },
       child: Container(
         width: 34.r,
