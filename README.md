@@ -11,10 +11,10 @@ flutter gen-l10n
 flutter run
 ```
 
-PostHog is optional — the app runs without it and logs that analytics are disabled:
+Mixpanel tracks to the Tably project by default; point it at another project with:
 
 ```bash
-flutter run --dart-define=POSTHOG_API_KEY=phc_your_key
+flutter run --dart-define=MIXPANEL_TOKEN=your_token
 ```
 
 ## Firebase
@@ -101,7 +101,7 @@ subfolders under each feature.
 
 ```
 lib/
-  main.dart                 Firebase + PostHog bootstrap
+  main.dart                 Firebase + Mixpanel bootstrap
   app.dart                  service/cubit wiring, MaterialApp, ScreenUtil
   root.dart                 splash -> onboarding -> home routing; binds uid to cubits
   core/
@@ -109,7 +109,7 @@ lib/
     model/                  Weekday and the preference enums
     util/                   Haptics, option label resolution, error banner
     widget/                 shared cards, buttons, photo, check circle
-    analytics/              PostHog wrapper + event names
+    analytics/              Mixpanel wrapper + event names
   features/
     onboarding/             24-step flow, rating prompt, generating screen
     plan/                   week tab, week planner, supermarket comparison

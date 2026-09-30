@@ -6,20 +6,12 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:liquid_glass_widgets/liquid_glass_widgets.dart';
-import 'package:posthog_flutter/posthog_flutter.dart';
 import 'package:superwallkit_flutter/superwallkit_flutter.dart';
 
 import 'app.dart';
+import 'core/analytics/analytics_service.dart';
 import 'features/subscription/service/paywall_service.dart';
 import 'firebase_options.dart';
-
-/// PostHog project credentials. Override at build time:
-/// `flutter run --dart-define=POSTHOG_API_KEY=phc_...`
-const _posthogApiKey = String.fromEnvironment('POSTHOG_API_KEY');
-const _posthogHost = String.fromEnvironment(
-  'POSTHOG_HOST',
-  defaultValue: 'https://eu.i.posthog.com',
-);
 
 /// A debug token registered in the Firebase console (App Check → Manage debug
 /// tokens), for simulators and the web build:
@@ -42,7 +34,7 @@ Future<void> main() async {
   }
 
   await _initAppCheck();
-  await _initAnalytics();
+  await AnalyticsService.init();
   _initPaywall();
   await _initGlass();
 
@@ -94,23 +86,5 @@ void _initPaywall() {
     debugPrint('[main] Superwall initialised');
   } catch (e) {
     debugPrint('[main] Superwall initialisation failed: $e');
-  }
-}
-
-/// Starts PostHog when a key is configured; the app runs fine without one.
-Future<void> _initAnalytics() async {
-  if (_posthogApiKey.isEmpty) {
-    debugPrint('[main] PostHog key not set — analytics disabled');
-    return;
-  }
-  try {
-    await Posthog().setup(
-      PostHogConfig(_posthogApiKey)
-        ..host = _posthogHost
-        ..captureApplicationLifecycleEvents = true,
-    );
-    debugPrint('[main] PostHog initialised');
-  } catch (e) {
-    debugPrint('[main] PostHog initialisation failed: $e');
   }
 }

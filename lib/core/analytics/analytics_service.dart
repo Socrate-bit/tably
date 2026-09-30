@@ -1,24 +1,42 @@
 import 'package:flutter/foundation.dart';
-import 'package:posthog_flutter/posthog_flutter.dart';
+import 'package:mixpanel_flutter/mixpanel_flutter.dart';
 
-/// Thin wrapper over PostHog so screens and cubits never touch the SDK directly
+/// Thin wrapper over Mixpanel so screens and cubits never touch the SDK directly
 /// and every failure is swallowed rather than breaking a user flow.
 class AnalyticsService {
   const AnalyticsService();
 
+  /// Mixpanel project token. Override at build time:
+  /// `flutter run --dart-define=MIXPANEL_TOKEN=...`
+  static const _token = String.fromEnvironment('MIXPANEL_TOKEN', defaultValue: '2d21ebcf30c96eb0f7ac5ac86a7f9419');
+
+  /// Set once by [init]; every call is a no-op while it is null.
+  static Mixpanel? _mixpanel;
+
+  /// Starts Mixpanel; the app runs fine if this fails.
+  static Future<void> init() async {
+    try {
+      _mixpanel = await Mixpanel.init(_token, trackAutomaticEvents: true);
+      await _mixpanel!.registerSuperProperties({'platform': defaultTargetPlatform.name});
+      debugPrint('[AnalyticsService] Mixpanel initialised');
+    } catch (e) {
+      debugPrint('[AnalyticsService] Mixpanel initialisation failed: $e');
+    }
+  }
+
   /// Records a product event with optional properties.
   Future<void> capture(String event, {Map<String, Object>? properties}) async {
     try {
-      await Posthog().capture(eventName: event, properties: properties);
+      await _mixpanel?.track(event, properties: properties);
     } catch (e) {
       debugPrint('[AnalyticsService] capture "$event" failed: $e');
     }
   }
 
-  /// Records a screen view.
+  /// Records a screen view (Mixpanel has no screen API, so it is an event).
   Future<void> screen(String name) async {
     try {
-      await Posthog().screen(screenName: name);
+      await _mixpanel?.track(AnalyticsEvents.screenViewed, properties: {'screen_name': name});
     } catch (e) {
       debugPrint('[AnalyticsService] screen "$name" failed: $e');
     }
@@ -26,8 +44,11 @@ class AnalyticsService {
 
   /// Ties subsequent events to a user and attaches their profile properties.
   Future<void> identify(String userId, {Map<String, Object>? properties}) async {
+    final mixpanel = _mixpanel;
+    if (mixpanel == null) return;
     try {
-      await Posthog().identify(userId: userId, userProperties: properties);
+      await mixpanel.identify(userId);
+      properties?.forEach(mixpanel.getPeople().set);
       debugPrint('[AnalyticsService] identified $userId');
     } catch (e) {
       debugPrint('[AnalyticsService] identify failed: $e');
@@ -37,7 +58,7 @@ class AnalyticsService {
   /// Clears the identity on sign-out.
   Future<void> reset() async {
     try {
-      await Posthog().reset();
+      await _mixpanel?.reset();
     } catch (e) {
       debugPrint('[AnalyticsService] reset failed: $e');
     }
@@ -46,6 +67,7 @@ class AnalyticsService {
 
 /// Event names, kept in one place so reporting stays consistent.
 abstract final class AnalyticsEvents {
+  static const screenViewed = 'screen_viewed';
   static const onboardingStarted = 'onboarding_started';
   static const onboardingStepCompleted = 'onboarding_step_completed';
   static const onboardingCompleted = 'onboarding_completed';
