@@ -560,6 +560,7 @@
   "recipeReplaceMeal": "Remplacer ce repas",
   "prefsMealsPerDay": "Repas par jour",
   "prefsMealsPerDaySub": "Les plats sont réutilisés en restes pour limiter le nombre de recettes",
+  "prefsVariety": "Variété",
   "mockCostShort": "COÛT EST.",
   "mockTapShort": "APPUYER"
 }

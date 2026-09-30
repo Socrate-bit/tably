@@ -53,6 +53,8 @@ class PreferenceGrid<T extends Enum> extends StatelessWidget {
       crossAxisCount: 2,
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
+      // Otherwise the grid pads itself with the tab bar inset from MediaQuery.
+      padding: EdgeInsets.zero,
       crossAxisSpacing: 12.w,
       mainAxisSpacing: 12.h,
       childAspectRatio: 1.42,

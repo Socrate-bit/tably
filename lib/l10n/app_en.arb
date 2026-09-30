@@ -422,6 +422,7 @@
   "recipeReplaceMeal": "Replace this meal",
   "prefsMealsPerDay": "Meals per day",
   "prefsMealsPerDaySub": "Dishes are reused as leftovers to keep the number of recipes down",
+  "prefsVariety": "Variety",
   "mockCostShort": "EST. COST",
   "mockTapShort": "TAP"
 }

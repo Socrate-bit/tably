@@ -1118,6 +1118,9 @@ class AppL10nFr extends AppL10n {
       'Les plats sont réutilisés en restes pour limiter le nombre de recettes';
 
   @override
+  String get prefsVariety => 'Variété';
+
+  @override
   String get mockCostShort => 'COÛT EST.';
 
   @override
