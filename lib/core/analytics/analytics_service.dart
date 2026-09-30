@@ -71,5 +71,4 @@ abstract final class AnalyticsEvents {
   static const paywallBypassed = 'paywall_bypassed';
   static const subscriptionActivated = 'subscription_activated';
   static const subscriptionLost = 'subscription_lost';
-  static const onboardingReplayed = 'onboarding_replayed';
 }

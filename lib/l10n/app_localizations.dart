@@ -1213,24 +1213,6 @@ abstract class AppL10n {
   /// **'Connecte-toi pour enregistrer tes\npréférences dans le cloud.'**
   String get accountSignInSub;
 
-  /// No description provided for @accountFamilyPlan.
-  ///
-  /// In fr, this message translates to:
-  /// **'Formule famille'**
-  String get accountFamilyPlan;
-
-  /// No description provided for @accountFamilyPlanSub.
-  ///
-  /// In fr, this message translates to:
-  /// **'Partage l\'accès à ton compte.'**
-  String get accountFamilyPlanSub;
-
-  /// No description provided for @accountInvite.
-  ///
-  /// In fr, this message translates to:
-  /// **'Inviter amis et famille'**
-  String get accountInvite;
-
   /// No description provided for @accountGreeting.
   ///
   /// In fr, this message translates to:
@@ -1255,89 +1237,11 @@ abstract class AppL10n {
   /// **'APP'**
   String get accountSectionApp;
 
-  /// No description provided for @accountRateTably.
-  ///
-  /// In fr, this message translates to:
-  /// **'Noter Tably'**
-  String get accountRateTably;
-
-  /// No description provided for @accountSuggestFeature.
-  ///
-  /// In fr, this message translates to:
-  /// **'Proposer une fonctionnalité'**
-  String get accountSuggestFeature;
-
   /// No description provided for @accountLanguage.
   ///
   /// In fr, this message translates to:
   /// **'Langue'**
   String get accountLanguage;
-
-  /// No description provided for @accountResetSaved.
-  ///
-  /// In fr, this message translates to:
-  /// **'Réinitialiser les repas enregistrés'**
-  String get accountResetSaved;
-
-  /// No description provided for @accountResetSavedSub.
-  ///
-  /// In fr, this message translates to:
-  /// **'Vider ta liste de favoris'**
-  String get accountResetSavedSub;
-
-  /// No description provided for @accountResetHistory.
-  ///
-  /// In fr, this message translates to:
-  /// **'Réinitialiser l\'historique de suggestions'**
-  String get accountResetHistory;
-
-  /// No description provided for @accountResetHistorySub.
-  ///
-  /// In fr, this message translates to:
-  /// **'Des suggestions plus fraîches à la régénération'**
-  String get accountResetHistorySub;
-
-  /// No description provided for @accountSectionAlerts.
-  ///
-  /// In fr, this message translates to:
-  /// **'ALERTES'**
-  String get accountSectionAlerts;
-
-  /// No description provided for @accountWeeklyReminder.
-  ///
-  /// In fr, this message translates to:
-  /// **'Rappel du plan hebdomadaire'**
-  String get accountWeeklyReminder;
-
-  /// No description provided for @accountWeeklyReminderSub.
-  ///
-  /// In fr, this message translates to:
-  /// **'Dimanche à 10:00 — planifie ta semaine'**
-  String get accountWeeklyReminderSub;
-
-  /// No description provided for @accountSectionHelp.
-  ///
-  /// In fr, this message translates to:
-  /// **'AIDE'**
-  String get accountSectionHelp;
-
-  /// No description provided for @accountShareTably.
-  ///
-  /// In fr, this message translates to:
-  /// **'Partager Tably'**
-  String get accountShareTably;
-
-  /// No description provided for @accountContactUs.
-  ///
-  /// In fr, this message translates to:
-  /// **'Nous contacter'**
-  String get accountContactUs;
-
-  /// No description provided for @accountManageSubscription.
-  ///
-  /// In fr, this message translates to:
-  /// **'Gérer l\'abonnement'**
-  String get accountManageSubscription;
 
   /// No description provided for @accountSectionLegal.
   ///
@@ -1380,24 +1284,6 @@ abstract class AppL10n {
   /// In fr, this message translates to:
   /// **'Saisir un code de parrainage'**
   String get accountEnterReferralCode;
-
-  /// No description provided for @accountSectionCreator.
-  ///
-  /// In fr, this message translates to:
-  /// **'CRÉATEUR'**
-  String get accountSectionCreator;
-
-  /// No description provided for @accountReplayOnboarding.
-  ///
-  /// In fr, this message translates to:
-  /// **'Revoir l\'onboarding'**
-  String get accountReplayOnboarding;
-
-  /// No description provided for @accountReplayOnboardingSub.
-  ///
-  /// In fr, this message translates to:
-  /// **'Relance le questionnaire depuis le début'**
-  String get accountReplayOnboardingSub;
 
   /// No description provided for @accountPlanFree.
   ///
@@ -1596,6 +1482,12 @@ abstract class AppL10n {
   /// In fr, this message translates to:
   /// **'Connexion impossible. Réessaie.'**
   String get errorSignIn;
+
+  /// No description provided for @errorOpenLink.
+  ///
+  /// In fr, this message translates to:
+  /// **'Impossible d\'ouvrir le lien.'**
+  String get errorOpenLink;
 
   /// No description provided for @errorShoppingUpdate.
   ///

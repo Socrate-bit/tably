@@ -29,20 +29,4 @@ class RecipeService {
       rethrow;
     }
   }
-
-  /// Clears favourites, or every saved recipe state, for the account reset actions.
-  Future<void> clearInteractions(String uid, {bool favouritesOnly = false}) async {
-    try {
-      final snap = await _state(uid).get();
-      final batch = _db.batch();
-      for (final doc in snap.docs) {
-        favouritesOnly ? batch.update(doc.reference, {'favourite': false}) : batch.delete(doc.reference);
-      }
-      await batch.commit();
-      debugPrint('[RecipeService] cleared interactions (favouritesOnly=$favouritesOnly)');
-    } catch (e) {
-      debugPrint('[RecipeService] clearInteractions failed: $e');
-      rethrow;
-    }
-  }
 }

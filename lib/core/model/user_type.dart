@@ -15,7 +15,4 @@ enum UserType {
 
   /// Admins and creators get the app without paying.
   bool get skipsPaywall => this != UserType.normal;
-
-  /// Admins and creators can run the onboarding funnel again to review it.
-  bool get canReplayOnboarding => this != UserType.normal;
 }

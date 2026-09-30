@@ -6,16 +6,17 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/util/error_feedback.dart';
 import '../../../core/util/haptics.dart';
+import '../../../core/util/legal_links.dart';
+import '../../../core/widget/app_sheet.dart';
 import '../../../l10n/app_localizations.dart';
-import '../../onboarding/cubit/onboarding_cubit.dart';
+import '../../onboarding/widget/steps/language_step.dart';
 import '../../preferences/cubit/profile_cubit.dart';
-import '../../recipe/cubit/recipe_cubit.dart';
-import '../../subscription/cubit/subscription_cubit.dart';
 import '../../subscription/widget/referral_code_dialog.dart';
 import '../cubit/auth_cubit.dart';
 import '../widget/account_rows.dart';
 
-/// The account tab: sign-in, family plan, app settings and legal links.
+/// The account tab: sign-in, profile and status, referral code, language,
+/// legal links and account actions.
 class AccountScreen extends StatelessWidget {
   const AccountScreen({super.key});
 
@@ -34,20 +35,13 @@ class AccountScreen extends StatelessWidget {
           return BlocBuilder<ProfileCubit, ProfileState>(
             builder: (context, profileState) {
               final profile = profileState.profile;
-              final recipeCubit = context.read<RecipeCubit>();
-              final userType = context.watch<SubscriptionCubit>().state.userType;
 
               return SingleChildScrollView(
                 padding: EdgeInsets.fromLTRB(20.w, 8.h, 20.w, AppDimens.tabBarInset),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    Row(
-                      children: [
-                        Expanded(child: Text(l10n.accountTitle, style: AppTextStyles.tabTitle)),
-                        const ActivePill(),
-                      ],
-                    ),
+                    Text(l10n.accountTitle, style: AppTextStyles.tabTitle),
                     SizedBox(height: 16.h),
 
                     // Apple sign-in only appears where it is actually available.
@@ -68,8 +62,6 @@ class AccountScreen extends StatelessWidget {
                       SizedBox(height: 22.h),
                     ],
 
-                    const FamilyPlanCard(),
-                    SizedBox(height: 18.h),
                     ProfileSummaryCard(
                       name: profile.displayName(l10n.defaultChefName),
                       store: profile.store.displayName,
@@ -80,75 +72,40 @@ class AccountScreen extends StatelessWidget {
                     AccountSection(
                       label: l10n.accountSectionApp,
                       rows: [
-                        AccountRow(title: l10n.accountRateTably, arrow: true, onTap: () {}),
-                        AccountRow(title: l10n.accountSuggestFeature, arrow: true, onTap: () {}),
-                        AccountRow(
-                          title: l10n.accountLanguage,
-                          subtitle: _languageName(profile.languageCode),
-                          arrow: true,
-                          onTap: () {},
-                        ),
-                        AccountRow(
-                          title: l10n.accountResetSaved,
-                          subtitle: l10n.accountResetSavedSub,
-                          arrow: true,
-                          onTap: () => recipeCubit.reset(favouritesOnly: true),
-                        ),
-                        AccountRow(
-                          title: l10n.accountResetHistory,
-                          subtitle: l10n.accountResetHistorySub,
-                          arrow: true,
-                          onTap: () => recipeCubit.reset(favouritesOnly: false),
-                        ),
                         AccountRow(
                           title: l10n.accountEnterReferralCode,
                           arrow: true,
                           onTap: () => ReferralCodeDialog.show(context),
                         ),
+                        AccountRow(
+                          title: l10n.accountLanguage,
+                          subtitle: languageFor(profile.languageCode).name,
+                          arrow: true,
+                          onTap: () => _pickLanguage(context),
+                        ),
                       ],
                     ),
+                    // Hosted on GitHub Pages and opened in the browser.
                     AccountSection(
-                      label: l10n.accountSectionAlerts,
+                      label: l10n.accountSectionLegal,
                       rows: [
                         AccountRow(
-                          title: l10n.accountWeeklyReminder,
-                          subtitle: l10n.accountWeeklyReminderSub,
-                          toggleValue: profile.weeklyReminder,
-                          onToggle: context.read<ProfileCubit>().setWeeklyReminder,
+                          title: l10n.accountPrivacy,
+                          arrow: true,
+                          onTap: () => openLegalLink(context, LegalLinks.privacyPolicy),
+                        ),
+                        AccountRow(
+                          title: l10n.accountTerms,
+                          arrow: true,
+                          onTap: () => openLegalLink(context, LegalLinks.terms),
                         ),
                       ],
                     ),
                     AccountSection(
-                      label: l10n.accountSectionHelp,
-                      rows: [
-                        AccountRow(title: l10n.accountShareTably, arrow: true, onTap: () {}),
-                        AccountRow(title: l10n.accountContactUs, arrow: true, onTap: () {}),
-                        AccountRow(title: l10n.accountManageSubscription, arrow: true, onTap: () {}),
-                      ],
-                    ),
-                    AccountSection(
-                      label: l10n.accountSectionLegal,
-                      rows: [
-                        AccountRow(title: l10n.accountPrivacy, arrow: true, onTap: () {}),
-                        AccountRow(title: l10n.accountTerms, arrow: true, onTap: () {}),
-                      ],
-                    ),
-                    // Only admins and creators, granted by a referral code.
-                    if (userType.canReplayOnboarding)
-                      AccountSection(
-                        label: l10n.accountSectionCreator,
-                        rows: [
-                          AccountRow(
-                            title: l10n.accountReplayOnboarding,
-                            subtitle: l10n.accountReplayOnboardingSub,
-                            arrow: true,
-                            onTap: () => _replayOnboarding(context, profile.languageCode),
-                          ),
-                        ],
-                      ),
-                    AccountSection(
                       label: l10n.accountSectionAccount,
                       rows: [
+                        // An anonymous user has nothing to sign out of — doing
+                        // so would only orphan their data.
                         if (authState.isSignedIn)
                           AccountRow(
                             title: l10n.accountSignOut,
@@ -178,23 +135,33 @@ class AccountScreen extends StatelessWidget {
       (defaultTargetPlatform == TargetPlatform.iOS ||
           defaultTargetPlatform == TargetPlatform.macOS);
 
-  /// Resets the funnel before clearing the flag: [RootScreen] swaps screens the
-  /// moment the profile stream reports it, and a stale cubit would flash the
-  /// last step the user saw.
-  void _replayOnboarding(BuildContext context, String languageCode) {
-    context.read<OnboardingCubit>().restart(languageCode);
-    context.read<ProfileCubit>().replayOnboarding();
+  /// Reuses the onboarding language picker in a sheet. The saved language
+  /// drives the app locale, so the switch applies immediately.
+  Future<void> _pickLanguage(BuildContext context) {
+    final profileCubit = context.read<ProfileCubit>();
+    return AppSheet.show<void>(
+      context,
+      (sheetContext) => Container(
+        padding: EdgeInsets.fromLTRB(24.w, 20.h, 24.w, 30.h),
+        decoration: BoxDecoration(
+          color: AppColors.scaffold,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(AppDimens.radiusSheet)),
+        ),
+        child: SafeArea(
+          top: false,
+          child: SingleChildScrollView(
+            child: LanguagePicker(
+              onSelected: (code) {
+                Navigator.of(sheetContext).pop();
+                profileCubit.setLanguage(code);
+              },
+              onBack: () => Navigator.of(sheetContext).pop(),
+            ),
+          ),
+        ),
+      ),
+    );
   }
-
-  String _languageName(String code) => switch (code) {
-        'en' => 'English',
-        'de' => 'Deutsch',
-        'sv' => 'Svenska',
-        'nl' => 'Nederlands',
-        'pt' => 'Português',
-        'es' => 'Español',
-        _ => 'Français',
-      };
 
   Future<void> _editName(BuildContext context, String current) async {
     final result = await showDialog<String>(

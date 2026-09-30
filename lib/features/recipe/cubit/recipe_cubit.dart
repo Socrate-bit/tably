@@ -68,19 +68,6 @@ class RecipeCubit extends Cubit<RecipeState> {
   Future<void> setNote(String recipeId, String note) =>
       _save(state.interactionFor(recipeId).copyWith(note: note));
 
-  /// Clears favourites (or the whole history) from the account screen.
-  Future<void> reset({required bool favouritesOnly}) async {
-    final uid = _uid;
-    if (uid == null) return;
-    try {
-      await _service.clearInteractions(uid, favouritesOnly: favouritesOnly);
-      debugPrint('[RecipeCubit] reset interactions (favouritesOnly=$favouritesOnly)');
-    } catch (e) {
-      debugPrint('[RecipeCubit] reset failed: $e');
-      emit(state.copyWith(error: e));
-    }
-  }
-
   /// Applies the change locally first so the UI never waits on the network.
   Future<void> _save(RecipeInteraction interaction) async {
     final previous = state.interactions;

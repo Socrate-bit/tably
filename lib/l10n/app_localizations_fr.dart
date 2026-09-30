@@ -619,15 +619,6 @@ class AppL10nFr extends AppL10n {
       'Connecte-toi pour enregistrer tes\npréférences dans le cloud.';
 
   @override
-  String get accountFamilyPlan => 'Formule famille';
-
-  @override
-  String get accountFamilyPlanSub => 'Partage l\'accès à ton compte.';
-
-  @override
-  String get accountInvite => 'Inviter amis et famille';
-
-  @override
   String accountGreeting(String name) {
     return 'Salut, $name ✎';
   }
@@ -644,49 +635,7 @@ class AppL10nFr extends AppL10n {
   String get accountSectionApp => 'APP';
 
   @override
-  String get accountRateTably => 'Noter Tably';
-
-  @override
-  String get accountSuggestFeature => 'Proposer une fonctionnalité';
-
-  @override
   String get accountLanguage => 'Langue';
-
-  @override
-  String get accountResetSaved => 'Réinitialiser les repas enregistrés';
-
-  @override
-  String get accountResetSavedSub => 'Vider ta liste de favoris';
-
-  @override
-  String get accountResetHistory =>
-      'Réinitialiser l\'historique de suggestions';
-
-  @override
-  String get accountResetHistorySub =>
-      'Des suggestions plus fraîches à la régénération';
-
-  @override
-  String get accountSectionAlerts => 'ALERTES';
-
-  @override
-  String get accountWeeklyReminder => 'Rappel du plan hebdomadaire';
-
-  @override
-  String get accountWeeklyReminderSub =>
-      'Dimanche à 10:00 — planifie ta semaine';
-
-  @override
-  String get accountSectionHelp => 'AIDE';
-
-  @override
-  String get accountShareTably => 'Partager Tably';
-
-  @override
-  String get accountContactUs => 'Nous contacter';
-
-  @override
-  String get accountManageSubscription => 'Gérer l\'abonnement';
 
   @override
   String get accountSectionLegal => 'MENTIONS LÉGALES';
@@ -708,16 +657,6 @@ class AppL10nFr extends AppL10n {
 
   @override
   String get accountEnterReferralCode => 'Saisir un code de parrainage';
-
-  @override
-  String get accountSectionCreator => 'CRÉATEUR';
-
-  @override
-  String get accountReplayOnboarding => 'Revoir l\'onboarding';
-
-  @override
-  String get accountReplayOnboardingSub =>
-      'Relance le questionnaire depuis le début';
 
   @override
   String get accountPlanFree => 'Gratuit';
@@ -818,6 +757,9 @@ class AppL10nFr extends AppL10n {
 
   @override
   String get errorSignIn => 'Connexion impossible. Réessaie.';
+
+  @override
+  String get errorOpenLink => 'Impossible d\'ouvrir le lien.';
 
   @override
   String get errorShoppingUpdate => 'Impossible de mettre à jour ta liste.';
