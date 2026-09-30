@@ -90,7 +90,7 @@ void main() {
     final cooked = plan.slots.where((s) => !s.isLeftover);
     expect(plan.slotCount, 14);
     expect(plan.baseTotal, closeTo(cooked.fold<double>(0, (t, s) => t + s.recipe.price), 1e-9));
-    expect(plan.totalAt(Store.monoprix), closeTo(plan.baseTotal * 1.21, 1e-9));
+    expect(plan.totalAt(Store.monoprix), closeTo(plan.baseTotal * 1.15, 1e-9));
   });
 
   test('an empty week has no slots and costs nothing', () {

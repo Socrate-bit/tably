@@ -1,15 +1,16 @@
 /// Supermarkets offered in the design, cheapest first. [priceFactor] scales a
-/// recipe's reference price to what it costs at that store.
+/// recipe's reference price (E.Leclerc, updated 2026-09) to what it costs at
+/// that store.
 enum Store {
-  lidl('lidl', 'Lidl', 0.88),
-  aldi('aldi', 'Aldi', 0.90),
-  leclerc('leclerc', 'E.Leclerc', 0.94),
-  intermarche('intermarche', 'Intermarché', 0.97),
-  carrefour('carrefour', 'Carrefour', 1.00),
-  auchan('auchan', 'Auchan', 1.02),
+  lidl('lidl', 'Lidl', 0.975),
+  leclerc('leclerc', 'E.Leclerc', 1.00),
+  aldi('aldi', 'Aldi', 1.02),
+  intermarche('intermarche', 'Intermarché', 1.04),
   superU('superu', 'Super U', 1.05),
-  franprix('franprix', 'Franprix', 1.14),
-  monoprix('monoprix', 'Monoprix', 1.21);
+  carrefour('carrefour', 'Carrefour', 1.07),
+  auchan('auchan', 'Auchan', 1.10),
+  monoprix('monoprix', 'Monoprix', 1.15),
+  franprix('franprix', 'Franprix', 1.25);
 
   const Store(this.id, this.displayName, this.priceFactor);
 
