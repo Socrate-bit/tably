@@ -942,7 +942,8 @@ class AppL10nFr extends AppL10n {
   String get storesTitle => 'Supermarché';
 
   @override
-  String get storesSubtitle => 'Prix estimé de ton plan cette semaine';
+  String get storesSubtitle =>
+      'Estimation France, peut varier selon le magasin et la région';
 
   @override
   String get storesCurrent => 'Ton magasin actuel';
@@ -959,15 +960,6 @@ class AppL10nFr extends AppL10n {
 
   @override
   String get storesCurrentTag => 'ACTUEL';
-
-  @override
-  String get storesDisclaimer =>
-      'Estimation basée sur les prix moyens en France. Les prix peuvent varier légèrement selon le magasin et la région.';
-
-  @override
-  String storesFootnote(int count) {
-    return 'Les prix sont estimés à partir des $count recettes de ta semaine et des relevés en magasin.';
-  }
 
   @override
   String get recipesTitle => 'Recettes';

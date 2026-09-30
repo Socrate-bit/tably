@@ -934,7 +934,7 @@ class AppL10nEn extends AppL10n {
   String get storesTitle => 'Supermarket';
 
   @override
-  String get storesSubtitle => 'Estimated price of this week\'s plan';
+  String get storesSubtitle => 'French estimate, may vary by store and region';
 
   @override
   String get storesCurrent => 'Your current store';
@@ -951,15 +951,6 @@ class AppL10nEn extends AppL10n {
 
   @override
   String get storesCurrentTag => 'CURRENT';
-
-  @override
-  String get storesDisclaimer =>
-      'Estimate based on average prices in France. Prices may vary slightly by store and region.';
-
-  @override
-  String storesFootnote(int count) {
-    return 'Prices are estimated from your week\'s $count recipes and in-store price checks.';
-  }
 
   @override
   String get recipesTitle => 'Recipes';
