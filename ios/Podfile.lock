@@ -1398,6 +1398,8 @@ PODS:
     - FlutterMacOS
     - PostHog (< 4.0.0, >= 3.75.2)
   - RecaptchaInterop (101.0.0)
+  - share_plus (0.0.1):
+    - Flutter
   - sign_in_with_apple (0.0.1):
     - Flutter
   - Superscript (1.0.15)
@@ -1415,6 +1417,7 @@ DEPENDENCIES:
   - Flutter (from `Flutter`)
   - flutter_native_splash (from `.symlinks/plugins/flutter_native_splash/ios`)
   - posthog_flutter (from `.symlinks/plugins/posthog_flutter/darwin`)
+  - share_plus (from `.symlinks/plugins/share_plus/ios`)
   - sign_in_with_apple (from `.symlinks/plugins/sign_in_with_apple/ios`)
   - superwallkit_flutter (from `.symlinks/plugins/superwallkit_flutter/ios`)
 
@@ -1460,6 +1463,8 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/flutter_native_splash/ios"
   posthog_flutter:
     :path: ".symlinks/plugins/posthog_flutter/darwin"
+  share_plus:
+    :path: ".symlinks/plugins/share_plus/ios"
   sign_in_with_apple:
     :path: ".symlinks/plugins/sign_in_with_apple/ios"
   superwallkit_flutter:
@@ -1495,6 +1500,7 @@ SPEC CHECKSUMS:
   PostHog: c08a14f4f807d7780d3e2d1ff61967229cee4640
   posthog_flutter: 05cca442c58a33db89148f17e811db2d783b9117
   RecaptchaInterop: 11e0b637842dfb48308d242afc3f448062325aba
+  share_plus: 50da8cb520a8f0f65671c6c6a99b3617ed10a58a
   sign_in_with_apple: c5dcc141574c8c54d5ac99dd2163c0c72ad22418
   Superscript: 55de63e7dc445d0f095c44f25d446889c7ba851d
   SuperwallKit: 3e013cb58ac8c1f37b5311b77cedd32b7938a0cc

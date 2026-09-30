@@ -545,9 +545,6 @@ class AppL10nEn extends AppL10n {
   String get shoppingShare => 'Share';
 
   @override
-  String get shoppingAddItems => 'Add groceries';
-
-  @override
   String shoppingNeeded(String amount) {
     return '($amount needed)';
   }
@@ -813,6 +810,9 @@ class AppL10nEn extends AppL10n {
 
   @override
   String get errorShoppingUpdate => 'Couldn\'t update your list.';
+
+  @override
+  String get errorShoppingShare => 'Couldn\'t share your list.';
 
   @override
   String get blockerSaving => 'I\'m trying to save money';

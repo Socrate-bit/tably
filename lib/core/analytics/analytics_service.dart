@@ -58,6 +58,7 @@ abstract final class AnalyticsEvents {
   static const recipeFavouriteToggled = 'recipe_favourite_toggled';
   static const shoppingItemToggled = 'shopping_item_toggled';
   static const shoppingListOpened = 'shopping_list_opened';
+  static const shoppingListShared = 'shopping_list_shared';
   static const preferenceChanged = 'preference_changed';
   static const tabSelected = 'tab_selected';
   static const recipeFiltersChanged = 'recipe_filters_changed';

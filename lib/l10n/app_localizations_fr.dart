@@ -550,9 +550,6 @@ class AppL10nFr extends AppL10n {
   String get shoppingShare => 'Partager';
 
   @override
-  String get shoppingAddItems => 'Ajouter des courses';
-
-  @override
   String shoppingNeeded(String amount) {
     return '($amount nécessaire)';
   }
@@ -821,6 +818,9 @@ class AppL10nFr extends AppL10n {
 
   @override
   String get errorShoppingUpdate => 'Impossible de mettre à jour ta liste.';
+
+  @override
+  String get errorShoppingShare => 'Impossible de partager ta liste.';
 
   @override
   String get blockerSaving => 'J\'essaye de faire des économies';

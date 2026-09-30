@@ -1087,12 +1087,6 @@ abstract class AppL10n {
   /// **'Partager'**
   String get shoppingShare;
 
-  /// No description provided for @shoppingAddItems.
-  ///
-  /// In fr, this message translates to:
-  /// **'Ajouter des courses'**
-  String get shoppingAddItems;
-
   /// No description provided for @shoppingNeeded.
   ///
   /// In fr, this message translates to:
@@ -1602,6 +1596,12 @@ abstract class AppL10n {
   /// In fr, this message translates to:
   /// **'Impossible de mettre à jour ta liste.'**
   String get errorShoppingUpdate;
+
+  /// No description provided for @errorShoppingShare.
+  ///
+  /// In fr, this message translates to:
+  /// **'Impossible de partager ta liste.'**
+  String get errorShoppingShare;
 
   /// No description provided for @blockerSaving.
   ///

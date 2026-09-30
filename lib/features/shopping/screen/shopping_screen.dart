@@ -68,19 +68,15 @@ class ShoppingScreen extends StatelessWidget {
                         ),
                         SizedBox(width: 11.w),
                         Expanded(
-                          child: SecondaryButton(
-                            label: l10n.shoppingShare,
-                            onPressed: () => _copyList(context),
+                          // Builder gives the button's own context to anchor the iPad popover.
+                          child: Builder(
+                            builder: (buttonContext) => SecondaryButton(
+                              label: l10n.shoppingShare,
+                              onPressed: () => _shareList(buttonContext),
+                            ),
                           ),
                         ),
                       ],
-                    ),
-                    SizedBox(height: 12.h),
-                    PrimaryButton(
-                      label: '+ ${l10n.shoppingAddItems}',
-                      fontSize: 16,
-                      verticalPadding: 17.h,
-                      onPressed: () {},
                     ),
                     SizedBox(height: 24.h),
                     for (final category in state.categories)
@@ -98,10 +94,22 @@ class ShoppingScreen extends StatelessWidget {
     );
   }
 
-  /// Copy and share both put the list on the clipboard for now.
+  /// Puts the list on the clipboard.
   void _copyList(BuildContext context) {
     Haptics.confirm();
     Clipboard.setData(ClipboardData(text: context.read<ShoppingCubit>().asPlainText()));
+  }
+
+  /// Opens the native share sheet, anchored to the share button.
+  Future<void> _shareList(BuildContext context) async {
+    Haptics.confirm();
+    final l10n = AppL10n.of(context);
+    final box = context.findRenderObject() as RenderBox?;
+    final shared = await context.read<ShoppingCubit>().share(
+          subject: l10n.shoppingList,
+          origin: box == null ? null : box.localToGlobal(Offset.zero) & box.size,
+        );
+    if (!shared && context.mounted) showErrorBanner(context, l10n.errorShoppingShare);
   }
 }
 
