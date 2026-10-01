@@ -47,6 +47,7 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^6.0.0
+  flutter_launcher_icons: ^0.14.4
 
 flutter:
   uses-material-design: true
@@ -58,9 +59,19 @@ flutter:
 
 # Native launch screen — regenerate with `dart run flutter_native_splash:create`.
 flutter_native_splash:
-  color: "#FFFFFF"
-  image: assets/brand/splash.png
-  android_12:
-    color: "#FFFFFF"
-    image: assets/brand/splash.png
+  color: "#FC2A1F"
+  image: assets/brand/splash_V2.png
+  ios_content_mode: scaleAspectFill
+  android: false
   web: false
+
+# App icon — regenerate with `dart run flutter_launcher_icons`.
+flutter_launcher_icons:
+  image_path: assets/brand/app_icon.png
+  android: false
+  ios: true
+  remove_alpha_ios: true
+  web:
+    generate: true
+    background_color: "#FFFFFF"
+    theme_color: "#FFFFFF"
