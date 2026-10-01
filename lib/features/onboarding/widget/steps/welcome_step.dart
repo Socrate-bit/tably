@@ -49,9 +49,7 @@ class WelcomeStep extends StatelessWidget {
           child: _LanguagePill(language: languageFor(languageCode), onTap: onOpenLanguage),
         ),
         SizedBox(height: 24.h),
-        AppLogo(size: 64.r),
-        SizedBox(height: 2.h),
-        Text(l10n.appName, textAlign: TextAlign.center, style: AppTextStyles.wordmarkLarge),
+        Center(child: AppWordmark(height: 72.h)),
         SizedBox(height: 16.h),
         Text(l10n.tagline, textAlign: TextAlign.center, style: AppTextStyles.subtitle),
         SizedBox(height: 18.h),
@@ -175,14 +173,7 @@ class _PhoneMockup extends StatelessWidget {
                 ),
               ),
               SizedBox(height: 7.h),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  AppLogo(size: 14.r),
-                  SizedBox(width: 4.w),
-                  Text(l10n.appName, style: AppTextStyles.mock(15, letterSpacing: -0.7)),
-                ],
-              ),
+              Center(child: AppWordmark(height: 20.h)),
               SizedBox(height: 6.h),
               Container(
                 padding: EdgeInsets.all(4.r),

@@ -35,6 +35,8 @@ class MenuScreen extends StatelessWidget {
     final shopping = context.watch<ShoppingCubit>().state;
     final week = plan.week;
     final total = week.totalAt(profile.store);
+    // Every slot in display order, so each card knows its place in the week.
+    final order = [for (final (_, slots) in week.byDay) ...slots];
     void openStores() => context.read<HomeCubit>().open(HomeSub.stores);
 
     return MultiBlocListener(
@@ -63,9 +65,8 @@ class MenuScreen extends StatelessWidget {
           children: [
             Row(
               children: [
-                AppLogo(size: 38.r),
-                SizedBox(width: 8.w),
-                Expanded(child: Text(l10n.appName, style: AppTextStyles.tabTitle)),
+                AppWordmark(height: 46.h),
+                const Spacer(),
                 StorePill(store: profile.store, onTap: openStores),
               ],
             ),
@@ -121,6 +122,7 @@ class MenuScreen extends StatelessWidget {
                             servings: profile.household,
                             store: profile.store,
                             country: profile.country,
+                            index: order.indexOf(slot),
                             onTap: () => RecipeScreen.open(context, recipeId: slot.recipe.id, slot: slot),
                           ),
                       ],
