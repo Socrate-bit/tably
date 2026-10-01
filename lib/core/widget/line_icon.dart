@@ -19,10 +19,8 @@ enum LineGlyph {
     'M4.8 20.2c.6-3.6 3.6-5.9 7.2-5.9s6.6 2.3 7.2 5.9',
   ]),
   filter(['M4 6.5h16', 'M7 12h10', 'M10 17.5h4']),
-  compass([
-    'M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18z',
-    'M15.6 8.4l-2 5.2-5.2 2 2-5.2z',
-  ]),
+  /// Compass needle alone, drawn [LineIcon.filled] inside a brand disc.
+  compass(['M17 7l-3.4 6.6L7 17l3.4-6.6z']),
   coins([
     'M9 9.5c3.3 0 6-1.1 6-2.5S12.3 4.5 9 4.5 3 5.6 3 7s2.7 2.5 6 2.5z',
     'M3 7v4c0 1.4 2.7 2.5 6 2.5s6-1.1 6-2.5V7',
@@ -38,7 +36,8 @@ enum LineGlyph {
     'M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18z',
     'M12 7.5V12l3 2',
   ]),
-  chevronRight(['M9.5 5.5L16 12l-6.5 6.5']);
+  chevronRight(['M9.5 5.5L16 12l-6.5 6.5']),
+  chevronDown(['M6.5 9.5L12 15l5.5-5.5']);
 
   const LineGlyph(this.paths);
   final List<String> paths;

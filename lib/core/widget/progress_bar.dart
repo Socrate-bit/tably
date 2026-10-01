@@ -3,9 +3,10 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../theme/app_theme.dart';
 
-/// Thin rounded progress track used in onboarding and while generating a plan.
+/// Rounded progress track with the brand gradient fill (onboarding, plan
+/// generation, and the week's cost and shopping cards).
 class ProgressBar extends StatelessWidget {
-  const ProgressBar({super.key, required this.value, this.animate = false, this.trackColor});
+  const ProgressBar({super.key, required this.value, this.animate = false, this.trackColor, this.height});
 
   /// 0.0–1.0.
   final double value;
@@ -14,12 +15,17 @@ class ProgressBar extends StatelessWidget {
   final bool animate;
   final Color? trackColor;
 
+  /// Defaults to 7.h.
+  final double? height;
+
   @override
   Widget build(BuildContext context) {
+    final barHeight = height ?? 7.h;
+    final radius = BorderRadius.circular(barHeight / 2);
     return ClipRRect(
-      borderRadius: BorderRadius.circular(7.r),
+      borderRadius: radius,
       child: Container(
-        height: 7.h,
+        height: barHeight,
         color: trackColor ?? AppColors.track,
         // Fractional sizing (not LayoutBuilder) so parents can measure intrinsics.
         child: TweenAnimationBuilder<double>(
@@ -31,8 +37,8 @@ class ProgressBar extends StatelessWidget {
             widthFactor: fraction,
             child: DecoratedBox(
               decoration: BoxDecoration(
-                color: AppColors.brand,
-                borderRadius: BorderRadius.circular(7.r),
+                gradient: const LinearGradient(colors: [AppColors.brandLight, AppColors.brand]),
+                borderRadius: radius,
               ),
             ),
           ),

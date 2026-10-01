@@ -15,26 +15,26 @@ class DayGroup extends StatelessWidget {
     final line = Expanded(child: Container(height: 1, color: AppColors.border));
 
     return Padding(
-      padding: EdgeInsets.only(bottom: 18.h),
+      padding: EdgeInsets.only(bottom: 13.h),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Row(
             children: [
               line,
-              SizedBox(width: 12.w),
+              SizedBox(width: 8.w),
               Container(
                 padding: EdgeInsets.symmetric(horizontal: 18.w, vertical: 6.h),
-                decoration: BoxDecoration(color: AppColors.ink, borderRadius: BorderRadius.circular(20.r)),
+                decoration: BoxDecoration(color: AppColors.dayPill, borderRadius: BorderRadius.circular(20.r)),
                 child: Text(label, style: AppTextStyles.dayPill),
               ),
-              SizedBox(width: 12.w),
+              SizedBox(width: 8.w),
               line,
             ],
           ),
-          SizedBox(height: 10.h),
+          SizedBox(height: 3.h),
           for (final (i, child) in children.indexed) ...[
-            if (i > 0) SizedBox(height: 8.h),
+            if (i > 0) SizedBox(height: 11.h),
             child,
           ],
         ],

@@ -6,7 +6,7 @@ import '../theme/app_theme.dart';
 import '../util/haptics.dart';
 import 'line_icon.dart';
 
-/// "🧭 Lidl ⌄" — the current store, tappable to compare prices across stores.
+/// "🧭 Lidl ⌄": the current store, tappable to compare prices across stores.
 class StorePill extends StatelessWidget {
   const StorePill({super.key, required this.store, required this.onTap});
 
@@ -21,22 +21,22 @@ class StorePill extends StatelessWidget {
         onTap();
       },
       child: Container(
-        padding: EdgeInsets.fromLTRB(8.w, 8.h, 16.w, 8.h),
+        padding: EdgeInsets.fromLTRB(12.w, 9.h, 13.w, 9.h),
         decoration: BoxDecoration(color: AppColors.brandSoft, borderRadius: BorderRadius.circular(28.r)),
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
             Container(
-              width: 30.r,
-              height: 30.r,
+              width: 22.r,
+              height: 22.r,
               alignment: Alignment.center,
               decoration: const BoxDecoration(color: AppColors.brand, shape: BoxShape.circle),
-              child: LineIcon(LineGlyph.compass, size: 18.r, color: AppColors.surface, strokeWidth: 2.1),
+              child: LineIcon(LineGlyph.compass, size: 15.r, color: AppColors.surface, filled: true, strokeWidth: 1.2),
             ),
-            SizedBox(width: 9.w),
+            SizedBox(width: 8.w),
             Text(store.displayName, style: AppTextStyles.storePill),
-            SizedBox(width: 7.w),
-            Text('⌄', style: AppTextStyles.storePill.copyWith(fontSize: 11.sp)),
+            SizedBox(width: 6.w),
+            LineIcon(LineGlyph.chevronDown, size: 14.r, color: AppColors.brandDark, strokeWidth: 2.6),
           ],
         ),
       ),

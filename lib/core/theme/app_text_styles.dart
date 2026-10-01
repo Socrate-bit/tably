@@ -61,7 +61,7 @@ abstract final class AppTextStyles {
 
   /// Meta line on recipe rows: "🕐 25m | €4.98".
   static TextStyle get rowMeta => _sans(13, FontWeight.w600, color: AppColors.textSecondary);
-  static TextStyle get rowMetaLarge => _sans(13.5, FontWeight.w600, color: AppColors.textSecondary);
+  static TextStyle get rowMetaLarge => _sans(13.5, FontWeight.w600, color: AppColors.inkMuted);
 
   /// Label on the gradient regenerate pill.
   static TextStyle get regenerate => _sans(15.5, FontWeight.w800, color: AppColors.surface, letterSpacing: -0.3);
@@ -160,7 +160,7 @@ abstract final class AppTextStyles {
 
   /// All-caps label inside a card ("COÛT EST.").
   static TextStyle get cardLabel =>
-      _sans(12, FontWeight.w700, color: AppColors.textTertiary, letterSpacing: 1.2);
+      _sans(12, FontWeight.w700, color: AppColors.textPlaceholder, letterSpacing: 1.2);
 
   static TextStyle get cardLabelInfo =>
       _sans(12, FontWeight.w700, color: AppColors.infoLabel, letterSpacing: 1.2);
@@ -238,7 +238,7 @@ abstract final class AppTextStyles {
 
   static TextStyle get dayChip => _sans(14, FontWeight.w800);
 
-  static TextStyle get mealTitle => _sans(17, FontWeight.w800, letterSpacing: -0.4, height: 1.2);
+  static TextStyle get mealTitle => _sans(17, FontWeight.w800, letterSpacing: -0.5, height: 1.12);
 
   static TextStyle get badge => _sans(14, FontWeight.w800, height: 1.2);
 
@@ -263,7 +263,7 @@ abstract final class AppTextStyles {
   static TextStyle get amountLarge => _sans(22, FontWeight.w800, letterSpacing: -0.8);
 
   static TextStyle get amountMuted =>
-      _sans(16, FontWeight.w700, color: AppColors.textDisabled, letterSpacing: -0.8);
+      _sans(16, FontWeight.w700, color: AppColors.textTertiary, letterSpacing: -0.8);
 
   static TextStyle get reviewName => _sans(15, FontWeight.w800);
 

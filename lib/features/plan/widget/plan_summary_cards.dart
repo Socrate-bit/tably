@@ -5,6 +5,7 @@ import '../../../core/model/preference_option.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/util/option_labels.dart';
 import '../../../core/widget/line_icon.dart';
+import '../../../core/widget/progress_bar.dart';
 import '../../../core/widget/surface_card.dart';
 import '../../../l10n/app_localizations.dart';
 
@@ -26,48 +27,41 @@ class CostCard extends StatelessWidget {
     return SurfaceCard(
       padding: EdgeInsets.all(16.r),
       onTap: onTap,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          _CardHeader(
-            label: Text(l10n.estimatedCost, style: AppTextStyles.cardLabel),
-            glyph: LineGlyph.coins,
-            background: AppColors.brandSoft,
-          ),
-          SizedBox(height: 4.h),
-          FittedBox(
-            fit: BoxFit.scaleDown,
-            alignment: Alignment.centerLeft,
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.baseline,
-              textBaseline: TextBaseline.alphabetic,
-              children: [
-                Text(formatMoney(country, total), style: AppTextStyles.amountLarge),
-                Text(' / ${formatMoney(country, budget)}', style: AppTextStyles.amountMuted),
-              ],
+      child: _CornerIcon(
+        glyph: LineGlyph.coins,
+        background: AppColors.brandSoft,
+        size: 34.r,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            _clearOf(34.r, Text(l10n.estimatedCost, style: AppTextStyles.cardLabel)),
+            SizedBox(height: 10.h),
+            FittedBox(
+              fit: BoxFit.scaleDown,
+              alignment: Alignment.centerLeft,
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.baseline,
+                textBaseline: TextBaseline.alphabetic,
+                children: [
+                  Text(formatMoney(country, total), style: AppTextStyles.amountLarge),
+                  Text(' / ${formatMoney(country, budget)}', style: AppTextStyles.amountMuted),
+                ],
+              ),
             ),
-          ),
-          SizedBox(height: 12.h),
-          ClipRRect(
-            borderRadius: BorderRadius.circular(7.r),
-            child: LinearProgressIndicator(
-              value: ratio,
-              minHeight: 7.h,
-              backgroundColor: AppColors.divider,
-              valueColor: const AlwaysStoppedAnimation(AppColors.brand),
+            SizedBox(height: 12.h),
+            ProgressBar(value: ratio, height: 10.h, trackColor: AppColors.brandSoft),
+            SizedBox(height: 10.h),
+            FittedBox(
+              fit: BoxFit.scaleDown,
+              alignment: Alignment.centerLeft,
+              child: Text(
+                l10n.budgetSavings(formatMoney(country, (budget - total).clamp(0, budget), decimals: 0)),
+                style: AppTextStyles.savings,
+              ),
             ),
-          ),
-          SizedBox(height: 9.h),
-          FittedBox(
-            fit: BoxFit.scaleDown,
-            alignment: Alignment.centerLeft,
-            child: Text(
-              l10n.budgetSavings(formatMoney(country, (budget - total).clamp(0, budget), decimals: 0)),
-              style: AppTextStyles.savings,
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -75,12 +69,7 @@ class CostCard extends StatelessWidget {
 
 /// The tinted shopping-list card that opens the full list.
 class ShoppingSummaryCard extends StatelessWidget {
-  const ShoppingSummaryCard({
-    super.key,
-    required this.checked,
-    required this.total,
-    required this.onTap,
-  });
+  const ShoppingSummaryCard({super.key, required this.checked, required this.total, required this.onTap});
 
   final int checked;
   final int total;
@@ -96,78 +85,73 @@ class ShoppingSummaryCard extends StatelessWidget {
       borderColor: null,
       padding: EdgeInsets.all(16.r),
       onTap: onTap,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          _CardHeader(
-            label: Text(l10n.tapToView, style: AppTextStyles.cardLabelInfo),
-            glyph: LineGlyph.cart,
-            background: AppColors.brandChip,
-          ),
-          SizedBox(height: 2.h),
-          FittedBox(
-            fit: BoxFit.scaleDown,
-            alignment: Alignment.centerLeft,
-            child: Text(
-              l10n.shoppingList,
-              style: AppTextStyles.sheetTitle.copyWith(fontSize: 18.sp, letterSpacing: -0.6),
+      child: _CornerIcon(
+        glyph: LineGlyph.cart,
+        background: AppColors.brandChip,
+        size: 40.r,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            _clearOf(40.r, Text(l10n.tapToView, style: AppTextStyles.cardLabelInfo)),
+            SizedBox(height: 10.h),
+            _clearOf(
+              40.r,
+              Text(l10n.shoppingList, style: AppTextStyles.sheetTitle.copyWith(fontSize: 16.sp, letterSpacing: -0.6)),
             ),
-          ),
-          SizedBox(height: 2.h),
-          FittedBox(
-            fit: BoxFit.scaleDown,
-            alignment: Alignment.centerLeft,
-            child: Text(
-              l10n.shoppingBoughtCount(checked, total),
-              style: AppTextStyles.caption.copyWith(
-                color: AppColors.inkBody,
-                fontWeight: FontWeight.w600,
+            SizedBox(height: 4.h),
+            FittedBox(
+              fit: BoxFit.scaleDown,
+              alignment: Alignment.centerLeft,
+              child: Text(
+                l10n.shoppingBoughtCount(checked, total),
+                style: AppTextStyles.caption.copyWith(
+                  fontSize: 14.sp,
+                  color: AppColors.inkBody,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
             ),
-          ),
-          SizedBox(height: 10.h),
-          ClipRRect(
-            borderRadius: BorderRadius.circular(7.r),
-            child: LinearProgressIndicator(
-              value: ratio,
-              minHeight: 7.h,
-              backgroundColor: AppColors.infoTrack,
-              valueColor: const AlwaysStoppedAnimation(AppColors.brand),
-            ),
-          ),
-        ],
+            SizedBox(height: 12.h),
+            ProgressBar(value: ratio, height: 8.h, trackColor: AppColors.infoTrack),
+          ],
+        ),
       ),
     );
   }
 }
 
-/// A card's caps label with its round icon badge on the right.
-class _CardHeader extends StatelessWidget {
-  const _CardHeader({required this.label, required this.glyph, required this.background});
+/// Keeps a card's top lines left of its [_CornerIcon], shrinking them if needed.
+Widget _clearOf(double iconSize, Widget text) => Padding(
+  padding: EdgeInsets.only(right: iconSize + 4.w),
+  child: FittedBox(fit: BoxFit.scaleDown, alignment: Alignment.centerLeft, child: text),
+);
 
-  final Widget label;
+/// Pins a round icon badge to the card's top-right corner, over [child].
+class _CornerIcon extends StatelessWidget {
+  const _CornerIcon({required this.glyph, required this.background, required this.size, required this.child});
+
   final LineGlyph glyph;
   final Color background;
+  final double size;
+  final Widget child;
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
+    return Stack(
+      clipBehavior: Clip.none,
       children: [
-        Expanded(
-          child: Padding(
-            padding: EdgeInsets.only(top: 4.h),
-            child: FittedBox(fit: BoxFit.scaleDown, alignment: Alignment.centerLeft, child: label),
+        child,
+        Positioned(
+          top: -2.r,
+          right: -2.r,
+          child: Container(
+            width: size,
+            height: size,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(color: background, shape: BoxShape.circle),
+            child: LineIcon(glyph, size: size * 0.55, color: AppColors.brand, strokeWidth: 2.1),
           ),
-        ),
-        SizedBox(width: 6.w),
-        Container(
-          width: 38.r,
-          height: 38.r,
-          alignment: Alignment.center,
-          decoration: BoxDecoration(color: background, shape: BoxShape.circle),
-          child: LineIcon(glyph, size: 20.r, color: AppColors.brand),
         ),
       ],
     );
