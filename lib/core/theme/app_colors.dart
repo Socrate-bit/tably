@@ -63,6 +63,9 @@ abstract final class AppColors {
   static const Color badgeIndulgentBg = Color(0xFFFDE7C4);
   static const Color badgeIndulgentInk = Color(0xFF96601A);
 
+  // Day pill above each day's meals
+  static const Color dayPill = Color(0xFF342724); // warm espresso
+
   // Creator credit over a recipe photo
   static const Color creatorScrim = Color(0xD1171923); // .82 ink
 

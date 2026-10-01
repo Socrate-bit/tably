@@ -12,8 +12,8 @@ import '../../../l10n/app_localizations.dart';
 import '../../recipe/widget/craving_badge.dart';
 import '../model/week_plan.dart';
 
-/// One meal of the week: photo, optional slot name, title, badges, meta, and
-/// a produce decoration above the open chevron.
+/// One meal of the week: photo, optional slot name, title, badges, meta and
+/// an open chevron, with a produce decoration bleeding off the top-right.
 class MealSlotCard extends StatelessWidget {
   const MealSlotCard({
     super.key,
@@ -46,70 +46,84 @@ class MealSlotCard extends StatelessWidget {
     final recipe = slot.recipe;
     final price = slot.isLeftover ? 0.0 : recipe.price * store.priceFactor;
     final divider = Text('  ·  ', style: AppTextStyles.rowMetaLarge.copyWith(color: AppColors.neutralBar));
-    Widget icon(LineGlyph glyph) => Padding(
+    Widget icon(LineGlyph glyph, {bool filled = false}) => Padding(
           padding: EdgeInsets.only(right: 5.w),
-          child: LineIcon(glyph, size: 16.r, color: AppColors.textSecondary),
+          child: LineIcon(glyph, size: 18.r, color: AppColors.textSecondary, filled: filled),
         );
+    final photoSize = 120.r;
 
     return SurfaceCard(
       onTap: onTap,
       radius: 24.r,
-      padding: EdgeInsets.all(14.r),
-      child: Row(
+      clip: true,
+      child: Stack(
         children: [
-          RecipePhoto(
-            url: recipe.photoUrl,
-            height: 104.r,
-            width: 104.r,
-            radius: 18.r,
-            opacity: slot.isLeftover ? 0.8 : 1,
+          // Painted first so text stays on top; the card clips its right edge.
+          Positioned(
+            top: 8.r,
+            right: -14.r,
+            child: Image.asset(
+              _decorations[index % _decorations.length],
+              width: 76.r,
+              filterQuality: FilterQuality.medium,
+            ),
           ),
-          SizedBox(width: 14.w),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+          Padding(
+            padding: EdgeInsets.all(11.r),
+            child: Row(
               children: [
-                if (slot.showSlotLabel) ...[
-                  Text(l10n.slotName(slot.slot).toUpperCase(), style: AppTextStyles.slotLabel),
-                  SizedBox(height: 3.h),
-                ],
-                Text(recipe.title, style: AppTextStyles.mealTitle),
-                Wrap(
-                  spacing: 5.w,
-                  children: [
-                    CravingBadge(craving: recipe.craving),
-                    if (slot.isLeftover) const _LeftoverBadge(),
-                  ],
+                RecipePhoto(
+                  url: recipe.photoUrl,
+                  height: photoSize,
+                  width: photoSize,
+                  radius: 18.r,
+                  opacity: slot.isLeftover ? 0.8 : 1,
                 ),
-                SizedBox(height: 7.h),
-                FittedBox(
-                  fit: BoxFit.scaleDown,
-                  alignment: Alignment.centerLeft,
-                  child: Row(
+                SizedBox(width: 14.w),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      icon(LineGlyph.clock),
-                      Text(slot.isLeftover ? leftoverTime : recipe.time, style: AppTextStyles.rowMetaLarge),
-                      divider,
-                      icon(LineGlyph.user),
-                      Text('$servings', style: AppTextStyles.rowMetaLarge),
-                      divider,
-                      Text(formatMoney(country, price), style: AppTextStyles.rowMetaLarge),
+                      if (slot.showSlotLabel) ...[
+                        Text(l10n.slotName(slot.slot).toUpperCase(), style: AppTextStyles.slotLabel),
+                        SizedBox(height: 3.h),
+                      ],
+                      Text(recipe.title, style: AppTextStyles.mealTitle),
+                      Wrap(
+                        spacing: 5.w,
+                        children: [
+                          CravingBadge(craving: recipe.craving),
+                          if (slot.isLeftover) const _LeftoverBadge(),
+                        ],
+                      ),
+                      SizedBox(height: 7.h),
+                      FittedBox(
+                        fit: BoxFit.scaleDown,
+                        alignment: Alignment.centerLeft,
+                        child: Row(
+                          children: [
+                            icon(LineGlyph.clock),
+                            Text(slot.isLeftover ? leftoverTime : recipe.time, style: AppTextStyles.rowMetaLarge),
+                            SizedBox(width: 14.w),
+                            icon(LineGlyph.user, filled: true),
+                            Text('$servings', style: AppTextStyles.rowMetaLarge),
+                            divider,
+                            Text(formatMoney(country, price), style: AppTextStyles.rowMetaLarge),
+                          ],
+                        ),
+                      ),
                     ],
                   ),
                 ),
-              ],
-            ),
-          ),
-          SizedBox(width: 6.w),
-          SizedBox(
-            width: 52.r,
-            height: 104.r,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                Image.asset(_decorations[index % _decorations.length], width: 52.r, filterQuality: FilterQuality.medium),
-                const _OpenChevron(),
+                SizedBox(width: 8.w),
+                // Sits in the lower half, under the decoration.
+                SizedBox(
+                  height: photoSize,
+                  child: Padding(
+                    padding: EdgeInsets.only(bottom: 6.r),
+                    child: const Align(alignment: Alignment.bottomCenter, child: _OpenChevron()),
+                  ),
+                ),
               ],
             ),
           ),

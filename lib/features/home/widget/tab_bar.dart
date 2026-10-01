@@ -17,7 +17,10 @@ class AppTabBar extends StatelessWidget {
   final ValueChanged<HomeTab> onSelected;
 
   /// Icon size inside the pill.
-  static double get _iconSize => 23.r;
+  static double get _iconSize => 32.r;
+
+  /// Glyph stroke, a touch heavier than the default to read as bold.
+  static const _stroke = 2.1;
 
   @override
   Widget build(BuildContext context) {
@@ -28,8 +31,8 @@ class AppTabBar extends StatelessWidget {
       (HomeTab.preferences, LineGlyph.heart, l10n.tabPreferences),
       (HomeTab.account, LineGlyph.user, l10n.tabAccount),
     ];
-    // Inactive tabs are ink at a third strength, as in the design.
-    final idle = AppColors.ink.withValues(alpha: 0.34);
+    // Inactive tabs are warm grey, as in the design.
+    const idle = AppColors.textQuaternary;
 
     return GlassTabBar.bottom(
       selectedIndex: tabs.indexWhere((t) => t.$1 == current),
@@ -46,11 +49,11 @@ class AppTabBar extends StatelessWidget {
       textStyle: AppTextStyles.tabLabel,
       selectedLabelColor: AppColors.brand,
       unselectedLabelColor: idle,
-      indicatorColor: AppColors.brand.withValues(alpha: 0.10),
+      indicatorColor: AppColors.brand.withValues(alpha: 0.14),
       quality: GlassQuality.premium,
       interactionBehavior: GlassInteractionBehavior.full,
       settings: LiquidGlassSettings(
-        glassColor: Colors.white.withValues(alpha: 0.85),
+        glassColor: Colors.white.withValues(alpha: 0.94),
         thickness: 20,
         blur: 2,
       ),
@@ -59,8 +62,8 @@ class AppTabBar extends StatelessWidget {
           GlassTab(
             label: label,
             // LineIcon draws an SVG, so it tints itself rather than inheriting.
-            icon: LineIcon(glyph, size: _iconSize, color: idle),
-            activeIcon: LineIcon(glyph, size: _iconSize, color: AppColors.brand),
+            icon: LineIcon(glyph, size: _iconSize, color: idle, strokeWidth: _stroke),
+            activeIcon: LineIcon(glyph, size: _iconSize, color: AppColors.brand, strokeWidth: _stroke),
           ),
       ],
     );

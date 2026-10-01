@@ -59,13 +59,14 @@ class MenuScreen extends StatelessWidget {
         ),
       ],
       child: SingleChildScrollView(
-        padding: EdgeInsets.fromLTRB(20.w, 8.h, 20.w, AppDimens.tabBarInset),
+        padding: EdgeInsets.fromLTRB(15.w, 8.h, 15.w, AppDimens.tabBarInset),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Row(
               children: [
-                AppWordmark(height: 46.h),
+                // Sized off the width so it spans the same share of every phone.
+                AppWordmark(height: 64.w),
                 const Spacer(),
                 StorePill(store: profile.store, onTap: openStores),
               ],
@@ -102,7 +103,7 @@ class MenuScreen extends StatelessWidget {
               style: AppTextStyles.planCounts,
               textAlign: TextAlign.center,
             ),
-            SizedBox(height: 20.h),
+            SizedBox(height: 16.h),
             if (catalogue.recipes.isEmpty) _CatalogueStatus(state: catalogue),
             // Keyed by the week so a regenerated plan slides in afresh.
             AnimatedOpacity(

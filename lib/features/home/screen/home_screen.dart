@@ -45,7 +45,7 @@ class HomeScreen extends StatelessWidget {
             child: SlideIn(key: ValueKey(home), child: body),
           ),
           bottomNavigationBar: Padding(
-            padding: EdgeInsets.only(left: 16.w, right: 16.w, bottom: 10.h),
+            padding: EdgeInsets.only(left: 9.w, right: 9.w, bottom: 10.h),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
