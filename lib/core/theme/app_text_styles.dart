@@ -36,7 +36,7 @@ abstract final class AppTextStyles {
       );
 
   // ---- Display / headings ----
-  /// Title of a main tab ("Tably", "Recettes", "Préférences", "Compte").
+  /// Title of a main tab ("Recettes", "Préférences", "Compte").
   static TextStyle get tabTitle => _sans(30, FontWeight.w800, letterSpacing: -1.6);
 
   /// Title of a pushed screen ("Supermarché", "Filtres", "Favoris").
@@ -101,13 +101,6 @@ abstract final class AppTextStyles {
 
   /// Tab screen title ("explorer", "préférence", "compte").
   static TextStyle get screenTitle => _sans(31, FontWeight.w800, letterSpacing: -1);
-
-  /// Tably wordmark.
-  static TextStyle get wordmark => _sans(34, FontWeight.w800, letterSpacing: -1.8);
-
-  static TextStyle get wordmarkLarge => _sans(40, FontWeight.w800, letterSpacing: -1.6);
-
-  static TextStyle get wordmarkGenerating => _sans(34, FontWeight.w800, letterSpacing: -1.6);
 
   /// Big numeric readouts (household count, budget, savings).
   static TextStyle get numeral => _sans(58, FontWeight.w800, letterSpacing: -2);
@@ -189,7 +182,7 @@ abstract final class AppTextStyles {
 
   /// "DÉJEUNER" / "DÎNER" above a meal when a day has several.
   static TextStyle get slotLabel =>
-      _sans(11, FontWeight.w800, color: AppColors.textDisabled, letterSpacing: 1.2);
+      _sans(11, FontWeight.w800, color: AppColors.brand, letterSpacing: 1.2);
 
   /// "7 repas · 7 recettes à cuisiner" under the menu cards.
   static TextStyle get planCounts => _sans(13.5, FontWeight.w700, color: AppColors.textQuaternary);

@@ -4,6 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../core/model/preference_option.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/util/option_labels.dart';
+import '../../../core/widget/line_icon.dart';
 import '../../../core/widget/surface_card.dart';
 import '../../../l10n/app_localizations.dart';
 
@@ -29,8 +30,12 @@ class CostCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text(l10n.estimatedCost, style: AppTextStyles.cardLabel),
-          SizedBox(height: 8.h),
+          _CardHeader(
+            label: Text(l10n.estimatedCost, style: AppTextStyles.cardLabel),
+            glyph: LineGlyph.coins,
+            background: AppColors.brandSoft,
+          ),
+          SizedBox(height: 4.h),
           FittedBox(
             fit: BoxFit.scaleDown,
             alignment: Alignment.centerLeft,
@@ -95,8 +100,12 @@ class ShoppingSummaryCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text(l10n.tapToView, style: AppTextStyles.cardLabelInfo),
-          SizedBox(height: 6.h),
+          _CardHeader(
+            label: Text(l10n.tapToView, style: AppTextStyles.cardLabelInfo),
+            glyph: LineGlyph.cart,
+            background: AppColors.brandChip,
+          ),
+          SizedBox(height: 2.h),
           FittedBox(
             fit: BoxFit.scaleDown,
             alignment: Alignment.centerLeft,
@@ -129,6 +138,38 @@ class ShoppingSummaryCard extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+/// A card's caps label with its round icon badge on the right.
+class _CardHeader extends StatelessWidget {
+  const _CardHeader({required this.label, required this.glyph, required this.background});
+
+  final Widget label;
+  final LineGlyph glyph;
+  final Color background;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Expanded(
+          child: Padding(
+            padding: EdgeInsets.only(top: 4.h),
+            child: FittedBox(fit: BoxFit.scaleDown, alignment: Alignment.centerLeft, child: label),
+          ),
+        ),
+        SizedBox(width: 6.w),
+        Container(
+          width: 38.r,
+          height: 38.r,
+          alignment: Alignment.center,
+          decoration: BoxDecoration(color: background, shape: BoxShape.circle),
+          child: LineIcon(glyph, size: 20.r, color: AppColors.brand),
+        ),
+      ],
     );
   }
 }

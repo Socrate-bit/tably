@@ -150,13 +150,7 @@ class _GeneratingScreenState extends State<GeneratingScreen> with TickerProvider
               scale: Tween<double>(begin: 1, end: 1.07).animate(
                 CurvedAnimation(parent: _pulse, curve: Curves.easeInOut),
               ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  AppLogo(size: 40.r),
-                  Text(AppL10n.of(context).appName, style: AppTextStyles.wordmarkGenerating),
-                ],
-              ),
+              child: AppWordmark(height: 46.h),
             ),
           ],
         ),

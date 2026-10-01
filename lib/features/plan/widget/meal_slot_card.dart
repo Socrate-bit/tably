@@ -5,13 +5,15 @@ import '../../../core/model/preference_option.dart';
 import '../../../core/model/store.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/util/option_labels.dart';
+import '../../../core/widget/line_icon.dart';
 import '../../../core/widget/recipe_photo.dart';
 import '../../../core/widget/surface_card.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../recipe/widget/craving_badge.dart';
 import '../model/week_plan.dart';
 
-/// One meal of the week: photo, optional slot name, title, badges and meta.
+/// One meal of the week: photo, optional slot name, title, badges, meta, and
+/// a produce decoration above the open chevron.
 class MealSlotCard extends StatelessWidget {
   const MealSlotCard({
     super.key,
@@ -19,16 +21,23 @@ class MealSlotCard extends StatelessWidget {
     required this.servings,
     required this.store,
     required this.country,
+    required this.index,
     required this.onTap,
   });
 
   /// Reheating leftovers takes a few minutes.
   static const leftoverTime = '5m';
 
+  /// Corner decorations, cycled through the week so neighbours differ.
+  static const _decorations = ['assets/decor/basil.png', 'assets/decor/pumpkin.png', 'assets/decor/lemon.png'];
+
   final PlanSlot slot;
   final int servings;
   final Store store;
   final Country country;
+
+  /// The card's position in the week, which picks its decoration.
+  final int index;
   final VoidCallback onTap;
 
   @override
@@ -36,7 +45,11 @@ class MealSlotCard extends StatelessWidget {
     final l10n = AppL10n.of(context);
     final recipe = slot.recipe;
     final price = slot.isLeftover ? 0.0 : recipe.price * store.priceFactor;
-    final divider = Text(' | ', style: AppTextStyles.rowMetaLarge.copyWith(color: AppColors.neutralBar));
+    final divider = Text('  ·  ', style: AppTextStyles.rowMetaLarge.copyWith(color: AppColors.neutralBar));
+    Widget icon(LineGlyph glyph) => Padding(
+          padding: EdgeInsets.only(right: 5.w),
+          child: LineIcon(glyph, size: 16.r, color: AppColors.textSecondary),
+        );
 
     return SurfaceCard(
       onTap: onTap,
@@ -74,9 +87,11 @@ class MealSlotCard extends StatelessWidget {
                   alignment: Alignment.centerLeft,
                   child: Row(
                     children: [
-                      Text('🕐 ${slot.isLeftover ? leftoverTime : recipe.time}', style: AppTextStyles.rowMetaLarge),
+                      icon(LineGlyph.clock),
+                      Text(slot.isLeftover ? leftoverTime : recipe.time, style: AppTextStyles.rowMetaLarge),
                       divider,
-                      Text('👤 $servings', style: AppTextStyles.rowMetaLarge),
+                      icon(LineGlyph.user),
+                      Text('$servings', style: AppTextStyles.rowMetaLarge),
                       divider,
                       Text(formatMoney(country, price), style: AppTextStyles.rowMetaLarge),
                     ],
@@ -85,8 +100,37 @@ class MealSlotCard extends StatelessWidget {
               ],
             ),
           ),
+          SizedBox(width: 6.w),
+          SizedBox(
+            width: 52.r,
+            height: 104.r,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Image.asset(_decorations[index % _decorations.length], width: 52.r, filterQuality: FilterQuality.medium),
+                const _OpenChevron(),
+              ],
+            ),
+          ),
         ],
       ),
+    );
+  }
+}
+
+/// The round "open" chevron at the end of the card; the whole card is the tap target.
+class _OpenChevron extends StatelessWidget {
+  const _OpenChevron();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 36.r,
+      height: 36.r,
+      alignment: Alignment.center,
+      decoration: const BoxDecoration(color: AppColors.brandSoft, shape: BoxShape.circle),
+      child: LineIcon(LineGlyph.chevronRight, size: 18.r, color: AppColors.brand, strokeWidth: 2.4),
     );
   }
 }

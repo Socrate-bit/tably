@@ -47,7 +47,7 @@ class _RegenerateButtonState extends State<RegenerateButton> with SingleTickerPr
           gradient: const LinearGradient(
             begin: Alignment(-1, -0.18),
             end: Alignment(1, 0.18),
-            colors: [AppColors.brandDark, AppColors.brandLight],
+            colors: [AppColors.brandLight, AppColors.brandDeep],
           ),
           boxShadow: [
             BoxShadow(color: AppColors.brand.withValues(alpha: 0.26), blurRadius: 18.r, offset: Offset(0, 6.h)),

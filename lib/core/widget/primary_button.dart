@@ -55,7 +55,7 @@ class PrimaryButton extends StatelessWidget {
                 ? const LinearGradient(
                     begin: Alignment(-0.9, -0.4),
                     end: Alignment(0.9, 0.4),
-                    colors: [AppColors.brandDark, AppColors.brandLight],
+                    colors: [AppColors.brandLight, AppColors.brandDeep],
                   )
                 : null,
             borderRadius: BorderRadius.circular(34.r),
