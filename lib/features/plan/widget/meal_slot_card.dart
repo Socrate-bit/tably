@@ -44,7 +44,8 @@ class MealSlotCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppL10n.of(context);
     final recipe = slot.recipe;
-    final price = slot.isLeftover ? 0.0 : recipe.price * store.priceFactor;
+    // What this meal costs the household, leftovers included: they were bought too.
+    final price = recipe.price * servings * store.priceFactor;
     final divider = Text('  ·  ', style: AppTextStyles.rowMetaLarge.copyWith(color: AppColors.neutralBar));
     Widget icon(LineGlyph glyph, {bool filled = false}) => Padding(
           padding: EdgeInsets.only(right: 5.w),

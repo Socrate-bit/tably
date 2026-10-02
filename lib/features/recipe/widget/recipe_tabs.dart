@@ -6,11 +6,12 @@ import '../../../core/widget/surface_card.dart';
 import '../../../l10n/app_localizations.dart';
 import '../model/recipe.dart';
 
-/// The ingredients card: icon, name, quantity.
+/// The ingredients card: icon, name, quantity for [portions].
 class IngredientList extends StatelessWidget {
-  const IngredientList({super.key, required this.ingredients});
+  const IngredientList({super.key, required this.ingredients, required this.portions});
 
   final List<Ingredient> ingredients;
+  final int portions;
 
   @override
   Widget build(BuildContext context) {
@@ -31,7 +32,7 @@ class IngredientList extends StatelessWidget {
                   Text(ingredient.icon, style: AppTextStyles.emojiIcon.copyWith(fontSize: 20.sp)),
                   SizedBox(width: 14.w),
                   Expanded(child: Text(ingredient.name, style: AppTextStyles.ingredientName)),
-                  Text(ingredient.quantity, style: AppTextStyles.ingredientQty),
+                  Text(ingredient.quantityFor(portions), style: AppTextStyles.ingredientQty),
                 ],
               ),
             ),

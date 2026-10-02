@@ -28,8 +28,8 @@ class Ingredient extends Equatable {
   final String unit;
   final Aisle aisle;
 
-  /// What the recipe screen shows, e.g. "150g" or "2 gousses".
-  String get quantity => formatQuantity(amount, unit);
+  /// What the recipe screen shows for [portions], e.g. "150g" or "2 gousses".
+  String quantityFor(int portions) => formatQuantity(amount * portions, unit);
 
   Map<String, dynamic> toMap() => {
         'id': id,

@@ -23,6 +23,7 @@ class PlanSlot extends Equatable {
     required this.slot,
     required this.recipe,
     required this.isLeftover,
+    required this.portions,
     required this.showSlotLabel,
   });
 
@@ -30,8 +31,12 @@ class PlanSlot extends Equatable {
   final MealSlot slot;
   final Recipe recipe;
 
-  /// Cooked the day before in the same slot and reheated — free and quick.
+  /// Served from an earlier meal's pot and reheated — free and quick.
   final bool isLeftover;
+
+  /// Portions cooked at this meal for the whole household: its own plus every
+  /// leftover it feeds. 0 for a leftover, which was paid for when cooked.
+  final int portions;
 
   /// Slot names only show when there is more than one meal a day.
   final bool showSlotLabel;
@@ -42,7 +47,7 @@ class PlanSlot extends Equatable {
   static String keyFor(Weekday day, MealSlot slot) => '${day.id}|${slot.id}';
 
   @override
-  List<Object?> get props => [day, slot, recipe, isLeftover, showSlotLabel];
+  List<Object?> get props => [day, slot, recipe, isLeftover, portions, showSlotLabel];
 }
 
 /// The computed week: every slot plus the figures the menu shows.
@@ -59,8 +64,10 @@ class WeekPlan extends Equatable {
 
   int get slotCount => slots.length;
 
-  /// Cost at the recipes' reference prices, before the store factor.
-  double get baseTotal => _cooked.fold(0, (sum, s) => sum + s.recipe.price);
+  /// Cost of every portion cooked — the same as every meal for the whole
+  /// household, leftovers included — at the recipes' reference prices, before
+  /// the store factor.
+  double get baseTotal => slots.fold(0, (sum, s) => sum + s.recipe.price * s.portions);
 
   double totalAt(Store store) => baseTotal * store.priceFactor;
 

@@ -73,12 +73,9 @@ class OnboardingState extends Equatable {
   /// store, plus everyday groceries. Rounded to 5 and kept within the slider.
   /// Before the recipes are built, each meal counts [referencePortionPrice].
   double get estimatedBudget {
-    final week = previewWeek;
-    final portions = catalogue.isEmpty
-        ? draft.mealCount * referencePortionPrice
-        : week.slots.fold<double>(0, (sum, s) => sum + s.recipe.price);
-    final perPortion = portions * draft.store.priceFactor;
-    final cost = perPortion * draft.household * _everydayGroceries;
+    final meals =
+        catalogue.isEmpty ? draft.mealCount * draft.household * referencePortionPrice : previewWeek.baseTotal;
+    final cost = meals * draft.store.priceFactor * _everydayGroceries;
     return ((cost / 5).round() * 5.0).clamp(OnboardingCubit.minBudget, OnboardingCubit.maxBudget);
   }
 

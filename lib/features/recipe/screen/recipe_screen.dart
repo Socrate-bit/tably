@@ -90,6 +90,16 @@ class _RecipeScreenState extends State<RecipeScreen> {
     RecipeScreen.open(context, recipeId: next.recipe.id, slot: next, replace: true);
   }
 
+  /// Portions to cook: the planned meal's whole pot, leftovers included, read
+  /// live so a household change shows at once. A leftover or a recipe opened
+  /// from browsing is for the household.
+  int _portions(BuildContext context) {
+    final household = context.select<ProfileCubit, int>((c) => c.state.profile.household);
+    final key = widget.slot?.key;
+    final planned = context.select<PlanCubit, int?>((c) => key == null ? null : c.state.week.slotByKey(key)?.portions);
+    return planned == null || planned == 0 ? household : planned;
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppL10n.of(context);
@@ -113,6 +123,7 @@ class _RecipeScreenState extends State<RecipeScreen> {
               );
             }
             final interaction = state.interactionFor(recipe.id);
+            final portions = _portions(context);
 
             return SingleChildScrollView(
               padding: EdgeInsets.fromLTRB(14.w, 6.h, 14.w, 24.h),
@@ -137,7 +148,7 @@ class _RecipeScreenState extends State<RecipeScreen> {
                   SizedBox(height: 14.h),
                   _NotesCard(
                     recipe: recipe,
-                    servings: context.select<ProfileCubit, int>((c) => c.state.profile.household),
+                    servings: portions,
                     cooked: interaction.cooked,
                     rating: interaction.rating,
                     onToggleCooked: () => context.read<RecipeCubit>().toggleCooked(recipe.id),
@@ -152,7 +163,7 @@ class _RecipeScreenState extends State<RecipeScreen> {
                   ),
                   SizedBox(height: 16.h),
                   if (_showIngredients)
-                    IngredientList(ingredients: recipe.ingredients)
+                    IngredientList(ingredients: recipe.ingredients, portions: portions)
                   else
                     PreparationList(steps: recipe.steps),
                   SizedBox(height: 24.h),

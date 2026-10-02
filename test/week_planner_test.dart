@@ -13,8 +13,10 @@ import 'package:tably/features/preferences/model/user_profile.dart';
 
 import 'fixtures/recipe_fixtures.dart';
 
-UserProfile _profile(int mealsPerDay, List<int> dayIndexes, {Variety variety = Variety.high}) => UserProfile(
+UserProfile _profile(int mealsPerDay, List<int> dayIndexes, {Variety variety = Variety.high, int household = 1}) =>
+    UserProfile(
       mealsPerDay: mealsPerDay,
+      household: household,
       variety: variety,
       days: {for (final i in dayIndexes) Weekday.values[i]},
     );
@@ -84,17 +86,24 @@ void main() {
     final mondayDinner = swapped.slotByKey('monday|dinner')!;
     expect(mondayDinner.isLeftover, isTrue);
     expect(mondayDinner.recipe, other, reason: 'the leftover must be what was cooked');
+    expect(swapped.slotByKey('monday|lunch')!.portions, 2, reason: 'the swap is cooked for its leftover too');
   });
 
-  test('leftovers are free and counted once in the recipe total', () {
+  test('a cooked meal pays for every portion of its pot, leftovers are free', () {
     final plan = WeekPlanner.build(
-      profile: _profile(2, [0, 1, 2, 3, 4, 5, 6], variety: Variety.balanced),
+      profile: _profile(2, [0, 1, 2, 3, 4, 5, 6], variety: Variety.balanced, household: 3),
       settings: const PlanSettings(),
       catalogue: RecipeFixtures.recipes,
     );
-    final cooked = plan.slots.where((s) => !s.isLeftover);
     expect(plan.slotCount, 14);
-    expect(plan.baseTotal, closeTo(cooked.fold<double>(0, (t, s) => t + s.recipe.price), 1e-9));
+    expect(plan.slots.where((s) => s.isLeftover).map((s) => s.portions), everyElement(0));
+    expect(plan.slots.fold<int>(0, (t, s) => t + s.portions), 14 * 3, reason: 'every meal eaten is cooked once');
+    for (final (i, s) in plan.slots.indexed) {
+      if (s.isLeftover) continue;
+      final leftovers = plan.slots.skip(i + 1).takeWhile((n) => n.isLeftover).length;
+      expect(s.portions, 3 * (1 + leftovers), reason: s.key);
+    }
+    expect(plan.baseTotal, closeTo(plan.slots.fold<double>(0, (t, s) => t + s.recipe.price * 3), 1e-9));
     expect(plan.totalAt(Store.monoprix), closeTo(plan.baseTotal * 1.15, 1e-9));
   });
 
