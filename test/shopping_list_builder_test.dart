@@ -24,7 +24,14 @@ Ingredient _ingredient(int id, String name, double amount, String unit, Aisle ai
     Ingredient(id: id, icon: '🍽️', name: name, amount: amount, unit: unit, aisle: aisle);
 
 PlanSlot _slot(Weekday day, Recipe recipe, {bool leftover = false}) =>
-    PlanSlot(day: day, slot: MealSlot.dinner, recipe: recipe, isLeftover: leftover, showSlotLabel: false);
+    PlanSlot(
+      day: day,
+      slot: MealSlot.dinner,
+      recipe: recipe,
+      isLeftover: leftover,
+      portions: leftover ? 0 : 1,
+      showSlotLabel: false,
+    );
 
 void main() {
   final soyA = _ingredient(16124, 'sauce soja', 14.5, 'ml', Aisle.tinsSauces);
