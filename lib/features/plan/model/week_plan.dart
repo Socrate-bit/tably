@@ -1,20 +1,11 @@
 import 'package:equatable/equatable.dart';
 
+import '../../../core/model/meal_slot.dart';
 import '../../../core/model/store.dart';
 import '../../../core/model/weekday.dart';
 import '../../recipe/model/recipe.dart';
 
-/// A meal of the day. Order matters: it is the order slots are listed in a day.
-enum MealSlot {
-  lunch('lunch'),
-  dinner('dinner');
-
-  const MealSlot(this.id);
-  final String id;
-
-  /// The slots planned for [mealsPerDay]: dinner only, then lunch + dinner.
-  static List<MealSlot> forMealsPerDay(int mealsPerDay) => mealsPerDay == 1 ? const [dinner] : const [lunch, dinner];
-}
+export '../../../core/model/meal_slot.dart';
 
 /// One meal in the week.
 class PlanSlot extends Equatable {
