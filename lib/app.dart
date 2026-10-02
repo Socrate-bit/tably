@@ -101,7 +101,9 @@ class TablyApp extends StatelessWidget {
               analytics: analytics,
             ),
           ),
-          BlocProvider(create: (_) => RecipeBrowseCubit(analytics: analytics)),
+          BlocProvider(
+            create: (context) => RecipeBrowseCubit(profileCubit: context.read<ProfileCubit>(), analytics: analytics),
+          ),
           BlocProvider(
             create: (context) => RecipeSearchCubit(
               search: context.read<RecipeSearchService>(),

@@ -16,8 +16,8 @@ import 'recipe_browse_cubit.dart';
 part 'recipe_search_state.dart';
 
 /// Searches Spoonacular for the recipes tab: the search text (translated to
-/// English by Gemini) and the browse filters, on top of the profile's hard
-/// constraints. Gemini then checks and translates the results, as it does the
+/// English by Gemini) and the browse filters, including the diets, allergies
+/// and appliances chosen there in place of the profile's. Gemini then checks and translates the results, as it does the
 /// cached pool. Results live in memory; one added to the week joins the pool.
 class RecipeSearchCubit extends Cubit<RecipeSearchState> {
   RecipeSearchCubit({
@@ -53,7 +53,8 @@ class RecipeSearchCubit extends Cubit<RecipeSearchState> {
     if (!reload && browse == state.searchedFor && state.status != RecipeSearchStatus.failed) return;
 
     final run = ++_latest;
-    final profile = _profileCubit.state.profile;
+    // The filters' diets, allergies and appliances stand in for the profile's.
+    final profile = browse.constraints.applyTo(_profileCubit.state.profile);
     final stopwatch = Stopwatch()..start();
     emit(RecipeSearchState(status: RecipeSearchStatus.searching, searchedFor: browse));
     try {

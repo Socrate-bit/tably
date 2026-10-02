@@ -22,7 +22,14 @@ CatalogueCubit seededCatalogue(ProfileCubit profileCubit, {FakeSearch? search, F
 
 /// Records every Spoonacular search instead of making it.
 class FakeSearch extends RecipeSearchService {
-  final calls = <({int number, String? query, Set<Cuisine> cuisines, Craving? craving, RecipeProtein? protein})>[];
+  final calls = <({
+    UserProfile profile,
+    int number,
+    String? query,
+    Set<Cuisine> cuisines,
+    Craving? craving,
+    RecipeProtein? protein,
+  })>[];
 
   @override
   Future<List<Map<String, dynamic>>> search(
@@ -33,7 +40,7 @@ class FakeSearch extends RecipeSearchService {
     Craving? craving,
     RecipeProtein? protein,
   }) async {
-    calls.add((number: number, query: query, cuisines: cuisines, craving: craving, protein: protein));
+    calls.add((profile: profile, number: number, query: query, cuisines: cuisines, craving: craving, protein: protein));
     return [for (var i = 0; i < number; i++) {'id': i}];
   }
 }
@@ -45,11 +52,15 @@ class FakeAi extends RecipeAiService {
 
   final List<Recipe> recipes;
 
+  /// The profile each Gemini check was given.
+  final checkedFor = <UserProfile>[];
+
   @override
   Future<String> toEnglish(String text, String languageCode) async => 'en:$text';
 
   @override
   Future<({List<Recipe> recipes, int rejected})> adapt(List<Map<String, dynamic>> raw, UserProfile profile) async {
+    checkedFor.add(profile);
     if (recipes.isEmpty) throw const NoMatchingRecipesException(0);
     return (recipes: recipes, rejected: 0);
   }
