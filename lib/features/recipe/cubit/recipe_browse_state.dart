@@ -27,6 +27,9 @@ class RecipeBrowseState extends Equatable {
 
   bool get hasFilters => filterCount > 0;
 
+  /// Whether there is anything to search the API for.
+  bool get canSearch => isSearching || hasFilters;
+
   /// Recipes that pass the filters and match every word of the search.
   /// [searchText] defaults to [query]; the replace sheet has its own box.
   /// [cravingLabel] lets the search match badge names in the user's language.

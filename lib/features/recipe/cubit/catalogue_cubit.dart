@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:equatable/equatable.dart';
@@ -63,6 +64,13 @@ class CatalogueCubit extends Cubit<CatalogueState> {
   /// The key whose last build failed, so it isn't retried on every profile
   /// change — only when the user asks.
   String? _failedKey;
+
+  /// The smallest pool worth building, so even a short week has spares.
+  static const minPoolSize = 24;
+
+  /// How many candidates a build asks for: twice the recipes the week cooks,
+  /// so single-meal regenerations have spares, and never below [minPoolSize].
+  static int poolSizeFor(UserProfile profile) => max(minPoolSize, profile.recipesToCook * 2);
 
   /// Identifies the preferences a catalogue depends on. Anything else in the
   /// profile (household, days, store…) only changes the plan, not the recipes.
@@ -158,7 +166,7 @@ class CatalogueCubit extends Cubit<CatalogueState> {
     final stopwatch = Stopwatch()..start();
     emit(state.copyWith(status: CatalogueStatus.building, step: CatalogueStep.searching, clearError: true));
     try {
-      final raw = await _search.search(profile);
+      final raw = await _search.search(profile, number: poolSizeFor(profile));
       if (superseded()) return false;
       emit(state.copyWith(step: CatalogueStep.adapting));
 
@@ -191,6 +199,21 @@ class CatalogueCubit extends Cubit<CatalogueState> {
         error: e,
       ));
       return false;
+    }
+  }
+
+  /// Adds a recipe found by search to the pool, so the week can use it.
+  /// Search results already passed the Gemini check for this user.
+  Future<void> addRecipe(Recipe recipe) async {
+    if (state.byId(recipe.id) != null) return;
+    final previous = state.recipes;
+    emit(state.copyWith(recipes: [...previous, recipe]..sort((a, b) => a.id.compareTo(b.id))));
+    final uid = _uid;
+    if (uid == null) return;
+    try {
+      await _service.saveRecipe(uid, recipe);
+    } catch (e) {
+      emit(state.copyWith(recipes: previous, error: e));
     }
   }
 

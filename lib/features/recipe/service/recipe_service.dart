@@ -34,6 +34,17 @@ class RecipeService {
   Stream<String?> watchCatalogueKey(String uid) =>
       _catalogue(uid).snapshots().map((snap) => snap.data()?['key'] as String?);
 
+  /// Adds one recipe to the catalogue.
+  Future<void> saveRecipe(String uid, Recipe recipe) async {
+    try {
+      await _recipes(uid).doc(recipe.id).set(recipe.toMap());
+      debugPrint('[RecipeService] added recipe ${recipe.id} to the catalogue');
+    } catch (e) {
+      debugPrint('[RecipeService] saveRecipe failed: $e');
+      rethrow;
+    }
+  }
+
   /// Swaps the whole catalogue for [recipes] in one batch, recording [key].
   Future<void> replaceCatalogue(String uid, List<Recipe> recipes, String key) async {
     try {

@@ -47,9 +47,6 @@ class PlanCubit extends Cubit<PlanState> {
         .listen((_) => emit(state.copyWith(week: _build(state.settings))));
   }
 
-  /// How long the regenerate icon spins before the new week appears.
-  static const regenerateDelay = Duration(milliseconds: 700);
-
   final PlanService _service;
   final ProfileCubit _profileCubit;
   final CatalogueCubit _catalogueCubit;
@@ -80,15 +77,19 @@ class PlanCubit extends Cubit<PlanState> {
     );
   }
 
-  /// Reshuffles the week and drops every swap, after a short spin.
+  /// "Régénérer le plan": fetches a fresh pool of recipes (Spoonacular, then
+  /// Gemini), then deals a new week from it with every swap dropped. If the
+  /// fetch fails the current week stays, and the catalogue reports the error.
   Future<void> regenerate() async {
     if (state.regenerating) return;
     emit(state.copyWith(regenerating: true, clearError: true));
-    await Future<void>.delayed(regenerateDelay);
+    final rebuilt = await _catalogueCubit.build(_profileCubit.state.profile);
     if (isClosed) return;
-    await _apply(PlanSettings(seed: state.settings.seed + 1));
+    if (rebuilt) await _apply(PlanSettings(seed: state.settings.seed + 1));
     emit(state.copyWith(regenerating: false));
-    unawaited(_analytics.capture(AnalyticsEvents.planRegenerated, properties: {'seed': state.settings.seed}));
+    if (rebuilt) {
+      unawaited(_analytics.capture(AnalyticsEvents.planRegenerated, properties: {'seed': state.settings.seed}));
+    }
   }
 
   /// Swaps the meal in [slotKey] for [recipeId].
@@ -100,8 +101,9 @@ class PlanCubit extends Cubit<PlanState> {
     ));
   }
 
-  /// Swaps the meal in [slot] for a random dish not already in the week, and
-  /// returns the updated slot so the caller can show it.
+  /// Swaps the meal in [slot] for a random dish from the cached pool that is
+  /// not already in the week — no API call — and returns the updated slot so
+  /// the caller can show it.
   Future<PlanSlot?> regenerateMeal(PlanSlot slot) async {
     final catalogue = _catalogueCubit.state.recipes;
     final inWeek = state.week.slots.map((s) => s.recipe.id).toSet();

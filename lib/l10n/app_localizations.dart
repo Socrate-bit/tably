@@ -2064,6 +2064,18 @@ abstract class AppL10n {
   /// In fr, this message translates to:
   /// **'Aucune recette ne correspond à tes préférences.'**
   String get errorCatalogueEmpty;
+
+  /// No description provided for @searchReload.
+  ///
+  /// In fr, this message translates to:
+  /// **'Relancer la recherche'**
+  String get searchReload;
+
+  /// No description provided for @searchLoading.
+  ///
+  /// In fr, this message translates to:
+  /// **'Recherche de recettes…'**
+  String get searchLoading;
 }
 
 class _AppL10nDelegate extends LocalizationsDelegate<AppL10n> {
