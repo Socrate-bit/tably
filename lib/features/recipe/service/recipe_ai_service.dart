@@ -4,6 +4,7 @@ import 'package:firebase_ai/firebase_ai.dart';
 import 'package:flutter/foundation.dart';
 
 import '../../../core/model/aisle.dart';
+import '../../../core/model/ingredient_unit.dart';
 import '../../../core/model/preference_option.dart';
 import '../../preferences/model/user_profile.dart';
 import '../model/recipe.dart';
@@ -19,8 +20,8 @@ class NoMatchingRecipesException implements Exception {
 }
 
 /// Checks Spoonacular candidates against the user's constraints and adapts
-/// the survivors with Gemini: translation, craving, protein, cuisine, emoji
-/// and aisle. Numbers, photos and sources always come from Spoonacular.
+/// the survivors with Gemini: translation, craving, protein, cuisine, emoji,
+/// unit and aisle. Numbers, photos and sources always come from Spoonacular.
 class RecipeAiService {
   static const model = 'gemini-3.1-flash-lite';
 
@@ -163,7 +164,7 @@ class RecipeAiService {
               icon: match?['icon'] as String? ?? '🍽️',
               name: match?['name'] as String? ?? i['name'] as String? ?? '',
               amount: (i['amount'] as num?)?.toDouble() ?? 0,
-              unit: match?['unit'] as String? ?? i['unit'] as String? ?? '',
+              unit: IngredientUnit.fromId(match?['unit'] as String? ?? i['unit'] as String?),
               aisle: Aisle.fromId(match?['aisle'] as String?),
             );
           }(),
@@ -211,8 +212,9 @@ When unsure about a diet or an allergen, reject.
   temperatures; give temperatures in °C.
 - ingredients: one entry per input ingredient, same id.
   name: the ingredient in $language, lower case unless a proper noun.
-  unit: the input unit in $language, short ("g", "ml", "c. à s.", "c. à c.",
-  "gousses", "tranches"); empty string for a plain count. Keep "g" and "ml".
+  unit: the closest code for the input unit, never changing the amount. Keep
+  g, kg, ml and l; Tbsp is tbsp and tsp is tsp. Plain counts, sizes (large,
+  medium) and servings are piece; use to_taste when the amount is 0.
   icon: one emoji for the ingredient.
   aisle: produce (fresh fruit, vegetables, fresh herbs), meat_fish,
   pasta_rice (pasta, rice, noodles, grains), tins_sauces (tins, jars, sauces,
@@ -242,7 +244,7 @@ When unsure about a diet or an allergen, reject.
                 properties: {
                   'id': Schema.integer(),
                   'name': Schema.string(),
-                  'unit': Schema.string(),
+                  'unit': Schema.enumString(enumValues: [for (final u in IngredientUnit.values) u.id]),
                   'icon': Schema.string(),
                   'aisle': Schema.enumString(enumValues: [for (final a in Aisle.values) a.id]),
                 },

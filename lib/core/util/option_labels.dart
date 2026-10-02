@@ -2,6 +2,7 @@ import '../../features/recipe/cubit/catalogue_cubit.dart';
 import '../../features/recipe/model/recipe.dart';
 import '../../l10n/app_localizations.dart';
 import '../model/aisle.dart';
+import '../model/ingredient_unit.dart';
 import '../model/meal_slot.dart';
 import '../model/preference_option.dart';
 import '../model/weekday.dart';
@@ -147,6 +148,30 @@ extension OptionLabels on AppL10n {
         Aisle.tinsSauces => aisleTinsSauces,
         Aisle.herbsGrocery => aisleHerbsGrocery,
       };
+
+  /// A unit's label for [amount]: singular up to one, plural above. A plain
+  /// count has none.
+  String unitLabel(IngredientUnit unit, double amount) {
+    final count = amount > 1 ? 2 : 1;
+    return switch (unit) {
+      IngredientUnit.g => unitG,
+      IngredientUnit.kg => unitKg,
+      IngredientUnit.ml => unitMl,
+      IngredientUnit.l => unitL,
+      IngredientUnit.tbsp => unitTbsp,
+      IngredientUnit.tsp => unitTsp,
+      IngredientUnit.piece => '',
+      IngredientUnit.clove => unitClove(count),
+      IngredientUnit.slice => unitSlice(count),
+      IngredientUnit.bunch => unitBunch(count),
+      IngredientUnit.sprig => unitSprig(count),
+      IngredientUnit.leaf => unitLeaf(count),
+      IngredientUnit.pinch => unitPinch(count),
+      IngredientUnit.can => unitCan(count),
+      IngredientUnit.pack => unitPack(count),
+      IngredientUnit.toTaste => unitToTaste,
+    };
+  }
 }
 
 /// Formats an amount with the profile's currency symbol.

@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tably/core/model/aisle.dart';
+import 'package:tably/core/model/ingredient_unit.dart';
 import 'package:tably/core/model/preference_option.dart';
 import 'package:tably/features/preferences/model/user_profile.dart';
 import 'package:tably/features/recipe/model/recipe.dart';
@@ -24,8 +25,8 @@ void main() {
             'protein': 'pork',
             'cuisine': 'none',
             'ingredients': [
-              {'id': 10010062, 'name': 'côtelettes de porc', 'unit': '', 'icon': '🥩', 'aisle': 'meat_fish'},
-              {'id': 19296, 'name': 'miel', 'unit': 'c. à s.', 'icon': '🍯', 'aisle': 'herbs_grocery'},
+              {'id': 10010062, 'name': 'côtelettes de porc', 'unit': 'piece', 'icon': '🥩', 'aisle': 'meat_fish'},
+              {'id': 19296, 'name': 'miel', 'unit': 'tbsp', 'icon': '🍯', 'aisle': 'herbs_grocery'},
             ],
             'steps': ['Faites dorer les côtelettes.', 'Nappez de sauce et servez.'],
           },
@@ -61,10 +62,10 @@ void main() {
 
     expect(ingredients, hasLength(source.length), reason: 'no ingredient is ever dropped');
     final honey = ingredients.firstWhere((i) => i.id == 19296);
-    expect((honey.name, honey.unit, honey.icon, honey.aisle), ('miel', 'c. à s.', '🍯', Aisle.herbsGrocery));
+    expect((honey.name, honey.unit, honey.icon, honey.aisle), ('miel', IngredientUnit.tbsp, '🍯', Aisle.herbsGrocery));
     expect(honey.amount, 0.5, reason: 'per-portion amount comes from Spoonacular');
     final soy = ingredients.firstWhere((i) => i.id == 16124);
-    expect((soy.name, soy.unit, soy.aisle), ('soy sauce', 'ml', Aisle.herbsGrocery));
+    expect((soy.name, soy.unit, soy.aisle), ('soy sauce', IngredientUnit.ml, Aisle.herbsGrocery));
   });
 
   test('a recipe both kept and rejected, or kept twice, is handled safely', () {

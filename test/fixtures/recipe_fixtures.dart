@@ -1,5 +1,6 @@
 import 'package:tably/core/analytics/analytics_service.dart';
 import 'package:tably/core/model/aisle.dart';
+import 'package:tably/core/model/ingredient_unit.dart';
 import 'package:tably/core/model/preference_option.dart';
 import 'package:tably/features/preferences/cubit/profile_cubit.dart';
 import 'package:tably/features/preferences/model/user_profile.dart';
@@ -400,7 +401,8 @@ abstract final class RecipeFixtures {
 final _ids = <String, int>{};
 
 /// Builds an ingredient from the design's free-text quantity ("150g",
-/// "½tbsp", "2 gousses"). Ids are stable per name, as Spoonacular's are.
+/// "½tbsp", "2 gousses"), its unit read as a legacy label. Ids are stable
+/// per name, as Spoonacular's are.
 Ingredient _ingredient(String icon, String name, String quantity) {
   final match = RegExp(r'^([\d.]*)([¼½¾]?)\s*(.*)$').firstMatch(quantity)!;
   const fractions = {'¼': 0.25, '½': 0.5, '¾': 0.75};
@@ -410,7 +412,7 @@ Ingredient _ingredient(String icon, String name, String quantity) {
     icon: icon,
     name: name,
     amount: amount,
-    unit: match[3]!,
+    unit: IngredientUnit.fromId(match[3]),
     aisle: Aisle.herbsGrocery,
   );
 }

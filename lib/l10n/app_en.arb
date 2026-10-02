@@ -415,6 +415,77 @@
   "aislePastaRice": "PASTA, RICE & NOODLES",
   "aisleTinsSauces": "TINS, JARS & SAUCES",
   "aisleHerbsGrocery": "HERBS, SPICES & PANTRY",
+  "unitG": "g",
+  "unitKg": "kg",
+  "unitMl": "ml",
+  "unitL": "l",
+  "unitTbsp": "tbsp",
+  "unitTsp": "tsp",
+  "unitClove": "{count, plural, =1{clove} other{cloves}}",
+  "@unitClove": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "unitSlice": "{count, plural, =1{slice} other{slices}}",
+  "@unitSlice": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "unitBunch": "{count, plural, =1{bunch} other{bunches}}",
+  "@unitBunch": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "unitSprig": "{count, plural, =1{sprig} other{sprigs}}",
+  "@unitSprig": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "unitLeaf": "{count, plural, =1{leaf} other{leaves}}",
+  "@unitLeaf": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "unitPinch": "{count, plural, =1{pinch} other{pinches}}",
+  "@unitPinch": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "unitCan": "{count, plural, =1{can} other{cans}}",
+  "@unitCan": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "unitPack": "{count, plural, =1{pack} other{packs}}",
+  "@unitPack": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "unitToTaste": "to taste",
   "actionRetry": "Try again",
   "generatingFailed": "We couldn't prepare your recipes right now.",
   "catalogueBuilding": "Preparing your recipes…",

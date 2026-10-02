@@ -2029,6 +2029,96 @@ abstract class AppL10n {
   /// **'HERBES, ÉPICES ET ÉPICERIE'**
   String get aisleHerbsGrocery;
 
+  /// No description provided for @unitG.
+  ///
+  /// In fr, this message translates to:
+  /// **'g'**
+  String get unitG;
+
+  /// No description provided for @unitKg.
+  ///
+  /// In fr, this message translates to:
+  /// **'kg'**
+  String get unitKg;
+
+  /// No description provided for @unitMl.
+  ///
+  /// In fr, this message translates to:
+  /// **'ml'**
+  String get unitMl;
+
+  /// No description provided for @unitL.
+  ///
+  /// In fr, this message translates to:
+  /// **'l'**
+  String get unitL;
+
+  /// No description provided for @unitTbsp.
+  ///
+  /// In fr, this message translates to:
+  /// **'c. à s.'**
+  String get unitTbsp;
+
+  /// No description provided for @unitTsp.
+  ///
+  /// In fr, this message translates to:
+  /// **'c. à c.'**
+  String get unitTsp;
+
+  /// No description provided for @unitClove.
+  ///
+  /// In fr, this message translates to:
+  /// **'{count, plural, =1{gousse} other{gousses}}'**
+  String unitClove(int count);
+
+  /// No description provided for @unitSlice.
+  ///
+  /// In fr, this message translates to:
+  /// **'{count, plural, =1{tranche} other{tranches}}'**
+  String unitSlice(int count);
+
+  /// No description provided for @unitBunch.
+  ///
+  /// In fr, this message translates to:
+  /// **'{count, plural, =1{botte} other{bottes}}'**
+  String unitBunch(int count);
+
+  /// No description provided for @unitSprig.
+  ///
+  /// In fr, this message translates to:
+  /// **'{count, plural, =1{brin} other{brins}}'**
+  String unitSprig(int count);
+
+  /// No description provided for @unitLeaf.
+  ///
+  /// In fr, this message translates to:
+  /// **'{count, plural, =1{feuille} other{feuilles}}'**
+  String unitLeaf(int count);
+
+  /// No description provided for @unitPinch.
+  ///
+  /// In fr, this message translates to:
+  /// **'{count, plural, =1{pincée} other{pincées}}'**
+  String unitPinch(int count);
+
+  /// No description provided for @unitCan.
+  ///
+  /// In fr, this message translates to:
+  /// **'{count, plural, =1{boîte} other{boîtes}}'**
+  String unitCan(int count);
+
+  /// No description provided for @unitPack.
+  ///
+  /// In fr, this message translates to:
+  /// **'{count, plural, =1{paquet} other{paquets}}'**
+  String unitPack(int count);
+
+  /// No description provided for @unitToTaste.
+  ///
+  /// In fr, this message translates to:
+  /// **'au goût'**
+  String get unitToTaste;
+
   /// No description provided for @actionRetry.
   ///
   /// In fr, this message translates to:

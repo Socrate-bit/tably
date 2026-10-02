@@ -546,6 +546,77 @@
   "aislePastaRice": "PÂTES, RIZ ET NOUILLES",
   "aisleTinsSauces": "CONSERVES, BOCAUX ET SAUCES",
   "aisleHerbsGrocery": "HERBES, ÉPICES ET ÉPICERIE",
+  "unitG": "g",
+  "unitKg": "kg",
+  "unitMl": "ml",
+  "unitL": "l",
+  "unitTbsp": "c. à s.",
+  "unitTsp": "c. à c.",
+  "unitClove": "{count, plural, =1{gousse} other{gousses}}",
+  "@unitClove": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "unitSlice": "{count, plural, =1{tranche} other{tranches}}",
+  "@unitSlice": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "unitBunch": "{count, plural, =1{botte} other{bottes}}",
+  "@unitBunch": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "unitSprig": "{count, plural, =1{brin} other{brins}}",
+  "@unitSprig": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "unitLeaf": "{count, plural, =1{feuille} other{feuilles}}",
+  "@unitLeaf": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "unitPinch": "{count, plural, =1{pincée} other{pincées}}",
+  "@unitPinch": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "unitCan": "{count, plural, =1{boîte} other{boîtes}}",
+  "@unitCan": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "unitPack": "{count, plural, =1{paquet} other{paquets}}",
+  "@unitPack": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "unitToTaste": "au goût",
   "actionRetry": "Réessayer",
   "generatingFailed": "Impossible de préparer tes recettes pour le moment.",
   "catalogueBuilding": "On prépare tes recettes…",

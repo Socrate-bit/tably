@@ -1,6 +1,7 @@
 import 'package:equatable/equatable.dart';
 
 import '../../../core/model/aisle.dart';
+import '../../../core/model/ingredient_unit.dart';
 
 /// One line on the shopping list, stored at `users/{uid}/shopping/{id}`.
 class ShoppingItem extends Equatable {
@@ -9,20 +10,21 @@ class ShoppingItem extends Equatable {
     required this.aisle,
     required this.icon,
     required this.name,
-    required this.needed,
+    required this.quantities,
     required this.order,
     this.checked = false,
   });
 
-  /// Ingredient id and unit, so a rebuilt list keeps what was ticked.
+  /// The ingredient's id, so a rebuilt list keeps what was ticked.
   final String id;
   final Aisle aisle;
   final String icon;
   final String name;
 
-  /// How much the week's recipes require, e.g. "350g"; empty when the
+  /// How much the week's recipes require, one part per unit that can't be
+  /// converted into another, e.g. 2 pieces and 150 g; empty when the
   /// recipes give no amount ("to taste").
-  final String needed;
+  final List<Quantity> quantities;
 
   /// Position within the list, aisle by aisle.
   final int order;
@@ -33,7 +35,7 @@ class ShoppingItem extends Equatable {
         aisle: aisle,
         icon: icon,
         name: name,
-        needed: needed,
+        quantities: quantities,
         order: order,
         checked: checked ?? this.checked,
       );
@@ -42,7 +44,7 @@ class ShoppingItem extends Equatable {
         'aisle': aisle.id,
         'icon': icon,
         'name': name,
-        'needed': needed,
+        'quantities': [for (final q in quantities) q.toMap()],
         'order': order,
         'checked': checked,
       };
@@ -52,13 +54,16 @@ class ShoppingItem extends Equatable {
         aisle: Aisle.fromId(map['aisle'] as String?),
         icon: map['icon'] as String? ?? '🛒',
         name: map['name'] as String? ?? '',
-        needed: map['needed'] as String? ?? '',
+        quantities: [
+          for (final q in map['quantities'] as List? ?? const [])
+            if (q is Map) Quantity.fromMap(Map<String, dynamic>.from(q)),
+        ],
         order: (map['order'] as num?)?.toInt() ?? 0,
         checked: map['checked'] as bool? ?? false,
       );
 
   @override
-  List<Object?> get props => [id, aisle, icon, name, needed, order, checked];
+  List<Object?> get props => [id, aisle, icon, name, quantities, order, checked];
 }
 
 /// Items of one aisle, ready to render as a card.

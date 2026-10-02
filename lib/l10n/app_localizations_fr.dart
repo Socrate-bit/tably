@@ -1092,6 +1092,115 @@ class AppL10nFr extends AppL10n {
   String get aisleHerbsGrocery => 'HERBES, ÉPICES ET ÉPICERIE';
 
   @override
+  String get unitG => 'g';
+
+  @override
+  String get unitKg => 'kg';
+
+  @override
+  String get unitMl => 'ml';
+
+  @override
+  String get unitL => 'l';
+
+  @override
+  String get unitTbsp => 'c. à s.';
+
+  @override
+  String get unitTsp => 'c. à c.';
+
+  @override
+  String unitClove(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'gousses',
+      one: 'gousse',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String unitSlice(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'tranches',
+      one: 'tranche',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String unitBunch(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'bottes',
+      one: 'botte',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String unitSprig(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'brins',
+      one: 'brin',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String unitLeaf(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'feuilles',
+      one: 'feuille',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String unitPinch(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'pincées',
+      one: 'pincée',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String unitCan(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'boîtes',
+      one: 'boîte',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String unitPack(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'paquets',
+      one: 'paquet',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get unitToTaste => 'au goût';
+
+  @override
   String get actionRetry => 'Réessayer';
 
   @override
