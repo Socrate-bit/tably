@@ -53,7 +53,7 @@ class MenuScreen extends StatelessWidget {
           listenWhen: (previous, current) =>
               current.error != null && previous.error != current.error && current.recipes.isNotEmpty,
           listener: (context, state) {
-            showErrorBanner(context, catalogueErrorText(l10n, state.error));
+            showErrorBanner(context, l10n.catalogueError(state.error));
             context.read<CatalogueCubit>().errorShown();
           },
         ),
@@ -147,13 +147,6 @@ class MenuScreen extends StatelessWidget {
   }
 }
 
-/// The message for a failed catalogue build.
-String catalogueErrorText(AppL10n l10n, Object? error) => switch (CatalogueCubit.reasonFor(error)) {
-      'quota' => l10n.errorCatalogueQuota,
-      'no_match' => l10n.errorCatalogueEmpty,
-      _ => l10n.errorCatalogue,
-    };
-
 /// Stands in for the week while there are no recipes yet: a spinner while
 /// they are built, or the reason and a retry when the build failed.
 class _CatalogueStatus extends StatelessWidget {
@@ -177,7 +170,7 @@ class _CatalogueStatus extends StatelessWidget {
             ),
           SizedBox(height: 16.h),
           Text(
-            failed ? catalogueErrorText(l10n, state.error) : l10n.catalogueBuilding,
+            failed ? l10n.catalogueError(state.error) : l10n.catalogueBuilding,
             textAlign: TextAlign.center,
             style: AppTextStyles.bodyMuted,
           ),

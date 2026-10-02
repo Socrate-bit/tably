@@ -73,6 +73,8 @@ abstract final class AnalyticsEvents {
   static const onboardingCompleted = 'onboarding_completed';
   static const catalogueBuilt = 'catalogue_built';
   static const catalogueBuildFailed = 'catalogue_build_failed';
+  static const recipeSearched = 'recipe_searched';
+  static const recipeSearchFailed = 'recipe_search_failed';
   static const planRegenerated = 'plan_regenerated';
   static const mealReplaced = 'meal_replaced';
   static const mealRegenerated = 'meal_regenerated';

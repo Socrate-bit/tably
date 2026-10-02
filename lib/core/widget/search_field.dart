@@ -11,6 +11,7 @@ class SearchField extends StatefulWidget {
     super.key,
     required this.hint,
     required this.onChanged,
+    this.onSubmitted,
     this.initialValue = '',
     this.compact = false,
   });
@@ -18,6 +19,9 @@ class SearchField extends StatefulWidget {
   final String hint;
   final String initialValue;
   final ValueChanged<String> onChanged;
+
+  /// The keyboard's search key.
+  final ValueChanged<String>? onSubmitted;
   final bool compact;
 
   @override
@@ -55,6 +59,7 @@ class _SearchFieldState extends State<SearchField> {
         widget.onChanged(value);
         setState(() {});
       },
+      onSubmitted: widget.onSubmitted,
       style: style,
       textInputAction: TextInputAction.search,
       decoration: InputDecoration(

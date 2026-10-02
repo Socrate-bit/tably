@@ -1111,4 +1111,10 @@ class AppL10nFr extends AppL10n {
   @override
   String get errorCatalogueEmpty =>
       'Aucune recette ne correspond à tes préférences.';
+
+  @override
+  String get searchReload => 'Relancer la recherche';
+
+  @override
+  String get searchLoading => 'Recherche de recettes…';
 }

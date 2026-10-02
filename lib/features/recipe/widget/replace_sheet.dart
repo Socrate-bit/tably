@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -16,6 +18,7 @@ import '../../preferences/model/user_profile.dart';
 import '../cubit/catalogue_cubit.dart';
 import '../cubit/recipe_browse_cubit.dart';
 import '../cubit/recipe_cubit.dart';
+import '../cubit/recipe_search_cubit.dart';
 import '../model/recipe.dart';
 import '../screen/filters_screen.dart';
 import 'filter_button.dart';
@@ -133,6 +136,11 @@ class _ReplaceSheetState extends State<ReplaceSheet> {
     Haptics.confirm();
     final plan = context.read<PlanCubit>();
     final slot = widget.slot;
+    // A search result joins the cached pool first, so the week can use it.
+    final incoming = slot != null ? chosen : widget.recipe;
+    if (context.read<RecipeSearchCubit>().state.byId(incoming.id) != null) {
+      unawaited(context.read<CatalogueCubit>().addRecipe(incoming));
+    }
     slot != null ? plan.replace(slot.key, chosen.id) : plan.replaceRecipe(chosen.id, widget.recipe.id);
     Navigator.of(context).pop(true);
   }

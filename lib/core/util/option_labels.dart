@@ -1,4 +1,5 @@
 import '../../features/plan/model/week_plan.dart';
+import '../../features/recipe/cubit/catalogue_cubit.dart';
 import '../../features/recipe/model/recipe.dart';
 import '../../l10n/app_localizations.dart';
 import '../model/aisle.dart';
@@ -131,6 +132,13 @@ extension OptionLabels on AppL10n {
       };
 
   String proteinName(RecipeProtein protein) => optionLabel(protein.id);
+
+  /// The message for a failed recipe build or search.
+  String catalogueError(Object? error) => switch (CatalogueCubit.reasonFor(error)) {
+        'quota' => errorCatalogueQuota,
+        'no_match' => errorCatalogueEmpty,
+        _ => errorCatalogue,
+      };
 
   String aisleName(Aisle aisle) => switch (aisle) {
         Aisle.produce => aisleProduce,

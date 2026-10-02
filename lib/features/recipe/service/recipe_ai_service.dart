@@ -65,6 +65,25 @@ class RecipeAiService {
     return (recipes: recipes, rejected: rejected);
   }
 
+  /// Turns a search typed in the user's language into the English Spoonacular
+  /// understands, e.g. "poulet curry" → "chicken curry". English passes
+  /// through untouched.
+  Future<String> toEnglish(String text, String languageCode) async {
+    if (languageCode == 'en') return text;
+    final gemini = FirebaseAI.googleAI().generativeModel(
+      model: model,
+      generationConfig: GenerationConfig(temperature: 0),
+      systemInstruction: Content.system(
+        'Translate this recipe search into English, using common food words. '
+        'Reply with the translation only, no quotes or punctuation.',
+      ),
+    );
+    final response = await gemini.generateContent([Content.text(text)]);
+    final english = response.text?.trim() ?? '';
+    debugPrint('[RecipeAiService] search "$text" → "$english"');
+    return english.isEmpty ? text : english;
+  }
+
   /// One Gemini call. Returns the decoded answer, or the error so a single
   /// failed chunk doesn't sink the whole build.
   Future<Object> _ask(GenerativeModel gemini, List<Map<String, dynamic>> chunk) async {

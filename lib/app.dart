@@ -16,6 +16,7 @@ import 'features/preferences/service/profile_service.dart';
 import 'features/recipe/cubit/catalogue_cubit.dart';
 import 'features/recipe/cubit/recipe_browse_cubit.dart';
 import 'features/recipe/cubit/recipe_cubit.dart';
+import 'features/recipe/cubit/recipe_search_cubit.dart';
 import 'features/recipe/service/recipe_ai_service.dart';
 import 'features/recipe/service/recipe_search_service.dart';
 import 'features/recipe/service/recipe_service.dart';
@@ -101,6 +102,14 @@ class TablyApp extends StatelessWidget {
             ),
           ),
           BlocProvider(create: (_) => RecipeBrowseCubit(analytics: analytics)),
+          BlocProvider(
+            create: (context) => RecipeSearchCubit(
+              search: context.read<RecipeSearchService>(),
+              ai: context.read<RecipeAiService>(),
+              profileCubit: context.read<ProfileCubit>(),
+              analytics: analytics,
+            ),
+          ),
           BlocProvider(
             create: (context) => OnboardingCubit(catalogueCubit: context.read<CatalogueCubit>(), analytics: analytics),
           ),

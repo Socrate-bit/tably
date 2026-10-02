@@ -14,10 +14,10 @@ import 'fixtures/recipe_fixtures.dart';
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  Future<PlanCubit> build(UserProfile profile) async {
+  Future<PlanCubit> build(UserProfile profile, {FakeSearch? search, FakeAi? ai}) async {
     const analytics = AnalyticsService();
     final profileCubit = ProfileCubit(service: ProfileService(), analytics: analytics);
-    final catalogue = seededCatalogue(profileCubit);
+    final catalogue = seededCatalogue(profileCubit, search: search, ai: ai);
     final recipes = RecipeCubit(service: RecipeService(), analytics: analytics);
     final plan = PlanCubit(
       service: PlanService(),
@@ -62,7 +62,8 @@ void main() {
   });
 
   test('regenerating a meal swaps in a dish not already in the week', () async {
-    final plan = await build(const UserProfile(mealsPerDay: 2, variety: Variety.balanced));
+    final search = FakeSearch();
+    final plan = await build(const UserProfile(mealsPerDay: 2, variety: Variety.balanced), search: search);
     final before = plan.state.week;
     final inWeek = before.slots.map((s) => s.recipe.id).toSet();
 
@@ -72,6 +73,30 @@ void main() {
     expect(inWeek, isNot(contains(next!.recipe.id)));
     expect(plan.state.week.slotByKey('monday|dinner')!.recipe, next.recipe, reason: 'leftover follows the swap');
     expect(plan.state.week.slotByKey('tuesday|lunch'), before.slotByKey('tuesday|lunch'));
+    expect(search.calls, isEmpty, reason: 'one meal comes from the cached pool, never the API');
+  });
+
+  test('regenerating everything fetches a fresh pool sized to the week', () async {
+    final search = FakeSearch();
+    // Lunch and dinner every day with a new dish each time: 14 recipes, ×2.
+    final plan = await build(const UserProfile(mealsPerDay: 2, variety: Variety.high), search: search);
+
+    await plan.regenerate();
+
+    expect(search.calls.single.number, 28);
+    expect(search.calls.single.query, isNull, reason: 'the pool is built from the profile alone');
+  });
+
+  test('a failed regeneration keeps the current week', () async {
+    final plan = await build(const UserProfile(), ai: FakeAi(recipes: const []));
+    await plan.replace('monday|dinner', RecipeFixtures.recipes.last.id);
+    final before = plan.state;
+
+    await plan.regenerate();
+
+    expect(plan.state.settings, before.settings);
+    expect(plan.state.week, before.week);
+    expect(plan.state.regenerating, isFalse);
   });
 
   test('regenerating reshuffles the week and clears swaps', () async {
