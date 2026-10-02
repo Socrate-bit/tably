@@ -60,9 +60,8 @@ flutter:
 
 # Native launch screen — regenerate with `dart run flutter_native_splash:create`.
 flutter_native_splash:
-  color: "#FC2A1F"
-  image: assets/brand/splash_V2.png
-  ios_content_mode: scaleAspectFill
+  background_image: assets/brand/gradient_splash.png
+  image: assets/brand/logo_splash.png
   android: false
   web: false
 

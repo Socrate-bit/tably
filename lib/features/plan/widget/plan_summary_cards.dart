@@ -30,17 +30,15 @@ class CostCard extends StatelessWidget {
       child: _CornerIcon(
         glyph: LineGlyph.coins,
         background: AppColors.brandSoft,
-        size: 34.r,
+        size: 40.r,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisSize: MainAxisSize.min,
           children: [
-            _clearOf(34.r, Text(l10n.estimatedCost, style: AppTextStyles.cardLabel)),
+            _clearOf(40.r, Text(l10n.estimatedCost, style: AppTextStyles.cardLabel)),
             SizedBox(height: 10.h),
-            FittedBox(
-              fit: BoxFit.scaleDown,
-              alignment: Alignment.centerLeft,
-              child: Row(
+            _OneLine(
+              Row(
                 crossAxisAlignment: CrossAxisAlignment.baseline,
                 textBaseline: TextBaseline.alphabetic,
                 children: [
@@ -50,12 +48,10 @@ class CostCard extends StatelessWidget {
               ),
             ),
             SizedBox(height: 12.h),
-            ProgressBar(value: ratio, height: 10.h, trackColor: AppColors.brandSoft),
+            ProgressBar(value: ratio, height: 8.h, trackColor: AppColors.track),
             SizedBox(height: 10.h),
-            FittedBox(
-              fit: BoxFit.scaleDown,
-              alignment: Alignment.centerLeft,
-              child: Text(
+            _OneLine(
+              Text(
                 l10n.budgetSavings(formatMoney(country, (budget - total).clamp(0, budget), decimals: 0)),
                 style: AppTextStyles.savings,
               ),
@@ -100,10 +96,8 @@ class ShoppingSummaryCard extends StatelessWidget {
               Text(l10n.shoppingList, style: AppTextStyles.sheetTitle.copyWith(fontSize: 16.sp, letterSpacing: -0.6)),
             ),
             SizedBox(height: 4.h),
-            FittedBox(
-              fit: BoxFit.scaleDown,
-              alignment: Alignment.centerLeft,
-              child: Text(
+            _OneLine(
+              Text(
                 l10n.shoppingBoughtCount(checked, total),
                 style: AppTextStyles.caption.copyWith(
                   fontSize: 14.sp,
@@ -124,8 +118,24 @@ class ShoppingSummaryCard extends StatelessWidget {
 /// Keeps a card's top lines left of its [_CornerIcon], shrinking them if needed.
 Widget _clearOf(double iconSize, Widget text) => Padding(
   padding: EdgeInsets.only(right: iconSize + 4.w),
-  child: FittedBox(fit: BoxFit.scaleDown, alignment: Alignment.centerLeft, child: text),
+  child: _OneLine(text),
 );
+
+/// Scales [text] down to fit on one line. The [IntrinsicHeight] row measures
+/// it at its narrow width, where wrapped lines left empty space at the bottom
+/// of the cards, so its height is pinned to one line's.
+class _OneLine extends StatelessWidget {
+  const _OneLine(this.text);
+
+  final Widget text;
+
+  @override
+  Widget build(BuildContext context) => DefaultTextStyle.merge(
+    maxLines: 1,
+    softWrap: false,
+    child: FittedBox(fit: BoxFit.scaleDown, alignment: Alignment.centerLeft, child: text),
+  );
+}
 
 /// Pins a round icon badge to the card's top-right corner, over [child].
 class _CornerIcon extends StatelessWidget {

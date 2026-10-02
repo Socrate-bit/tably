@@ -202,7 +202,7 @@ class _RecipeScreenState extends State<RecipeScreen> {
   }
 }
 
-/// Hero image with the back and favourite buttons, and the creator credit.
+/// Hero image with the back and favourite buttons.
 class _PhotoHeader extends StatelessWidget {
   const _PhotoHeader({
     required this.recipe,
@@ -221,8 +221,6 @@ class _PhotoHeader extends StatelessWidget {
     return Stack(
       children: [
         RecipePhoto(url: recipe.photoUrl, height: 300.h, width: double.infinity, radius: 22.r),
-        if (recipe.creator != null)
-          Positioned(left: 16.w, bottom: 16.h, child: _CreatorBadge(name: recipe.creator!)),
         Positioned(
           top: 16.h,
           left: 16.w,
@@ -245,50 +243,6 @@ class _PhotoHeader extends StatelessWidget {
           ),
         ),
       ],
-    );
-  }
-}
-
-/// "RECETTE DE" credit for creator recipes, with the creator's initials.
-class _CreatorBadge extends StatelessWidget {
-  const _CreatorBadge({required this.name});
-
-  final String name;
-
-  /// "C'est Tarpin Bon" → "CTB".
-  String get _initials => name
-      .split(RegExp(r'\s+'))
-      .where((w) => w.isNotEmpty)
-      .map((w) => w[0].toUpperCase())
-      .take(3)
-      .join();
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.fromLTRB(9.w, 8.h, 15.w, 8.h),
-      decoration: BoxDecoration(color: AppColors.creatorScrim, borderRadius: BorderRadius.circular(26.r)),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Container(
-            width: 28.r,
-            height: 28.r,
-            alignment: Alignment.center,
-            decoration: const BoxDecoration(color: AppColors.brand, shape: BoxShape.circle),
-            child: FittedBox(child: Text(_initials, style: AppTextStyles.creatorInitials)),
-          ),
-          SizedBox(width: 9.w),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(AppL10n.of(context).recipeCreatedBy, style: AppTextStyles.creatorEyebrow),
-              Text(name, style: AppTextStyles.creatorName),
-            ],
-          ),
-        ],
-      ),
     );
   }
 }

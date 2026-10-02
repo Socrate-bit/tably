@@ -260,7 +260,7 @@ abstract final class AppTextStyles {
 
   static TextStyle get statLabel => _sans(13, FontWeight.w500, color: AppColors.textQuaternary);
 
-  static TextStyle get amountLarge => _sans(22, FontWeight.w800, letterSpacing: -0.8);
+  static TextStyle get amountLarge => _sans(26, FontWeight.w800, letterSpacing: -0.8);
 
   static TextStyle get amountMuted =>
       _sans(16, FontWeight.w700, color: AppColors.textTertiary, letterSpacing: -0.8);

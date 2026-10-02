@@ -25,6 +25,8 @@ class ProgressBar extends StatelessWidget {
     return ClipRRect(
       borderRadius: radius,
       child: Container(
+        // Full width even when empty; loose parents would otherwise shrink it to the fill.
+        width: double.infinity,
         height: barHeight,
         color: trackColor ?? AppColors.track,
         // Fractional sizing (not LayoutBuilder) so parents can measure intrinsics.

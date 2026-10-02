@@ -140,11 +140,11 @@ class _OpenChevron extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 36.r,
-      height: 36.r,
+      width: 42.r,
+      height: 42.r,
       alignment: Alignment.center,
       decoration: const BoxDecoration(color: AppColors.brandSoft, shape: BoxShape.circle),
-      child: LineIcon(LineGlyph.chevronRight, size: 18.r, color: AppColors.brand, strokeWidth: 2.4),
+      child: LineIcon(LineGlyph.chevronRight, size: 24.r, color: AppColors.brand, strokeWidth: 2.4),
     );
   }
 }
