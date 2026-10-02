@@ -8,6 +8,7 @@ import 'package:share_plus/share_plus.dart';
 
 import '../../../core/analytics/analytics_service.dart';
 import '../../../core/model/aisle.dart';
+import '../../../core/model/ingredient_unit.dart';
 import '../../plan/cubit/plan_cubit.dart';
 import '../../preferences/cubit/profile_cubit.dart';
 import '../model/shopping_item.dart';
@@ -116,20 +117,27 @@ class ShoppingCubit extends Cubit<ShoppingState> {
   }
 
   /// Renders the list as plain text for copy and share, with [aisleName]
-  /// giving each aisle's heading in the user's language.
-  String asPlainText(String Function(Aisle) aisleName) => [
+  /// and [quantities] giving each aisle's heading and each item's amount in
+  /// the user's language.
+  String asPlainText(String Function(Aisle) aisleName, String Function(List<Quantity>) quantities) => [
         for (final category in state.categories) ...[
           aisleName(category.aisle),
-          for (final item in category.items) item.needed.isEmpty ? '- ${item.name}' : '- ${item.name} (${item.needed})',
+          for (final item in category.items)
+            item.quantities.isEmpty ? '- ${item.name}' : '- ${item.name} (${quantities(item.quantities)})',
           '',
         ],
       ].join('\n').trim();
 
   /// Opens the native share sheet with the list as text. Returns false on failure.
-  Future<bool> share({required String subject, required String Function(Aisle) aisleName, Rect? origin}) async {
+  Future<bool> share({
+    required String subject,
+    required String Function(Aisle) aisleName,
+    required String Function(List<Quantity>) quantities,
+    Rect? origin,
+  }) async {
     try {
       final result = await SharePlus.instance.share(ShareParams(
-        text: asPlainText(aisleName),
+        text: asPlainText(aisleName, quantities),
         subject: subject,
         sharePositionOrigin: origin,
       ));

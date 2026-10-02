@@ -1082,6 +1082,115 @@ class AppL10nEn extends AppL10n {
   String get aisleHerbsGrocery => 'HERBS, SPICES & PANTRY';
 
   @override
+  String get unitG => 'g';
+
+  @override
+  String get unitKg => 'kg';
+
+  @override
+  String get unitMl => 'ml';
+
+  @override
+  String get unitL => 'l';
+
+  @override
+  String get unitTbsp => 'tbsp';
+
+  @override
+  String get unitTsp => 'tsp';
+
+  @override
+  String unitClove(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'cloves',
+      one: 'clove',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String unitSlice(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'slices',
+      one: 'slice',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String unitBunch(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'bunches',
+      one: 'bunch',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String unitSprig(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'sprigs',
+      one: 'sprig',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String unitLeaf(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'leaves',
+      one: 'leaf',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String unitPinch(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'pinches',
+      one: 'pinch',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String unitCan(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'cans',
+      one: 'can',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String unitPack(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'packs',
+      one: 'pack',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get unitToTaste => 'to taste';
+
+  @override
   String get actionRetry => 'Try again';
 
   @override

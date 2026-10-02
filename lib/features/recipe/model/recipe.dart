@@ -1,8 +1,8 @@
 import 'package:equatable/equatable.dart';
 
 import '../../../core/model/aisle.dart';
+import '../../../core/model/ingredient_unit.dart';
 import '../../../core/model/preference_option.dart';
-import '../../../core/util/quantity.dart';
 
 /// One ingredient line on a recipe.
 class Ingredient extends Equatable {
@@ -24,19 +24,16 @@ class Ingredient extends Equatable {
   /// How much one portion needs, in [unit].
   final double amount;
 
-  /// Translated unit label, e.g. "g", "c. à s.", or empty for a plain count.
-  final String unit;
+  /// One of a fixed set of units, so the shopping list can sum it.
+  final IngredientUnit unit;
   final Aisle aisle;
-
-  /// What the recipe screen shows for [portions], e.g. "150g" or "2 gousses".
-  String quantityFor(int portions) => formatQuantity(amount * portions, unit);
 
   Map<String, dynamic> toMap() => {
         'id': id,
         'icon': icon,
         'name': name,
         'amount': amount,
-        'unit': unit,
+        'unit': unit.id,
         'aisle': aisle.id,
       };
 
@@ -45,7 +42,7 @@ class Ingredient extends Equatable {
         icon: map['icon'] as String? ?? '🍽️',
         name: map['name'] as String? ?? '',
         amount: (map['amount'] as num?)?.toDouble() ?? 0,
-        unit: map['unit'] as String? ?? '',
+        unit: IngredientUnit.fromId(map['unit'] as String?),
         aisle: Aisle.fromId(map['aisle'] as String?),
       );
 

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../../core/theme/app_theme.dart';
+import '../../../core/util/quantity.dart';
 import '../../../core/widget/surface_card.dart';
 import '../../../l10n/app_localizations.dart';
 import '../model/recipe.dart';
@@ -15,6 +16,7 @@ class IngredientList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppL10n.of(context);
     return SurfaceCard(
       clip: true,
       child: Column(
@@ -32,7 +34,10 @@ class IngredientList extends StatelessWidget {
                   Text(ingredient.icon, style: AppTextStyles.emojiIcon.copyWith(fontSize: 20.sp)),
                   SizedBox(width: 14.w),
                   Expanded(child: Text(ingredient.name, style: AppTextStyles.ingredientName)),
-                  Text(ingredient.quantityFor(portions), style: AppTextStyles.ingredientQty),
+                  Text(
+                    formatQuantity(ingredient.amount * portions, ingredient.unit, l10n),
+                    style: AppTextStyles.ingredientQty,
+                  ),
                 ],
               ),
             ),

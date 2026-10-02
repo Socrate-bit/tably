@@ -1,14 +1,20 @@
+import '../../l10n/app_localizations.dart';
+import '../model/ingredient_unit.dart';
+import 'option_labels.dart';
+
 /// Formats an ingredient amount with its unit: "150g", "½", "2 gousses".
 /// Weights and volumes are whole numbers; small counts use common fractions.
-String formatQuantity(double amount, String unit) {
-  if (amount <= 0) return unit;
-  final number = _metric.contains(unit.toLowerCase()) ? _whole(amount) : _count(amount);
-  if (unit.isEmpty) return number;
-  return _metric.contains(unit.toLowerCase()) ? '$number$unit' : '$number $unit';
+String formatQuantity(double amount, IngredientUnit unit, AppL10n l10n) {
+  final label = l10n.unitLabel(unit, amount);
+  if (amount <= 0 || unit == IngredientUnit.toTaste) return label;
+  final number = unit.isMetric ? _whole(amount) : _count(amount);
+  if (label.isEmpty) return number;
+  return unit.isMetric ? '$number$label' : '$number $label';
 }
 
-/// Units written glued to the number, as the design does ("150g", "15ml").
-const _metric = {'g', 'kg', 'ml', 'l', 'cl'};
+/// Formats a shopping-list line's parts, e.g. "2 + 150g".
+String formatQuantities(List<Quantity> quantities, AppL10n l10n) =>
+    quantities.map((q) => formatQuantity(q.amount, q.unit, l10n)).join(' + ');
 
 String _whole(double amount) => amount < 1 ? _count(amount) : '${amount.round()}';
 

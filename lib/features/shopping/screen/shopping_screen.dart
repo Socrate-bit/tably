@@ -7,6 +7,7 @@ import '../../../core/theme/app_theme.dart';
 import '../../../core/util/error_feedback.dart';
 import '../../../core/util/haptics.dart';
 import '../../../core/util/option_labels.dart';
+import '../../../core/util/quantity.dart';
 import '../../../core/widget/check_circle.dart';
 import '../../../core/widget/primary_button.dart';
 import '../../../core/widget/sub_screen_header.dart';
@@ -98,7 +99,10 @@ class ShoppingScreen extends StatelessWidget {
   /// Puts the list on the clipboard.
   void _copyList(BuildContext context) {
     Haptics.confirm();
-    Clipboard.setData(ClipboardData(text: context.read<ShoppingCubit>().asPlainText(AppL10n.of(context).aisleName)));
+    final l10n = AppL10n.of(context);
+    Clipboard.setData(ClipboardData(
+      text: context.read<ShoppingCubit>().asPlainText(l10n.aisleName, (q) => formatQuantities(q, l10n)),
+    ));
   }
 
   /// Opens the native share sheet, anchored to the share button.
@@ -109,6 +113,7 @@ class ShoppingScreen extends StatelessWidget {
     final shared = await context.read<ShoppingCubit>().share(
           subject: l10n.shoppingList,
           aisleName: l10n.aisleName,
+          quantities: (q) => formatQuantities(q, l10n),
           origin: box == null ? null : box.localToGlobal(Offset.zero) & box.size,
         );
     if (!shared && context.mounted) showErrorBanner(context, l10n.errorShoppingShare);
@@ -204,9 +209,9 @@ class _ItemRow extends StatelessWidget {
                       decorationColor: AppColors.textDisabled,
                     ),
                   ),
-                  if (item.needed.isNotEmpty) ...[
+                  if (item.quantities.isNotEmpty) ...[
                     SizedBox(height: 1.h),
-                    Text(l10n.shoppingNeeded(item.needed), style: AppTextStyles.metaMuted),
+                    Text(l10n.shoppingNeeded(formatQuantities(item.quantities, l10n)), style: AppTextStyles.metaMuted),
                   ],
                 ],
               ),
