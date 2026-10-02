@@ -96,7 +96,7 @@ void main() {
       expect(find.text('DIMANCHE'), findsOneWidget);
       expect(find.text('DÉJEUNER'), findsNWidgets(7));
       expect(find.text('DÎNER'), findsNWidgets(7));
-      // Seven recipes over fourteen meals: every dinner reheats that day's lunch.
+      // Seven recipes over fourteen meals: every pot feeds one leftover.
       expect(find.text('♻ Reste'), findsNWidgets(7));
       expect(find.textContaining('14 repas ·'), findsOneWidget);
 

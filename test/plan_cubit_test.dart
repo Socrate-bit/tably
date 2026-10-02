@@ -45,8 +45,8 @@ void main() {
 
     final after = plan.state.week;
     expect(after.slotByKey('monday|lunch')!.recipe, other);
-    expect(after.slotByKey('monday|dinner')!.recipe, other, reason: 'leftover follows the swap');
-    expect(after.slotByKey('tuesday|lunch'), before.slotByKey('tuesday|lunch'));
+    expect(after.slotByKey('tuesday|lunch')!.recipe, other, reason: 'leftover follows the swap');
+    expect(after.slotByKey('monday|dinner'), before.slotByKey('monday|dinner'));
     expect(lunch.recipe, isNot(other));
   });
 
@@ -71,8 +71,8 @@ void main() {
 
     expect(next, isNotNull);
     expect(inWeek, isNot(contains(next!.recipe.id)));
-    expect(plan.state.week.slotByKey('monday|dinner')!.recipe, next.recipe, reason: 'leftover follows the swap');
-    expect(plan.state.week.slotByKey('tuesday|lunch'), before.slotByKey('tuesday|lunch'));
+    expect(plan.state.week.slotByKey('tuesday|lunch')!.recipe, next.recipe, reason: 'leftover follows the swap');
+    expect(plan.state.week.slotByKey('monday|dinner'), before.slotByKey('monday|dinner'));
     expect(search.calls, isEmpty, reason: 'one meal comes from the cached pool, never the API');
   });
 
