@@ -1,6 +1,9 @@
+import 'dart:math';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:equatable/equatable.dart';
 
+import '../../../core/model/meal_slot.dart';
 import '../../../core/model/preference_option.dart';
 import '../../../core/model/store.dart';
 import '../../../core/model/user_type.dart';
@@ -48,6 +51,9 @@ class UserProfile extends Equatable {
   /// Meals planned per cooking day: dinner, then lunch.
   static const maxMealsPerDay = 2;
 
+  /// Longest a cooked dish is kept before it is eaten, in hours.
+  static const leftoverHours = 32;
+
   final String name;
   final int household;
   final int mealsPerDay;
@@ -85,12 +91,39 @@ class UserProfile extends Equatable {
   /// Meals planned in the week.
   int get mealCount => days.length * mealsPerDay;
 
-  /// Recipes to cook for [variety]: one per meal, per two meals, or per four.
-  int get recipesToCook => switch (variety) {
-        Variety.high => mealCount,
-        Variety.balanced => (mealCount + 1) ~/ 2,
-        Variety.low => (mealCount + 3) ~/ 4,
-      };
+  /// Every meal of the week in eating order.
+  List<(Weekday, MealSlot)> get meals => [
+        for (final day in orderedDays)
+          for (final slot in MealSlot.forMealsPerDay(mealsPerDay)) (day, slot),
+      ];
+
+  /// The week's meals, as indexes into [meals], grouped into the fewest
+  /// windows a single pot can feed: each holds every meal eaten within
+  /// [leftoverHours] of its first, so whatever is cooked inside stays fresh.
+  List<List<int>> get freshWindows {
+    int hourOf((Weekday, MealSlot) meal) => meal.$1.index * 24 + meal.$2.hour;
+    final meals = this.meals;
+    final windows = <List<int>>[];
+    for (final (i, meal) in meals.indexed) {
+      if (windows.isEmpty || hourOf(meal) - hourOf(meals[windows.last.first]) > leftoverHours) windows.add([]);
+      windows.last.add(i);
+    }
+    return windows;
+  }
+
+  /// Recipes to cook for [variety]: one per meal, per two meals, or per four —
+  /// but at least one per fresh window, so no leftover is kept too long.
+  int get recipesToCook => min(
+        mealCount,
+        max(
+          freshWindows.length,
+          switch (variety) {
+            Variety.high => mealCount,
+            Variety.balanced => (mealCount + 1) ~/ 2,
+            Variety.low => (mealCount + 3) ~/ 4,
+          },
+        ),
+      );
 
   /// Dishes each variety level would cook this week. Levels that land on the
   /// same count as a higher one are dropped, so every choice differs.

@@ -12,9 +12,9 @@ abstract final class WeekPlanner {
     required List<Recipe> catalogue,
     List<Recipe> favourites = const [],
   }) {
-    final days = profile.orderedDays;
+    final meals = profile.meals;
     final mealSlots = MealSlot.forMealsPerDay(profile.mealsPerDay);
-    if (days.isEmpty || catalogue.isEmpty) return const WeekPlan();
+    if (meals.isEmpty || catalogue.isEmpty) return const WeekPlan();
     final shuffled = _shuffle(catalogue, settings.seed);
     // Swaps may name a saved favourite that has left the catalogue; the
     // shuffle itself only ever draws from the catalogue.
@@ -22,40 +22,58 @@ abstract final class WeekPlanner {
         ? null
         : catalogue.where((r) => r.id == id).firstOrNull ?? favourites.where((r) => r.id == id).firstOrNull;
 
-    // Meals in eating order, split into [recipesToCook] consecutive runs as
-    // even as possible. Each run is one dish: cooked at its first meal, then
-    // served as leftovers for the rest. Past the catalogue's size a dish
-    // comes back, cooked fresh again.
-    final meals = [for (final day in days) for (final slot in mealSlots) (day, slot)];
-    final recipes = profile.recipesToCook;
-    int runOf(int meal) => meal * recipes ~/ meals.length;
-    final firstMealOfRun = <int, int>{};
+    // Every fresh window gets a pot; each extra one goes to the window with
+    // the most meals per pot, so pots stay as even as possible.
+    final windows = profile.freshWindows;
+    final potsIn = [for (final _ in windows) 1];
+    for (var extra = profile.recipesToCook - windows.length; extra > 0; extra--) {
+      var busiest = 0;
+      for (var w = 1; w < windows.length; w++) {
+        if (windows[w].length * potsIn[busiest] > windows[busiest].length * potsIn[w]) busiest = w;
+      }
+      potsIn[busiest]++;
+    }
+
+    // Within a window the pots take turns (A B A B), so a dish only comes
+    // back to back when its window has a single pot. Each pot is cooked at
+    // its first meal and served as leftovers for the rest, all within the
+    // window, so never past [UserProfile.leftoverHours]. Past the
+    // catalogue's size a dish comes back, cooked fresh again.
+    final potOf = List.filled(meals.length, 0);
+    var firstPot = 0;
+    for (final (w, window) in windows.indexed) {
+      for (final (j, meal) in window.indexed) {
+        potOf[meal] = firstPot + j % potsIn[w];
+      }
+      firstPot += potsIn[w];
+    }
+    final cookOf = <int, int>{};
     for (var i = 0; i < meals.length; i++) {
-      firstMealOfRun.putIfAbsent(runOf(i), () => i);
+      cookOf.putIfAbsent(potOf[i], () => i);
     }
 
     // A swapped meal is cooked fresh, never a leftover. Every other meal past
-    // its run's first is served from that first meal's pot.
+    // its pot's first is served from that first meal's pot.
     bool isLeftover(int i) =>
-        byId(settings.overrides[PlanSlot.keyFor(meals[i].$1, meals[i].$2)]) == null && firstMealOfRun[runOf(i)] != i;
+        byId(settings.overrides[PlanSlot.keyFor(meals[i].$1, meals[i].$2)]) == null && cookOf[potOf[i]] != i;
     final leftoversOf = <int, int>{};
     for (var i = 0; i < meals.length; i++) {
-      if (isLeftover(i)) leftoversOf.update(firstMealOfRun[runOf(i)]!, (n) => n + 1, ifAbsent: () => 1);
+      if (isLeftover(i)) leftoversOf.update(cookOf[potOf[i]]!, (n) => n + 1, ifAbsent: () => 1);
     }
 
     return WeekPlan(slots: [
       for (final (i, (day, slot)) in meals.indexed)
         () {
-          final run = runOf(i);
-          final (cookedDay, cookedSlot) = meals[firstMealOfRun[run]!];
+          final pot = potOf[i];
+          final (cookedDay, cookedSlot) = meals[cookOf[pot]!];
           final override = byId(settings.overrides[PlanSlot.keyFor(day, slot)]);
           final leftover = isLeftover(i);
-          // A leftover is whatever was cooked for its run, including a swap.
+          // A leftover is whatever was cooked for its pot, including a swap.
           final cookedOverride = leftover ? byId(settings.overrides[PlanSlot.keyFor(cookedDay, cookedSlot)]) : null;
           return PlanSlot(
             day: day,
             slot: slot,
-            recipe: override ?? cookedOverride ?? shuffled[run % shuffled.length],
+            recipe: override ?? cookedOverride ?? shuffled[pot % shuffled.length],
             isLeftover: leftover,
             // The cook buys for the whole household, for itself and its leftovers.
             portions: leftover ? 0 : profile.household * (1 + (leftoversOf[i] ?? 0)),

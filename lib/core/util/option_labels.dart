@@ -1,8 +1,8 @@
-import '../../features/plan/model/week_plan.dart';
 import '../../features/recipe/cubit/catalogue_cubit.dart';
 import '../../features/recipe/model/recipe.dart';
 import '../../l10n/app_localizations.dart';
 import '../model/aisle.dart';
+import '../model/meal_slot.dart';
 import '../model/preference_option.dart';
 import '../model/weekday.dart';
 

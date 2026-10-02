@@ -65,9 +65,58 @@ void main() {
     }
   });
 
-  test('one meal a day offers 7, 4 and 2 recipes', () {
-    int recipes(Variety v) => _profile(1, [0, 1, 2, 3, 4, 5, 6], variety: v).recipesToCook;
-    expect([recipes(Variety.high), recipes(Variety.balanced), recipes(Variety.low)], [7, 4, 2]);
+  test('one meal a day offers 7 and 4 recipes', () {
+    // A dinner keeps until the next day's dinner only, so batch cooking can't
+    // stretch a pot further than balanced does.
+    final profile = _profile(1, [0, 1, 2, 3, 4, 5, 6]);
+    int recipes(Variety v) => profile.copyWith(variety: v).recipesToCook;
+    expect([recipes(Variety.high), recipes(Variety.balanced), recipes(Variety.low)], [7, 4, 4]);
+    expect(profile.varietyRecipes, {Variety.high: 7, Variety.balanced: 4});
+  });
+
+  test('leftovers stay fresh and alternate for every week shape', () {
+    int hourOf(PlanSlot s) => s.day.index * 24 + s.slot.hour;
+    for (var mask = 1; mask < 128; mask++) {
+      for (final mealsPerDay in [1, 2]) {
+        for (final variety in Variety.values) {
+          final profile = _profile(mealsPerDay, [for (var d = 0; d < 7; d++) if (mask & 1 << d != 0) d], variety: variety);
+          final plan = WeekPlanner.build(profile: profile, settings: const PlanSettings(), catalogue: RecipeFixtures.recipes);
+          final where = 'mask $mask, perDay $mealsPerDay, $variety';
+
+          expect(plan.slots.where((s) => !s.isLeftover).length, profile.recipesToCook, reason: where);
+          for (final (i, s) in plan.slots.indexed) {
+            if (!s.isLeftover) continue;
+            final cooked = plan.slots.take(i).lastWhere((c) => !c.isLeftover && c.recipe.id == s.recipe.id);
+            expect(hourOf(s) - hourOf(cooked), lessThanOrEqualTo(UserProfile.leftoverHours), reason: '$where, ${s.key}');
+          }
+          // A dish only comes back to back inside a window with a single pot.
+          final windows = profile.freshWindows;
+          for (final window in windows) {
+            final slots = [for (final i in window) plan.slots[i]];
+            if (slots.where((s) => !s.isLeftover).length < 2) continue;
+            for (var j = 1; j < slots.length; j++) {
+              expect(slots[j].recipe.id, isNot(slots[j - 1].recipe.id), reason: '$where, ${slots[j].key}');
+            }
+          }
+        }
+      }
+    }
+  });
+
+  test('two meals a day on balanced alternates dishes across each pair of days', () {
+    final plan = WeekPlanner.build(
+      profile: _profile(2, [0, 1, 2, 3, 4, 5, 6], variety: Variety.balanced),
+      settings: const PlanSettings(),
+      catalogue: RecipeFixtures.recipes,
+    );
+    final ids = plan.slots.map((s) => s.recipe.id).toList();
+    // Monday and Tuesday: A B A B.
+    expect([ids[2], ids[3]], [ids[0], ids[1]]);
+    expect(ids[0], isNot(ids[1]));
+    expect([for (final s in plan.slots.take(4)) s.isLeftover], [false, false, true, true]);
+    // Sunday stands alone, so its dinner is the only back-to-back repeat.
+    final repeats = [for (var i = 1; i < ids.length; i++) if (ids[i] == ids[i - 1]) plan.slots[i].key];
+    expect(repeats, ['sunday|dinner']);
   });
 
   test('a swapped meal carries through to its leftover', () {
@@ -83,9 +132,9 @@ void main() {
     );
 
     expect(swapped.slotByKey('monday|lunch')!.recipe, other);
-    final mondayDinner = swapped.slotByKey('monday|dinner')!;
-    expect(mondayDinner.isLeftover, isTrue);
-    expect(mondayDinner.recipe, other, reason: 'the leftover must be what was cooked');
+    final tuesdayLunch = swapped.slotByKey('tuesday|lunch')!;
+    expect(tuesdayLunch.isLeftover, isTrue);
+    expect(tuesdayLunch.recipe, other, reason: 'the leftover must be what was cooked');
     expect(swapped.slotByKey('monday|lunch')!.portions, 2, reason: 'the swap is cooked for its leftover too');
   });
 
@@ -100,7 +149,7 @@ void main() {
     expect(plan.slots.fold<int>(0, (t, s) => t + s.portions), 14 * 3, reason: 'every meal eaten is cooked once');
     for (final (i, s) in plan.slots.indexed) {
       if (s.isLeftover) continue;
-      final leftovers = plan.slots.skip(i + 1).takeWhile((n) => n.isLeftover).length;
+      final leftovers = plan.slots.skip(i + 1).where((n) => n.isLeftover && n.recipe.id == s.recipe.id).length;
       expect(s.portions, 3 * (1 + leftovers), reason: s.key);
     }
     expect(plan.baseTotal, closeTo(plan.slots.fold<double>(0, (t, s) => t + s.recipe.price * 3), 1e-9));
