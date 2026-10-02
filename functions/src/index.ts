@@ -87,8 +87,9 @@ export const redeemReferralCode = onCall({region: REGION}, async (request) => {
 
 const SPOONACULAR_HOST = "spoonacular-recipe-food-nutrition-v1.p.rapidapi.com";
 
-/** Candidates fetched per build; Gemini then drops any that break a constraint. */
+/** Candidates fetched when the caller doesn't say; Spoonacular's cap is 100. */
 const SEARCH_SIZE = 24;
+const MAX_SEARCH_SIZE = 100;
 
 /** Spoonacular prices are US cents; everyone is on EUR for now. Approximate. */
 const USD_TO_EUR = 0.86;
@@ -120,6 +121,25 @@ const PROTEIN_EXCLUDES: Record<string, string[]> = {
   fish: ["fish", "salmon", "tuna", "cod"],
 };
 
+/** App cuisine ids → Spoonacular cuisines (comma means OR). */
+const CUISINES: Record<string, string> = {
+  italian: "Italian",
+  asian: "Asian,Chinese,Japanese,Korean,Thai,Vietnamese",
+  mexican: "Mexican,Latin American",
+  indian: "Indian",
+  mediterranean: "Mediterranean,Greek,Spanish,Middle Eastern",
+};
+
+/**
+ * The cravings Spoonacular can filter on. The others ("family favourites",
+ * "indulgent"…) are left to Gemini's classification.
+ */
+const CRAVINGS: Record<string, Record<string, string>> = {
+  quick: {maxReadyTime: "25"},
+  high_protein: {minProtein: "30"},
+  low_calorie: {maxCalories: "450"},
+};
+
 /** Profile cook-time ids → Spoonacular maxReadyTime in minutes. */
 const MAX_READY_TIME: Record<string, number> = {
   "15_30": 30,
@@ -134,17 +154,30 @@ const stringList = (value: unknown): string[] =>
 const round = (value: number, decimals = 2): number =>
   Math.round(value * 10 ** decimals) / 10 ** decimals;
 
+/** A non-empty string, or null. */
+const text = (value: unknown): string | null =>
+  typeof value === "string" && value.trim().length > 0 ? value.trim() : null;
+
 /**
- * Builds the complexSearch query from the profile's constraint ids.
- * Meat exclusions only apply when no diet already rules meat out.
+ * Builds the complexSearch query: the profile's hard constraints (diets,
+ * allergies, proteins, cook time), then the optional search filters (text,
+ * cuisines, one craving, one protein). Meat exclusions only apply when no
+ * diet already rules meat out.
  */
 function searchParams(data: Record<string, unknown>): URLSearchParams {
   const diets = stringList(data.diets);
   const allergies = stringList(data.allergies);
   const proteins = stringList(data.proteins);
-  const cookTime = typeof data.cookTime === "string" ? data.cookTime : null;
+  const cookTime = text(data.cookTime);
+  const requested = Math.round(Number(data.number));
+  const number = Number.isFinite(requested) ?
+    Math.min(Math.max(requested, 1), MAX_SEARCH_SIZE) :
+    SEARCH_SIZE;
 
   const diet = diets.map((d) => DIETS[d]).filter(Boolean);
+  // A protein picked in the search filters narrows further.
+  const protein = text(data.protein);
+  if (protein === "vegetarian" && !diet.includes("vegan")) diet.push("vegetarian");
   const intolerances = allergies.flatMap((a) => INTOLERANCES[a] ?? []);
   const excludes = diets.includes("halal") ? [...HALAL_EXCLUDES] : [];
   if (diet.length === 0) {
@@ -160,13 +193,26 @@ function searchParams(data: Record<string, unknown>): URLSearchParams {
     addRecipeNutrition: "true",
     fillIngredients: "true",
     sort: "random",
-    number: String(SEARCH_SIZE),
+    number: String(number),
   });
-  if (diet.length > 0) params.set("diet", diet.join(","));
+  if (diet.length > 0) params.set("diet", [...new Set(diet)].join(","));
   if (intolerances.length > 0) params.set("intolerances", intolerances.join(","));
   if (excludes.length > 0) params.set("excludeIngredients", [...new Set(excludes)].join(","));
   const maxReadyTime = cookTime ? MAX_READY_TIME[cookTime] : undefined;
   if (maxReadyTime) params.set("maxReadyTime", String(maxReadyTime));
+
+  // Search filters, all optional.
+  const query = text(data.query);
+  if (query) params.set("query", query.slice(0, 100));
+  const cuisines = stringList(data.cuisines).map((c) => CUISINES[c]).filter(Boolean);
+  if (cuisines.length > 0) params.set("cuisine", cuisines.join(","));
+  const craving = text(data.craving);
+  for (const [key, value] of Object.entries(craving ? CRAVINGS[craving] ?? {} : {})) {
+    // A craving's time limit never loosens the profile's own.
+    const current = params.get(key);
+    params.set(key, current ? String(Math.min(Number(current), Number(value))) : value);
+  }
+  if (protein && protein !== "vegetarian") params.set("includeIngredients", protein);
   return params;
 }
 
@@ -217,10 +263,11 @@ function trimRecipe(r: any): Record<string, unknown> | null {
 
 /**
  * Searches Spoonacular for main courses matching the caller's constraints.
- * 1. Maps diets, allergies, proteins and cook time to query parameters
- * 2. Calls complexSearch with the secret RapidAPI key (1 request of the quota)
+ * 1. Maps the constraints and search filters to query parameters
+ * 2. Calls complexSearch with the secret RapidAPI key (1 request of the quota,
+ *    for up to 100 recipes)
  * 3. Trims each result to the fields the app and Gemini use
- * Live and uncached for now: every call spends quota.
+ * Live and uncached: every call spends quota.
  */
 export const searchRecipes = onCall(
   {region: REGION, secrets: [spoonacularKey], timeoutSeconds: 60},

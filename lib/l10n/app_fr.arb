@@ -551,5 +551,7 @@
   "catalogueBuilding": "On prépare tes recettes…",
   "errorCatalogue": "Impossible de charger tes recettes.",
   "errorCatalogueQuota": "La limite de recherche de recettes est atteinte pour aujourd'hui.",
-  "errorCatalogueEmpty": "Aucune recette ne correspond à tes préférences."
+  "errorCatalogueEmpty": "Aucune recette ne correspond à tes préférences.",
+  "searchReload": "Relancer la recherche",
+  "searchLoading": "Recherche de recettes…"
 }

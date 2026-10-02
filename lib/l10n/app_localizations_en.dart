@@ -1099,4 +1099,10 @@ class AppL10nEn extends AppL10n {
 
   @override
   String get errorCatalogueEmpty => 'No recipes match your preferences.';
+
+  @override
+  String get searchReload => 'Search again';
+
+  @override
+  String get searchLoading => 'Searching for recipes…';
 }

@@ -18,6 +18,7 @@ import '../../plan/model/week_plan.dart';
 import '../../preferences/cubit/profile_cubit.dart';
 import '../cubit/catalogue_cubit.dart';
 import '../cubit/recipe_cubit.dart';
+import '../cubit/recipe_search_cubit.dart';
 import '../model/recipe.dart';
 import '../widget/macro_card.dart';
 import '../widget/recipe_tabs.dart';
@@ -98,9 +99,11 @@ class _RecipeScreenState extends State<RecipeScreen> {
       body: SafeArea(
         child: BlocBuilder<RecipeCubit, RecipeState>(
           builder: (context, state) {
-            // A favourite stays openable after it leaves the catalogue.
-            final recipe =
-                context.watch<CatalogueCubit>().state.byId(widget.recipeId) ?? state.savedRecipe(widget.recipeId);
+            // A favourite stays openable after it leaves the catalogue, and a
+            // search result before it joins it.
+            final recipe = context.watch<CatalogueCubit>().state.byId(widget.recipeId) ??
+                state.savedRecipe(widget.recipeId) ??
+                context.watch<RecipeSearchCubit>().state.byId(widget.recipeId);
             if (recipe == null) {
               return Center(
                 child: CircleIconButton(

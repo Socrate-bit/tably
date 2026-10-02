@@ -420,5 +420,7 @@
   "catalogueBuilding": "Preparing your recipes…",
   "errorCatalogue": "Couldn't load your recipes.",
   "errorCatalogueQuota": "Today's recipe search limit has been reached.",
-  "errorCatalogueEmpty": "No recipes match your preferences."
+  "errorCatalogueEmpty": "No recipes match your preferences.",
+  "searchReload": "Search again",
+  "searchLoading": "Searching for recipes…"
 }

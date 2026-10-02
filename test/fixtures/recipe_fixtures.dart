@@ -2,22 +2,58 @@ import 'package:tably/core/analytics/analytics_service.dart';
 import 'package:tably/core/model/aisle.dart';
 import 'package:tably/core/model/preference_option.dart';
 import 'package:tably/features/preferences/cubit/profile_cubit.dart';
+import 'package:tably/features/preferences/model/user_profile.dart';
 import 'package:tably/features/recipe/cubit/catalogue_cubit.dart';
 import 'package:tably/features/recipe/model/recipe.dart';
 import 'package:tably/features/recipe/service/recipe_ai_service.dart';
 import 'package:tably/features/recipe/service/recipe_search_service.dart';
 import 'package:tably/features/recipe/service/recipe_service.dart';
 
-/// A catalogue cubit holding the fixtures. Never bound to a user, so it makes
-/// no Firebase, Spoonacular or Gemini call.
-CatalogueCubit seededCatalogue(ProfileCubit profileCubit) => CatalogueCubit(
+/// A catalogue cubit holding the fixtures. Never bound to a user, and its
+/// search and Gemini steps are fakes, so it makes no network call.
+CatalogueCubit seededCatalogue(ProfileCubit profileCubit, {FakeSearch? search, FakeAi? ai}) => CatalogueCubit(
       service: RecipeService(),
-      search: RecipeSearchService(),
-      ai: RecipeAiService(),
+      search: search ?? FakeSearch(),
+      ai: ai ?? FakeAi(),
       profileCubit: profileCubit,
       analytics: const AnalyticsService(),
       recipes: RecipeFixtures.recipes,
     );
+
+/// Records every Spoonacular search instead of making it.
+class FakeSearch extends RecipeSearchService {
+  final calls = <({int number, String? query, Set<Cuisine> cuisines, Craving? craving, RecipeProtein? protein})>[];
+
+  @override
+  Future<List<Map<String, dynamic>>> search(
+    UserProfile profile, {
+    required int number,
+    String? query,
+    Set<Cuisine> cuisines = const {},
+    Craving? craving,
+    RecipeProtein? protein,
+  }) async {
+    calls.add((number: number, query: query, cuisines: cuisines, craving: craving, protein: protein));
+    return [for (var i = 0; i < number; i++) {'id': i}];
+  }
+}
+
+/// Stands in for Gemini: "translates" by tagging the text, and keeps
+/// [recipes] (the fixtures by default) whatever the candidates.
+class FakeAi extends RecipeAiService {
+  FakeAi({List<Recipe>? recipes}) : recipes = recipes ?? RecipeFixtures.recipes;
+
+  final List<Recipe> recipes;
+
+  @override
+  Future<String> toEnglish(String text, String languageCode) async => 'en:$text';
+
+  @override
+  Future<({List<Recipe> recipes, int rejected})> adapt(List<Map<String, dynamic>> raw, UserProfile profile) async {
+    if (recipes.isEmpty) throw const NoMatchingRecipesException(0);
+    return (recipes: recipes, rejected: 0);
+  }
+}
 
 /// The design's original 11 recipes, kept as test data: the planner fixtures
 /// in design_plans.json were recorded against exactly this list and order.
