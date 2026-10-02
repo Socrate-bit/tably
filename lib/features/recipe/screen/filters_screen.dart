@@ -16,7 +16,8 @@ import '../../../core/widget/app_slider.dart';
 import '../cubit/recipe_browse_cubit.dart';
 import '../model/recipe.dart';
 
-/// "Filtres": cravings, cuisine, protein and price per portion.
+/// "Filtres": cravings, cuisine, protein, diets, allergies, appliances and
+/// price per portion.
 class FiltersScreen extends StatelessWidget {
   const FiltersScreen({super.key});
 
@@ -104,6 +105,53 @@ class FiltersScreen extends StatelessWidget {
                     onTap: () => cubit.toggleProtein(protein),
                   ),
               ]),
+              // Diets, allergies and appliances: the profile's by default,
+              // and changing them here only affects the search.
+              for (final (title, chips) in [
+                (
+                  l10n.prefsDiet,
+                  [
+                    for (final diet in Diet.values)
+                      _FilterChip(
+                        icon: diet.icon,
+                        label: l10n.optionLabel(diet.id),
+                        selected: state.constraints.diets.contains(diet),
+                        onTap: () => cubit.toggleDiet(diet),
+                      ),
+                  ],
+                ),
+                (
+                  l10n.prefsAllergens,
+                  [
+                    for (final allergy in Allergy.values)
+                      _FilterChip(
+                        icon: allergy.icon,
+                        label: l10n.optionLabel(allergy.id),
+                        selected: state.constraints.allergies.contains(allergy),
+                        onTap: () => cubit.toggleAllergy(allergy),
+                      ),
+                  ],
+                ),
+                (
+                  l10n.prefsAppliances,
+                  [
+                    for (final appliance in Appliance.values)
+                      _FilterChip(
+                        icon: appliance.icon,
+                        label: l10n.optionLabel(appliance.id),
+                        selected: state.constraints.appliances.contains(appliance),
+                        onTap: () => cubit.toggleAppliance(appliance),
+                      ),
+                  ],
+                ),
+              ]) ...[
+                SizedBox(height: 28.h),
+                Text(title, style: AppTextStyles.filterSection),
+                SizedBox(height: 2.h),
+                Text(l10n.filtersFromPreferences, style: AppTextStyles.caption.copyWith(fontSize: 14.5.sp)),
+                SizedBox(height: 12.h),
+                grid(chips),
+              ],
               SizedBox(height: 28.h),
               Text(l10n.filtersPrice, style: AppTextStyles.filterSection),
               SizedBox(height: 8.h),

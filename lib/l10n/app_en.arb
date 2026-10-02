@@ -422,5 +422,6 @@
   "errorCatalogueQuota": "Today's recipe search limit has been reached.",
   "errorCatalogueEmpty": "No recipes match your preferences.",
   "searchReload": "Search again",
-  "searchLoading": "Searching for recipes…"
+  "searchLoading": "Searching for recipes…",
+  "filtersFromPreferences": "Your preferences by default, adjustable for this search"
 }

@@ -2076,6 +2076,12 @@ abstract class AppL10n {
   /// In fr, this message translates to:
   /// **'Recherche de recettes…'**
   String get searchLoading;
+
+  /// No description provided for @filtersFromPreferences.
+  ///
+  /// In fr, this message translates to:
+  /// **'Tes préférences par défaut, modifiables pour cette recherche'**
+  String get filtersFromPreferences;
 }
 
 class _AppL10nDelegate extends LocalizationsDelegate<AppL10n> {

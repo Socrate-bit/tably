@@ -20,7 +20,7 @@ class SearchField extends StatefulWidget {
   final String initialValue;
   final ValueChanged<String> onChanged;
 
-  /// The keyboard's search key.
+  /// The keyboard's search key, or leaving the field (tapping elsewhere).
   final ValueChanged<String>? onSubmitted;
   final bool compact;
 
@@ -30,11 +30,32 @@ class SearchField extends StatefulWidget {
 
 class _SearchFieldState extends State<SearchField> {
   late final TextEditingController _controller = TextEditingController(text: widget.initialValue);
+  late final FocusNode _focus = FocusNode()..addListener(_onFocusChange);
+
+  /// Leaving the screen also drops focus; that must not submit from a widget
+  /// that is being torn down.
+  @override
+  void deactivate() {
+    _focus.removeListener(_onFocusChange);
+    super.deactivate();
+  }
+
+  @override
+  void activate() {
+    super.activate();
+    _focus.addListener(_onFocusChange);
+  }
 
   @override
   void dispose() {
+    _focus.dispose();
     _controller.dispose();
     super.dispose();
+  }
+
+  /// Leaving the field submits what was typed.
+  void _onFocusChange() {
+    if (!_focus.hasFocus) widget.onSubmitted?.call(_controller.text);
   }
 
   void _clear() {
@@ -55,6 +76,7 @@ class _SearchFieldState extends State<SearchField> {
 
     return TextField(
       controller: _controller,
+      focusNode: _focus,
       onChanged: (value) {
         widget.onChanged(value);
         setState(() {});

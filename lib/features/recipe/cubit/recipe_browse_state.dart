@@ -7,6 +7,8 @@ class RecipeBrowseState extends Equatable {
     this.cuisines = const {},
     this.proteins = const {},
     this.maxPrice = RecipeBrowseCubit.priceCeiling,
+    this.constraints = const DietaryConstraints(),
+    this.defaults = const DietaryConstraints(),
   });
 
   /// Text in the search box.
@@ -18,12 +20,25 @@ class RecipeBrowseState extends Equatable {
   /// Highest price per portion to show; the ceiling means "no limit".
   final double maxPrice;
 
+  /// Diets, allergies and appliances the search respects.
+  final DietaryConstraints constraints;
+
+  /// The profile's own constraints, which [constraints] start from and
+  /// "Réinitialiser" restores. Only a difference counts as a filter.
+  final DietaryConstraints defaults;
+
   bool get isSearching => query.trim().isNotEmpty;
 
   bool get hasPriceLimit => maxPrice < RecipeBrowseCubit.priceCeiling;
 
-  /// The badge count on the filter button: one per chip, plus one for price.
-  int get filterCount => cravings.length + cuisines.length + proteins.length + (hasPriceLimit ? 1 : 0);
+  /// The badge count on the filter button: one per chip, plus one for price,
+  /// plus one per diet, allergy or appliance changed from the profile.
+  int get filterCount =>
+      cravings.length +
+      cuisines.length +
+      proteins.length +
+      (hasPriceLimit ? 1 : 0) +
+      constraints.differencesFrom(defaults);
 
   bool get hasFilters => filterCount > 0;
 
@@ -56,6 +71,8 @@ class RecipeBrowseState extends Equatable {
     Set<Cuisine>? cuisines,
     Set<RecipeProtein>? proteins,
     double? maxPrice,
+    DietaryConstraints? constraints,
+    DietaryConstraints? defaults,
   }) =>
       RecipeBrowseState(
         query: query ?? this.query,
@@ -63,8 +80,10 @@ class RecipeBrowseState extends Equatable {
         cuisines: cuisines ?? this.cuisines,
         proteins: proteins ?? this.proteins,
         maxPrice: maxPrice ?? this.maxPrice,
+        constraints: constraints ?? this.constraints,
+        defaults: defaults ?? this.defaults,
       );
 
   @override
-  List<Object?> get props => [query, cravings, cuisines, proteins, maxPrice];
+  List<Object?> get props => [query, cravings, cuisines, proteins, maxPrice, constraints, defaults];
 }
