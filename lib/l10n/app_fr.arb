@@ -192,6 +192,10 @@
     }
   },
   "regeneratePlan": "régénérer le plan",
+  "planOutdatedTitle": "Tes préférences ont changé",
+  "planOutdatedBody": "Tes repas ont été choisis avec tes anciennes préférences. On t’en propose de nouveaux ?",
+  "planOutdatedRegenerate": "Régénérer les repas",
+  "planOutdatedKeep": "Garder ceux-ci",
   "exploreSearchPlaceholder": "Rechercher des repas",
   "exploreRecent": "Consultés récemment",
   "addRecipeTitle": "Ajouter une recette",
@@ -230,6 +234,7 @@
   "shoppingEyebrow": "CETTE SEMAINE",
   "shoppingCopyList": "Copier la liste",
   "shoppingShare": "Partager",
+  "shoppingUpdating": "Mise à jour de la liste…",
   "shoppingShareHeader": "Coucou ! 👋\n\nVoici notre liste de courses pour la semaine, de quoi préparer plein de bons petits plats 🍽️ Bonnes courses ! 🛒\n\nPréparée avec Tably 💚",
   "shoppingNeeded": "({amount} nécessaire)",
   "@shoppingNeeded": {

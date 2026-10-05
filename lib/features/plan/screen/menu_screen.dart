@@ -8,6 +8,7 @@ import '../../../core/util/option_labels.dart';
 import '../../../core/widget/app_logo.dart';
 import '../../../core/widget/primary_button.dart';
 import '../../../core/widget/store_pill.dart';
+import '../../../core/widget/surface_card.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../home/cubit/home_cubit.dart';
 import '../../preferences/cubit/profile_cubit.dart';
@@ -37,6 +38,8 @@ class MenuScreen extends StatelessWidget {
     final total = week.totalAt(profile.store);
     // Every slot in display order, so each card knows its place in the week.
     final order = [for (final (_, slots) in week.byDay) ...slots];
+    // Hidden while the new week is being fetched.
+    final outdated = catalogue.outdated && !plan.regenerating && !catalogue.isBuilding;
     void openStores() => context.read<HomeCubit>().open(HomeSub.stores);
 
     return MultiBlocListener(
@@ -105,31 +108,41 @@ class MenuScreen extends StatelessWidget {
             ),
             SizedBox(height: 16.h),
             if (catalogue.recipes.isEmpty) _CatalogueStatus(state: catalogue),
-            // Keyed by the week so a regenerated plan slides in afresh.
-            AnimatedOpacity(
-              opacity: plan.regenerating ? 0.5 : 1,
-              duration: const Duration(milliseconds: 200),
-              child: Column(
-                key: ValueKey(plan.settings.seed),
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  for (final (day, slots) in week.byDay)
-                    DayGroup(
-                      label: l10n.dayName(day).toUpperCase(),
+            // Keyed by the week so a regenerated plan slides in afresh. When the
+            // preferences changed, the week dims under the regenerate prompt.
+            Stack(
+              clipBehavior: Clip.none,
+              children: [
+                AnimatedOpacity(
+                  opacity: plan.regenerating ? 0.5 : (outdated ? 0.3 : 1),
+                  duration: const Duration(milliseconds: 200),
+                  child: IgnorePointer(
+                    ignoring: outdated,
+                    child: Column(
+                      key: ValueKey(plan.settings.seed),
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        for (final slot in slots)
-                          MealSlotCard(
-                            slot: slot,
-                            servings: profile.household,
-                            store: profile.store,
-                            country: profile.country,
-                            index: order.indexOf(slot),
-                            onTap: () => RecipeScreen.open(context, recipeId: slot.recipe.id, slot: slot),
+                        for (final (day, slots) in week.byDay)
+                          DayGroup(
+                            label: l10n.dayName(day).toUpperCase(),
+                            children: [
+                              for (final slot in slots)
+                                MealSlotCard(
+                                  slot: slot,
+                                  servings: profile.household,
+                                  store: profile.store,
+                                  country: profile.country,
+                                  index: order.indexOf(slot),
+                                  onTap: () => RecipeScreen.open(context, recipeId: slot.recipe.id, slot: slot),
+                                ),
+                            ],
                           ),
                       ],
                     ),
-                ],
-              ),
+                  ),
+                ),
+                if (outdated) const Positioned(top: 0, left: 0, right: 0, child: _OutdatedPrompt()),
+              ],
             ),
             Padding(
               padding: EdgeInsets.only(top: 34.h, bottom: 18.h),
@@ -178,6 +191,33 @@ class _CatalogueStatus extends StatelessWidget {
             SizedBox(height: 18.h),
             PrimaryButton(label: l10n.actionRetry, onPressed: context.read<CatalogueCubit>().retry),
           ],
+        ],
+      ),
+    );
+  }
+}
+
+/// Laid over the week when the preferences changed in a way the recipes
+/// depend on: fetch a new week, or keep this one.
+class _OutdatedPrompt extends StatelessWidget {
+  const _OutdatedPrompt();
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppL10n.of(context);
+    return SurfaceCard(
+      shadow: true,
+      padding: EdgeInsets.all(20.r),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Text(l10n.planOutdatedTitle, style: AppTextStyles.sheetTitle),
+          SizedBox(height: 8.h),
+          Text(l10n.planOutdatedBody, style: AppTextStyles.body),
+          SizedBox(height: 18.h),
+          PrimaryButton(label: l10n.planOutdatedRegenerate, onPressed: context.read<PlanCubit>().regenerate),
+          SizedBox(height: 10.h),
+          SecondaryButton(label: l10n.planOutdatedKeep, onPressed: context.read<CatalogueCubit>().keep),
         ],
       ),
     );

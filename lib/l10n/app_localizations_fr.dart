@@ -463,6 +463,19 @@ class AppL10nFr extends AppL10n {
   String get regeneratePlan => 'régénérer le plan';
 
   @override
+  String get planOutdatedTitle => 'Tes préférences ont changé';
+
+  @override
+  String get planOutdatedBody =>
+      'Tes repas ont été choisis avec tes anciennes préférences. On t’en propose de nouveaux ?';
+
+  @override
+  String get planOutdatedRegenerate => 'Régénérer les repas';
+
+  @override
+  String get planOutdatedKeep => 'Garder ceux-ci';
+
+  @override
   String get exploreSearchPlaceholder => 'Rechercher des repas';
 
   @override
@@ -548,6 +561,9 @@ class AppL10nFr extends AppL10n {
 
   @override
   String get shoppingShare => 'Partager';
+
+  @override
+  String get shoppingUpdating => 'Mise à jour de la liste…';
 
   @override
   String get shoppingShareHeader =>

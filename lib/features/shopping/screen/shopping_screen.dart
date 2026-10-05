@@ -81,11 +81,16 @@ class ShoppingScreen extends StatelessWidget {
                       ],
                     ),
                     SizedBox(height: 24.h),
-                    for (final category in state.categories)
-                      Padding(
-                        padding: EdgeInsets.only(bottom: 24.h),
-                        child: _CategorySection(category: category),
-                      ),
+                    // The old items belong to the previous week, so they
+                    // give way to a spinner until the new list lands.
+                    if (state.updating)
+                      const _Updating()
+                    else
+                      for (final category in state.categories)
+                        Padding(
+                          padding: EdgeInsets.only(bottom: 24.h),
+                          child: _CategorySection(category: category),
+                        ),
                   ],
                 ),
               );
@@ -118,6 +123,29 @@ class ShoppingScreen extends StatelessWidget {
           origin: box == null ? null : box.localToGlobal(Offset.zero) & box.size,
         );
     if (!shared && context.mounted) showErrorBanner(context, l10n.errorShoppingShare);
+  }
+}
+
+/// Stands in for the list while it is rebuilt.
+class _Updating extends StatelessWidget {
+  const _Updating();
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: 40.h),
+      child: Column(
+        children: [
+          SizedBox(
+            width: 28.r,
+            height: 28.r,
+            child: const CircularProgressIndicator(strokeWidth: 2.5, color: AppColors.brand),
+          ),
+          SizedBox(height: 16.h),
+          Text(AppL10n.of(context).shoppingUpdating, textAlign: TextAlign.center, style: AppTextStyles.bodyMuted),
+        ],
+      ),
+    );
   }
 }
 

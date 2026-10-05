@@ -919,6 +919,30 @@ abstract class AppL10n {
   /// **'régénérer le plan'**
   String get regeneratePlan;
 
+  /// No description provided for @planOutdatedTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Tes préférences ont changé'**
+  String get planOutdatedTitle;
+
+  /// No description provided for @planOutdatedBody.
+  ///
+  /// In fr, this message translates to:
+  /// **'Tes repas ont été choisis avec tes anciennes préférences. On t’en propose de nouveaux ?'**
+  String get planOutdatedBody;
+
+  /// No description provided for @planOutdatedRegenerate.
+  ///
+  /// In fr, this message translates to:
+  /// **'Régénérer les repas'**
+  String get planOutdatedRegenerate;
+
+  /// No description provided for @planOutdatedKeep.
+  ///
+  /// In fr, this message translates to:
+  /// **'Garder ceux-ci'**
+  String get planOutdatedKeep;
+
   /// No description provided for @exploreSearchPlaceholder.
   ///
   /// In fr, this message translates to:
@@ -1086,6 +1110,12 @@ abstract class AppL10n {
   /// In fr, this message translates to:
   /// **'Partager'**
   String get shoppingShare;
+
+  /// No description provided for @shoppingUpdating.
+  ///
+  /// In fr, this message translates to:
+  /// **'Mise à jour de la liste…'**
+  String get shoppingUpdating;
 
   /// No description provided for @shoppingShareHeader.
   ///

@@ -17,9 +17,10 @@ import '../service/recipe_service.dart';
 
 part 'catalogue_state.dart';
 
-/// Owns the user's recipe catalogue. Streams it from Firestore and rebuilds
-/// it (Spoonacular search, then Gemini check and translation) whenever the
-/// preferences it was built for change.
+/// Owns the user's recipe catalogue. Streams it from Firestore and builds the
+/// first one (Spoonacular search, then Gemini check and translation) once
+/// onboarding is done. Later preference changes only mark it [outdated]:
+/// the user then regenerates the week or keeps it.
 class CatalogueCubit extends Cubit<CatalogueState> {
   /// [recipes] seeds the catalogue, for tests that never bind a user.
   CatalogueCubit({
@@ -38,12 +39,8 @@ class CatalogueCubit extends Cubit<CatalogueState> {
           recipes: recipes,
           status: recipes.isEmpty ? CatalogueStatus.loading : CatalogueStatus.ready,
         )) {
-    _profileSubscription = profileCubit.stream.map((s) => s.profile).distinct().listen(_scheduleRebuild);
+    _profileSubscription = profileCubit.stream.map((s) => s.profile).distinct().listen(_check);
   }
-
-  /// Preferences save on every tap; wait for the user to settle before
-  /// spending a search on the new answers.
-  static const rebuildDelay = Duration(seconds: 3);
 
   final RecipeService _service;
   final RecipeSearchService _search;
@@ -52,8 +49,7 @@ class CatalogueCubit extends Cubit<CatalogueState> {
   final AnalyticsService _analytics;
   late final StreamSubscription<UserProfile> _profileSubscription;
   StreamSubscription<List<Recipe>>? _recipesSubscription;
-  StreamSubscription<String?>? _keySubscription;
-  Timer? _rebuildTimer;
+  StreamSubscription<({String? key, String? keptKey})>? _keySubscription;
   String? _uid;
   bool _keyLoaded = false;
 
@@ -61,7 +57,7 @@ class CatalogueCubit extends Cubit<CatalogueState> {
   Future<bool>? _building;
   String? _buildingKey;
 
-  /// The key whose last build failed, so it isn't retried on every profile
+  /// The key whose first build failed, so it isn't retried on every profile
   /// change — only when the user asks.
   String? _failedKey;
 
@@ -107,36 +103,55 @@ class CatalogueCubit extends Cubit<CatalogueState> {
           recipes: recipes,
           status: state.isBuilding ? CatalogueStatus.building : CatalogueStatus.ready,
         ));
-        _scheduleRebuild(_profileCubit.state.profile);
+        _check(_profileCubit.state.profile);
       },
       onError: (Object e) {
         debugPrint('[CatalogueCubit] recipes stream error: $e');
         emit(state.copyWith(status: CatalogueStatus.failed, error: e));
       },
     );
-    _keySubscription = _service.watchCatalogueKey(uid).listen(
-      (key) {
+    _keySubscription = _service.watchCatalogueKeys(uid).listen(
+      (keys) {
         _keyLoaded = true;
-        emit(state.copyWith(key: key));
-        _scheduleRebuild(_profileCubit.state.profile);
+        emit(state.copyWith(key: keys.key, keptKey: keys.keptKey, clearKeptKey: keys.keptKey == null));
+        _check(_profileCubit.state.profile);
       },
       onError: (Object e) => debugPrint('[CatalogueCubit] key stream error: $e'),
     );
   }
 
-  /// Rebuilds once the stored catalogue no longer matches [profile]:
-  /// straight away when there is none yet, after [rebuildDelay] otherwise.
-  void _scheduleRebuild(UserProfile profile) {
+  /// Compares the stored catalogue with [profile]: builds the first one
+  /// straight away, and otherwise flags it [CatalogueState.outdated] when
+  /// the recipes depend on something that changed and the user has not
+  /// already chosen to keep them.
+  void _check(UserProfile profile) {
     if (!profile.onboardingComplete || _uid == null || !_keyLoaded || state.status == CatalogueStatus.loading) {
       return;
     }
     final key = keyFor(profile);
-    _rebuildTimer?.cancel();
-    if (key == state.key || key == _buildingKey || key == _failedKey) return;
-    _rebuildTimer = Timer(
-      state.key == null ? Duration.zero : rebuildDelay,
-      () => build(_profileCubit.state.profile),
-    );
+    if (state.key == null) {
+      if (key != _buildingKey && key != _failedKey) build(profile);
+      return;
+    }
+    final outdated = key != state.key && key != state.keptKey;
+    if (outdated != state.outdated) emit(state.copyWith(outdated: outdated));
+  }
+
+  /// Keeps the current recipes despite the preferences change, so the user
+  /// is not asked again until the preferences change once more.
+  Future<void> keep() async {
+    final key = keyFor(_profileCubit.state.profile);
+    final previous = state;
+    emit(state.copyWith(keptKey: key, outdated: false));
+    unawaited(_analytics.capture(AnalyticsEvents.catalogueKept));
+    final uid = _uid;
+    if (uid == null) return;
+    try {
+      await _service.keepCatalogue(uid, key);
+    } catch (e) {
+      debugPrint('[CatalogueCubit] keep failed: $e');
+      emit(previous.copyWith(error: e));
+    }
   }
 
   /// Retries after a failure, for the current profile.
@@ -147,7 +162,6 @@ class CatalogueCubit extends Cubit<CatalogueState> {
   Future<bool> build(UserProfile profile) {
     final key = keyFor(profile);
     if (_building case final running? when _buildingKey == key) return running;
-    _rebuildTimer?.cancel();
     _buildingKey = key;
     final build = _run(profile, key);
     _building = build;
@@ -180,7 +194,13 @@ class CatalogueCubit extends Cubit<CatalogueState> {
       if (isClosed) return false;
 
       _failedKey = null;
-      emit(state.copyWith(status: CatalogueStatus.ready, recipes: recipes, key: key));
+      emit(state.copyWith(
+        status: CatalogueStatus.ready,
+        recipes: recipes,
+        key: key,
+        clearKeptKey: true,
+        outdated: false,
+      ));
       debugPrint('[CatalogueCubit] built ${recipes.length} recipes in ${stopwatch.elapsedMilliseconds}ms');
       unawaited(_analytics.capture(AnalyticsEvents.catalogueBuilt, properties: {
         'candidates': raw.length,
@@ -224,7 +244,6 @@ class CatalogueCubit extends Cubit<CatalogueState> {
     _profileSubscription.cancel();
     _recipesSubscription?.cancel();
     _keySubscription?.cancel();
-    _rebuildTimer?.cancel();
     return super.close();
   }
 }

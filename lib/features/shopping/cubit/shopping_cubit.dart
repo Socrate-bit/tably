@@ -87,6 +87,7 @@ class ShoppingCubit extends Cubit<ShoppingState> {
     final source = ShoppingListBuilder.sourceOf(plan.week, profile.household, profile.languageCode);
     if (source == _building || (state.items.isNotEmpty && state.items.every((i) => i.source == source))) return;
     _building = source;
+    emit(state.copyWith(updating: true));
 
     final lines = ShoppingListBuilder.linesFromWeek(plan.week, profile.household);
     List<ShoppingItem> derived;
@@ -103,7 +104,7 @@ class ShoppingCubit extends Cubit<ShoppingState> {
     final ticked = {for (final i in previous) if (i.checked) i.id};
     final next = [for (final i in derived) i.copyWith(checked: ticked.contains(i.id))];
     final kept = {for (final i in next) i.id};
-    emit(state.copyWith(items: next, clearError: true));
+    emit(state.copyWith(items: next, updating: false, clearError: true));
     try {
       await _service.replaceList(uid, next, previous.map((i) => i.id).where((id) => !kept.contains(id)));
     } catch (e) {
