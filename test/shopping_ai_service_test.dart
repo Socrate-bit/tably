@@ -79,6 +79,20 @@ void main() {
     expect(items.every((i) => i.source == 'fr|2|r1x1'), isTrue);
   });
 
+  test('items Gemini left apart under the same name and unit are summed', () {
+    final items = ShoppingAiService.merge(lines, jsonDecode(jsonEncode({
+      'items': [
+        {'refs': [3], 'name': 'sel', 'icon': '🧂', 'aisle': 'herbs_grocery', 'amount': 1, 'unit': 'tsp'},
+        {'refs': [4], 'name': 'Sel', 'icon': '🧂', 'aisle': 'herbs_grocery', 'amount': 0.5, 'unit': 'tsp'},
+        {'refs': [6], 'name': 'sauce soja', 'icon': '🍶', 'aisle': 'tins_sauces', 'amount': 30, 'unit': 'ml'},
+        {'refs': [5], 'name': 'sauce soja', 'icon': '🍶', 'aisle': 'tins_sauces', 'amount': 1, 'unit': 'tbsp'},
+      ],
+    })) as Map<String, dynamic>, '');
+    final salt = items.where((i) => i.name.toLowerCase() == 'sel').single;
+    expect((salt.amount, salt.unit, salt.id), (1.5, IngredientUnit.tsp, '2047'));
+    expect(items.where((i) => i.name == 'sauce soja'), hasLength(2), reason: 'different units are never summed');
+  });
+
   test('an uncovered line keeps its own item, so nothing is dropped', () {
     final soy = ShoppingAiService.merge(lines, answer(), '').firstWhere((i) => i.id == '16124');
     expect((soy.name, soy.amount, soy.unit), ('sauce soja', 30.0, IngredientUnit.ml));

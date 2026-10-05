@@ -192,6 +192,10 @@
     }
   },
   "regeneratePlan": "regenerate plan",
+  "planOutdatedTitle": "Your preferences changed",
+  "planOutdatedBody": "Your meals were picked with your previous preferences. Want new ones?",
+  "planOutdatedRegenerate": "Regenerate meals",
+  "planOutdatedKeep": "Keep these",
   "exploreSearchPlaceholder": "Search meals",
   "exploreRecent": "Recently viewed",
   "addRecipeTitle": "Add a recipe",
@@ -230,6 +234,7 @@
   "shoppingEyebrow": "THIS WEEK",
   "shoppingCopyList": "Copy the list",
   "shoppingShare": "Share",
+  "shoppingUpdating": "Updating your list…",
   "shoppingShareHeader": "Hi there! 👋\n\nHere's our shopping list for the week, so we've got everything we need for some tasty meals 🍽️ Happy shopping! 🛒\n\nMade with Tably 💚",
   "shoppingNeeded": "({amount} needed)",
   "@shoppingNeeded": {

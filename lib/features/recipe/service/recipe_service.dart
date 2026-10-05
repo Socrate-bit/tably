@@ -30,9 +30,25 @@ class RecipeService {
         return recipes..sort((a, b) => a.id.compareTo(b.id));
       });
 
-  /// The preferences key the stored catalogue was built for, or null if none.
-  Stream<String?> watchCatalogueKey(String uid) =>
-      _catalogue(uid).snapshots().map((snap) => snap.data()?['key'] as String?);
+  /// The preferences key the stored catalogue was built for, or null if
+  /// none, and the newer key the user chose to keep it for, if any.
+  Stream<({String? key, String? keptKey})> watchCatalogueKeys(String uid) =>
+      _catalogue(uid).snapshots().map((snap) => (
+            key: snap.data()?['key'] as String?,
+            keptKey: snap.data()?['keptKey'] as String?,
+          ));
+
+  /// Records that the user kept the catalogue although their preferences
+  /// changed to [keptKey]. A rebuild clears it.
+  Future<void> keepCatalogue(String uid, String keptKey) async {
+    try {
+      await _catalogue(uid).update({'keptKey': keptKey});
+      debugPrint('[RecipeService] catalogue kept for $keptKey');
+    } catch (e) {
+      debugPrint('[RecipeService] keepCatalogue failed: $e');
+      rethrow;
+    }
+  }
 
   /// Adds one recipe to the catalogue.
   Future<void> saveRecipe(String uid, Recipe recipe) async {

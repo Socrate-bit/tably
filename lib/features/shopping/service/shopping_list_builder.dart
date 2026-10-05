@@ -2,10 +2,11 @@ import '../../../core/model/aisle.dart';
 import '../../plan/model/week_plan.dart';
 import '../../recipe/model/recipe.dart';
 import '../model/shopping_item.dart';
+import 'shopping_ai_service.dart';
 
 /// Derives the raw shopping lines from the week. Pure, so the same week
 /// always gives the same lines; merging similar ones is left to
-/// ShoppingAiService.
+/// [ShoppingAiService].
 abstract final class ShoppingListBuilder {
   /// Every ingredient line the week needs, summed across meals: each slot is
   /// one portion per household member, leftovers included since they are
@@ -31,15 +32,16 @@ abstract final class ShoppingListBuilder {
     return lines.values.toList();
   }
 
-  /// What a list is built from: the language, the household and how many
-  /// slots each recipe fills. The list is only rebuilt when this changes.
+  /// What a list is built from: the merge rules' version, the language, the
+  /// household and how many slots each recipe fills. The list is only
+  /// rebuilt when this changes.
   static String sourceOf(WeekPlan week, int household, String languageCode) {
     final counts = <String, int>{};
     for (final slot in week.slots) {
       counts.update(slot.recipe.id, (n) => n + 1, ifAbsent: () => 1);
     }
     final recipes = [for (final e in counts.entries) '${e.key}x${e.value}']..sort();
-    return '$languageCode|$household|${recipes.join(',')}';
+    return 'v${ShoppingAiService.version}|$languageCode|$household|${recipes.join(',')}';
   }
 
   /// Groups items into aisle cards, in aisle order.
