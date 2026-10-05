@@ -68,8 +68,8 @@ class ShoppingCubit extends Cubit<ShoppingState> {
         emit(state.copyWith(status: ShoppingStatus.ready, items: items, clearError: true));
         if (firstLoad) _sync();
       },
-      onError: (Object e) {
-        debugPrint('[ShoppingCubit] stream error: $e');
+      onError: (Object e, StackTrace s) {
+        AnalyticsService.reportError('ShoppingCubit', 'stream', e, stack: s);
         emit(state.copyWith(status: ShoppingStatus.failed, error: e));
       },
     );
@@ -96,8 +96,8 @@ class ShoppingCubit extends Cubit<ShoppingState> {
     List<ShoppingItem> derived;
     try {
       derived = await _ai.aggregate(lines, profile.languageCode, source);
-    } catch (e) {
-      debugPrint('[ShoppingCubit] merge failed, keeping raw lines: $e');
+    } catch (e, s) {
+      AnalyticsService.reportError('ShoppingCubit', 'merge', e, stack: s);
       derived = ShoppingAiService.merge(lines, const {}, '');
     }
     if (_building != source || isClosed) return;
@@ -119,8 +119,8 @@ class ShoppingCubit extends Cubit<ShoppingState> {
     emit(state.copyWith(items: next, updating: false, clearError: true));
     try {
       await _service.replaceList(uid, next, previous.map((i) => i.id).where((id) => !kept.contains(id)));
-    } catch (e) {
-      debugPrint('[ShoppingCubit] sync failed: $e');
+    } catch (e, s) {
+      AnalyticsService.reportError('ShoppingCubit', 'sync', e, stack: s);
       emit(state.copyWith(items: previous, error: e));
     }
   }
@@ -145,8 +145,8 @@ class ShoppingCubit extends Cubit<ShoppingState> {
         AnalyticsEvents.shoppingItemToggled,
         properties: {'checked': next},
       ));
-    } catch (e) {
-      debugPrint('[ShoppingCubit] toggle failed: $e');
+    } catch (e, s) {
+      AnalyticsService.reportError('ShoppingCubit', 'toggle', e, stack: s);
       emit(state.copyWith(items: previous, error: e));
     }
   }
@@ -231,8 +231,8 @@ class ShoppingCubit extends Cubit<ShoppingState> {
         'checked': check.length + uncheck.length,
       }));
       return true;
-    } catch (e) {
-      debugPrint('[ShoppingCubit] edit failed: $e');
+    } catch (e, s) {
+      AnalyticsService.reportError('ShoppingCubit', 'edit', e, stack: s);
       emit(state.copyWith(items: previous, error: e));
       return false;
     }
@@ -271,8 +271,8 @@ class ShoppingCubit extends Cubit<ShoppingState> {
         properties: {'status': result.status.name},
       ));
       return true;
-    } catch (e) {
-      debugPrint('[ShoppingCubit] share failed: $e');
+    } catch (e, s) {
+      AnalyticsService.reportError('ShoppingCubit', 'share', e, stack: s);
       return false;
     }
   }

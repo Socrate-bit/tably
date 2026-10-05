@@ -101,8 +101,8 @@ class SubscriptionCubit extends Cubit<SubscriptionState> {
         default:
           _redeemFailed(RedeemStatus.failed, 'error');
       }
-    } catch (e) {
-      debugPrint('[SubscriptionCubit] redeem failed: $e');
+    } catch (e, s) {
+      AnalyticsService.reportError('SubscriptionCubit', 'redeem', e, stack: s);
       _redeemFailed(RedeemStatus.failed, 'error');
     }
   }

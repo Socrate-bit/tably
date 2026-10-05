@@ -91,8 +91,8 @@ class RecipeSearchCubit extends Cubit<RecipeSearchState> {
         'reload': reload,
         'results': recipes.length,
       }));
-    } catch (e) {
-      debugPrint('[RecipeSearchCubit] search failed: $e');
+    } catch (e, s) {
+      AnalyticsService.reportError('RecipeSearchCubit', 'search', e, stack: s);
       if (isClosed || run != _latest) return;
       unawaited(_analytics.capture(AnalyticsEvents.recipeSearchFailed, properties: {'reason': CatalogueCubit.reasonFor(e)}));
       emit(RecipeSearchState(status: RecipeSearchStatus.failed, searchedFor: browse, error: e));

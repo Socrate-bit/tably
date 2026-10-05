@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../analytics/analytics_service.dart';
 import '../../l10n/app_localizations.dart';
 import 'error_feedback.dart';
 
@@ -24,8 +25,8 @@ Future<void> openLegalLink(BuildContext context, String url) async {
       return;
     }
     debugPrint('[LegalLinks] launchUrl refused $url');
-  } catch (e) {
-    debugPrint('[LegalLinks] open failed for $url: $e');
+  } catch (e, s) {
+    AnalyticsService.reportError('LegalLinks', 'open $url', e, stack: s);
   }
   if (context.mounted) showErrorBanner(context, message);
 }

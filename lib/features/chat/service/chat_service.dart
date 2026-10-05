@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 
+import '../../../core/analytics/analytics_service.dart';
 import '../model/chat_message.dart';
 
 /// Reads and writes the conversation with the AI chef at
@@ -48,8 +49,8 @@ class ChatService {
       }
       await batch.commit();
       debugPrint('[ChatService] expired ${pending.docs.length} pending actions');
-    } catch (e) {
-      debugPrint('[ChatService] expirePending failed: $e');
+    } catch (e, s) {
+      AnalyticsService.reportError('ChatService', 'expirePending', e, stack: s);
     }
   }
 }

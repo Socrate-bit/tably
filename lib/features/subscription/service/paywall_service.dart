@@ -1,6 +1,8 @@
 import 'package:flutter/foundation.dart';
 import 'package:superwallkit_flutter/superwallkit_flutter.dart';
 
+import '../../../core/analytics/analytics_service.dart';
+
 /// Where the subscription gate stands. [unknown] until Superwall reports, which
 /// is also the permanent state when no Superwall key is configured.
 enum SubscriptionGateStatus { unknown, active, inactive }
@@ -28,11 +30,11 @@ class PaywallService {
   Stream<SubscriptionGateStatus> get status {
     if (!isEnabled) return const Stream.empty();
     try {
-      return Superwall.shared.subscriptionStatus.map(_map).handleError((Object e) {
-        debugPrint('[PaywallService] status stream failed: $e');
+      return Superwall.shared.subscriptionStatus.map(_map).handleError((Object e, StackTrace s) {
+        AnalyticsService.reportError('PaywallService', 'status stream', e, stack: s);
       });
-    } catch (e) {
-      debugPrint('[PaywallService] status unavailable: $e');
+    } catch (e, s) {
+      AnalyticsService.reportError('PaywallService', 'status', e, stack: s);
       return const Stream.empty();
     }
   }
@@ -49,8 +51,8 @@ class PaywallService {
     try {
       await Superwall.shared.identify(uid);
       debugPrint('[PaywallService] identified $uid');
-    } catch (e) {
-      debugPrint('[PaywallService] identify failed: $e');
+    } catch (e, s) {
+      AnalyticsService.reportError('PaywallService', 'identify', e, stack: s);
     }
   }
 
@@ -59,8 +61,8 @@ class PaywallService {
     if (!isEnabled) return;
     try {
       await Superwall.shared.reset();
-    } catch (e) {
-      debugPrint('[PaywallService] reset failed: $e');
+    } catch (e, s) {
+      AnalyticsService.reportError('PaywallService', 'reset', e, stack: s);
     }
   }
 
@@ -71,8 +73,8 @@ class PaywallService {
     try {
       await Superwall.shared.registerPlacement(placement);
       debugPrint('[PaywallService] presented "$placement"');
-    } catch (e) {
-      debugPrint('[PaywallService] present "$placement" failed: $e');
+    } catch (e, s) {
+      AnalyticsService.reportError('PaywallService', 'present $placement', e, stack: s);
     }
   }
 }
