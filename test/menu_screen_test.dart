@@ -132,7 +132,7 @@ void main() {
     expect(find.text('DÉJEUNER'), findsNWidgets(7));
   });
 
-  testWidgets('dragging a meal by its dots moves it down the week', (tester) async {
+  testWidgets('dragging a meal by its grip moves it down the week', (tester) async {
     await _pumpMenu(tester, physicalSize: const Size(804, 1748), profile: const UserProfile());
     String titleAt(int i) => tester.widget<MealSlotCard>(find.byType(MealSlotCard).at(i)).slot.recipe.title;
     final monday = titleAt(0);
@@ -140,7 +140,11 @@ void main() {
 
     // Drag Monday's handle down onto Tuesday.
     final cards = find.byType(MealSlotCard);
-    final handle = find.descendant(of: cards.first, matching: find.byIcon(Icons.more_vert_rounded));
+    // The grip, not the long-press listener wrapping the whole card.
+    final handle = find.descendant(
+      of: cards.first,
+      matching: find.byWidgetPredicate((w) => w.runtimeType == ReorderableDragStartListener),
+    );
     final step = tester.getCenter(cards.at(1)).dy - tester.getCenter(cards.first).dy;
     final gesture = await tester.startGesture(tester.getCenter(handle));
     for (var i = 0; i < 10; i++) {

@@ -139,6 +139,9 @@ class Recipe extends Equatable {
   /// Cooking time shown in the recipe notes, e.g. "20-25m".
   final String cookTime;
 
+  /// [time] in minutes, or null when it holds no number.
+  int? get minutes => int.tryParse(time.replaceAll(RegExp(r'\D'), ''));
+
   /// Reference cost per portion, scaled by the store's price factor.
   final double price;
 

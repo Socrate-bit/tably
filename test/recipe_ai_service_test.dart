@@ -100,7 +100,7 @@ void main() {
     final text = RecipeAiService.instruction(profile);
     expect(text, contains('vegetarian'));
     expect(text, contains('nut_free, gluten_free'));
-    expect(text, contains('The user has: hob'));
+    expect(text, contains('does NOT have:\n  microwave, oven,'));
     expect(text, contains('French'));
 
     final none = RecipeAiService.instruction(const UserProfile(languageCode: 'en', diets: {Diet.none}));

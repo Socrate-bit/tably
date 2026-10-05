@@ -78,6 +78,9 @@ extension OptionLabels on AppL10n {
         'oven' => applianceOven,
         'air_fryer' => applianceAirFryer,
         'mixer' => applianceMixer,
+        'slow_cooker' => applianceSlowCooker,
+        'pressure_cooker' => appliancePressureCooker,
+        'barbecue' => applianceBarbecue,
         _ => id,
       };
 

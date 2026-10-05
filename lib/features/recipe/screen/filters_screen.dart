@@ -14,6 +14,7 @@ import '../../../core/widget/sub_screen_header.dart';
 import '../../../core/widget/surface_card.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../preferences/cubit/profile_cubit.dart';
+import '../../preferences/widget/cook_time_slider.dart';
 import '../../../core/widget/app_slider.dart';
 import '../cubit/recipe_browse_cubit.dart';
 import '../cubit/recipe_search_cubit.dart';
@@ -161,6 +162,10 @@ class FiltersScreen extends StatelessWidget {
                 SizedBox(height: 12.h),
                 grid(chips),
               ],
+              SizedBox(height: 28.h),
+              Text(l10n.cookTimeTitle, style: AppTextStyles.filterSection),
+              SizedBox(height: 8.h),
+              CookTimeSlider(minutes: state.constraints.cookMinutes, onChanged: cubit.setCookMinutes),
               SizedBox(height: 28.h),
               Text(l10n.filtersPrice, style: AppTextStyles.filterSection),
               SizedBox(height: 8.h),

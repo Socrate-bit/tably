@@ -504,5 +504,12 @@
   "searchPrompt": "Search for “{query}”",
   "filtersFromPreferences": "Your preferences by default, adjustable for this search",
   "proteinNoMeat": "No meat",
-  "applianceMixer": "Blender"
+  "applianceMixer": "Blender",
+  "applianceSlowCooker": "Slow cooker",
+  "appliancePressureCooker": "Pressure cooker",
+  "applianceBarbecue": "Barbecue",
+  "cookTimeTitle": "Cooking time",
+  "cookTimeSub": "The longest a recipe may take",
+  "cookTimeMinutes": "{minutes} min",
+  "cookTimeNoLimit": "No limit"
 }
