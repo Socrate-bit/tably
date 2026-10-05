@@ -82,7 +82,7 @@ void main() {
 
   test('the source changes with the language, the household and the recipes, not their order', () {
     final source = ShoppingListBuilder.sourceOf(week, 2, 'fr');
-    expect(source, 'fr|2|porcx2,pouletx1');
+    expect(source, 'v${ShoppingAiService.version}|fr|2|porcx2,pouletx1');
     expect(ShoppingListBuilder.sourceOf(WeekPlan(slots: week.slots.reversed.toList()), 2, 'fr'), source);
     expect(ShoppingListBuilder.sourceOf(week, 3, 'fr'), isNot(source));
     expect(ShoppingListBuilder.sourceOf(week, 2, 'en'), isNot(source));

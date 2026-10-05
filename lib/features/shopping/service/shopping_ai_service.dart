@@ -9,17 +9,33 @@ import '../../recipe/model/recipe.dart';
 import '../../recipe/service/recipe_ai_service.dart';
 import '../model/shopping_item.dart';
 
+/// One shopping item before it gets its id and position.
+typedef _Draft = ({Ingredient first, Aisle aisle, String icon, String name, double amount, IngredientUnit unit});
+
 /// Turns the week's raw ingredient lines into a shopping list with Gemini:
 /// similar ingredients merge into one item ("oignon", "oignons", "sel de
 /// mer"), each in a single unit.
 class ShoppingAiService {
+  /// Telling which lines are the same product takes judgement the lite model
+  /// lacks ("cumin moulu" is "cumin"), and this runs only when the week
+  /// changes, so it uses the stronger model with a little thinking.
+  static const model = 'gemini-3.5-flash';
+
+  /// Part of every list's source: bump it when the rules change, so lists
+  /// built with the old ones are rebuilt.
+  static const version = 2;
+
   /// Builds the list for [lines], stamped with [source]. Throws when Gemini
   /// fails.
   Future<List<ShoppingItem>> aggregate(List<Ingredient> lines, String languageCode, String source) async {
     final gemini = FirebaseAI.googleAI().generativeModel(
-      model: RecipeAiService.model,
+      model: model,
       systemInstruction: Content.system(instruction(languageCode)),
-      generationConfig: GenerationConfig(responseMimeType: 'application/json', responseSchema: _schema, temperature: 0),
+      generationConfig: GenerationConfig(
+        responseMimeType: 'application/json',
+        responseSchema: _schema,
+        thinkingConfig: ThinkingConfig.withThinkingLevel(ThinkingLevel.low),
+      ),
     );
     final input = [
       for (final (ref, line) in lines.indexed)
@@ -33,12 +49,26 @@ class ShoppingAiService {
   }
 
   /// Builds items from Gemini's [answer] over [lines], sorted by aisle then
-  /// name. A line no item covers becomes its own item, so nothing is ever
-  /// dropped; with an empty answer, that is every line, which is the
-  /// fallback when Gemini fails.
+  /// name. Items left apart under the same name and unit are summed. A line
+  /// no item covers becomes its own item, so nothing is ever dropped; with
+  /// an empty answer, that is every line, which is the fallback when Gemini
+  /// fails.
   static List<ShoppingItem> merge(List<Ingredient> lines, Map<String, dynamic> answer, String source) {
+    final drafts = <(String, IngredientUnit), _Draft>{};
+    void add(_Draft d) => drafts.update(
+      (d.name.toLowerCase(), d.unit),
+      (twin) => (
+        first: twin.first,
+        aisle: twin.aisle,
+        icon: twin.icon,
+        name: twin.name,
+        amount: twin.amount + d.amount,
+        unit: twin.unit,
+      ),
+      ifAbsent: () => d,
+    );
+
     final covered = <int>{};
-    final drafts = <({Ingredient first, Aisle aisle, String icon, String name, double amount, IngredientUnit unit})>[];
     for (final item in (answer['items'] as List? ?? const []).cast<Map<String, dynamic>>()) {
       final refs = [
         for (final r in item['refs'] as List? ?? const [])
@@ -47,7 +77,7 @@ class ShoppingAiService {
       final name = (item['name'] as String? ?? '').trim();
       if (refs.isEmpty || name.isEmpty) continue;
       covered.addAll(refs);
-      drafts.add((
+      add((
         first: lines[refs.first],
         aisle: Aisle.fromId(item['aisle'] as String?),
         icon: item['icon'] as String? ?? lines[refs.first].icon,
@@ -58,23 +88,17 @@ class ShoppingAiService {
     }
     for (final (ref, line) in lines.indexed) {
       if (covered.contains(ref)) continue;
-      drafts.add((
-        first: line,
-        aisle: line.aisle,
-        icon: line.icon,
-        name: line.name,
-        amount: line.amount,
-        unit: line.unit,
-      ));
+      add((first: line, aisle: line.aisle, icon: line.icon, name: line.name, amount: line.amount, unit: line.unit));
     }
 
-    drafts.sort((a, b) {
-      final byAisle = a.aisle.index.compareTo(b.aisle.index);
-      return byAisle != 0 ? byAisle : a.name.toLowerCase().compareTo(b.name.toLowerCase());
-    });
+    final sorted = drafts.values.toList()
+      ..sort((a, b) {
+        final byAisle = a.aisle.index.compareTo(b.aisle.index);
+        return byAisle != 0 ? byAisle : a.name.toLowerCase().compareTo(b.name.toLowerCase());
+      });
     final ids = <String>{};
     return [
-      for (final (index, d) in drafts.indexed)
+      for (final (index, d) in sorted.indexed)
         ShoppingItem(
           id: _uniqueId(ids, d.first, d.name),
           aisle: d.aisle,
@@ -116,8 +140,13 @@ already the totals for the whole week.
 
 Return one item per product a shopper picks off the shelf:
 - Merge every line that is the same product, whatever its wording: singular
-  and plural, size, colour or preparation ("chopped", "minced"), and variants
-  bought as one product (onion and onions; salt, sea salt and kosher salt).
+  and plural, size, colour, variety, and any preparation or cooking state
+  (ground, hard-boiled, chopped, minced, sliced, grated, beaten, cooked,
+  melted, softened, at room temperature). For example: cumin and ground
+  cumin are one item, cumin; egg, eggs and hard-boiled egg are one item,
+  egg; onion and onions are one item, onion; salt, sea salt and kosher salt
+  are one item, salt. When unsure whether two lines are the same product,
+  merge them.
 - Split a line that names several products ("salt and pepper") into one item
   each, both listing that line's ref.
 - refs: every input ref the item covers. Every input ref must appear in at
@@ -130,8 +159,9 @@ Return one item per product a shopper picks off the shelf:
   for liquids, tsp, tbsp or pinch for small amounts of spices and seasonings.
   Round up to a practical amount. When no line gives an amount, use
   to_taste with amount 0.
-- name: the product in $language, lower case, short and generic (e.g. "sel",
-  not "sel de mer fin").
+- name: the product in $language, lower case, short and generic, with no
+  preparation or variety (e.g. "sel", not "sel de mer fin"; "cumin", not
+  "cumin moulu"; "œuf", not "œuf dur"). Two items never share a name.
 - icon: one emoji for the product.
 - aisle: ${RecipeAiService.aisleGuide}
 ''';
@@ -149,6 +179,8 @@ Return one item per product a shopper picks off the shelf:
             'amount': Schema.number(),
             'unit': Schema.enumString(enumValues: [for (final u in IngredientUnit.values) u.id]),
           },
+          // The product's name comes first, so the lines it covers follow from it.
+          propertyOrdering: ['name', 'refs', 'unit', 'amount', 'icon', 'aisle'],
         ),
       ),
     },
