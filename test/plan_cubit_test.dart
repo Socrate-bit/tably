@@ -91,14 +91,13 @@ void main() {
     expect(search.calls, isEmpty, reason: 'one meal comes from the cached pool, never the API');
   });
 
-  test('regenerating everything fetches a fresh pool sized to the week', () async {
+  test('regenerating everything fetches a fresh pool', () async {
     final search = FakeSearch();
-    // Lunch and dinner every day with a new dish each time: 14 recipes, ×2.
     final plan = await build(const UserProfile(mealsPerDay: 2, variety: Variety.high), search: search);
 
     await plan.regenerate();
 
-    expect(search.calls.single.number, 28);
+    expect(search.calls.single.number, 50);
     expect(search.calls.single.query, isNull, reason: 'the pool is built from the profile alone');
   });
 

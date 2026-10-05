@@ -140,5 +140,12 @@ void main() {
       expect(none, isNot(contains('must avoid')));
       expect(rules(const UserProfile(allergies: {Allergy.nutFree})), contains('must avoid: nut_free.'));
     });
+
+    test('allergy examples only cover the allergies picked', () {
+      final gluten = rules(const UserProfile(allergies: {Allergy.glutenFree}));
+      expect(gluten, contains('gluten_free excludes wheat'));
+      expect(gluten, isNot(contains('lactose')));
+      expect(gluten, isNot(contains('nut_free')));
+    });
   });
 }

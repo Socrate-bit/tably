@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:math';
 
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:equatable/equatable.dart';
@@ -61,12 +60,10 @@ class CatalogueCubit extends Cubit<CatalogueState> {
   /// change — only when the user asks.
   String? _failedKey;
 
-  /// The smallest pool worth building, so even a short week has spares.
-  static const minPoolSize = 24;
-
-  /// How many candidates a build asks for: twice the recipes the week cooks,
-  /// so single-meal regenerations have spares, and never below [minPoolSize].
-  static int poolSizeFor(UserProfile profile) => max(minPoolSize, profile.recipesToCook * 2);
+  /// Candidates a build asks for. Gemini rejects a good share of them, and
+  /// the busiest week cooks 14 recipes, so this leaves spares for
+  /// single-meal regenerations. Still one request of the quota.
+  static const poolSize = 50;
 
   /// Identifies the preferences a catalogue depends on. Anything else in the
   /// profile (household, days, store…) only changes the plan, not the recipes.
@@ -184,7 +181,7 @@ class CatalogueCubit extends Cubit<CatalogueState> {
     final stopwatch = Stopwatch()..start();
     emit(state.copyWith(status: CatalogueStatus.building, step: CatalogueStep.searching, clearError: true));
     try {
-      final raw = await _search.search(profile, number: poolSizeFor(profile));
+      final raw = await _search.search(profile, number: poolSize);
       if (superseded()) return false;
       emit(state.copyWith(step: CatalogueStep.adapting));
 
