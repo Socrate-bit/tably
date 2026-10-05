@@ -3,7 +3,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../../core/theme/app_theme.dart';
-import '../../../core/util/haptics.dart';
 import '../../../core/widget/slide_in.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../account/screen/account_screen.dart';
@@ -17,12 +16,11 @@ import '../../preferences/screen/preferences_screen.dart';
 import '../../recipe/cubit/catalogue_cubit.dart';
 import '../../recipe/screen/favourites_screen.dart';
 import '../../recipe/screen/recipes_screen.dart';
-import '../../recipe/widget/add_recipe_sheet.dart';
 import '../cubit/home_cubit.dart';
 import '../widget/tab_bar.dart';
 
 /// The signed-in app shell: three tabs, the favourites, stores and account screens that
-/// keep the tab bar, and the AI chef's button beside it.
+/// keep the tab bar, and the AI chef's button beside it on the menu tab.
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
@@ -58,10 +56,8 @@ class HomeScreen extends StatelessWidget {
                 Expanded(
                   child: AppTabBar(current: home.tab, onSelected: context.read<HomeCubit>().select),
                 ),
-                SizedBox(width: 12.w),
-                const ChefButton(),
-                // Hidden for now.
-                // _AddRecipeSlot(visible: home.tab == HomeTab.recipes && home.sub == HomeSub.none),
+                // The AI chef pops in beside the bar on the menu tab only.
+                _FabSlot(visible: home.tab == HomeTab.menu && home.sub == HomeSub.none, child: const ChefButton()),
               ],
             ),
           ),
@@ -108,19 +104,20 @@ class _GeneratingOverlay extends StatelessWidget {
   }
 }
 
-/// Reserves space beside the tab bar for the add-recipe button, collapsing its
+/// Reserves space beside the tab bar for a round button, collapsing its
 /// width when hidden so the bar re-centres. An [OverflowBox] keeps the button
 /// at full size throughout, so it slides out rather than shrinking.
-class _AddRecipeSlot extends StatefulWidget {
-  const _AddRecipeSlot({required this.visible});
+class _FabSlot extends StatefulWidget {
+  const _FabSlot({required this.visible, required this.child});
 
   final bool visible;
+  final Widget child;
 
   @override
-  State<_AddRecipeSlot> createState() => _AddRecipeSlotState();
+  State<_FabSlot> createState() => _FabSlotState();
 }
 
-class _AddRecipeSlotState extends State<_AddRecipeSlot> with SingleTickerProviderStateMixin {
+class _FabSlotState extends State<_FabSlot> with SingleTickerProviderStateMixin {
   late final AnimationController _controller = AnimationController(
     vsync: this,
     duration: const Duration(milliseconds: 300),
@@ -130,7 +127,7 @@ class _AddRecipeSlotState extends State<_AddRecipeSlot> with SingleTickerProvide
   late final Animation<double> _scale = CurvedAnimation(parent: _controller, curve: Curves.easeOutBack);
 
   @override
-  void didUpdateWidget(_AddRecipeSlot oldWidget) {
+  void didUpdateWidget(_FabSlot oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (widget.visible != oldWidget.visible) {
       widget.visible ? _controller.forward() : _controller.reverse();
@@ -145,14 +142,14 @@ class _AddRecipeSlotState extends State<_AddRecipeSlot> with SingleTickerProvide
 
   @override
   Widget build(BuildContext context) {
-    final slot = AppDimens.fab + 12.w;
+    final slot = AppDimens.tabBarHeight + 12.w;
     return AnimatedBuilder(
       animation: _size,
       builder: (context, child) => SizedBox(
         width: slot * _size.value.clamp(0.0, 1.0),
         // A fixed height stops the OverflowBox from filling the screen, which
         // made the bottom bar full-height and pushed SnackBars off screen.
-        height: AppDimens.fab,
+        height: AppDimens.tabBarHeight,
         child: child,
       ),
       child: OverflowBox(
@@ -165,40 +162,10 @@ class _AddRecipeSlotState extends State<_AddRecipeSlot> with SingleTickerProvide
             scale: _scale,
             child: FadeTransition(
               opacity: _size,
-              child: _AddRecipeButton(onTap: () => AddRecipeSheet.show(context)),
+              child: widget.child,
             ),
           ),
         ),
-      ),
-    );
-  }
-}
-
-/// The blue floating "+" on the recipes tab.
-class _AddRecipeButton extends StatelessWidget {
-  const _AddRecipeButton({required this.onTap});
-
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () {
-        Haptics.confirm();
-        onTap();
-      },
-      child: Container(
-        width: AppDimens.fab,
-        height: AppDimens.fab,
-        alignment: Alignment.center,
-        decoration: BoxDecoration(
-          color: AppColors.brand,
-          shape: BoxShape.circle,
-          boxShadow: [
-            BoxShadow(color: AppColors.brand.withValues(alpha: 0.42), blurRadius: 24.r, offset: Offset(0, 10.h)),
-          ],
-        ),
-        child: Icon(Icons.add_rounded, size: 60.r, color: AppColors.surface),
       ),
     );
   }
