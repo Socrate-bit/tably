@@ -78,7 +78,9 @@ class CatalogueCubit extends Cubit<CatalogueState> {
       ids(profile.allergies.map((a) => a.id)),
       ids(profile.proteins.map((p) => p.id)),
       ids(profile.appliances.map((a) => a.id)),
-      profile.cookTime ?? '',
+      // Unchanged since onboarding, the answer stands in, so catalogues
+      // stored before the slider existed keep their key.
+      profile.cookMinutes == UserProfile.cookMinutesFor(profile.cookTime) ? profile.cookTime ?? '' : '${profile.cookMinutes}',
     ].join('|');
   }
 

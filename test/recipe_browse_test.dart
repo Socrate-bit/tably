@@ -42,7 +42,12 @@ void main() {
   });
 
   test('filter count counts chips plus one for a price limit', () {
-    expect(const RecipeBrowseState().filterCount, 0);
-    expect(const RecipeBrowseState(cravings: {Craving.quick}, proteins: {RecipeProtein.tofu}, maxPrice: 8).filterCount, 3);
+    final widest = RecipeBrowseState.widest;
+    expect(RecipeBrowseState(constraints: widest).filterCount, 0);
+    expect(
+      RecipeBrowseState(constraints: widest, cravings: {Craving.quick}, proteins: {RecipeProtein.tofu}, maxPrice: 8)
+          .filterCount,
+      3,
+    );
   });
 }

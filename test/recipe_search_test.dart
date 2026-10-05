@@ -90,7 +90,7 @@ void main() {
   test('nothing to search for makes no call and clears the results', () async {
     final search = cubit();
     await search.search(const RecipeBrowseState(query: 'tofu'));
-    await search.search(const RecipeBrowseState());
+    await search.search(RecipeBrowseState(constraints: RecipeBrowseState.widest));
     expect(api.calls, hasLength(1));
     expect(search.state.results, isEmpty);
     expect(search.state.status, RecipeSearchStatus.idle);

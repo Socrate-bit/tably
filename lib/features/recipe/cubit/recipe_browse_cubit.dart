@@ -78,6 +78,10 @@ class RecipeBrowseCubit extends Cubit<RecipeBrowseState> {
         ),
       ));
 
+  /// The ceiling means no time limit.
+  void setCookMinutes(int minutes) =>
+      _filter(state.copyWith(constraints: state.constraints.copyWith(cookMinutes: minutes)));
+
   /// As in the preferences, ticking nothing means no appliance at all.
   void toggleAppliance(Appliance appliance) => _filter(state.copyWith(
         constraints: state.constraints.copyWith(appliances: Selection.toggle(state.constraints.appliances, appliance)),

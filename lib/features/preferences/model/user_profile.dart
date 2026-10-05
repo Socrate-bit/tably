@@ -39,6 +39,7 @@ class UserProfile extends Equatable {
     this.goals = const {},
     this.blockers = const {},
     this.cookTime,
+    this.cookMinutes = cookMinutesCeiling,
     this.onboardingComplete = false,
     this.weeklyReminder = false,
     this.userType = UserType.normal,
@@ -53,6 +54,18 @@ class UserProfile extends Equatable {
 
   /// Longest a cooked dish is kept before it is eaten, in hours.
   static const leftoverHours = 72;
+
+  /// Cooking-time slider bounds, in minutes; the ceiling means "no limit".
+  static const cookMinutesFloor = 15;
+  static const cookMinutesCeiling = 90;
+
+  /// The time limit an onboarding [cookTime] answer stands for.
+  static int cookMinutesFor(String? cookTime) => switch (cookTime) {
+        '15_30' => 30,
+        '30_45' => 45,
+        '45_60' => 60,
+        _ => cookMinutesCeiling,
+      };
 
   final String name;
   final int household;
@@ -74,6 +87,12 @@ class UserProfile extends Equatable {
   final Set<String> goals;
   final Set<String> blockers;
   final String? cookTime;
+
+  /// Longest a recipe may take, in minutes; [cookMinutesCeiling] is no limit.
+  /// Starts from the [cookTime] answer, then follows the preferences slider.
+  final int cookMinutes;
+
+  bool get hasCookLimit => cookMinutes < cookMinutesCeiling;
 
   final bool onboardingComplete;
   final bool weeklyReminder;
@@ -161,6 +180,7 @@ class UserProfile extends Equatable {
     Set<String>? goals,
     Set<String>? blockers,
     String? cookTime,
+    int? cookMinutes,
     bool? onboardingComplete,
     bool? weeklyReminder,
     UserType? userType,
@@ -184,6 +204,7 @@ class UserProfile extends Equatable {
       goals: goals ?? this.goals,
       blockers: blockers ?? this.blockers,
       cookTime: cookTime ?? this.cookTime,
+      cookMinutes: cookMinutes ?? this.cookMinutes,
       onboardingComplete: onboardingComplete ?? this.onboardingComplete,
       weeklyReminder: weeklyReminder ?? this.weeklyReminder,
       userType: userType ?? this.userType,
@@ -211,6 +232,7 @@ class UserProfile extends Equatable {
         'goals': goals.toList(),
         'blockers': blockers.toList(),
         'cookTime': cookTime,
+        'cookMinutes': cookMinutes,
         'onboardingComplete': onboardingComplete,
         'weeklyReminder': weeklyReminder,
         'updatedAt': FieldValue.serverTimestamp(),
@@ -261,6 +283,9 @@ class UserProfile extends Equatable {
       goals: strings('goals'),
       blockers: strings('blockers'),
       cookTime: map['cookTime'] as String?,
+      // Profiles saved before the slider existed take their onboarding answer.
+      cookMinutes: ((map['cookMinutes'] as num?)?.toInt() ?? cookMinutesFor(map['cookTime'] as String?))
+          .clamp(cookMinutesFloor, cookMinutesCeiling),
       onboardingComplete: map['onboardingComplete'] as bool? ?? false,
       weeklyReminder: map['weeklyReminder'] as bool? ?? false,
       userType: UserType.fromId(map['userType'] as String?),
@@ -287,6 +312,7 @@ class UserProfile extends Equatable {
         goals,
         blockers,
         cookTime,
+        cookMinutes,
         onboardingComplete,
         weeklyReminder,
         userType,

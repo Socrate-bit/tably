@@ -1264,4 +1264,27 @@ class AppL10nFr extends AppL10n {
 
   @override
   String get applianceMixer => 'Mixeur';
+
+  @override
+  String get applianceSlowCooker => 'Mijoteuse';
+
+  @override
+  String get appliancePressureCooker => 'Autocuiseur';
+
+  @override
+  String get applianceBarbecue => 'Barbecue';
+
+  @override
+  String get cookTimeTitle => 'Temps de cuisine';
+
+  @override
+  String get cookTimeSub => 'Le temps maximum que peut prendre une recette';
+
+  @override
+  String cookTimeMinutes(String minutes) {
+    return '$minutes min';
+  }
+
+  @override
+  String get cookTimeNoLimit => 'Pas de limite';
 }

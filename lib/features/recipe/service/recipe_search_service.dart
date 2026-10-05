@@ -39,7 +39,7 @@ class RecipeSearchService {
       'diets': [for (final d in profile.diets) d.id],
       'allergies': [for (final a in profile.allergies) a.id],
       'proteins': [for (final p in profile.proteins) p.id],
-      'cookTime': profile.cookTime,
+      'maxReadyTime': profile.hasCookLimit ? profile.cookMinutes : null,
       'number': number,
       'query': query,
       'cuisines': [for (final c in cuisines) c.id],

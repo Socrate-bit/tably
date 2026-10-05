@@ -1252,4 +1252,27 @@ class AppL10nEn extends AppL10n {
 
   @override
   String get applianceMixer => 'Blender';
+
+  @override
+  String get applianceSlowCooker => 'Slow cooker';
+
+  @override
+  String get appliancePressureCooker => 'Pressure cooker';
+
+  @override
+  String get applianceBarbecue => 'Barbecue';
+
+  @override
+  String get cookTimeTitle => 'Cooking time';
+
+  @override
+  String get cookTimeSub => 'The longest a recipe may take';
+
+  @override
+  String cookTimeMinutes(String minutes) {
+    return '$minutes min';
+  }
+
+  @override
+  String get cookTimeNoLimit => 'No limit';
 }

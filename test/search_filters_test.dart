@@ -3,6 +3,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tably/core/analytics/analytics_service.dart';
 import 'package:tably/core/model/preference_option.dart';
+import 'package:tably/core/model/store.dart';
 import 'package:tably/core/widget/search_field.dart';
 import 'package:tably/features/preferences/cubit/profile_cubit.dart';
 import 'package:tably/features/preferences/model/user_profile.dart';
@@ -29,17 +30,17 @@ void main() {
     final cubit = RecipeBrowseCubit(profileCubit: profileCubit, analytics: analytics);
     addTearDown(cubit.close);
     addTearDown(profileCubit.close);
+    // A loaded profile still onboarding, as for a new user.
+    await profileCubit.setName('');
     await profileCubit.completeOnboarding(profile);
     await Future<void>.delayed(Duration.zero);
     return (cubit, profileCubit);
   }
 
   group('diets, allergies and appliances in the filters', () {
-    test('start from the onboarding answers and count as no filter', () async {
+    test('are seeded from the onboarding answers', () async {
       final (cubit, _) = await browse(onboarding);
       expect(cubit.state.constraints, DietaryConstraints.of(onboarding));
-      expect(cubit.state.filterCount, 0);
-      expect(cubit.state.canSearch, isFalse, reason: 'the cached pool already matches the profile');
     });
 
     test('can differ from the profile, which stays untouched', () async {
@@ -52,7 +53,6 @@ void main() {
       expect(cubit.state.constraints.diets, {Diet.vegetarian, Diet.vegan});
       expect(cubit.state.constraints.allergies, {Allergy.nutFree, Allergy.glutenFree});
       expect(cubit.state.constraints.appliances, {Appliance.hob});
-      expect(cubit.state.filterCount, 3);
       expect(cubit.state.canSearch, isTrue);
       expect(profileCubit.state.profile.diets, {Diet.vegetarian});
     });
@@ -69,31 +69,41 @@ void main() {
       expect(cubit.state.constraints.appliances, isEmpty, reason: 'no appliance at all is allowed');
     });
 
-    test('follow later preference changes until the user changes them', () async {
+    test('never follow later preference changes', () async {
       final (cubit, profileCubit) = await browse(onboarding);
 
       await profileCubit.toggleDiet(Diet.vegan);
+      await profileCubit.setCookMinutes(30);
       await Future<void>.delayed(Duration.zero);
-      expect(cubit.state.constraints.diets, {Diet.vegetarian, Diet.vegan}, reason: 'still following the profile');
-
-      cubit.toggleAllergy(Allergy.soyFree);
-      await profileCubit.toggleAllergy(Allergy.eggFree);
-      await Future<void>.delayed(Duration.zero);
-      expect(cubit.state.constraints.allergies, {Allergy.nutFree, Allergy.soyFree}, reason: 'the user diverged');
-      expect(cubit.state.defaults.allergies, {Allergy.nutFree, Allergy.eggFree});
+      expect(cubit.state.constraints, DietaryConstraints.of(onboarding));
     });
 
-    test('"Réinitialiser" restores the profile but keeps the search text', () async {
+    test('"Réinitialiser" widens everything but keeps the search text', () async {
       final (cubit, _) = await browse(onboarding);
       cubit.search('dahl');
       cubit.toggleDiet(Diet.vegan);
       cubit.toggleCraving(Craving.quick);
+      cubit.setCookMinutes(30);
 
       cubit.resetFilters();
 
-      expect(cubit.state.constraints, DietaryConstraints.of(onboarding));
+      expect(cubit.state.constraints, RecipeBrowseState.widest);
       expect(cubit.state.filterCount, 0);
       expect(cubit.state.query, 'dahl');
+    });
+
+    test('a time limit counts as one filter and hides longer recipes', () async {
+      final (cubit, _) = await browse(onboarding);
+      cubit.resetFilters();
+
+      cubit.setCookMinutes(20);
+
+      expect(cubit.state.filterCount, 1);
+      expect(cubit.state.constraints.applyTo(onboarding).cookMinutes, 20);
+      final kept = cubit.state.apply(RecipeFixtures.recipes, store: Store.lidl, cravingLabel: (c) => c.id);
+      expect(kept, isNotEmpty);
+      expect(kept.every((r) => r.minutes! <= 20), isTrue);
+      expect(kept.length, lessThan(RecipeFixtures.recipes.length));
     });
   });
 

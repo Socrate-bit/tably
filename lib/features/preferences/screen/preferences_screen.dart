@@ -20,6 +20,7 @@ import '../../onboarding/cubit/onboarding_cubit.dart';
 import '../../plan/widget/meals_per_day_options.dart';
 import '../../plan/widget/variety_options.dart';
 import '../cubit/profile_cubit.dart';
+import '../widget/cook_time_slider.dart';
 import '../widget/preference_grid.dart';
 
 /// The preferences tab. Every control writes straight through to the profile,
@@ -141,6 +142,11 @@ class PreferencesScreen extends StatelessWidget {
                     ),
                   ],
                 ),
+                SizedBox(height: 28.h),
+
+                PreferenceSectionHeader(title: l10n.cookTimeTitle, subtitle: l10n.cookTimeSub),
+                SizedBox(height: 8.h),
+                CookTimeSlider(minutes: profile.cookMinutes, onChanged: cubit.setCookMinutes),
                 SizedBox(height: 28.h),
 
                 PreferenceSectionHeader(

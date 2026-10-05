@@ -81,8 +81,21 @@ void main() {
     test('no appliance means only no-cook recipes, and the mixer is understood', () {
       expect(rules(const UserProfile(appliances: {})), contains('no cooking appliance at all'));
       final withMixer = rules(const UserProfile(appliances: {Appliance.hob, Appliance.mixer}));
-      expect(withMixer, contains('The user has: hob, mixer'));
+      expect(withMixer, contains('does NOT have:\n  microwave, oven, air_fryer, slow_cooker, pressure_cooker, barbecue.'));
       expect(withMixer, contains('mixer = blender or food processor'));
+    });
+
+    test('a full kitchen is never a reason to reject', () {
+      expect(rules(UserProfile(appliances: Appliance.values.toSet())), isNot(contains('does NOT have')));
+    });
+
+    test('time only rejects past the user\'s own limit', () {
+      expect(rules(const UserProfile()), isNot(contains('minutes in total')));
+      expect(rules(const UserProfile(cookMinutes: 45)), contains('longer than 45 minutes in total'));
+    });
+
+    test('alcohol is only ruled out by halal', () {
+      expect(rules(const UserProfile()), contains('Alcohol is fine for every other diet.'));
     });
   });
 }

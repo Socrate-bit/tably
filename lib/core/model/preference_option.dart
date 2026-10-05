@@ -76,7 +76,10 @@ enum Appliance {
   hob('hob', '🔥'),
   oven('oven', '🔲'),
   airFryer('air_fryer', '🍟'),
-  mixer('mixer', '🥤');
+  mixer('mixer', '🥤'),
+  slowCooker('slow_cooker', '🍲'),
+  pressureCooker('pressure_cooker', '🥘'),
+  barbecue('barbecue', '🍖');
 
   const Appliance(this.id, this.icon);
   final String id;

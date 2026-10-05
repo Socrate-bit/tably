@@ -642,5 +642,19 @@
   },
   "filtersFromPreferences": "Tes préférences par défaut, modifiables pour cette recherche",
   "proteinNoMeat": "Pas de viande",
-  "applianceMixer": "Mixeur"
+  "applianceMixer": "Mixeur",
+  "applianceSlowCooker": "Mijoteuse",
+  "appliancePressureCooker": "Autocuiseur",
+  "applianceBarbecue": "Barbecue",
+  "cookTimeTitle": "Temps de cuisine",
+  "cookTimeSub": "Le temps maximum que peut prendre une recette",
+  "cookTimeMinutes": "{minutes} min",
+  "@cookTimeMinutes": {
+    "placeholders": {
+      "minutes": {
+        "type": "String"
+      }
+    }
+  },
+  "cookTimeNoLimit": "Pas de limite"
 }

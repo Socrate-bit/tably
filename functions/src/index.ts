@@ -140,7 +140,7 @@ const CRAVINGS: Record<string, Record<string, string>> = {
   low_calorie: {maxCalories: "450"},
 };
 
-/** Profile cook-time ids → Spoonacular maxReadyTime in minutes. */
+/** Onboarding cook-time ids → maxReadyTime, for app builds that send them. */
 const MAX_READY_TIME: Record<string, number> = {
   "15_30": 30,
   "30_45": 45,
@@ -168,7 +168,12 @@ function searchParams(data: Record<string, unknown>): URLSearchParams {
   const diets = stringList(data.diets);
   const allergies = stringList(data.allergies);
   const proteins = stringList(data.proteins);
+  // The profile's time limit in minutes; older builds send the onboarding id.
+  const minutes = Math.round(Number(data.maxReadyTime));
   const cookTime = text(data.cookTime);
+  const maxReadyTime = Number.isFinite(minutes) && minutes > 0 ?
+    minutes :
+    cookTime ? MAX_READY_TIME[cookTime] : undefined;
   const requested = Math.round(Number(data.number));
   const number = Number.isFinite(requested) ?
     Math.min(Math.max(requested, 1), MAX_SEARCH_SIZE) :
@@ -201,7 +206,6 @@ function searchParams(data: Record<string, unknown>): URLSearchParams {
   if (diet.length > 0) params.set("diet", [...new Set(diet)].join(","));
   if (intolerances.length > 0) params.set("intolerances", intolerances.join(","));
   if (excludes.length > 0) params.set("excludeIngredients", [...new Set(excludes)].join(","));
-  const maxReadyTime = cookTime ? MAX_READY_TIME[cookTime] : undefined;
   if (maxReadyTime) params.set("maxReadyTime", String(maxReadyTime));
 
   // Search filters, all optional.

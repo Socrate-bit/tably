@@ -140,7 +140,11 @@ class RecipeAiService {
         (i['id'] as num?)?.toInt(): i,
     };
     final steps = (kept['steps'] as List? ?? const []).whereType<String>().toList();
-    final minutes = '${(source['readyInMinutes'] as num?)?.toInt() ?? 0}m';
+    // Spoonacular often leaves out marinating or long roasting; Gemini's
+    // reading of the steps only ever lengthens it.
+    final ready = (source['readyInMinutes'] as num?)?.toInt() ?? 0;
+    final estimate = (kept['minutes'] as num?)?.toInt() ?? 0;
+    final minutes = '${estimate > ready ? estimate : ready}m';
     final title = kept['title'] as String? ?? '';
     return Recipe(
       id: '${source['id']}',
@@ -195,10 +199,29 @@ class RecipeAiService {
         : profile.proteins.isEmpty
             ? 'any meat or fish'
             : ids(profile.proteins.map((p) => p.id));
-    // No appliance ticked means literally none: only no-cook recipes pass.
-    final appliances = profile.appliances.isEmpty
-        ? 'no cooking appliance at all, so keep only recipes that need no cooking and no appliance'
-        : ids(profile.appliances.map((a) => a.id));
+    // The optional rules below end in a newline, so a skipped one leaves no
+    // gap. Appliances are listed by what is missing: the model reads a short
+    // "does not have" list far more reliably than the full kitchen.
+    final missing = Appliance.values.where((a) => !profile.appliances.contains(a)).map((a) => a.id);
+    final equipment = profile.appliances.isEmpty
+        ? '''- It needs cooking or any appliance: the user has
+  no cooking appliance at all, so keep only recipes that need no cooking.
+'''
+        : missing.isEmpty
+            ? ''
+            : '''- It cannot be made without an appliance the user does NOT have:
+  ${missing.join(', ')}.
+  (hob = stovetop, mixer = blender or food processor, slow_cooker = crockpot,
+  pressure_cooker = pressure cooker or Instant Pot, barbecue = outdoor grill.)
+  Every other appliance, and basic tools like pots, pans, baking dishes and
+  knives, is available.
+''';
+    // No limit means time is never a reason to reject.
+    final time = profile.hasCookLimit
+        ? '''- It takes clearly longer than ${profile.cookMinutes} minutes in total, counting
+  marinating, resting, simmering and roasting.
+'''
+        : '';
     return '''
 You adapt recipes for Tably, a weekly dinner-planning app. The input is a JSON
 array of recipes. Put every input recipe in exactly one of "kept" or
@@ -206,7 +229,7 @@ array of recipes. Put every input recipe in exactly one of "kept" or
 
 1. CHECK. Reject a recipe, with a short reason, if ANY of these is true:
 - It breaks one of the user's diets: ${ids(profile.diets.map((d) => d.id))}.
-  Halal means no pork and no alcohol.
+  Halal means no pork and no alcohol. Alcohol is fine for every other diet.
 - It contains something the user must avoid: ${ids(profile.allergies.map((a) => a.id))}.
   Check every ingredient, including stocks, sauces, pastes and garnishes
   (e.g. nut_free excludes peanuts, tree nuts, nut butters and pesto;
@@ -214,18 +237,15 @@ array of recipes. Put every input recipe in exactly one of "kept" or
 - Its main protein is a meat or fish the user did not pick. Allowed:
   $proteins. Vegetarian and tofu dishes are always allowed unless a diet
   rules them out.
-- It needs equipment the user lacks. The user has: $appliances
-  (hob = stovetop, mixer = blender or food processor). Reject anything that
-  must be baked or roasted in an oven when "oven" is missing, or blended when
-  "mixer" is missing.
-- It is not a proper savoury main course: desserts, drinks, sauces, sides,
+$equipment- It is not a proper savoury main course: desserts, drinks, sauces, sides,
   snacks, or text that is not really a recipe.
-- Its steps need far longer than readyInMinutes, e.g. overnight marinating or
-  hours of roasting.
-When unsure about a diet or an allergen, reject.
+${time}Never reject for any other reason. When unsure about a diet or an allergen,
+reject.
 
 2. ADAPT every kept recipe, writing all text in $language:
 - title: short and appetising, at most 60 characters.
+- minutes: the realistic total time from the steps, including marinating,
+  resting, simmering and roasting; readyInMinutes when that is plausible.
 - steps: translate each step faithfully and concisely. Keep quantities and
   temperatures; give temperatures in °C.
 - ingredients: one entry per input ingredient, same id.
@@ -251,6 +271,7 @@ When unsure about a diet or an allergen, reject.
           properties: {
             'id': Schema.integer(),
             'title': Schema.string(),
+            'minutes': Schema.integer(),
             'craving': Schema.enumString(enumValues: [for (final c in Craving.values) c.id]),
             'protein': Schema.enumString(enumValues: [for (final p in RecipeProtein.values) p.id]),
             'cuisine': Schema.enumString(enumValues: [for (final c in Cuisine.values) c.id, 'none']),

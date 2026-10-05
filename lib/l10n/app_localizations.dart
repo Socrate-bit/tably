@@ -2232,6 +2232,48 @@ abstract class AppL10n {
   /// In fr, this message translates to:
   /// **'Mixeur'**
   String get applianceMixer;
+
+  /// No description provided for @applianceSlowCooker.
+  ///
+  /// In fr, this message translates to:
+  /// **'Mijoteuse'**
+  String get applianceSlowCooker;
+
+  /// No description provided for @appliancePressureCooker.
+  ///
+  /// In fr, this message translates to:
+  /// **'Autocuiseur'**
+  String get appliancePressureCooker;
+
+  /// No description provided for @applianceBarbecue.
+  ///
+  /// In fr, this message translates to:
+  /// **'Barbecue'**
+  String get applianceBarbecue;
+
+  /// No description provided for @cookTimeTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Temps de cuisine'**
+  String get cookTimeTitle;
+
+  /// No description provided for @cookTimeSub.
+  ///
+  /// In fr, this message translates to:
+  /// **'Le temps maximum que peut prendre une recette'**
+  String get cookTimeSub;
+
+  /// No description provided for @cookTimeMinutes.
+  ///
+  /// In fr, this message translates to:
+  /// **'{minutes} min'**
+  String cookTimeMinutes(String minutes);
+
+  /// No description provided for @cookTimeNoLimit.
+  ///
+  /// In fr, this message translates to:
+  /// **'Pas de limite'**
+  String get cookTimeNoLimit;
 }
 
 class _AppL10nDelegate extends LocalizationsDelegate<AppL10n> {
