@@ -6,6 +6,7 @@ import '../../../core/theme/app_theme.dart';
 import '../../../l10n/app_localizations.dart';
 import '../cubit/chat_cubit.dart';
 import '../tool/chat_tool.dart';
+import 'message_bubble.dart';
 
 /// "The chef is thinking…", or what the tool running now is doing.
 class TypingIndicator extends StatelessWidget {
@@ -25,16 +26,19 @@ class TypingIndicator extends StatelessWidget {
       (_, ToolKind.write) => l10n.chatActivityPreparing,
       _ => l10n.chatThinking,
     };
-    return Row(
-      children: [
-        SizedBox(
-          width: 16.r,
-          height: 16.r,
-          child: const CircularProgressIndicator(strokeWidth: 2, color: AppColors.brand),
-        ),
-        SizedBox(width: 10.w),
-        Flexible(child: Text(label, style: AppTextStyles.metaMuted)),
-      ],
+    return ChefAvatarRow(
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Flexible(child: Text(label, style: AppTextStyles.metaMuted)),
+          SizedBox(width: 10.w),
+          SizedBox(
+            width: 14.r,
+            height: 14.r,
+            child: const CircularProgressIndicator(strokeWidth: 2, color: AppColors.brand),
+          ),
+        ],
+      ),
     );
   }
 }

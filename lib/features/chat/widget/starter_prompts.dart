@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../../core/theme/app_theme.dart';
+import '../../../core/widget/app_logo.dart';
 import '../../../core/widget/surface_card.dart';
 import '../../../l10n/app_localizations.dart';
 
@@ -18,7 +19,7 @@ class StarterPrompts extends StatelessWidget {
     return ListView(
       padding: EdgeInsets.symmetric(horizontal: AppDimens.pageH, vertical: 12.h),
       children: [
-        Text('👨‍🍳', style: AppTextStyles.emojiIcon.copyWith(fontSize: 44.sp)),
+        Align(alignment: Alignment.centerLeft, child: AppLogo(size: 72.r)),
         SizedBox(height: 12.h),
         Text(l10n.chatEmptyTitle, style: AppTextStyles.h2),
         SizedBox(height: 6.h),

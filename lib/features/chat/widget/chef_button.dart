@@ -3,11 +3,11 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../../core/theme/app_theme.dart';
 import '../../../core/util/haptics.dart';
-import '../../../core/widget/app_logo.dart';
+import '../../../core/widget/line_icon.dart';
 import '../screen/chat_screen.dart';
 
-/// The round orange button with the Tably chef beside the tab bar, as tall
-/// as the bar, opening the AI chef's chat.
+/// The round orange chat button beside the tab bar, as tall as the bar,
+/// opening the AI chef's chat.
 class ChefButton extends StatelessWidget {
   const ChefButton({super.key});
 
@@ -34,7 +34,7 @@ class ChefButton extends StatelessWidget {
             BoxShadow(color: AppColors.brand.withValues(alpha: 0.42), blurRadius: 24.r, offset: Offset(0, 10.h)),
           ],
         ),
-        child: AppLogo(size: size * 0.86),
+        child: LineIcon(LineGlyph.chat, size: size * 0.44, color: AppColors.surface, strokeWidth: 2.2),
       ),
     );
   }
