@@ -11,6 +11,7 @@ import '../../../core/widget/count_badge.dart';
 import '../../../core/widget/line_icon.dart';
 import '../../../core/widget/recipe_photo.dart';
 import '../../../core/widget/search_field.dart';
+import '../../../core/widget/surface_card.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../home/cubit/home_cubit.dart';
 import '../../preferences/cubit/profile_cubit.dart';
@@ -41,6 +42,9 @@ class RecipesScreen extends StatelessWidget {
     // text was matched by the API (in English), so only the filters apply.
     final found = searchState.resultsFor(browse);
     final searching = searchState.isSearchingFor(browse);
+    // Text typed but not searched yet (or its search failed): the pool's
+    // matches under a prompt to search, never "no results" before asking.
+    final pending = browse.isSearching && found == null && !searching;
     final results = browse.apply(
       found ?? catalogue,
       store: profile.store,
@@ -90,40 +94,42 @@ class RecipesScreen extends StatelessWidget {
                   child: SearchField(
                     hint: l10n.exploreSearchPlaceholder,
                     initialValue: browse.query,
-                    // Typing narrows the cached pool; the search key asks the API.
-                    onChanged: context.read<RecipeBrowseCubit>().search,
+                    // Typing narrows the cached pool; the search key asks the
+                    // API. Emptied, it falls back to the filters' own search.
+                    onChanged: (value) {
+                      context.read<RecipeBrowseCubit>().search(value);
+                      if (value.trim().isEmpty) search();
+                    },
                     onSubmitted: (_) => search(),
                   ),
                 ),
                 SizedBox(width: 10.w),
-                FilterButton(
-                  onPressed: () async {
-                    await FiltersScreen.open(context);
-                    if (context.mounted) search();
-                  },
-                ),
+                FilterButton(onPressed: () => FiltersScreen.open(context)),
               ],
             ),
             SizedBox(height: 26.h),
             if (browse.isSearching || found != null || searching) ...[
-              Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      searching ? l10n.searchLoading : l10n.searchResultCount(results.length),
-                      style: AppTextStyles.resultCount,
+              if (pending)
+                _SearchPrompt(query: browse.query.trim(), onTap: search)
+              else
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        searching ? l10n.searchLoading : l10n.searchResultCount(results.length),
+                        style: AppTextStyles.resultCount,
+                      ),
                     ),
-                  ),
-                  if (browse.canSearch && !searching) _ReloadButton(onPressed: () => search(reload: true)),
-                ],
-              ),
+                    if (browse.canSearch && !searching) _ReloadButton(onPressed: () => search(reload: true)),
+                  ],
+                ),
               SizedBox(height: 12.h),
               if (searching)
-                const _Searching()
-              else if (results.isEmpty)
-                _EmptyText(browse.isSearching ? l10n.searchEmpty(browse.query.trim()) : l10n.filtersEmpty)
-              else
-                ..._separated([for (final r in results) row(r)], 11.h),
+                const _SearchingRows()
+              else if (results.isNotEmpty)
+                ..._separated([for (final r in results) row(r)], 11.h)
+              else if (!pending)
+                _EmptyText(browse.isSearching ? l10n.searchEmpty(browse.query.trim()) : l10n.filtersEmpty),
             ] else ...[
               // Hidden until the user has opened a recipe.
               if (recentlyViewed.isNotEmpty) ...[
@@ -208,20 +214,102 @@ class _ReloadButton extends StatelessWidget {
   }
 }
 
-/// Shown while a search runs: the API call, then Gemini.
-class _Searching extends StatelessWidget {
-  const _Searching();
+/// "Rechercher « … »": asks the API for typed text not searched yet.
+class _SearchPrompt extends StatelessWidget {
+  const _SearchPrompt({required this.query, required this.onTap});
+
+  final String query;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.symmetric(vertical: 40.h),
-      child: Center(
-        child: SizedBox(
-          width: 28.r,
-          height: 28.r,
-          child: const CircularProgressIndicator(strokeWidth: 2.5, color: AppColors.brand),
-        ),
+    return SurfaceCard(
+      onTap: onTap,
+      radius: 20.r,
+      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 15.h),
+      child: Row(
+        children: [
+          LineIcon(LineGlyph.search, size: 20.r, color: AppColors.brand),
+          SizedBox(width: 12.w),
+          Expanded(
+            child: Text(
+              AppL10n.of(context).searchPrompt(query),
+              style: AppTextStyles.recipeRowTitle,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+          SizedBox(width: 8.w),
+          LineIcon(LineGlyph.chevronRight, size: 18.r, color: AppColors.chevron),
+        ],
+      ),
+    );
+  }
+}
+
+/// Shown while a search runs (the API call, then Gemini): placeholder rows
+/// shaped like the results, pulsing.
+class _SearchingRows extends StatefulWidget {
+  const _SearchingRows();
+
+  /// Title widths, so the placeholders don't look stamped.
+  static const _widths = [0.82, 0.6, 0.74, 0.52];
+
+  @override
+  State<_SearchingRows> createState() => _SearchingRowsState();
+}
+
+class _SearchingRowsState extends State<_SearchingRows> with SingleTickerProviderStateMixin {
+  late final AnimationController _pulse = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 850),
+    lowerBound: 0.5,
+  )..repeat(reverse: true);
+
+  @override
+  void dispose() {
+    _pulse.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    Widget block(double width, double height, double radius) => Container(
+      width: width,
+      height: height,
+      decoration: BoxDecoration(color: AppColors.track, borderRadius: BorderRadius.circular(radius)),
+    );
+    Widget bar(double widthFactor, double height) =>
+        FractionallySizedBox(widthFactor: widthFactor, child: block(double.infinity, height, height / 2));
+
+    return FadeTransition(
+      opacity: _pulse,
+      child: Column(
+        children: RecipesScreen._separated([
+          for (final width in _SearchingRows._widths)
+            SurfaceCard(
+              radius: 20.r,
+              padding: EdgeInsets.all(11.r),
+              child: Row(
+                children: [
+                  block(62.r, 62.r, 14.r),
+                  SizedBox(width: 13.w),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        bar(width, 15.h),
+                        SizedBox(height: 9.h),
+                        bar(0.32, 12.h),
+                        SizedBox(height: 9.h),
+                        bar(0.45, 11.h),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+        ], 11.h),
       ),
     );
   }

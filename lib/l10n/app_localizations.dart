@@ -2203,6 +2203,12 @@ abstract class AppL10n {
   /// **'Recherche de recettes…'**
   String get searchLoading;
 
+  /// No description provided for @searchPrompt.
+  ///
+  /// In fr, this message translates to:
+  /// **'Rechercher « {query} »'**
+  String searchPrompt(String query);
+
   /// No description provided for @filtersFromPreferences.
   ///
   /// In fr, this message translates to:

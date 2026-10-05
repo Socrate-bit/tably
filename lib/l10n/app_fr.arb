@@ -631,6 +631,14 @@
   "errorCatalogueEmpty": "Aucune recette ne correspond à tes préférences.",
   "searchReload": "Relancer la recherche",
   "searchLoading": "Recherche de recettes…",
+  "searchPrompt": "Rechercher « {query} »",
+  "@searchPrompt": {
+    "placeholders": {
+      "query": {
+        "type": "String"
+      }
+    }
+  },
   "filtersFromPreferences": "Tes préférences par défaut, modifiables pour cette recherche",
   "proteinNoMeat": "Pas de viande",
   "applianceMixer": "Mixeur"
