@@ -112,6 +112,7 @@ class ShoppingScreen extends StatelessWidget {
     final box = context.findRenderObject() as RenderBox?;
     final shared = await context.read<ShoppingCubit>().share(
           subject: l10n.shoppingList,
+          header: l10n.shoppingShareHeader,
           aisleName: l10n.aisleName,
           quantities: (q) => formatQuantities(q, l10n),
           origin: box == null ? null : box.localToGlobal(Offset.zero) & box.size,

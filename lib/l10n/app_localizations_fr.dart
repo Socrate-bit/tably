@@ -550,6 +550,10 @@ class AppL10nFr extends AppL10n {
   String get shoppingShare => 'Partager';
 
   @override
+  String get shoppingShareHeader =>
+      'Coucou ! 👋\n\nVoici notre liste de courses pour la semaine, de quoi préparer plein de bons petits plats 🍽️ Bonnes courses ! 🛒\n\nPréparée avec Tably 💚';
+
+  @override
   String shoppingNeeded(String amount) {
     return '($amount nécessaire)';
   }

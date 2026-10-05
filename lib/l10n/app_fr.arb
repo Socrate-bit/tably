@@ -230,6 +230,7 @@
   "shoppingEyebrow": "CETTE SEMAINE",
   "shoppingCopyList": "Copier la liste",
   "shoppingShare": "Partager",
+  "shoppingShareHeader": "Coucou ! 👋\n\nVoici notre liste de courses pour la semaine, de quoi préparer plein de bons petits plats 🍽️ Bonnes courses ! 🛒\n\nPréparée avec Tably 💚",
   "shoppingNeeded": "({amount} nécessaire)",
   "@shoppingNeeded": {
     "placeholders": {

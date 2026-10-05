@@ -1087,6 +1087,12 @@ abstract class AppL10n {
   /// **'Partager'**
   String get shoppingShare;
 
+  /// No description provided for @shoppingShareHeader.
+  ///
+  /// In fr, this message translates to:
+  /// **'Coucou ! 👋\n\nVoici notre liste de courses pour la semaine, de quoi préparer plein de bons petits plats 🍽️ Bonnes courses ! 🛒\n\nPréparée avec Tably 💚'**
+  String get shoppingShareHeader;
+
   /// No description provided for @shoppingNeeded.
   ///
   /// In fr, this message translates to:

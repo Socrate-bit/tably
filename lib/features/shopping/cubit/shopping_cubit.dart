@@ -128,16 +128,18 @@ class ShoppingCubit extends Cubit<ShoppingState> {
         ],
       ].join('\n').trim();
 
-  /// Opens the native share sheet with the list as text. Returns false on failure.
+  /// Opens the native share sheet with [header] above the list as text.
+  /// Returns false on failure.
   Future<bool> share({
     required String subject,
+    required String header,
     required String Function(Aisle) aisleName,
     required String Function(List<Quantity>) quantities,
     Rect? origin,
   }) async {
     try {
       final result = await SharePlus.instance.share(ShareParams(
-        text: asPlainText(aisleName, quantities),
+        text: '$header\n\n${asPlainText(aisleName, quantities)}',
         subject: subject,
         sharePositionOrigin: origin,
       ));

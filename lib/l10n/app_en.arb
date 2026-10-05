@@ -230,6 +230,7 @@
   "shoppingEyebrow": "THIS WEEK",
   "shoppingCopyList": "Copy the list",
   "shoppingShare": "Share",
+  "shoppingShareHeader": "Hi there! 👋\n\nHere's our shopping list for the week, so we've got everything we need for some tasty meals 🍽️ Happy shopping! 🛒\n\nMade with Tably 💚",
   "shoppingNeeded": "({amount} needed)",
   "@shoppingNeeded": {
     "placeholders": {
