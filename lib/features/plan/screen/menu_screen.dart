@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart' show ViewportOffset;
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
+import '../../../core/model/weekday.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/util/error_feedback.dart';
+import '../../../core/util/haptics.dart';
 import '../../../core/util/option_labels.dart';
 import '../../../core/widget/app_logo.dart';
 import '../../../core/widget/primary_button.dart';
@@ -18,7 +21,8 @@ import '../../recipe/screen/recipe_screen.dart';
 import '../../shopping/cubit/shopping_cubit.dart';
 import '../../shopping/screen/shopping_screen.dart';
 import '../cubit/plan_cubit.dart';
-import '../widget/day_group.dart';
+import '../model/week_plan.dart';
+import '../widget/day_header.dart';
 import '../widget/meal_slot_card.dart';
 import '../widget/plan_summary_cards.dart';
 import '../widget/regenerate_button.dart';
@@ -36,8 +40,6 @@ class MenuScreen extends StatelessWidget {
     final shopping = context.watch<ShoppingCubit>().state;
     final week = plan.week;
     final total = week.totalAt(profile.store);
-    // Every slot in display order, so each card knows its place in the week.
-    final order = [for (final (_, slots) in week.byDay) ...slots];
     // Hidden while the new week is being fetched.
     final outdated = catalogue.outdated && !plan.regenerating && !catalogue.isBuilding;
     void openStores() => context.read<HomeCubit>().open(HomeSub.stores);
@@ -118,34 +120,14 @@ class MenuScreen extends StatelessWidget {
                   duration: const Duration(milliseconds: 200),
                   child: IgnorePointer(
                     ignoring: outdated,
-                    child: Column(
-                      key: ValueKey(plan.settings.seed),
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        for (final (day, slots) in week.byDay)
-                          DayGroup(
-                            label: l10n.dayName(day).toUpperCase(),
-                            children: [
-                              for (final slot in slots)
-                                MealSlotCard(
-                                  slot: slot,
-                                  servings: profile.household,
-                                  store: profile.store,
-                                  country: profile.country,
-                                  index: order.indexOf(slot),
-                                  onTap: () => RecipeScreen.open(context, recipeId: slot.recipe.id, slot: slot),
-                                ),
-                            ],
-                          ),
-                      ],
-                    ),
+                    child: _WeekList(key: ValueKey(plan.settings.seed), week: week, profile: profile),
                   ),
                 ),
                 if (outdated) const Positioned(top: 0, left: 0, right: 0, child: _OutdatedPrompt()),
               ],
             ),
             Padding(
-              padding: EdgeInsets.only(top: 34.h, bottom: 18.h),
+              padding: EdgeInsets.only(top: 36.h, bottom: 18.h),
               child: Center(
                 child: RegenerateButton(
                   regenerating: plan.regenerating,
@@ -156,6 +138,76 @@ class MenuScreen extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+/// The week as one reorderable list: each day's header, then its meals. Only
+/// meals drag, by their dots; the headers stay put, so a dropped meal takes
+/// the place it lands in and the meals in between shift along.
+class _WeekList extends StatelessWidget {
+  const _WeekList({super.key, required this.week, required this.profile});
+
+  final WeekPlan week;
+  final UserProfile profile;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppL10n.of(context);
+    final items = <Object>[
+      for (final (day, slots) in week.byDay) ...[day, ...slots],
+    ];
+    // Meals in display order, so each card knows its place in the week.
+    final meals = items.whereType<PlanSlot>().toList();
+
+    // The list reports where the dragged meal landed among headers and meals;
+    // it takes the place of the meal it lands beside. Landing just under a
+    // day's header means that day's first meal, just above it the day before's
+    // last.
+    void reorder(int from, int to) {
+      final down = from < to;
+      final target = switch (down ? items[to - 1] : items[to]) {
+        final PlanSlot beside => meals.indexOf(beside),
+        _ when down => meals.indexOf(items[to] as PlanSlot),
+        _ => to == 0 ? 0 : meals.indexOf(items[to - 1] as PlanSlot),
+      };
+      final keys = [for (final meal in meals) meal.key];
+      keys.insert(target, keys.removeAt(meals.indexOf(items[from] as PlanSlot)));
+      context.read<PlanCubit>().reorder(keys);
+    }
+
+    // A fixed, non-scrolling viewport: the list lays out every item like the
+    // column it replaces, while dragging near an edge scrolls the menu itself.
+    return ShrinkWrappingViewport(
+      offset: ViewportOffset.zero(),
+      slivers: [
+        SliverReorderableList(
+          itemCount: items.length,
+          onReorder: reorder,
+          onReorderStart: (_) => Haptics.toggle(),
+          onReorderEnd: (_) => Haptics.tap(),
+          proxyDecorator: (child, _, animation) => ScaleTransition(
+            scale: Tween<double>(begin: 1, end: 1.03).animate(CurvedAnimation(parent: animation, curve: Curves.easeOut)),
+            child: child,
+          ),
+          itemBuilder: (context, i) => switch (items[i]) {
+            final Weekday day => DayHeader(key: ValueKey(day), label: l10n.dayName(day).toUpperCase()),
+            final slot as PlanSlot => Padding(
+              key: ValueKey(slot.key),
+              padding: EdgeInsets.only(bottom: 11.h),
+              child: MealSlotCard(
+                slot: slot,
+                servings: profile.household,
+                store: profile.store,
+                country: profile.country,
+                index: meals.indexOf(slot),
+                dragIndex: i,
+                onTap: () => RecipeScreen.open(context, recipeId: slot.recipe.id, slot: slot),
+              ),
+            ),
+          },
+        ),
+      ],
     );
   }
 }

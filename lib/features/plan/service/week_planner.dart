@@ -37,8 +37,9 @@ abstract final class WeekPlanner {
     // Within a window the pots take turns (A B A B), so a dish only comes
     // back to back when its window has a single pot. Each pot is cooked at
     // its first meal and served as leftovers for the rest, all within the
-    // window, so never past [UserProfile.leftoverHours]. Past the
-    // catalogue's size a dish comes back, cooked fresh again.
+    // window, so never past [UserProfile.leftoverHours] unless the user moved
+    // meals apart. Past the catalogue's size a dish comes back, cooked fresh
+    // again.
     final potOf = List.filled(meals.length, 0);
     var firstPot = 0;
     for (final (w, window) in windows.indexed) {
@@ -47,32 +48,36 @@ abstract final class WeekPlanner {
       }
       firstPot += potsIn[w];
     }
+    // Meals are planned by index into [meals]; [shownAt] says which one the
+    // week shows at each place once the user rearranged it. A pot is cooked
+    // at whichever of its meals now comes first.
+    final keys = [for (final (day, slot) in meals) PlanSlot.keyFor(day, slot)];
+    final shownAt = _arrangement(keys, settings.order);
     final cookOf = <int, int>{};
-    for (var i = 0; i < meals.length; i++) {
+    for (final i in shownAt) {
       cookOf.putIfAbsent(potOf[i], () => i);
     }
 
     // A swapped meal is cooked fresh, never a leftover. Every other meal past
     // its pot's first is served from that first meal's pot.
-    bool isLeftover(int i) =>
-        byId(settings.overrides[PlanSlot.keyFor(meals[i].$1, meals[i].$2)]) == null && cookOf[potOf[i]] != i;
+    bool isLeftover(int i) => byId(settings.overrides[keys[i]]) == null && cookOf[potOf[i]] != i;
     final leftoversOf = <int, int>{};
     for (var i = 0; i < meals.length; i++) {
       if (isLeftover(i)) leftoversOf.update(cookOf[potOf[i]]!, (n) => n + 1, ifAbsent: () => 1);
     }
 
     return WeekPlan(slots: [
-      for (final (i, (day, slot)) in meals.indexed)
+      for (final (place, i) in shownAt.indexed)
         () {
           final pot = potOf[i];
-          final (cookedDay, cookedSlot) = meals[cookOf[pot]!];
-          final override = byId(settings.overrides[PlanSlot.keyFor(day, slot)]);
+          final override = byId(settings.overrides[keys[i]]);
           final leftover = isLeftover(i);
           // A leftover is whatever was cooked for its pot, including a swap.
-          final cookedOverride = leftover ? byId(settings.overrides[PlanSlot.keyFor(cookedDay, cookedSlot)]) : null;
+          final cookedOverride = leftover ? byId(settings.overrides[keys[cookOf[pot]!]]) : null;
           return PlanSlot(
-            day: day,
-            slot: slot,
+            key: keys[i],
+            day: meals[place].$1,
+            slot: meals[place].$2,
             recipe: override ?? cookedOverride ?? shuffled[pot % shuffled.length],
             isLeftover: leftover,
             // The cook buys for the whole household, for itself and its leftovers.
@@ -81,6 +86,13 @@ abstract final class WeekPlanner {
           );
         }(),
     ]);
+  }
+
+  /// The meal index shown at each place: [order] when it rearranges exactly
+  /// [keys], else the planned order.
+  static List<int> _arrangement(List<String> keys, List<String> order) {
+    final valid = order.length == keys.length && order.toSet().length == keys.length && keys.toSet().containsAll(order);
+    return valid ? [for (final key in order) keys.indexOf(key)] : [for (var i = 0; i < keys.length; i++) i];
   }
 
   /// The design's seeded shuffle, reproduced exactly so a given seed yields

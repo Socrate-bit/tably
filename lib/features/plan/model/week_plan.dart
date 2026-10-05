@@ -10,6 +10,7 @@ export '../../../core/model/meal_slot.dart';
 /// One meal in the week.
 class PlanSlot extends Equatable {
   const PlanSlot({
+    required this.key,
     required this.day,
     required this.slot,
     required this.recipe,
@@ -18,6 +19,11 @@ class PlanSlot extends Equatable {
     required this.showSlotLabel,
   });
 
+  /// Identifies the meal across regenerations and moves: the slot it was
+  /// planned at, e.g. `monday|dinner`. Swaps and the week's order refer to it.
+  final String key;
+
+  /// Where the meal shows in the week, which differs from [key] once moved.
   final Weekday day;
   final MealSlot slot;
   final Recipe recipe;
@@ -32,13 +38,10 @@ class PlanSlot extends Equatable {
   /// Slot names only show when there is more than one meal a day.
   final bool showSlotLabel;
 
-  /// Identifies the slot across regenerations, e.g. `monday|dinner`.
-  String get key => keyFor(day, slot);
-
   static String keyFor(Weekday day, MealSlot slot) => '${day.id}|${slot.id}';
 
   @override
-  List<Object?> get props => [day, slot, recipe, isLeftover, portions, showSlotLabel];
+  List<Object?> get props => [key, day, slot, recipe, isLeftover, portions, showSlotLabel];
 }
 
 /// The computed week: every slot plus the figures the menu shows.

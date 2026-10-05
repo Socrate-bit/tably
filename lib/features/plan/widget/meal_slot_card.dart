@@ -12,8 +12,9 @@ import '../../../l10n/app_localizations.dart';
 import '../../recipe/widget/craving_badge.dart';
 import '../model/week_plan.dart';
 
-/// One meal of the week: photo, optional slot name, title, badges, meta and
-/// an open chevron, with a produce decoration bleeding off the top-right.
+/// One meal of the week: drag dots, photo, optional slot name, title, badges,
+/// meta and an open chevron, with a produce decoration bleeding off the
+/// top-right.
 class MealSlotCard extends StatelessWidget {
   const MealSlotCard({
     super.key,
@@ -22,6 +23,7 @@ class MealSlotCard extends StatelessWidget {
     required this.store,
     required this.country,
     required this.index,
+    required this.dragIndex,
     required this.onTap,
   });
 
@@ -38,6 +40,9 @@ class MealSlotCard extends StatelessWidget {
 
   /// The card's position in the week, which picks its decoration.
   final int index;
+
+  /// The card's index in the enclosing reorderable list, which its dots drag.
+  final int dragIndex;
   final VoidCallback onTap;
 
   @override
@@ -70,9 +75,10 @@ class MealSlotCard extends StatelessWidget {
             ),
           ),
           Padding(
-            padding: EdgeInsets.all(11.r),
+            padding: EdgeInsets.fromLTRB(0, 11.r, 11.r, 11.r),
             child: Row(
               children: [
+                _DragHandle(index: dragIndex, height: photoSize),
                 RecipePhoto(
                   url: recipe.photoUrl,
                   height: photoSize,
@@ -129,6 +135,31 @@ class MealSlotCard extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+/// The three dots on the card's left edge: press and drag to move the meal
+/// up or down the week.
+class _DragHandle extends StatelessWidget {
+  const _DragHandle({required this.index, required this.height});
+
+  final int index;
+  final double height;
+
+  @override
+  Widget build(BuildContext context) {
+    return ReorderableDragStartListener(
+      index: index,
+      // Transparent fill so the whole strip, not just the glyph, takes the press.
+      child: ColoredBox(
+        color: Colors.transparent,
+        child: SizedBox(
+          width: 28.w,
+          height: height,
+          child: Icon(Icons.more_vert_rounded, size: 22.r, color: AppColors.textTertiary),
+        ),
       ),
     );
   }

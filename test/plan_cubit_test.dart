@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:tably/core/model/preference_option.dart';
+import 'package:tably/core/model/weekday.dart';
 import 'package:tably/core/analytics/analytics_service.dart';
 import 'package:tably/features/plan/cubit/plan_cubit.dart';
 import 'package:tably/features/plan/service/plan_service.dart';
@@ -48,6 +49,20 @@ void main() {
     expect(after.slotByKey('tuesday|lunch')!.recipe, other, reason: 'leftover follows the swap');
     expect(after.slotByKey('monday|dinner'), before.slotByKey('monday|dinner'));
     expect(lunch.recipe, isNot(other));
+  });
+
+  test('reordering moves meals and keeps each one reachable by its key', () async {
+    final plan = await build(const UserProfile());
+    final before = plan.state.week;
+    final keys = [for (final s in before.slots) s.key];
+
+    await plan.reorder([...keys.skip(1), keys.first]);
+
+    final after = plan.state.week;
+    expect(after.slots.last.key, 'monday|dinner');
+    expect(after.slots.last.day, Weekday.sunday);
+    expect(after.slotByKey('monday|dinner')!.recipe, before.slotByKey('monday|dinner')!.recipe);
+    expect(after.slots.first.recipe, before.slotByKey('tuesday|dinner')!.recipe);
   });
 
   test('adding a recipe to the week takes the place of a chosen dish everywhere', () async {
