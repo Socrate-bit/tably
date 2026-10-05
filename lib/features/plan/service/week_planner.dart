@@ -67,21 +67,24 @@ abstract final class WeekPlanner {
   /// Shares meals eaten at [hours] among exactly [pots] pots, numbered in the
   /// order they are cooked. No pot is eaten past [UserProfile.leftoverHours]
   /// after cooking; among the ways that holds, the fewest meals repeat the one
-  /// before, then pots are as even as possible. An exhaustive search: a week
-  /// has at most 14 meals and a pot can only feed the next few, so it stays
-  /// small.
+  /// before, then pots are as even as possible. An exhaustive search, which a
+  /// week of at most 14 meals keeps small; it stops at the first perfect week.
   static List<int> _sharePots(List<int> hours, int pots) {
     var best = <int>[];
     var bestRepeats = 0;
     var bestSpread = 0;
+    // No repeats and pots as even as the meal count allows.
+    final perfectSpread = hours.length % pots == 0 ? 0 : 1;
+    bool perfect() => best.isNotEmpty && bestRepeats == 0 && bestSpread == perfectSpread;
     final potOf = <int>[];
     final cookedAt = <int>[];
     final sizes = <int>[];
 
     void place(int repeats) {
       final meal = potOf.length;
-      // Every pot left must still get a meal, and a worse week is dropped early.
-      if (hours.length - meal < pots - cookedAt.length) return;
+      // Done once perfect; every pot left must still get a meal, and a worse
+      // week is dropped early.
+      if (perfect() || hours.length - meal < pots - cookedAt.length) return;
       if (best.isNotEmpty && repeats > bestRepeats) return;
       if (meal == hours.length) {
         final spread = sizes.reduce(max) - sizes.reduce(min);
@@ -90,16 +93,8 @@ abstract final class WeekPlanner {
         }
         return;
       }
-      // Cooking a new pot first, so ties keep leftovers late in the week.
-      if (cookedAt.length < pots) {
-        potOf.add(cookedAt.length);
-        cookedAt.add(hours[meal]);
-        sizes.add(1);
-        place(repeats);
-        potOf.removeLast();
-        cookedAt.removeLast();
-        sizes.removeLast();
-      }
+      // Leftovers from the oldest pot first, then a new pot, so ties eat each
+      // dish as soon after cooking as they can.
       for (var pot = 0; pot < cookedAt.length; pot++) {
         if (hours[meal] - cookedAt[pot] > UserProfile.leftoverHours) continue;
         final repeat = potOf.isNotEmpty && potOf.last == pot;
@@ -108,6 +103,15 @@ abstract final class WeekPlanner {
         place(repeats + (repeat ? 1 : 0));
         potOf.removeLast();
         sizes[pot]--;
+      }
+      if (cookedAt.length < pots) {
+        potOf.add(cookedAt.length);
+        cookedAt.add(hours[meal]);
+        sizes.add(1);
+        place(repeats);
+        potOf.removeLast();
+        cookedAt.removeLast();
+        sizes.removeLast();
       }
     }
 

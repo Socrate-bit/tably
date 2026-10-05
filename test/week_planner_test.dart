@@ -65,13 +65,14 @@ void main() {
     }
   });
 
-  test('one meal a day offers 7 and 4 recipes', () {
-    // A dinner keeps until the next day's dinner only, so batch cooking can't
-    // stretch a pot further than balanced does.
-    final profile = _profile(1, [0, 1, 2, 3, 4, 5, 6]);
-    int recipes(Variety v) => profile.copyWith(variety: v).recipesToCook;
-    expect([recipes(Variety.high), recipes(Variety.balanced), recipes(Variety.low)], [7, 4, 4]);
-    expect(profile.varietyRecipes, {Variety.high: 7, Variety.balanced: 4});
+  test('one meal a day offers 7, 4 and 2 recipes', () {
+    int recipes(Variety v) => _profile(1, [0, 1, 2, 3, 4, 5, 6], variety: v).recipesToCook;
+    expect([recipes(Variety.high), recipes(Variety.balanced), recipes(Variety.low)], [7, 4, 2]);
+  });
+
+  test('cooking days too far apart need a dish each', () {
+    // Monday's dinner can't wait until Friday.
+    expect(_profile(1, [0, 4], variety: Variety.low).recipesToCook, 2);
   });
 
   test('leftovers stay fresh for every week shape', () {
@@ -106,15 +107,16 @@ void main() {
       return plan.slots.map((s) => letters.putIfAbsent(s.recipe.id, () => String.fromCharCode(65 + letters.length))).join();
     }
 
-    // Balanced: two days at a time, A B A B; the lone Sunday repeats.
-    expect(pattern(2, [0, 1, 2, 3, 4, 5, 6], Variety.balanced), 'ABABCDCDEFEFGG');
-    // Batch cooking: a dish eaten three or four times within 32h can't avoid
-    // repeats, but they're kept to the fewest, in even shares.
-    expect(pattern(2, [2, 3, 4], Variety.low), 'AABABB');
-    expect(pattern(2, [0, 1, 2, 3, 4], Variety.low), 'AABABBCCCC');
-    expect(pattern(2, [0, 1, 2, 3, 4, 5, 6], Variety.low), 'AABABBCCCCDDDD');
-    // One meal a day: a dinner only keeps until the next day's dinner.
-    expect(pattern(1, [0, 1, 2, 3, 4, 5, 6], Variety.balanced), 'ABBCCDD');
+    // Balanced: every dish twice, never twice in a row.
+    expect(pattern(2, [0, 1, 2, 3, 4, 5, 6], Variety.balanced), 'ABABCDCDEFEGFG');
+    // Batch cooking: three or four servings of a dish can still alternate.
+    expect(pattern(2, [2, 3, 4], Variety.low), 'ABABAB');
+    expect(pattern(2, [0, 1, 2, 3, 4, 5, 6], Variety.low), 'ABABABABCDCDCD');
+    expect(pattern(2, [0, 1, 2, 3, 4], Variety.low), 'AABABCACBC');
+    // One meal a day: a dish keeps three days, so two dishes can't alternate
+    // across seven dinners.
+    expect(pattern(1, [0, 1, 2, 3, 4, 5, 6], Variety.balanced), 'ABABCDC');
+    expect(pattern(1, [0, 1, 2, 3, 4, 5, 6], Variety.low), 'AAAABBB');
   });
 
   test('a swapped meal carries through to its leftover', () {

@@ -52,7 +52,7 @@ class UserProfile extends Equatable {
   static const maxMealsPerDay = 2;
 
   /// Longest a cooked dish is kept before it is eaten, in hours.
-  static const leftoverHours = 32;
+  static const leftoverHours = 72;
 
   final String name;
   final int household;
