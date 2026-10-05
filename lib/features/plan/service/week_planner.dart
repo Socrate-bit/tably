@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import '../../preferences/model/user_profile.dart';
 import '../../recipe/model/recipe.dart';
 import '../model/plan_settings.dart';
@@ -22,32 +24,11 @@ abstract final class WeekPlanner {
         ? null
         : catalogue.where((r) => r.id == id).firstOrNull ?? favourites.where((r) => r.id == id).firstOrNull;
 
-    // Every fresh window gets a pot; each extra one goes to the window with
-    // the most meals per pot, so pots stay as even as possible.
-    final windows = profile.freshWindows;
-    final potsIn = [for (final _ in windows) 1];
-    for (var extra = profile.recipesToCook - windows.length; extra > 0; extra--) {
-      var busiest = 0;
-      for (var w = 1; w < windows.length; w++) {
-        if (windows[w].length * potsIn[busiest] > windows[busiest].length * potsIn[w]) busiest = w;
-      }
-      potsIn[busiest]++;
-    }
-
-    // Within a window the pots take turns (A B A B), so a dish only comes
-    // back to back when its window has a single pot. Each pot is cooked at
-    // its first meal and served as leftovers for the rest, all within the
-    // window, so never past [UserProfile.leftoverHours] unless the user moved
-    // meals apart. Past the catalogue's size a dish comes back, cooked fresh
-    // again.
-    final potOf = List.filled(meals.length, 0);
-    var firstPot = 0;
-    for (final (w, window) in windows.indexed) {
-      for (final (j, meal) in window.indexed) {
-        potOf[meal] = firstPot + j % potsIn[w];
-      }
-      firstPot += potsIn[w];
-    }
+    // Each meal is served from a pot: cooked at its first meal, then served
+    // as leftovers for the rest, never past [UserProfile.leftoverHours] unless
+    // the user moved meals apart. Past the catalogue's size a dish comes back,
+    // cooked fresh again.
+    final potOf = _sharePots(profile.mealHours, profile.recipesToCook);
     // Meals are planned by index into [meals]; [shownAt] says which one the
     // week shows at each place once the user rearranged it. A pot is cooked
     // at whichever of its meals now comes first.
@@ -93,6 +74,61 @@ abstract final class WeekPlanner {
   static List<int> _arrangement(List<String> keys, List<String> order) {
     final valid = order.length == keys.length && order.toSet().length == keys.length && keys.toSet().containsAll(order);
     return valid ? [for (final key in order) keys.indexOf(key)] : [for (var i = 0; i < keys.length; i++) i];
+  }
+
+  /// Shares meals eaten at [hours] among exactly [pots] pots, numbered in the
+  /// order they are cooked. No pot is eaten past [UserProfile.leftoverHours]
+  /// after cooking; among the ways that holds, the fewest meals repeat the one
+  /// before, then pots are as even as possible. An exhaustive search, which a
+  /// week of at most 14 meals keeps small; it stops at the first perfect week.
+  static List<int> _sharePots(List<int> hours, int pots) {
+    var best = <int>[];
+    var bestRepeats = 0;
+    var bestSpread = 0;
+    // No repeats and pots as even as the meal count allows.
+    final perfectSpread = hours.length % pots == 0 ? 0 : 1;
+    bool perfect() => best.isNotEmpty && bestRepeats == 0 && bestSpread == perfectSpread;
+    final potOf = <int>[];
+    final cookedAt = <int>[];
+    final sizes = <int>[];
+
+    void place(int repeats) {
+      final meal = potOf.length;
+      // Done once perfect; every pot left must still get a meal, and a worse
+      // week is dropped early.
+      if (perfect() || hours.length - meal < pots - cookedAt.length) return;
+      if (best.isNotEmpty && repeats > bestRepeats) return;
+      if (meal == hours.length) {
+        final spread = sizes.reduce(max) - sizes.reduce(min);
+        if (best.isEmpty || repeats < bestRepeats || spread < bestSpread) {
+          (best, bestRepeats, bestSpread) = ([...potOf], repeats, spread);
+        }
+        return;
+      }
+      // Leftovers from the oldest pot first, then a new pot, so ties eat each
+      // dish as soon after cooking as they can.
+      for (var pot = 0; pot < cookedAt.length; pot++) {
+        if (hours[meal] - cookedAt[pot] > UserProfile.leftoverHours) continue;
+        final repeat = potOf.isNotEmpty && potOf.last == pot;
+        potOf.add(pot);
+        sizes[pot]++;
+        place(repeats + (repeat ? 1 : 0));
+        potOf.removeLast();
+        sizes[pot]--;
+      }
+      if (cookedAt.length < pots) {
+        potOf.add(cookedAt.length);
+        cookedAt.add(hours[meal]);
+        sizes.add(1);
+        place(repeats);
+        potOf.removeLast();
+        cookedAt.removeLast();
+        sizes.removeLast();
+      }
+    }
+
+    place(0);
+    return best;
   }
 
   /// The design's seeded shuffle, reproduced exactly so a given seed yields
