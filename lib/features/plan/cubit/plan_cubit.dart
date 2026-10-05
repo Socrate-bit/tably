@@ -95,12 +95,17 @@ class PlanCubit extends Cubit<PlanState> {
     return rebuilt;
   }
 
-  /// Swaps the meal in [slotKey] for [recipeId].
-  Future<void> replace(String slotKey, String recipeId) async {
-    await _apply(state.settings.copyWith(overrides: {...state.settings.overrides, slotKey: recipeId}));
+  /// Swaps the meal in [slotKey] for [recipe]. One from neither the cached
+  /// pool nor the saved favourites — a search result — joins the pool first,
+  /// so the week can use it.
+  Future<void> replace(String slotKey, Recipe recipe) async {
+    final known = _catalogueCubit.state.byId(recipe.id) ?? _recipeCubit.state.savedRecipe(recipe.id);
+    if (known == null) unawaited(_catalogueCubit.addRecipe(recipe));
+    await _apply(state.settings.copyWith(overrides: {...state.settings.overrides, slotKey: recipe.id}));
+    debugPrint('[PlanCubit] meal replaced: $slotKey → ${recipe.id}');
     unawaited(_analytics.capture(
       AnalyticsEvents.mealReplaced,
-      properties: {'slot': slotKey, 'recipe_id': recipeId},
+      properties: {'slot': slotKey, 'recipe_id': recipe.id},
     ));
   }
 

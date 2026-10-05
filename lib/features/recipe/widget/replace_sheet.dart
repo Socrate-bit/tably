@@ -1,14 +1,10 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-import '../../../core/theme/app_theme.dart';
 import '../../../core/util/haptics.dart';
 import '../../../core/util/option_labels.dart';
 import '../../../core/widget/app_sheet.dart';
-import '../../../core/widget/search_field.dart';
 import '../../../core/widget/segmented_toggle.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../plan/cubit/plan_cubit.dart';
@@ -18,33 +14,30 @@ import '../../preferences/model/user_profile.dart';
 import '../cubit/catalogue_cubit.dart';
 import '../cubit/recipe_browse_cubit.dart';
 import '../cubit/recipe_cubit.dart';
+import '../cubit/recipe_search_cubit.dart';
 import '../model/recipe.dart';
-import '../screen/filters_screen.dart';
-import 'filter_button.dart';
 import 'recipe_row.dart';
+import 'recipe_search_results.dart';
 
-/// "Remplacer par": picks a dish for the week.
-///
-/// Opened from a planned meal ([slot] set), the chosen recipe replaces that
-/// meal. Opened from any other recipe, the list shows this week's dishes and
-/// [recipe] takes the place of the one chosen.
+/// "Remplacer par": picks the dish that replaces the planned meal [slot].
+/// Searches like the recipes tab, whose search and filters it shares: typing
+/// narrows the list, the search key asks the API, and the filters open over
+/// the sheet.
 class ReplaceSheet extends StatefulWidget {
-  const ReplaceSheet({super.key, required this.recipe, this.slot});
+  const ReplaceSheet({super.key, required this.slot});
 
-  final Recipe recipe;
-  final PlanSlot? slot;
+  final PlanSlot slot;
 
-  /// Shows the sheet; resolves to true once the week changed.
-  static Future<bool> show(BuildContext context, {required Recipe recipe, PlanSlot? slot}) async =>
-      await AppSheet.show<bool>(context, (_) => ReplaceSheet(recipe: recipe, slot: slot)) ?? false;
+  /// Shows the sheet; resolves to true once the meal was replaced.
+  static Future<bool> show(BuildContext context, {required PlanSlot slot}) async =>
+      await AppSheet.show<bool>(context, (_) => ReplaceSheet(slot: slot)) ?? false;
 
   @override
   State<ReplaceSheet> createState() => _ReplaceSheetState();
 }
 
 class _ReplaceSheetState extends State<ReplaceSheet> {
-  /// Search text and the favourites toggle only live while the sheet is open.
-  String _query = '';
+  /// The favourites toggle only lives while the sheet is open.
   bool _favouritesOnly = false;
 
   @override
@@ -53,96 +46,68 @@ class _ReplaceSheetState extends State<ReplaceSheet> {
     final profile = context.select<ProfileCubit, UserProfile>((c) => c.state.profile);
     final browse = context.watch<RecipeBrowseCubit>().state;
     final recipes = context.watch<RecipeCubit>().state;
-    final week = context.select<PlanCubit, WeekPlan>((c) => c.state.week);
-    final slot = widget.slot;
+    final searchState = context.watch<RecipeSearchCubit>().state;
 
-    // For a slot, the catalogue plus saved favourites the user may pick even
-    // if they left it; without a slot, the dishes already in the week.
-    final pool = slot != null
-        ? {
-            for (final r in context.watch<CatalogueCubit>().state.recipes) r.id: r,
-            for (final r in recipes.savedFavourites) r.id: r,
-          }.values.toList()
-        : {for (final s in week.slots.where((s) => !s.isLeftover)) s.recipe.id: s.recipe}.values.toList();
+    // API results for exactly this search; otherwise the catalogue plus saved
+    // favourites the user may pick even if they left it.
+    final found = searchState.resultsFor(browse);
+    final pool = found ??
+        {
+          for (final r in context.watch<CatalogueCubit>().state.recipes) r.id: r,
+          for (final r in recipes.savedFavourites) r.id: r,
+        }.values.toList();
     final options = browse
-        .apply(pool, store: profile.store, cravingLabel: l10n.cravingLabel, searchText: _query)
+        .apply(pool, store: profile.store, cravingLabel: l10n.cravingLabel, searched: found != null)
         .where((r) => !_favouritesOnly || recipes.isFavourite(r.id))
-        .where((r) => slot != null || r.id != widget.recipe.id)
         .toList();
+    final emptyText = _favouritesOnly ? l10n.replaceEmptyFavourites : null;
+
+    Widget row(Recipe recipe) => RecipeRow(
+      recipe: recipe,
+      store: profile.store,
+      country: profile.country,
+      bordered: true,
+      onTap: () => _choose(recipe),
+    );
 
     return AppSheet(
       title: l10n.replaceTitle,
-      subtitle: slot != null ? l10n.replaceSubtitleSlot(l10n.dayName(slot.day)) : l10n.replaceSubtitleWeek,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Row(
-            children: [
-              Expanded(
-                child: SearchField(
-                  hint: l10n.exploreSearchPlaceholder,
-                  compact: true,
-                  onChanged: (value) => setState(() => _query = value),
-                ),
+      subtitle: l10n.replaceSubtitleSlot(l10n.dayName(widget.slot.day)),
+      child: RecipeSearchErrorListener(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            const RecipeSearchBar(compact: true),
+            SizedBox(height: 12.h),
+            SegmentedToggle(
+              first: l10n.replaceAll,
+              second: l10n.replaceFavourites,
+              firstSelected: !_favouritesOnly,
+              compact: true,
+              onChanged: (all) => setState(() => _favouritesOnly = !all),
+            ),
+            SizedBox(height: 14.h),
+            Expanded(
+              child: SingleChildScrollView(
+                child: searchState.showsSearch(browse)
+                    ? RecipeSearchResults(results: options, row: row, emptyText: emptyText)
+                    : options.isEmpty
+                        ? RecipeListEmpty(emptyText ?? l10n.filtersEmpty)
+                        : Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: withGaps([for (final r in options) row(r)], 10.h),
+                          ),
               ),
-              SizedBox(width: 9.w),
-              FilterButton(
-                compact: true,
-                onPressed: () {
-                  Navigator.of(context).pop(false);
-                  FiltersScreen.open(context);
-                },
-              ),
-            ],
-          ),
-          SizedBox(height: 12.h),
-          SegmentedToggle(
-            first: l10n.replaceAll,
-            second: l10n.replaceFavourites,
-            firstSelected: !_favouritesOnly,
-            compact: true,
-            onChanged: (all) => setState(() => _favouritesOnly = !all),
-          ),
-          SizedBox(height: 14.h),
-          Expanded(
-            child: options.isEmpty
-                ? Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 26.h),
-                    child: Text(
-                      _favouritesOnly ? l10n.replaceEmptyFavourites : l10n.replaceEmptySearch,
-                      textAlign: TextAlign.center,
-                      style: AppTextStyles.meta.copyWith(color: AppColors.textQuaternary, fontSize: 15.sp),
-                    ),
-                  )
-                : ListView.separated(
-                    itemCount: options.length,
-                    separatorBuilder: (_, _) => SizedBox(height: 10.h),
-                    itemBuilder: (context, i) => RecipeRow(
-                      recipe: options[i],
-                      store: profile.store,
-                      country: profile.country,
-                      bordered: true,
-                      onTap: () => _choose(options[i]),
-                    ),
-                  ),
-          ),
-        ],
+            ),
+          ],
+        ),
       ),
     );
   }
 
   void _choose(Recipe chosen) {
     Haptics.confirm();
-    final plan = context.read<PlanCubit>();
-    final slot = widget.slot;
-    // A search result or a recipe from the chat joins the cached pool
-    // first, so the week can use it.
-    final incoming = slot != null ? chosen : widget.recipe;
-    if (context.read<CatalogueCubit>().state.byId(incoming.id) == null &&
-        context.read<RecipeCubit>().state.savedRecipe(incoming.id) == null) {
-      unawaited(context.read<CatalogueCubit>().addRecipe(incoming));
-    }
-    slot != null ? plan.replace(slot.key, chosen.id) : plan.replaceRecipe(chosen.id, widget.recipe.id);
+    context.read<PlanCubit>().replace(widget.slot.key, chosen);
     Navigator.of(context).pop(true);
   }
 }

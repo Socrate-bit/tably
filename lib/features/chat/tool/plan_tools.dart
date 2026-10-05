@@ -95,7 +95,7 @@ List<ChatTool> planTools(ChatTools t) {
               return {'ok': true, 'new_recipe': ToolPayloads.recipeSummary(next.recipe, t.store)};
             }
             await t.ensureInPool(recipe);
-            await t.plan.replace(slot.key, recipe.id);
+            await t.plan.replace(slot.key, recipe);
             return {'ok': true, 'week': t.weekJson()};
           },
         );

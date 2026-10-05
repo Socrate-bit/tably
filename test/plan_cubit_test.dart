@@ -8,6 +8,7 @@ import 'package:tably/features/preferences/cubit/profile_cubit.dart';
 import 'package:tably/features/preferences/model/user_profile.dart';
 import 'package:tably/features/preferences/service/profile_service.dart';
 import 'package:tably/features/recipe/cubit/recipe_cubit.dart';
+import 'package:tably/features/recipe/model/recipe.dart';
 import 'package:tably/features/recipe/service/recipe_service.dart';
 
 import 'fixtures/recipe_fixtures.dart';
@@ -42,7 +43,7 @@ void main() {
     final lunch = before.slotByKey('monday|lunch')!;
     final other = RecipeFixtures.recipes.firstWhere((r) => before.slots.every((s) => s.recipe.id != r.id));
 
-    await plan.replace('monday|lunch', other.id);
+    await plan.replace('monday|lunch', other);
 
     final after = plan.state.week;
     expect(after.slotByKey('monday|lunch')!.recipe, other);
@@ -63,6 +64,28 @@ void main() {
     expect(after.slots.last.day, Weekday.sunday);
     expect(after.slotByKey('monday|dinner')!.recipe, before.slotByKey('monday|dinner')!.recipe);
     expect(after.slots.first.recipe, before.slotByKey('tuesday|dinner')!.recipe);
+  });
+
+  test('a search result replacing a meal joins the cached pool', () async {
+    final plan = await build(const UserProfile());
+    final fixture = RecipeFixtures.recipes.first;
+    final found = Recipe(
+      id: 'search_result',
+      title: 'Search result',
+      photoUrl: '',
+      macros: fixture.macros,
+      time: fixture.time,
+      cookTime: fixture.cookTime,
+      price: fixture.price,
+      craving: fixture.craving,
+      protein: fixture.protein,
+      ingredients: fixture.ingredients,
+      steps: fixture.steps,
+    );
+
+    await plan.replace('monday|dinner', found);
+
+    expect(plan.state.week.slotByKey('monday|dinner')!.recipe.id, found.id);
   });
 
   test('adding a recipe to the week takes the place of a chosen dish everywhere', () async {
@@ -103,7 +126,7 @@ void main() {
 
   test('a failed regeneration keeps the current week', () async {
     final plan = await build(const UserProfile(), ai: FakeAi(recipes: const []));
-    await plan.replace('monday|dinner', RecipeFixtures.recipes.last.id);
+    await plan.replace('monday|dinner', RecipeFixtures.recipes.last);
     final before = plan.state;
 
     await plan.regenerate();
@@ -115,7 +138,7 @@ void main() {
 
   test('regenerating reshuffles the week and clears swaps', () async {
     final plan = await build(const UserProfile());
-    await plan.replace('monday|dinner', RecipeFixtures.recipes.last.id);
+    await plan.replace('monday|dinner', RecipeFixtures.recipes.last);
     final seed = plan.state.settings.seed;
 
     await plan.regenerate();
