@@ -19,7 +19,6 @@ import '../../preferences/model/user_profile.dart';
 import '../../recipe/cubit/catalogue_cubit.dart';
 import '../../recipe/screen/recipe_screen.dart';
 import '../../recipe/widget/quota_dialog.dart';
-import '../../recipe/widget/search_quota_badge.dart';
 import '../../shopping/cubit/shopping_cubit.dart';
 import '../../shopping/screen/shopping_screen.dart';
 import '../cubit/plan_cubit.dart';
@@ -87,8 +86,6 @@ class MenuScreen extends StatelessWidget {
                   ),
                 ),
                 SizedBox(width: 8.w),
-                const SearchQuotaBadge(),
-                SizedBox(width: 6.w),
                 StorePill(store: profile.store, onTap: openStores),
               ],
             ),
