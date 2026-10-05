@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -12,17 +14,25 @@ import '../../../core/widget/sub_screen_header.dart';
 import '../../../core/widget/surface_card.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../preferences/cubit/profile_cubit.dart';
+import '../../preferences/widget/cook_time_slider.dart';
 import '../../../core/widget/app_slider.dart';
 import '../cubit/recipe_browse_cubit.dart';
+import '../cubit/recipe_search_cubit.dart';
 import '../model/recipe.dart';
 
-/// "Filtres": cravings, cuisine, protein, diets, allergies, appliances and
-/// price per portion.
+/// "Filtres": cravings, cuisine, diets, allergies, meats, appliances, cooking
+/// time and price per portion.
 class FiltersScreen extends StatelessWidget {
   const FiltersScreen({super.key});
 
-  static Future<void> open(BuildContext context) =>
-      Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const FiltersScreen()));
+  /// Opens the filters; closing them searches again with the new ones,
+  /// wherever they were opened from.
+  static Future<void> open(BuildContext context) async {
+    final browse = context.read<RecipeBrowseCubit>();
+    final search = context.read<RecipeSearchCubit>();
+    await Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const FiltersScreen()));
+    unawaited(search.search(browse.state));
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -91,22 +101,9 @@ class FiltersScreen extends StatelessWidget {
                     ),
                 ],
               ),
-              SizedBox(height: 28.h),
-              Text(l10n.filtersProtein, style: AppTextStyles.filterSection),
-              SizedBox(height: 2.h),
-              Text(l10n.filtersProteinSub, style: AppTextStyles.caption.copyWith(fontSize: 14.5.sp)),
-              SizedBox(height: 12.h),
-              grid([
-                for (final protein in RecipeProtein.values)
-                  _FilterChip(
-                    icon: protein.icon,
-                    label: l10n.proteinName(protein),
-                    selected: state.proteins.contains(protein),
-                    onTap: () => cubit.toggleProtein(protein),
-                  ),
-              ]),
-              // Diets, allergies and appliances: seeded from the onboarding
-              // answers, then independent of the profile.
+              // Diets, allergies, meats and appliances: the preferences' own
+              // options, seeded from the onboarding answers, then independent
+              // of the profile.
               for (final (title, chips) in [
                 (
                   l10n.prefsDiet,
@@ -133,6 +130,18 @@ class FiltersScreen extends StatelessWidget {
                   ],
                 ),
                 (
+                  l10n.prefsProteins,
+                  [
+                    for (final protein in Protein.values)
+                      _FilterChip(
+                        icon: protein.icon,
+                        label: l10n.optionLabel(protein.id),
+                        selected: state.constraints.proteins.contains(protein),
+                        onTap: () => cubit.toggleProtein(protein),
+                      ),
+                  ],
+                ),
+                (
                   l10n.prefsAppliances,
                   [
                     for (final appliance in Appliance.values)
@@ -152,6 +161,10 @@ class FiltersScreen extends StatelessWidget {
                 SizedBox(height: 12.h),
                 grid(chips),
               ],
+              SizedBox(height: 28.h),
+              Text(l10n.cookTimeTitle, style: AppTextStyles.filterSection),
+              SizedBox(height: 8.h),
+              CookTimeSlider(minutes: state.constraints.cookMinutes, onChanged: cubit.setCookMinutes),
               SizedBox(height: 28.h),
               Text(l10n.filtersPrice, style: AppTextStyles.filterSection),
               SizedBox(height: 8.h),

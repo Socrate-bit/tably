@@ -478,8 +478,6 @@
   "filtersResetAll": "Réinitialiser les filtres",
   "filtersCravings": "Tes envies",
   "filtersCuisine": "Cuisine type",
-  "filtersProtein": "Préférence",
-  "filtersProteinSub": "Le type de viande ou de protéine que tu veux voir",
   "filtersPrice": "Prix par portion",
   "filtersPriceRange": "{min} – {max}",
   "@filtersPriceRange": {
@@ -632,14 +630,64 @@
   "errorCatalogueEmpty": "Aucune recette ne correspond à tes préférences.",
   "searchReload": "Relancer la recherche",
   "searchLoading": "Recherche de recettes…",
+  "searchPrompt": "Rechercher « {query} »",
+  "@searchPrompt": {
+    "placeholders": {
+      "query": {
+        "type": "String"
+      }
+    }
+  },
   "filtersFromPreferences": "Tes préférences par défaut, modifiables pour cette recherche",
   "proteinNoMeat": "Pas de viande",
   "applianceMixer": "Mixeur",
+  "applianceSlowCooker": "Mijoteuse",
+  "appliancePressureCooker": "Autocuiseur",
+  "applianceBarbecue": "Barbecue",
+  "cookTimeTitle": "Temps de cuisine",
+  "cookTimeSub": "Le temps maximum que peut prendre une recette",
+  "cookTimeMinutes": "{minutes} min",
+  "@cookTimeMinutes": {
+    "placeholders": {
+      "minutes": {
+        "type": "String"
+      }
+    }
+  },
+  "cookTimeNoLimit": "Pas de limite",
+  "prefsCustomInstructions": "Instructions personnalisées",
+  "prefsCustomInstructionsSub": "Tably en tient compte pour choisir tes recettes",
+  "prefsCustomInstructionsHint": "Ex. : pas de champignons, peu épicé, pas de poisson cru…",
+  "actionOk": "OK",
+  "quotaTitle": "Recherches du jour",
+  "quotaBody": "{remaining, plural, =1{Il te reste 1 recherche de recettes} other{Il te reste {remaining} recherches de recettes}} sur {limit} aujourd'hui. Le compteur se réinitialise demain à {time}.",
+  "@quotaBody": {
+    "placeholders": {
+      "remaining": {
+        "type": "int"
+      },
+      "limit": {
+        "type": "int"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "quotaReachedTitle": "Limite de recherches atteinte",
+  "quotaReachedBody": "Tu as utilisé tes {limit} recherches de recettes du jour. Elles se réinitialisent demain à {time}.",
+  "@quotaReachedBody": {
+    "placeholders": {
+      "limit": {
+        "type": "int"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
+  },
   "actionCancel": "Annuler",
   "actionSave": "Enregistrer",
-  "prefsCustom": "Mes règles",
-  "prefsCustomSub": "Ce que tes recettes doivent toujours respecter",
-  "prefsCustomHint": "ex. pas de coriandre",
   "shoppingAddHint": "Ajouter un article",
   "shoppingDelete": "Supprimer",
   "shoppingEditTitle": "Modifier l'article",
@@ -734,7 +782,6 @@
   "chatDetailOutdated": "Tes recettes ne correspondront plus : il faudra les régénérer ou les garder.",
   "chatFieldName": "Prénom",
   "chatFieldLanguage": "Langue",
-  "chatFieldCookTime": "Temps de cuisine",
   "chatActShopping": "Modifier ta liste de courses",
   "chatActShare": "Partager ta liste de courses",
   "chatActCreateRecipe": "Ajouter cette nouvelle recette",

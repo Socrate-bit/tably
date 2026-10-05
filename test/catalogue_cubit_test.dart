@@ -56,6 +56,12 @@ void main() {
     expect(CatalogueCubit.keyFor(base.copyWith(appliances: {Appliance.oven})), isNot(key));
     expect(CatalogueCubit.keyFor(base.copyWith(cookTime: '15_30')), isNot(key));
     expect(CatalogueCubit.keyFor(base.copyWith(proteins: {Protein.fish})), isNot(key));
+    expect(CatalogueCubit.keyFor(base.copyWith(customInstructions: 'no mushrooms')), isNot(key));
+  });
+
+  test('keys stored before the slider and custom instructions existed still match', () {
+    final answered = base.copyWith(cookTime: '30_45', cookMinutes: UserProfile.cookMinutesFor('30_45'));
+    expect(CatalogueCubit.keyFor(answered), endsWith('|30_45'));
   });
 
   test('failures map to reasons the UI and analytics can tell apart', () {
@@ -78,6 +84,7 @@ void main() {
       catalogue = CatalogueCubit(
         service: service,
         search: search,
+        quota: unboundQuota(profile),
         ai: FakeAi(),
         profileCubit: profile,
         analytics: const AnalyticsService(),
@@ -137,14 +144,6 @@ void main() {
       expect(catalogue.state.outdated, isFalse);
       expect(search.calls, hasLength(1));
     });
-  });
-
-  test("the user's own rules change the key only once there are some", () {
-    final key = CatalogueCubit.keyFor(base);
-    expect(CatalogueCubit.keyFor(base.copyWith(customPreferences: [])), key, reason: 'old catalogues stay current');
-    final withRule = CatalogueCubit.keyFor(base.copyWith(customPreferences: ['Pas de coriandre']));
-    expect(withRule, isNot(key));
-    expect(CatalogueCubit.keyFor(base.copyWith(customPreferences: [' pas de coriandre'])), withRule);
   });
 
   test("a rebuild keeps the chef's recipes and drops the rest", () async {

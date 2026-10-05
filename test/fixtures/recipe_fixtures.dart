@@ -5,21 +5,56 @@ import 'package:tably/core/model/preference_option.dart';
 import 'package:tably/features/preferences/cubit/profile_cubit.dart';
 import 'package:tably/features/preferences/model/user_profile.dart';
 import 'package:tably/features/recipe/cubit/catalogue_cubit.dart';
+import 'package:tably/features/recipe/cubit/search_quota_cubit.dart';
 import 'package:tably/features/recipe/model/recipe.dart';
 import 'package:tably/features/recipe/service/recipe_ai_service.dart';
 import 'package:tably/features/recipe/service/recipe_search_service.dart';
 import 'package:tably/features/recipe/service/recipe_service.dart';
+import 'package:tably/features/recipe/service/search_quota_service.dart';
 
 /// A catalogue cubit holding the fixtures. Never bound to a user, and its
 /// search and Gemini steps are fakes, so it makes no network call.
-CatalogueCubit seededCatalogue(ProfileCubit profileCubit, {FakeSearch? search, FakeAi? ai}) => CatalogueCubit(
+CatalogueCubit seededCatalogue(ProfileCubit profileCubit, {FakeSearch? search, FakeAi? ai, SearchQuotaCubit? quota}) =>
+    CatalogueCubit(
       service: RecipeService(),
       search: search ?? FakeSearch(),
+      quota: quota ?? unboundQuota(profileCubit),
       ai: ai ?? FakeAi(),
       profileCubit: profileCubit,
       analytics: const AnalyticsService(),
       recipes: RecipeFixtures.recipes,
     );
+
+/// A quota cubit never bound to a user: all of today's searches are left,
+/// and no rollover timer runs.
+SearchQuotaCubit unboundQuota(ProfileCubit profileCubit) =>
+    SearchQuotaCubit(service: FakeQuota(), profileCubit: profileCubit, analytics: const AnalyticsService());
+
+/// A quota cubit with [used] of today's searches spent, all of a normal
+/// user's by default. Close it in the test.
+Future<SearchQuotaCubit> spentQuota(ProfileCubit profileCubit, {int used = 30}) async {
+  final cubit = SearchQuotaCubit(
+    service: FakeQuota(used: used),
+    profileCubit: profileCubit,
+    analytics: const AnalyticsService(),
+  )..bind('uid');
+  await cubit.stream.first;
+  return cubit;
+}
+
+/// Serves a fixed count of searches instead of Firestore's.
+class FakeQuota extends SearchQuotaService {
+  FakeQuota({this.used = 0, this.day});
+
+  final int used;
+
+  /// The UTC day [used] was counted on; today by default.
+  final String? day;
+
+  @override
+  Stream<({String? day, int count})> watch(String uid) =>
+      Stream.value((day: day ?? SearchQuotaState.utcDay(DateTime.now()), count: used));
+}
 
 /// Records every Spoonacular search instead of making it.
 class FakeSearch extends RecipeSearchService {
@@ -29,7 +64,6 @@ class FakeSearch extends RecipeSearchService {
     String? query,
     Set<Cuisine> cuisines,
     Craving? craving,
-    RecipeProtein? protein,
   })>[];
 
   @override
@@ -39,10 +73,10 @@ class FakeSearch extends RecipeSearchService {
     String? query,
     Set<Cuisine> cuisines = const {},
     Craving? craving,
-    RecipeProtein? protein,
   }) async {
-    calls.add((profile: profile, number: number, query: query, cuisines: cuisines, craving: craving, protein: protein));
-    return [for (var i = 0; i < number; i++) {'id': i}];
+    calls.add((profile: profile, number: number, query: query, cuisines: cuisines, craving: craving));
+    // Candidate i costs i € per portion.
+    return [for (var i = 0; i < number; i++) {'id': i, 'price': i}];
   }
 }
 
@@ -56,12 +90,16 @@ class FakeAi extends RecipeAiService {
   /// The profile each Gemini check was given.
   final checkedFor = <UserProfile>[];
 
+  /// The candidates each Gemini check was given.
+  final candidates = <List<Map<String, dynamic>>>[];
+
   @override
   Future<String> toEnglish(String text, String languageCode) async => 'en:$text';
 
   @override
   Future<({List<Recipe> recipes, int rejected})> adapt(List<Map<String, dynamic>> raw, UserProfile profile) async {
     checkedFor.add(profile);
+    candidates.add(raw);
     if (recipes.isEmpty) throw const NoMatchingRecipesException(0);
     return (recipes: recipes, rejected: 0);
   }

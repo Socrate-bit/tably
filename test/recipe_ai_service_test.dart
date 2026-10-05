@@ -100,21 +100,20 @@ void main() {
     final text = RecipeAiService.instruction(profile);
     expect(text, contains('vegetarian'));
     expect(text, contains('nut_free, gluten_free'));
-    expect(text, contains('The user has: hob'));
+    expect(text, contains('does NOT have:\n  microwave, oven,'));
     expect(text, contains('French'));
 
     final none = RecipeAiService.instruction(const UserProfile(languageCode: 'en', diets: {Diet.none}));
-    expect(none, contains('diets: none'));
+    expect(none, isNot(contains("user's diets")));
     expect(none, contains('English'));
   });
 
-  test("the user's own rules are checked as strictly as allergies", () {
-    const plain = UserProfile();
-    expect(RecipeAiService.instruction(plain), isNot(contains('own rules')));
-    final text = RecipeAiService.instruction(const UserProfile(customPreferences: ['pas de coriandre']));
+  test("the recipe writer respects the user's instructions and time limit", () {
+    const profile = UserProfile(customInstructions: 'pas de coriandre', cookMinutes: 30);
+    final text = RecipeAiService.writerInstruction(profile, derived: true);
     expect(text, contains('"pas de coriandre"'));
-    expect(RecipeAiService.writerInstruction(const UserProfile(customPreferences: ['pas de coriandre']), derived: true),
-        contains('"pas de coriandre"'));
+    expect(text, contains('At most 30 minutes'));
+    expect(RecipeAiService.writerInstruction(const UserProfile(), derived: false), isNot(contains('instructions:')));
   });
 
   test('a written recipe is the user\'s own, and a derived one keeps the base\'s ingredient ids', () {

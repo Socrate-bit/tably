@@ -957,12 +957,6 @@ class AppL10nEn extends AppL10n {
   String get filtersCuisine => 'Cuisine';
 
   @override
-  String get filtersProtein => 'Preference';
-
-  @override
-  String get filtersProteinSub => 'The meat or protein you want to see';
-
-  @override
   String get filtersPrice => 'Price per portion';
 
   @override
@@ -1239,6 +1233,11 @@ class AppL10nEn extends AppL10n {
   String get searchLoading => 'Searching for recipes…';
 
   @override
+  String searchPrompt(String query) {
+    return 'Search for “$query”';
+  }
+
+  @override
   String get filtersFromPreferences =>
       'Your preferences by default, adjustable for this search';
 
@@ -1249,19 +1248,69 @@ class AppL10nEn extends AppL10n {
   String get applianceMixer => 'Blender';
 
   @override
+  String get applianceSlowCooker => 'Slow cooker';
+
+  @override
+  String get appliancePressureCooker => 'Pressure cooker';
+
+  @override
+  String get applianceBarbecue => 'Barbecue';
+
+  @override
+  String get cookTimeTitle => 'Cooking time';
+
+  @override
+  String get cookTimeSub => 'The longest a recipe may take';
+
+  @override
+  String cookTimeMinutes(String minutes) {
+    return '$minutes min';
+  }
+
+  @override
+  String get cookTimeNoLimit => 'No limit';
+
+  @override
+  String get prefsCustomInstructions => 'Custom instructions';
+
+  @override
+  String get prefsCustomInstructionsSub =>
+      'Tably follows them when picking your recipes';
+
+  @override
+  String get prefsCustomInstructionsHint =>
+      'E.g. no mushrooms, not too spicy, no raw fish…';
+
+  @override
+  String get actionOk => 'OK';
+
+  @override
+  String get quotaTitle => 'Today\'s searches';
+
+  @override
+  String quotaBody(int remaining, int limit, String time) {
+    String _temp0 = intl.Intl.pluralLogic(
+      remaining,
+      locale: localeName,
+      other: 'You have $remaining recipe searches left',
+      one: 'You have 1 recipe search left',
+    );
+    return '$_temp0 out of $limit today. The counter resets tomorrow at $time.';
+  }
+
+  @override
+  String get quotaReachedTitle => 'Search limit reached';
+
+  @override
+  String quotaReachedBody(int limit, String time) {
+    return 'You\'ve used your $limit recipe searches for today. They reset tomorrow at $time.';
+  }
+
+  @override
   String get actionCancel => 'Cancel';
 
   @override
   String get actionSave => 'Save';
-
-  @override
-  String get prefsCustom => 'My rules';
-
-  @override
-  String get prefsCustomSub => 'What your recipes must always respect';
-
-  @override
-  String get prefsCustomHint => 'e.g. no coriander';
 
   @override
   String get shoppingAddHint => 'Add an item';
@@ -1441,9 +1490,6 @@ class AppL10nEn extends AppL10n {
 
   @override
   String get chatFieldLanguage => 'Language';
-
-  @override
-  String get chatFieldCookTime => 'Cooking time';
 
   @override
   String get chatActShopping => 'Edit your shopping list';

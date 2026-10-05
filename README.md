@@ -82,17 +82,17 @@ Firebase AI Logic) with function calling, and the tools in
   run at once.
 - **Spoonacular** calls (search, "what can I make with…", similar recipes,
   import from a URL, ingredient substitutes, wine pairing) go through the
-  `spoonacular` Cloud Function, which caps each user at 10 requests a day in
-  `agentQuota/{uid}` so the chat can't spend the app's shared quota.
+  `spoonacular` Cloud Function. Each one spends one of the user's daily
+  searches in `searchQuota/{uid}`, like a search from the recipes tab.
 - **Changes** (regenerate the week or a meal, swap meals, preferences
-  including the user's own free-text rules, favourites and ratings, the
+  including their custom instructions, favourites and ratings, the
   shopping list, writing a recipe or deriving one from another) are shown as
   cards the user approves or declines; nothing runs before that.
 
 Recipes the chef writes are stored with the catalogue (`origin: chef`) and
 survive rebuilds. Only recipes a build fetched are dealt into the week, so
-adding one never reshuffles it. The user's own rules (`customPreferences`) are
-checked by Gemini as strictly as allergies.
+adding one never reshuffles it. Written recipes follow the user's custom
+instructions and cooking-time limit.
 
 Deploy the function like `searchRecipes`:
 
@@ -114,7 +114,6 @@ users/{uid}/shopping/{itemId}   ShoppingItem derived from the week or added by t
                                 with its checked, removed and edited state
 users/{uid}/recipeState/{id}    favourite, cooked, rating, note, viewedAt
 users/{uid}/chat/{messageId}    the conversation with the AI chef and its proposals
-agentQuota/{uid}                the AI chef's Spoonacular requests today (server only)
 ```
 
 The week itself is never stored. `WeekPlanner` derives it from the profile

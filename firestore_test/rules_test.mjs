@@ -110,12 +110,6 @@ await check('owner can write their chat with the AI chef', () =>
 await check('a different user cannot read it', () =>
   assertFails(getDoc(doc(other, 'users', UID, 'chat', 'msg-1'))));
 
-console.log('\nagentQuota — server-owned');
-await check('no client can reset their AI chef allowance', () =>
-  assertFails(setDoc(doc(db, 'agentQuota', UID), { day: '2026-10-05', count: 0 })));
-await check('no client can read it either', () =>
-  assertFails(getDoc(doc(db, 'agentQuota', UID))));
-
 console.log('\nreferralCodes');
 await env.withSecurityRulesDisabled(async (ctx) => {
   await setDoc(doc(ctx.firestore(), 'referralCodes', 'TABLY-ADMIN'), {
@@ -134,6 +128,19 @@ await check('no client can mint a code', () =>
   })));
 await check('no client can delete a code', () =>
   assertFails(deleteDoc(doc(db, 'referralCodes', 'TABLY-ADMIN'))));
+
+console.log('\nsearchQuota/{uid} — server-owned');
+await env.withSecurityRulesDisabled(async (ctx) => {
+  await setDoc(doc(ctx.firestore(), 'searchQuota', UID), { day: '2026-10-05', count: 30 });
+});
+await check('owner can read their search count', () =>
+  assertSucceeds(getDoc(doc(db, 'searchQuota', UID))));
+await check('a different user cannot read it', () =>
+  assertFails(getDoc(doc(other, 'searchQuota', UID))));
+await check('owner cannot reset it', () =>
+  assertFails(setDoc(doc(db, 'searchQuota', UID), { day: '2026-10-05', count: 0 })));
+await check('owner cannot delete it', () =>
+  assertFails(deleteDoc(doc(db, 'searchQuota', UID))));
 
 await env.cleanup();
 console.log(`\n${passed} passed, ${failed} failed`);

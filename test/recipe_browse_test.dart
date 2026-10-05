@@ -2,6 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:tably/core/model/preference_option.dart';
 import 'package:tably/core/model/store.dart';
 import 'package:tably/features/recipe/cubit/recipe_browse_cubit.dart';
+import 'package:tably/features/recipe/model/dietary_constraints.dart';
 import 'package:tably/features/recipe/model/recipe.dart';
 
 import 'fixtures/recipe_fixtures.dart';
@@ -27,11 +28,22 @@ void main() {
     expect(_ids(const RecipeBrowseState(query: 'zzz')), isEmpty);
   });
 
-  test('craving, cuisine and protein filters combine', () {
-    const state = RecipeBrowseState(cuisines: {Cuisine.italian}, proteins: {RecipeProtein.pork});
-    expect(_ids(state), unorderedEquals(['carbonara_haricots_asperges', 'fusilli_pois_lard_ricotta']));
+  test('craving, cuisine and meat filters combine', () {
+    const state = RecipeBrowseState(cuisines: {Cuisine.italian}, constraints: DietaryConstraints(proteins: {Protein.pork}));
+    expect(
+      _ids(state),
+      unorderedEquals(['farfalle_feta_feves', 'carbonara_haricots_asperges', 'fusilli_pois_lard_ricotta']),
+      reason: 'meat-free dishes always pass',
+    );
     expect(_ids(const RecipeBrowseState(cravings: {Craving.indulgent})), ['wraps_big_mac']);
     expect(_ids(const RecipeBrowseState(cuisines: {Cuisine.mexican})), isEmpty);
+  });
+
+  test('meats follow the preferences: none or all means any, "no meat" none', () {
+    List<String> meats(Set<Protein> proteins) => _ids(RecipeBrowseState(constraints: DietaryConstraints(proteins: proteins)));
+    expect(meats({}), hasLength(RecipeFixtures.recipes.length));
+    expect(meats(Protein.meats), hasLength(RecipeFixtures.recipes.length));
+    expect(meats({Protein.noMeat}), unorderedEquals(['nouilles_tofu_satay', 'farfalle_feta_feves']));
   });
 
   test('price limit uses the store price the cards show', () {
@@ -41,8 +53,38 @@ void main() {
     expect(_ids(state, store: Store.franprix), isEmpty);
   });
 
+  test('a craving filter also keeps recipes that meet it under another badge', () {
+    final strong = RecipeFixtures.recipes.where((r) => r.macros.protein >= 30 && r.craving != Craving.highProtein);
+    expect(strong, isNotEmpty, reason: 'fixtures need a high-protein dish badged otherwise');
+    final kept = _ids(const RecipeBrowseState(cravings: {Craving.highProtein}));
+    expect(kept, containsAll(strong.map((r) => r.id)));
+    expect(
+      kept,
+      unorderedEquals([
+        for (final r in RecipeFixtures.recipes)
+          if (r.craving == Craving.highProtein || r.macros.protein >= 30) r.id,
+      ]),
+    );
+  });
+
+  test('API results are not filtered again on what the API already matched', () {
+    // Nothing in the fixtures is Mexican, nor matches the text, yet the API said so.
+    const state = RecipeBrowseState(query: 'zzz', cuisines: {Cuisine.mexican}, cravings: {Craving.indulgent});
+    final searched = state.apply(RecipeFixtures.recipes, store: Store.carrefour, cravingLabel: _label, searched: true);
+    expect(searched, hasLength(RecipeFixtures.recipes.length));
+
+    // Several cravings are not sent to the API, so they still apply.
+    const several = RecipeBrowseState(cravings: {Craving.indulgent, Craving.lowCalorie});
+    final local = several.apply(RecipeFixtures.recipes, store: Store.carrefour, cravingLabel: _label, searched: true);
+    expect(local.every((r) => r.satisfies(Craving.indulgent) || r.satisfies(Craving.lowCalorie)), isTrue);
+    expect(local.length, lessThan(RecipeFixtures.recipes.length));
+  });
+
   test('filter count counts chips plus one for a price limit', () {
-    expect(const RecipeBrowseState().filterCount, 0);
-    expect(const RecipeBrowseState(cravings: {Craving.quick}, proteins: {RecipeProtein.tofu}, maxPrice: 8).filterCount, 3);
+    final widest = RecipeBrowseState.widest;
+    expect(RecipeBrowseState(constraints: widest).filterCount, 0);
+    expect(RecipeBrowseState(constraints: widest.copyWith(proteins: {})).filterCount, 0, reason: 'no meat ticked is any meat');
+    final noFish = widest.copyWith(proteins: {Protein.beef, Protein.pork, Protein.chicken});
+    expect(RecipeBrowseState(constraints: noFish, cravings: {Craving.quick}, maxPrice: 8).filterCount, 3);
   });
 }

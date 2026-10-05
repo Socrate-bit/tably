@@ -12,29 +12,33 @@ import '../service/recipe_ai_service.dart';
 import '../service/recipe_search_service.dart';
 import 'catalogue_cubit.dart';
 import 'recipe_browse_cubit.dart';
+import 'search_quota_cubit.dart';
 
 part 'recipe_search_state.dart';
 
 /// Searches Spoonacular for the recipes tab: the search text (translated to
-/// English by Gemini) and the browse filters, including the diets, allergies
-/// and appliances chosen there in place of the profile's. Gemini then checks and translates the results, as it does the
-/// cached pool. Results live in memory; one added to the week joins the pool.
+/// English by Gemini) and the browse filters, including the diets, allergies,
+/// meats and appliances chosen there in place of the profile's. Gemini then
+/// checks and translates the results, as it does the cached pool. Results live in memory; one added to the week joins the pool.
 class RecipeSearchCubit extends Cubit<RecipeSearchState> {
   RecipeSearchCubit({
     required RecipeSearchService search,
+    required SearchQuotaCubit quota,
     required RecipeAiService ai,
     required ProfileCubit profileCubit,
     required AnalyticsService analytics,
   })  : _search = search,
+        _quota = quota,
         _ai = ai,
         _profileCubit = profileCubit,
         _analytics = analytics,
         super(const RecipeSearchState());
 
-  /// Candidates per search, before Gemini drops any that break a constraint.
-  static const size = 24;
+  /// Candidates per search, before the price limit and Gemini drop any.
+  static const size = 50;
 
   final RecipeSearchService _search;
+  final SearchQuotaCubit _quota;
   final RecipeAiService _ai;
   final ProfileCubit _profileCubit;
   final AnalyticsService _analytics;
@@ -58,6 +62,8 @@ class RecipeSearchCubit extends Cubit<RecipeSearchState> {
     final stopwatch = Stopwatch()..start();
     emit(RecipeSearchState(status: RecipeSearchStatus.searching, searchedFor: browse));
     try {
+      // Spent searches stop here, before Gemini translates the text.
+      _quota.ensureAvailable();
       final text = browse.query.trim();
       final query = text.isEmpty ? null : await _ai.toEnglish(text, profile.languageCode);
       final raw = await _search.search(
@@ -67,13 +73,18 @@ class RecipeSearchCubit extends Cubit<RecipeSearchState> {
         cuisines: browse.cuisines,
         // Spoonacular combines filters with AND, so only a single pick narrows
         // the search; several are applied to the results instead.
-        craving: browse.cravings.length == 1 ? browse.cravings.single : null,
-        protein: browse.proteins.length == 1 ? browse.proteins.single : null,
+        craving: browse.searchCraving,
       );
-      final recipes = await _adapt(raw, profile);
+      // Over-budget candidates are dropped before Gemini spends time on them.
+      final affordable = [
+        for (final r in raw)
+          if (browse.fitsPrice((r['price'] as num? ?? 0).toDouble(), profile.store)) r,
+      ];
+      final recipes = await _adapt(affordable, profile);
       if (isClosed || run != _latest) return;
       emit(RecipeSearchState(status: RecipeSearchStatus.ready, searchedFor: browse, results: recipes));
-      debugPrint('[RecipeSearchCubit] "$text" → ${recipes.length} recipes in ${stopwatch.elapsedMilliseconds}ms');
+      debugPrint('[RecipeSearchCubit] "$text" → ${recipes.length} recipes '
+          '(${raw.length - affordable.length} over budget) in ${stopwatch.elapsedMilliseconds}ms');
       unawaited(_analytics.capture(AnalyticsEvents.recipeSearched, properties: {
         'has_query': text.isNotEmpty,
         'filters': browse.filterCount,

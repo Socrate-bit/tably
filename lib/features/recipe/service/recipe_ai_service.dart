@@ -214,7 +214,11 @@ class RecipeAiService {
         (i['id'] as num?)?.toInt(): i,
     };
     final steps = (kept['steps'] as List? ?? const []).whereType<String>().toList();
-    final minutes = '${(source['readyInMinutes'] as num?)?.toInt() ?? 0}m';
+    // Spoonacular often leaves out marinating or long roasting; Gemini's
+    // reading of the steps only ever lengthens it.
+    final ready = (source['readyInMinutes'] as num?)?.toInt() ?? 0;
+    final estimate = (kept['minutes'] as num?)?.toInt() ?? 0;
+    final minutes = '${estimate > ready ? estimate : ready}m';
     final title = kept['title'] as String? ?? '';
     return Recipe(
       id: '${source['id']}',
@@ -254,38 +258,97 @@ class RecipeAiService {
   condiments, stock), herbs_grocery (spices, dried herbs, oils, dairy, eggs,
   baking, anything else).''';
 
+  /// What each allergy rules out, beyond the obvious, for the allergy rule.
+  static const _allergyExamples = {
+    Allergy.glutenFree: 'wheat, flour, bread, pasta, couscous, soy sauce and beer',
+    Allergy.lactoseFree: 'milk, butter, cream, cheese and yoghurt',
+    Allergy.nutFree: 'peanuts, tree nuts, nut butters and pesto',
+    Allergy.eggFree: 'eggs, mayonnaise and fresh egg pasta',
+    Allergy.shellfishFree: 'prawns, crab, lobster, mussels, clams and scallops',
+    Allergy.sesameFree: 'sesame seeds, sesame oil and tahini',
+    Allergy.soyFree: 'soy sauce, tofu, edamame and miso',
+  };
+
   /// The rules Gemini applies, filled in with the user's constraints.
   @visibleForTesting
   static String instruction(UserProfile profile) {
-    final c = _constraints(profile);
-    final language = _language(profile);
+    String ids(Iterable<String> values) {
+      final list = values.where((v) => v != OptionIds.none).toList();
+      return list.isEmpty ? 'none' : list.join(', ');
+    }
+
+    final language = profile.languageCode == 'en' ? 'English' : 'French';
+    // No meat ticked or every meat ticked means no preference, so the rule is
+    // left out; "no_meat" means none at all. Meat-free dishes always pass it.
+    final noMeat = profile.proteins.contains(Protein.noMeat);
+    final anyMeat = !noMeat && (profile.proteins.isEmpty || profile.proteins.containsAll(Protein.meats));
+    final protein = anyMeat
+        ? ''
+        : '''- Its main protein is a meat or fish the user did not pick. Allowed:
+  ${noMeat ? 'none: the user eats no meat or fish at all' : ids(profile.proteins.map((p) => p.id))}.
+  Meat-free dishes (vegetarian, vegan, tofu, meat substitutes) are always
+  allowed unless a diet rules them out.
+''';
+    // The optional rules below end in a newline, so a skipped one leaves no
+    // gap. Appliances are listed by what is missing: the model reads a short
+    // "does not have" list far more reliably than the full kitchen.
+    final missing = Appliance.values.where((a) => !profile.appliances.contains(a)).map((a) => a.id);
+    final equipment = profile.appliances.isEmpty
+        ? '''- It needs cooking or any appliance: the user has
+  no cooking appliance at all, so keep only recipes that need no cooking.
+'''
+        : missing.isEmpty
+            ? ''
+            : '''- It cannot be made without an appliance the user does NOT have:
+  ${missing.join(', ')}.
+  (hob = stovetop, mixer = blender or food processor, slow_cooker = crockpot,
+  pressure_cooker = pressure cooker or Instant Pot, barbecue = outdoor grill.)
+  Every other appliance, and basic tools like pots, pans, baking dishes and
+  knives, is available.
+''';
+    // No limit means time is never a reason to reject.
+    // A rule left in with "none" still primes the model (halal's "no alcohol"
+    // got applied with no diet), so diets and allergies only appear when set.
+    final diets = profile.diets.where((d) => d != Diet.none);
+    final halal = diets.contains(Diet.halal);
+    final diet = diets.isEmpty
+        ? ''
+        : '''- It breaks one of the user's diets: ${ids(diets.map((d) => d.id))}.
+${halal ? '  Halal means no pork and no alcohol.\n' : ''}''';
+    final allergies = profile.allergies.where((a) => a != Allergy.none);
+    // Examples only for the allergies picked: one for an allergy the user
+    // doesn't have gets applied anyway.
+    final watchFor = [for (final a in allergies) '${a.id} excludes ${_allergyExamples[a]}'];
+    final allergy = allergies.isEmpty
+        ? ''
+        : '''- It contains something the user must avoid: ${ids(allergies.map((a) => a.id))}.
+  Check every ingredient, including stocks, sauces, pastes and garnishes
+  (${watchFor.join('; ')}).
+''';
+    final custom = profile.customInstructions.isEmpty
+        ? ''
+        : '''- It clearly goes against the user's own instructions: "${profile.customInstructions}"
+''';
+    final time = profile.hasCookLimit
+        ? '''- It takes clearly longer than ${profile.cookMinutes} minutes in total, counting
+  marinating, resting, simmering and roasting.
+'''
+        : '';
     return '''
 You adapt recipes for Tably, a weekly dinner-planning app. The input is a JSON
 array of recipes. Put every input recipe in exactly one of "kept" or
 "rejected", by its id.
 
 1. CHECK. Reject a recipe, with a short reason, if ANY of these is true:
-- It breaks one of the user's diets: ${c.diets}.
-  Halal means no pork and no alcohol.
-- It contains something the user must avoid: ${c.allergies}.
-  Check every ingredient, including stocks, sauces, pastes and garnishes
-  (e.g. nut_free excludes peanuts, tree nuts, nut butters and pesto;
-  lactose_free excludes milk, butter, cream and cheese).
-- Its main protein is a meat or fish the user did not pick. Allowed:
-  ${c.proteins}. Vegetarian and tofu dishes are always allowed unless a diet
-  rules them out.
-- It needs equipment the user lacks. The user has: ${c.appliances}
-  (hob = stovetop, mixer = blender or food processor). Reject anything that
-  must be baked or roasted in an oven when "oven" is missing, or blended when
-  "mixer" is missing.
-${c.custom.isEmpty ? '' : "- It breaks one of the user's own rules, which are as strict as allergies: ${c.custom}.\n"}- It is not a proper savoury main course: desserts, drinks, sauces, sides,
+$diet$allergy$protein$equipment- It is not a proper savoury main course: desserts, drinks, sauces, sides,
   snacks, or text that is not really a recipe.
-- Its steps need far longer than readyInMinutes, e.g. overnight marinating or
-  hours of roasting.
+$time${custom}Never reject for any other reason${halal ? '' : ': alcohol, wine and spirits are fine'}.
 When unsure about a diet or an allergen, reject.
 
 2. ADAPT every kept recipe, writing all text in $language:
 - title: short and appetising, at most 60 characters.
+- minutes: the realistic total time from the steps, including marinating,
+  resting, simmering and roasting; readyInMinutes when that is plausible.
 - steps: translate each step faithfully and concisely. Keep quantities and
   temperatures; give temperatures in °C.
 - ingredients: one entry per input ingredient, same id.
@@ -308,8 +371,20 @@ When unsure about a diet or an allergen, reject.
   /// one, filled in with the user's constraints.
   @visibleForTesting
   static String writerInstruction(UserProfile profile, {required bool derived}) {
-    final c = _constraints(profile);
-    final language = _language(profile);
+    String ids(Iterable<String> values) {
+      final list = values.where((v) => v != OptionIds.none).toList();
+      return list.isEmpty ? 'none' : list.join(', ');
+    }
+
+    final language = profile.languageCode == 'en' ? 'English' : 'French';
+    final proteins = profile.proteins.contains(Protein.noMeat)
+        ? 'none: the user eats no meat or fish at all'
+        : profile.proteins.isEmpty
+            ? 'any meat or fish'
+            : ids(profile.proteins.map((p) => p.id));
+    final appliances = profile.appliances.isEmpty
+        ? 'none at all, so the recipe must need no cooking'
+        : ids(profile.appliances.map((a) => a.id));
     final task = derived
         ? '''The input has a "base" recipe and a "request". Return a copy of the base
 changed only as requested. Keep every other ingredient with its id as
@@ -322,14 +397,15 @@ You are Tably's chef and write recipes for a weekly dinner-planning app.
 $task
 
 Every recipe MUST respect the user's constraints:
-- Diets: ${c.diets}. Halal means no pork and no alcohol.
-- Must avoid: ${c.allergies}, including in stocks, sauces, pastes and
-  garnishes.
-- Main protein allowed: ${c.proteins}. Vegetarian and tofu are always fine
-  unless a diet rules them out.
-- Appliances the user has: ${c.appliances} (hob = stovetop, mixer = blender
-  or food processor).
-${c.custom.isEmpty ? '' : "- The user's own rules, as strict as allergies: ${c.custom}.\n"}If the request cannot be met without breaking one of these, set "refused"
+- Diets: ${ids(profile.diets.map((d) => d.id))}. Halal means no pork and no alcohol.
+- Must avoid: ${ids(profile.allergies.map((a) => a.id))}, including in stocks, sauces,
+  pastes and garnishes.
+- Main protein allowed: $proteins. Meat-free dishes are always fine unless
+  a diet rules them out.
+- Appliances the user has: $appliances (hob = stovetop, mixer = blender or
+  food processor, slow_cooker = crockpot, pressure_cooker = Instant Pot,
+  barbecue = outdoor grill).
+${profile.hasCookLimit ? '- At most ${profile.cookMinutes} minutes in total.\n' : ''}${profile.customInstructions.isEmpty ? '' : '- The user\'s own instructions: "${profile.customInstructions}"\n'}If the request cannot be met without breaking one of these, set "refused"
 to a short reason in $language and leave everything else empty. Otherwise
 set "refused" to an empty string.
 
@@ -358,35 +434,6 @@ Write all text in $language:
 ''';
   }
 
-  static String _language(UserProfile profile) => profile.languageCode == 'en' ? 'English' : 'French';
-
-  /// The user's hard constraints, worded for a prompt.
-  static ({String diets, String allergies, String proteins, String appliances, String custom}) _constraints(
-    UserProfile profile,
-  ) {
-    String ids(Iterable<String> values) {
-      final list = values.where((v) => v != OptionIds.none).toList();
-      return list.isEmpty ? 'none' : list.join(', ');
-    }
-
-    return (
-      diets: ids(profile.diets.map((d) => d.id)),
-      allergies: ids(profile.allergies.map((a) => a.id)),
-      // No meat ticked means no preference; "no_meat" means none at all.
-      proteins: profile.proteins.contains(Protein.noMeat)
-          ? 'none: the user eats no meat or fish at all'
-          : profile.proteins.isEmpty
-              ? 'any meat or fish'
-              : ids(profile.proteins.map((p) => p.id)),
-      // No appliance ticked means literally none: only no-cook recipes pass.
-      appliances: profile.appliances.isEmpty
-          ? 'no cooking appliance at all, so keep only recipes that need no cooking and no appliance'
-          : ids(profile.appliances.map((a) => a.id)),
-      // The user's own rules in their words; empty when there are none.
-      custom: profile.customPreferences.map((p) => '"$p"').join('; '),
-    );
-  }
-
   static final _schema = Schema.object(
     properties: {
       'kept': Schema.array(
@@ -394,6 +441,7 @@ Write all text in $language:
           properties: {
             'id': Schema.integer(),
             'title': Schema.string(),
+            'minutes': Schema.integer(),
             'craving': Schema.enumString(enumValues: [for (final c in Craving.values) c.id]),
             'protein': Schema.enumString(enumValues: [for (final p in RecipeProtein.values) p.id]),
             'cuisine': Schema.enumString(enumValues: [for (final c in Cuisine.values) c.id, 'none']),

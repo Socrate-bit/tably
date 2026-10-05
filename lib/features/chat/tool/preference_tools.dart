@@ -32,8 +32,8 @@ List<ChatTool> preferenceTools(ChatTools t) {
           'allergies': [for (final a in p.allergies) a.id],
           'proteins': [for (final x in p.proteins) x.id],
           'appliances': [for (final a in p.appliances) a.id],
-          'cook_time': p.cookTime,
-          'custom_preferences': p.customPreferences,
+          'cook_minutes_max': p.hasCookLimit ? p.cookMinutes : null,
+          'custom_instructions': p.customInstructions,
         });
       },
     ),
@@ -42,9 +42,10 @@ List<ChatTool> preferenceTools(ChatTools t) {
       declaration: FunctionDeclaration(
         'set_preferences',
         'Changes any of the user\'s preferences in one go. Give only the fields that change; a list replaces '
-            'the whole list, so include what stays. custom_preferences are the user\'s own rules in their words '
-            '("no coriander", "kids hate spicy food"), applied as strictly as allergies. Changing diets, '
-            'allergies, proteins, appliances, cook_time, language or custom_preferences makes the current '
+            'the whole list, so include what stays. custom_instructions is the user\'s own free text (e.g. "no '
+            'coriander, kids hate spicy food"), checked on every recipe: it replaces the whole text, so keep what '
+            'stays. Changing diets, allergies, proteins, appliances, cook_minutes, language or custom_instructions '
+            'makes the current '
             'recipes outdated: then offer regenerate_week or keep_current_recipes.',
         parameters: {
           'name': Schema.string(),
@@ -63,8 +64,8 @@ List<ChatTool> preferenceTools(ChatTools t) {
           'allergies': ids([for (final a in Allergy.values) a.id]),
           'proteins': ids([for (final p in Protein.values) p.id]),
           'appliances': ids([for (final a in Appliance.values) a.id]),
-          'cook_time': Schema.enumString(enumValues: PreferenceChange.cookTimes),
-          'custom_preferences': Schema.array(items: Schema.string()),
+          'cook_minutes': Schema.integer(description: 'Longest a recipe may take, 15-90; 90 means no limit.'),
+          'custom_instructions': Schema.string(description: 'At most 300 characters; empty clears it.'),
         },
         optionalParameters: [
           'name',
@@ -80,8 +81,8 @@ List<ChatTool> preferenceTools(ChatTools t) {
           'allergies',
           'proteins',
           'appliances',
-          'cook_time',
-          'custom_preferences',
+          'cook_minutes',
+          'custom_instructions',
         ],
       ),
       run: (args, context) async {

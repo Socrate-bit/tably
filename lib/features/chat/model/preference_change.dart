@@ -20,8 +20,6 @@ class PreferenceChange {
   /// Why the change is refused, for the model to fix; null when valid.
   final String? error;
 
-  static const cookTimes = ['15_30', '30_45', '45_60', '60_plus'];
-
   /// Applies [args] (a set_preferences call) to [current].
   static PreferenceChange of(UserProfile current, Map<String, Object?> args) {
     try {
@@ -81,8 +79,10 @@ class PreferenceChange {
     if (language != null && !AppL10n.supportedLocales.any((l) => l.languageCode == language)) {
       throw FormatException('language: unsupported "$language"');
     }
-    final cookTime = args['cook_time'] as String?;
-    if (cookTime != null && !cookTimes.contains(cookTime)) throw FormatException('cook_time: unknown "$cookTime"');
+    final instructions = (args['custom_instructions'] as String?)?.trim();
+    if (instructions != null && instructions.length > UserProfile.customInstructionsMax) {
+      throw FormatException('custom_instructions: ${UserProfile.customInstructionsMax} characters at most');
+    }
     final store = args['store'] as String?;
     if (store != null && !Store.values.any((s) => s.id == store)) throw FormatException('store: unknown "$store"');
 
@@ -100,28 +100,10 @@ class PreferenceChange {
       allergies: withNone(pick('allergies', Allergy.values, (a) => a.id), Allergy.none),
       proteins: proteins,
       appliances: pick('appliances', Appliance.values, (a) => a.id),
-      cookTime: cookTime,
-      customPreferences: _rules(args['custom_preferences']),
+      // The slider's ceiling means no limit.
+      cookMinutes: whole('cook_minutes', UserProfile.cookMinutesFloor, UserProfile.cookMinutesCeiling),
+      customInstructions: instructions,
     );
-  }
-
-  /// The user's own rules, trimmed and without repeats.
-  static List<String>? _rules(Object? raw) {
-    if (raw == null) return null;
-    if (raw is! List) throw const FormatException('custom_preferences must be a list');
-    final rules = <String>[];
-    for (final rule in raw.whereType<String>().map((r) => r.trim()).where((r) => r.isNotEmpty)) {
-      if (rule.length > UserProfile.maxCustomPreferenceLength) {
-        throw FormatException(
-          'custom_preferences: "$rule" is longer than ${UserProfile.maxCustomPreferenceLength} characters',
-        );
-      }
-      if (!rules.any((r) => r.toLowerCase() == rule.toLowerCase())) rules.add(rule);
-    }
-    if (rules.length > UserProfile.maxCustomPreferences) {
-      throw FormatException('custom_preferences: ${UserProfile.maxCustomPreferences} at most');
-    }
-    return rules;
   }
 
   static Map<String, Object?> _diff(UserProfile from, UserProfile to) {
@@ -155,8 +137,8 @@ class PreferenceChange {
     list('allergies', from.allergies.map((a) => a.id), to.allergies.map((a) => a.id));
     list('proteins', from.proteins.map((p) => p.id), to.proteins.map((p) => p.id));
     list('appliances', from.appliances.map((a) => a.id), to.appliances.map((a) => a.id));
-    value('cook_time', from.cookTime, to.cookTime);
-    list('custom_preferences', from.customPreferences, to.customPreferences);
+    value('cook_minutes', from.cookMinutes, to.cookMinutes);
+    value('custom_instructions', from.customInstructions, to.customInstructions);
     return changes;
   }
 }

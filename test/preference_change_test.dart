@@ -38,15 +38,14 @@ void main() {
     expect(PreferenceChange.of(profile, {'language': 'de'}).error, contains('language'));
   });
 
-  test('custom rules are trimmed, without repeats, and capped', () {
-    final change = PreferenceChange.of(profile, {
-      'custom_preferences': ['  pas de coriandre ', 'Pas de coriandre', 'pas trop épicé'],
-    });
-    expect(change.next.customPreferences, ['pas de coriandre', 'pas trop épicé']);
-    expect(change.changes['custom_preferences'], {'added': ['pas de coriandre', 'pas trop épicé'], 'removed': <String>[]});
+  test('custom instructions and the time limit are set as on the screen', () {
+    final change = PreferenceChange.of(profile, {'custom_instructions': '  pas de coriandre ', 'cook_minutes': 30});
+    expect(change.next.customInstructions, 'pas de coriandre');
+    expect(change.next.cookMinutes, 30);
+    expect(change.changes['custom_instructions'], {'from': '', 'to': 'pas de coriandre'});
 
-    final tooMany = [for (var i = 0; i <= UserProfile.maxCustomPreferences; i++) 'règle $i'];
-    expect(PreferenceChange.of(profile, {'custom_preferences': tooMany}).error, isNotNull);
+    expect(PreferenceChange.of(profile, {'custom_instructions': 'x' * 301}).error, isNotNull);
+    expect(PreferenceChange.of(profile, {'cook_minutes': 5}).error, contains('cook_minutes'));
   });
 
   test('nothing to change gives no changes', () {

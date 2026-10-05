@@ -165,7 +165,7 @@ void main() {
     final (chat, agent) = await build([
       _calls([
         const FunctionCall('get_preferences', {}, id: '1'),
-        const FunctionCall('set_preferences', {'household': 3, 'custom_preferences': ['pas de coriandre']}, id: '2'),
+        const FunctionCall('set_preferences', {'household': 3, 'custom_instructions': 'pas de coriandre'}, id: '2'),
       ]),
       _text('Noté.'),
     ]);
@@ -179,7 +179,7 @@ void main() {
     expect(answers.first.response['household'], 2);
     expect(answers.last.response['ok'], true);
     expect(profile.state.profile.household, 3);
-    expect(profile.state.profile.customPreferences, ['pas de coriandre']);
+    expect(profile.state.profile.customInstructions, 'pas de coriandre');
   });
 
   test('made-up ids and tools are answered with an error, without a card', () async {

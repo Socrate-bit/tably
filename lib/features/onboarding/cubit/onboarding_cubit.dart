@@ -90,7 +90,7 @@ class OnboardingCubit extends Cubit<OnboardingState> {
       StepIds.age => draft.copyWith(ageRange: optionId),
       StepIds.goal => draft.copyWith(goals: Selection.toggle(draft.goals, optionId)),
       StepIds.blocker => draft.copyWith(blockers: Selection.toggle(draft.blockers, optionId)),
-      StepIds.cookTime => draft.copyWith(cookTime: optionId),
+      StepIds.cookTime => draft.copyWith(cookTime: optionId, cookMinutes: UserProfile.cookMinutesFor(optionId)),
       StepIds.country || StepIds.europeCountry => draft.copyWith(country: Country.fromId(optionId)),
       StepIds.store => draft.copyWith(store: Store.fromId(optionId)),
       StepIds.cravings =>

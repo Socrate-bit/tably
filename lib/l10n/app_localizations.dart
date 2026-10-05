@@ -1807,18 +1807,6 @@ abstract class AppL10n {
   /// **'Cuisine type'**
   String get filtersCuisine;
 
-  /// No description provided for @filtersProtein.
-  ///
-  /// In fr, this message translates to:
-  /// **'Préférence'**
-  String get filtersProtein;
-
-  /// No description provided for @filtersProteinSub.
-  ///
-  /// In fr, this message translates to:
-  /// **'Le type de viande ou de protéine que tu veux voir'**
-  String get filtersProteinSub;
-
   /// No description provided for @filtersPrice.
   ///
   /// In fr, this message translates to:
@@ -2209,6 +2197,12 @@ abstract class AppL10n {
   /// **'Recherche de recettes…'**
   String get searchLoading;
 
+  /// No description provided for @searchPrompt.
+  ///
+  /// In fr, this message translates to:
+  /// **'Rechercher « {query} »'**
+  String searchPrompt(String query);
+
   /// No description provided for @filtersFromPreferences.
   ///
   /// In fr, this message translates to:
@@ -2227,6 +2221,96 @@ abstract class AppL10n {
   /// **'Mixeur'**
   String get applianceMixer;
 
+  /// No description provided for @applianceSlowCooker.
+  ///
+  /// In fr, this message translates to:
+  /// **'Mijoteuse'**
+  String get applianceSlowCooker;
+
+  /// No description provided for @appliancePressureCooker.
+  ///
+  /// In fr, this message translates to:
+  /// **'Autocuiseur'**
+  String get appliancePressureCooker;
+
+  /// No description provided for @applianceBarbecue.
+  ///
+  /// In fr, this message translates to:
+  /// **'Barbecue'**
+  String get applianceBarbecue;
+
+  /// No description provided for @cookTimeTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Temps de cuisine'**
+  String get cookTimeTitle;
+
+  /// No description provided for @cookTimeSub.
+  ///
+  /// In fr, this message translates to:
+  /// **'Le temps maximum que peut prendre une recette'**
+  String get cookTimeSub;
+
+  /// No description provided for @cookTimeMinutes.
+  ///
+  /// In fr, this message translates to:
+  /// **'{minutes} min'**
+  String cookTimeMinutes(String minutes);
+
+  /// No description provided for @cookTimeNoLimit.
+  ///
+  /// In fr, this message translates to:
+  /// **'Pas de limite'**
+  String get cookTimeNoLimit;
+
+  /// No description provided for @prefsCustomInstructions.
+  ///
+  /// In fr, this message translates to:
+  /// **'Instructions personnalisées'**
+  String get prefsCustomInstructions;
+
+  /// No description provided for @prefsCustomInstructionsSub.
+  ///
+  /// In fr, this message translates to:
+  /// **'Tably en tient compte pour choisir tes recettes'**
+  String get prefsCustomInstructionsSub;
+
+  /// No description provided for @prefsCustomInstructionsHint.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ex. : pas de champignons, peu épicé, pas de poisson cru…'**
+  String get prefsCustomInstructionsHint;
+
+  /// No description provided for @actionOk.
+  ///
+  /// In fr, this message translates to:
+  /// **'OK'**
+  String get actionOk;
+
+  /// No description provided for @quotaTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Recherches du jour'**
+  String get quotaTitle;
+
+  /// No description provided for @quotaBody.
+  ///
+  /// In fr, this message translates to:
+  /// **'{remaining, plural, =1{Il te reste 1 recherche de recettes} other{Il te reste {remaining} recherches de recettes}} sur {limit} aujourd\'hui. Le compteur se réinitialise demain à {time}.'**
+  String quotaBody(int remaining, int limit, String time);
+
+  /// No description provided for @quotaReachedTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Limite de recherches atteinte'**
+  String get quotaReachedTitle;
+
+  /// No description provided for @quotaReachedBody.
+  ///
+  /// In fr, this message translates to:
+  /// **'Tu as utilisé tes {limit} recherches de recettes du jour. Elles se réinitialisent demain à {time}.'**
+  String quotaReachedBody(int limit, String time);
+
   /// No description provided for @actionCancel.
   ///
   /// In fr, this message translates to:
@@ -2238,24 +2322,6 @@ abstract class AppL10n {
   /// In fr, this message translates to:
   /// **'Enregistrer'**
   String get actionSave;
-
-  /// No description provided for @prefsCustom.
-  ///
-  /// In fr, this message translates to:
-  /// **'Mes règles'**
-  String get prefsCustom;
-
-  /// No description provided for @prefsCustomSub.
-  ///
-  /// In fr, this message translates to:
-  /// **'Ce que tes recettes doivent toujours respecter'**
-  String get prefsCustomSub;
-
-  /// No description provided for @prefsCustomHint.
-  ///
-  /// In fr, this message translates to:
-  /// **'ex. pas de coriandre'**
-  String get prefsCustomHint;
 
   /// No description provided for @shoppingAddHint.
   ///
@@ -2574,12 +2640,6 @@ abstract class AppL10n {
   /// In fr, this message translates to:
   /// **'Langue'**
   String get chatFieldLanguage;
-
-  /// No description provided for @chatFieldCookTime.
-  ///
-  /// In fr, this message translates to:
-  /// **'Temps de cuisine'**
-  String get chatFieldCookTime;
 
   /// No description provided for @chatActShopping.
   ///

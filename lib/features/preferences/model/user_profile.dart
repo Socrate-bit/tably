@@ -33,13 +33,14 @@ class UserProfile extends Equatable {
     this.cravings = const {Craving.quick, Craving.highProtein},
     this.diets = const {Diet.none},
     this.allergies = const {Allergy.none},
-    this.proteins = const {Protein.beef, Protein.pork, Protein.chicken},
+    this.proteins = Protein.meats,
     this.appliances = const {Appliance.microwave, Appliance.hob},
-    this.customPreferences = const [],
     this.ageRange,
     this.goals = const {},
     this.blockers = const {},
     this.cookTime,
+    this.cookMinutes = cookMinutesCeiling,
+    this.customInstructions = '',
     this.onboardingComplete = false,
     this.weeklyReminder = false,
     this.userType = UserType.normal,
@@ -52,12 +53,23 @@ class UserProfile extends Equatable {
   /// Meals planned per cooking day: dinner, then lunch.
   static const maxMealsPerDay = 2;
 
-  /// Bounds on the user's own free-text rules ("no coriander").
-  static const maxCustomPreferences = 10;
-  static const maxCustomPreferenceLength = 80;
-
   /// Longest a cooked dish is kept before it is eaten, in hours.
   static const leftoverHours = 72;
+
+  /// Cooking-time slider bounds, in minutes; the ceiling means "no limit".
+  static const cookMinutesFloor = 15;
+  static const cookMinutesCeiling = 90;
+
+  /// Longest custom instruction, in characters.
+  static const customInstructionsMax = 300;
+
+  /// The time limit an onboarding [cookTime] answer stands for.
+  static int cookMinutesFor(String? cookTime) => switch (cookTime) {
+        '15_30' => 30,
+        '30_45' => 45,
+        '45_60' => 60,
+        _ => cookMinutesCeiling,
+      };
 
   final String name;
   final int household;
@@ -74,15 +86,21 @@ class UserProfile extends Equatable {
   final Set<Protein> proteins;
   final Set<Appliance> appliances;
 
-  /// The user's own rules in their words ("no coriander", "kids hate
-  /// spicy"), applied as strictly as allergies when recipes are checked.
-  final List<String> customPreferences;
-
   /// Survey answers — captured once during onboarding for personalisation.
   final String? ageRange;
   final Set<String> goals;
   final Set<String> blockers;
   final String? cookTime;
+
+  /// Longest a recipe may take, in minutes; [cookMinutesCeiling] is no limit.
+  /// Starts from the [cookTime] answer, then follows the preferences slider.
+  final int cookMinutes;
+
+  bool get hasCookLimit => cookMinutes < cookMinutesCeiling;
+
+  /// Free text from the preferences that Gemini follows when checking
+  /// recipes, e.g. "no mushrooms"; empty when none.
+  final String customInstructions;
 
   final bool onboardingComplete;
   final bool weeklyReminder;
@@ -166,11 +184,12 @@ class UserProfile extends Equatable {
     Set<Allergy>? allergies,
     Set<Protein>? proteins,
     Set<Appliance>? appliances,
-    List<String>? customPreferences,
     String? ageRange,
     Set<String>? goals,
     Set<String>? blockers,
     String? cookTime,
+    int? cookMinutes,
+    String? customInstructions,
     bool? onboardingComplete,
     bool? weeklyReminder,
     UserType? userType,
@@ -190,11 +209,12 @@ class UserProfile extends Equatable {
       allergies: allergies ?? this.allergies,
       proteins: proteins ?? this.proteins,
       appliances: appliances ?? this.appliances,
-      customPreferences: customPreferences ?? this.customPreferences,
       ageRange: ageRange ?? this.ageRange,
       goals: goals ?? this.goals,
       blockers: blockers ?? this.blockers,
       cookTime: cookTime ?? this.cookTime,
+      cookMinutes: cookMinutes ?? this.cookMinutes,
+      customInstructions: customInstructions ?? this.customInstructions,
       onboardingComplete: onboardingComplete ?? this.onboardingComplete,
       weeklyReminder: weeklyReminder ?? this.weeklyReminder,
       userType: userType ?? this.userType,
@@ -218,11 +238,12 @@ class UserProfile extends Equatable {
         'allergies': allergies.map((a) => a.id).toList(),
         'proteins': proteins.map((p) => p.id).toList(),
         'appliances': appliances.map((a) => a.id).toList(),
-        'customPreferences': customPreferences,
         'ageRange': ageRange,
         'goals': goals.toList(),
         'blockers': blockers.toList(),
         'cookTime': cookTime,
+        'cookMinutes': cookMinutes,
+        'customInstructions': customInstructions,
         'onboardingComplete': onboardingComplete,
         'weeklyReminder': weeklyReminder,
         'updatedAt': FieldValue.serverTimestamp(),
@@ -269,11 +290,14 @@ class UserProfile extends Equatable {
       allergies: parse('allergies', Allergy.values, (a) => a.id, fallback.allergies),
       proteins: parse('proteins', Protein.values, (p) => p.id, fallback.proteins, allowEmpty: true),
       appliances: parse('appliances', Appliance.values, (a) => a.id, fallback.appliances, allowEmpty: true),
-      customPreferences: (map['customPreferences'] as List? ?? const []).whereType<String>().toList(),
       ageRange: map['ageRange'] as String?,
       goals: strings('goals'),
       blockers: strings('blockers'),
       cookTime: map['cookTime'] as String?,
+      // Profiles saved before the slider existed take their onboarding answer.
+      cookMinutes: ((map['cookMinutes'] as num?)?.toInt() ?? cookMinutesFor(map['cookTime'] as String?))
+          .clamp(cookMinutesFloor, cookMinutesCeiling),
+      customInstructions: map['customInstructions'] as String? ?? '',
       onboardingComplete: map['onboardingComplete'] as bool? ?? false,
       weeklyReminder: map['weeklyReminder'] as bool? ?? false,
       userType: UserType.fromId(map['userType'] as String?),
@@ -296,11 +320,12 @@ class UserProfile extends Equatable {
         allergies,
         proteins,
         appliances,
-        customPreferences,
         ageRange,
         goals,
         blockers,
         cookTime,
+        cookMinutes,
+        customInstructions,
         onboardingComplete,
         weeklyReminder,
         userType,

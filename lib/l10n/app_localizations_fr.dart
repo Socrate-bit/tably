@@ -964,13 +964,6 @@ class AppL10nFr extends AppL10n {
   String get filtersCuisine => 'Cuisine type';
 
   @override
-  String get filtersProtein => 'Préférence';
-
-  @override
-  String get filtersProteinSub =>
-      'Le type de viande ou de protéine que tu veux voir';
-
-  @override
   String get filtersPrice => 'Prix par portion';
 
   @override
@@ -1251,6 +1244,11 @@ class AppL10nFr extends AppL10n {
   String get searchLoading => 'Recherche de recettes…';
 
   @override
+  String searchPrompt(String query) {
+    return 'Rechercher « $query »';
+  }
+
+  @override
   String get filtersFromPreferences =>
       'Tes préférences par défaut, modifiables pour cette recherche';
 
@@ -1261,19 +1259,69 @@ class AppL10nFr extends AppL10n {
   String get applianceMixer => 'Mixeur';
 
   @override
+  String get applianceSlowCooker => 'Mijoteuse';
+
+  @override
+  String get appliancePressureCooker => 'Autocuiseur';
+
+  @override
+  String get applianceBarbecue => 'Barbecue';
+
+  @override
+  String get cookTimeTitle => 'Temps de cuisine';
+
+  @override
+  String get cookTimeSub => 'Le temps maximum que peut prendre une recette';
+
+  @override
+  String cookTimeMinutes(String minutes) {
+    return '$minutes min';
+  }
+
+  @override
+  String get cookTimeNoLimit => 'Pas de limite';
+
+  @override
+  String get prefsCustomInstructions => 'Instructions personnalisées';
+
+  @override
+  String get prefsCustomInstructionsSub =>
+      'Tably en tient compte pour choisir tes recettes';
+
+  @override
+  String get prefsCustomInstructionsHint =>
+      'Ex. : pas de champignons, peu épicé, pas de poisson cru…';
+
+  @override
+  String get actionOk => 'OK';
+
+  @override
+  String get quotaTitle => 'Recherches du jour';
+
+  @override
+  String quotaBody(int remaining, int limit, String time) {
+    String _temp0 = intl.Intl.pluralLogic(
+      remaining,
+      locale: localeName,
+      other: 'Il te reste $remaining recherches de recettes',
+      one: 'Il te reste 1 recherche de recettes',
+    );
+    return '$_temp0 sur $limit aujourd\'hui. Le compteur se réinitialise demain à $time.';
+  }
+
+  @override
+  String get quotaReachedTitle => 'Limite de recherches atteinte';
+
+  @override
+  String quotaReachedBody(int limit, String time) {
+    return 'Tu as utilisé tes $limit recherches de recettes du jour. Elles se réinitialisent demain à $time.';
+  }
+
+  @override
   String get actionCancel => 'Annuler';
 
   @override
   String get actionSave => 'Enregistrer';
-
-  @override
-  String get prefsCustom => 'Mes règles';
-
-  @override
-  String get prefsCustomSub => 'Ce que tes recettes doivent toujours respecter';
-
-  @override
-  String get prefsCustomHint => 'ex. pas de coriandre';
 
   @override
   String get shoppingAddHint => 'Ajouter un article';
@@ -1455,9 +1503,6 @@ class AppL10nFr extends AppL10n {
 
   @override
   String get chatFieldLanguage => 'Langue';
-
-  @override
-  String get chatFieldCookTime => 'Temps de cuisine';
 
   @override
   String get chatActShopping => 'Modifier ta liste de courses';

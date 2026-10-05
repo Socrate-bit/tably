@@ -97,6 +97,16 @@ class ProfileCubit extends Cubit<ProfileState> {
   Future<void> setBudget(double budget) =>
       _update(state.profile.copyWith(budget: budget), changed: 'budget');
 
+  Future<void> setCookMinutes(int minutes) =>
+      _update(state.profile.copyWith(cookMinutes: minutes), changed: 'cook_minutes');
+
+  /// Saved trimmed, and only when it actually changed.
+  Future<void> setCustomInstructions(String text) async {
+    final trimmed = text.trim();
+    if (trimmed == state.profile.customInstructions) return;
+    await _update(state.profile.copyWith(customInstructions: trimmed), changed: 'custom_instructions');
+  }
+
   Future<void> setStore(Store store) =>
       _update(state.profile.copyWith(store: store), changed: 'store');
 
@@ -132,27 +142,6 @@ class ProfileCubit extends Cubit<ProfileState> {
   Future<void> toggleAppliance(Appliance appliance) => _update(
         state.profile.copyWith(appliances: Selection.toggle(state.profile.appliances, appliance)),
         changed: 'appliances',
-      );
-
-  Future<void> setCookTime(String cookTime) =>
-      _update(state.profile.copyWith(cookTime: cookTime), changed: 'cookTime');
-
-  /// Adds one of the user's own rules ("no coriander"), trimmed, unless it
-  /// is empty, already there, or the list is full.
-  Future<void> addCustomPreference(String text) async {
-    final rule = text.trim();
-    final current = state.profile.customPreferences;
-    if (rule.isEmpty || current.length >= UserProfile.maxCustomPreferences) return;
-    if (current.any((p) => p.toLowerCase() == rule.toLowerCase())) return;
-    final clipped = rule.length > UserProfile.maxCustomPreferenceLength
-        ? rule.substring(0, UserProfile.maxCustomPreferenceLength)
-        : rule;
-    await _update(state.profile.copyWith(customPreferences: [...current, clipped]), changed: 'customPreferences');
-  }
-
-  Future<void> removeCustomPreference(String rule) => _update(
-        state.profile.copyWith(customPreferences: [...state.profile.customPreferences.where((p) => p != rule)]),
-        changed: 'customPreferences',
       );
 
   /// Saves several changes at once, as the AI chef makes them; [changed]

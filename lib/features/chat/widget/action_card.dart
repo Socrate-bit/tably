@@ -15,6 +15,7 @@ import '../../../core/widget/surface_card.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../onboarding/widget/steps/language_step.dart';
 import '../../preferences/cubit/profile_cubit.dart';
+import '../../preferences/model/user_profile.dart';
 import '../../shopping/screen/shopping_screen.dart';
 import '../cubit/chat_cubit.dart';
 import '../model/chat_message.dart';
@@ -135,7 +136,8 @@ class ActionCard extends StatelessWidget {
       ('budget', final num n) => formatMoney(country, n.toDouble(), decimals: 0),
       ('store', _) => Store.fromId('$value').displayName,
       ('language', _) => languageFor('$value').name,
-      ('name' || 'household' || 'custom_preferences', _) => '$value',
+      ('cook_minutes', final num n) => n >= UserProfile.cookMinutesCeiling ? l10n.cookTimeNoLimit : l10n.cookTimeMinutes('${n.toInt()}'),
+          ('name' || 'household' || 'custom_instructions', _) => '$value',
       _ => l10n.optionLabel('$value'),
     };
     final name = switch (field) {
@@ -152,8 +154,8 @@ class ActionCard extends StatelessWidget {
       'allergies' => l10n.prefsAllergens,
       'proteins' => l10n.prefsProteins,
       'appliances' => l10n.prefsAppliances,
-      'cook_time' => l10n.chatFieldCookTime,
-      'custom_preferences' => l10n.prefsCustom,
+      'cook_minutes' => l10n.cookTimeTitle,
+      'custom_instructions' => l10n.prefsCustomInstructions,
       _ => field,
     };
     if (change.containsKey('from')) return l10n.chatFieldChange(name, '${label(change['from'])} → ${label(change['to'])}');

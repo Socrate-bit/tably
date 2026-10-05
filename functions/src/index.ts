@@ -91,6 +91,68 @@ const SPOONACULAR_HOST = "spoonacular-recipe-food-nutrition-v1.p.rapidapi.com";
 const SEARCH_SIZE = 24;
 const MAX_SEARCH_SIZE = 100;
 
+/**
+ * Searches per UTC day: admins and creators (a granted userType) get more.
+ * The app shows the same numbers.
+ */
+const DAILY_SEARCH_LIMIT = 30;
+const GRANTED_SEARCH_LIMIT = 200;
+
+/** Today's UTC date, "YYYY-MM-DD": the quota resets at midnight UTC. */
+const utcDay = (): string => new Date().toISOString().slice(0, 10);
+
+/**
+ * Spends one of the caller's daily searches at `searchQuota/{uid}` (server
+ * only, so the client can't reset it). The limit follows the user's type.
+ * Returns the searches left, or throws resource-exhausted once the day's
+ * are spent.
+ */
+async function spendSearch(uid: string, day: string): Promise<number> {
+  const ref = db.collection("searchQuota").doc(uid);
+  const userRef = db.collection("users").doc(uid);
+  return db.runTransaction(async (tx) => {
+    const [quota, user] = await Promise.all([tx.get(ref), tx.get(userRef)]);
+    const limit = GRANTABLE_TYPES.includes(user.data()?.userType) ? GRANTED_SEARCH_LIMIT : DAILY_SEARCH_LIMIT;
+    const data = quota.data();
+    const count = data?.day === day ? Number(data.count) || 0 : 0;
+    if (count >= limit) {
+      throw new HttpsError("resource-exhausted", "Daily search limit reached.", {reason: "daily-limit"});
+    }
+    tx.set(ref, {day, count: count + 1});
+    return limit - count - 1;
+  });
+}
+
+/** Gives back a search whose Spoonacular call failed, unless the day rolled over. */
+async function refundSearch(uid: string, day: string): Promise<void> {
+  const ref = db.collection("searchQuota").doc(uid);
+  try {
+    await db.runTransaction(async (tx) => {
+      const data = (await tx.get(ref)).data();
+      if (data?.day === day && Number(data.count) > 0) tx.update(ref, {count: FieldValue.increment(-1)});
+    });
+  } catch (e) {
+    logger.error("refundSearch failed", e);
+  }
+}
+
+/**
+ * Runs [call] as one of the user's daily searches: spends it first (throwing
+ * resource-exhausted once the day's are gone) and gives it back if the call
+ * fails.
+ */
+async function withSearch<T>(uid: string, call: () => Promise<T>): Promise<T> {
+  const day = utcDay();
+  const left = await spendSearch(uid, day);
+  logger.info("search spent", {uid, userSearchesLeft: left});
+  try {
+    return await call();
+  } catch (e) {
+    await refundSearch(uid, day);
+    throw e;
+  }
+}
+
 /** Spoonacular prices are US cents; everyone is on EUR for now. Approximate. */
 const USD_TO_EUR = 0.86;
 
@@ -140,7 +202,7 @@ const CRAVINGS: Record<string, Record<string, string>> = {
   low_calorie: {maxCalories: "450"},
 };
 
-/** Profile cook-time ids → Spoonacular maxReadyTime in minutes. */
+/** Onboarding cook-time ids → maxReadyTime, for app builds that send them. */
 const MAX_READY_TIME: Record<string, number> = {
   "15_30": 30,
   "30_45": 45,
@@ -168,7 +230,12 @@ function searchParams(data: Record<string, unknown>): URLSearchParams {
   const diets = stringList(data.diets);
   const allergies = stringList(data.allergies);
   const proteins = stringList(data.proteins);
+  // The profile's time limit in minutes; older builds send the onboarding id.
+  const minutes = Math.round(Number(data.maxReadyTime));
   const cookTime = text(data.cookTime);
+  const maxReadyTime = Number.isFinite(minutes) && minutes > 0 ?
+    minutes :
+    cookTime ? MAX_READY_TIME[cookTime] : undefined;
   const requested = Math.round(Number(data.number));
   const number = Number.isFinite(requested) ?
     Math.min(Math.max(requested, 1), MAX_SEARCH_SIZE) :
@@ -201,7 +268,6 @@ function searchParams(data: Record<string, unknown>): URLSearchParams {
   if (diet.length > 0) params.set("diet", [...new Set(diet)].join(","));
   if (intolerances.length > 0) params.set("intolerances", intolerances.join(","));
   if (excludes.length > 0) params.set("excludeIngredients", [...new Set(excludes)].join(","));
-  const maxReadyTime = cookTime ? MAX_READY_TIME[cookTime] : undefined;
   if (maxReadyTime) params.set("maxReadyTime", String(maxReadyTime));
 
   // Search filters, all optional.
@@ -306,9 +372,11 @@ async function spoonacularGet(path: string, params: URLSearchParams, uid: string
 /**
  * Searches Spoonacular for main courses matching the caller's constraints.
  * 1. Maps the constraints and search filters to query parameters
- * 2. Calls complexSearch with the secret RapidAPI key (1 request of the quota,
- *    for up to 100 recipes)
- * 3. Trims each result to the fields the app and Gemini use
+ * 2. Spends one of the caller's searches for today (30, or 200 for admins
+ *    and creators)
+ * 3. Calls complexSearch with the secret RapidAPI key (1 request of the quota,
+ *    for up to 100 recipes); a failed call gives the search back
+ * 4. Trims each result to the fields the app and Gemini use
  * Live and uncached: every call spends quota.
  */
 export const searchRecipes = onCall(
@@ -317,8 +385,9 @@ export const searchRecipes = onCall(
     if (!request.auth) {
       throw new HttpsError("unauthenticated", "Must be signed in.");
     }
+    const uid = request.auth.uid;
     const data = (request.data ?? {}) as Record<string, unknown>;
-    const body = await spoonacularGet("/recipes/complexSearch", searchParams(data), request.auth.uid);
+    const body = await withSearch(uid, () => spoonacularGet("/recipes/complexSearch", searchParams(data), uid));
     const recipes = (body.results ?? [])
       .map((r: any) => trimRecipe(r))
       .filter((r: unknown) => r !== null);
@@ -327,29 +396,8 @@ export const searchRecipes = onCall(
   }
 );
 
-/** Spoonacular requests one user's AI chef may spend a day. The quota is shared by the whole app. */
-const AGENT_DAILY_CAP = 10;
-
 /** Recipes the AI chef asks for per search; it shows a handful at a time. */
 const AGENT_SEARCH_SIZE = 8;
-
-/**
- * Counts [requests] against the user's daily allowance for the AI chef, in
- * `agentQuota/{uid}` (server-only: the rules deny every client). Throws
- * "resource-exhausted" once the day's cap is reached.
- */
-async function chargeAgentQuota(uid: string, requests: number): Promise<void> {
-  const ref = db.collection("agentQuota").doc(uid);
-  const day = new Date().toISOString().slice(0, 10);
-  await db.runTransaction(async (tx) => {
-    const snap = await tx.get(ref);
-    const count = snap.data()?.day === day ? Number(snap.data()?.count) || 0 : 0;
-    if (count + requests > AGENT_DAILY_CAP) {
-      throw new HttpsError("resource-exhausted", "Daily AI chef recipe quota reached.");
-    }
-    tx.set(ref, {day, count: count + requests});
-  });
-}
 
 /** Full, trimmed recipes for Spoonacular ids (1 request). */
 async function recipesById(ids: number[], uid: string): Promise<Record<string, unknown>[]> {
@@ -375,11 +423,11 @@ function importedId(url: string): number {
 }
 
 /**
- * Everything the AI chef can ask Spoonacular, one action per call, each
- * capped per user per day (see AGENT_DAILY_CAP):
+ * Everything the AI chef can ask Spoonacular, one action per call. Each
+ * spends one of the user's daily searches, like searchRecipes:
  * - search: complexSearch with the profile's constraints, plus
  *   includeIngredients for "what can I make with…" (1 request)
- * - similar: recipes like a Spoonacular id, in full (2 requests)
+ * - similar: recipes like a Spoonacular id, in full (2 requests, 1 search)
  * - extract: imports a recipe from a web page (1 request)
  * - substitutes: replacements for an English ingredient name (1 request)
  * - winePairing: wines for an English dish or ingredient (1 request)
@@ -397,9 +445,8 @@ export const spoonacular = onCall(
 
     switch (action) {
     case "search": {
-      await chargeAgentQuota(uid, 1);
       const params = searchParams({number: AGENT_SEARCH_SIZE, ...data});
-      const body = await spoonacularGet("/recipes/complexSearch", params, uid);
+      const body = await withSearch(uid, () => spoonacularGet("/recipes/complexSearch", params, uid));
       const recipes = (body.results ?? []).map((r: any) => trimRecipe(r)).filter((r: unknown) => r !== null);
       logger.info("spoonacular search: done", {uid, returned: recipes.length});
       return {recipes};
@@ -407,17 +454,17 @@ export const spoonacular = onCall(
     case "similar": {
       const id = Math.round(Number(data.id));
       if (!Number.isFinite(id) || id <= 0) throw new HttpsError("invalid-argument", "A Spoonacular id is required.");
-      await chargeAgentQuota(uid, 2);
-      const similar = await spoonacularGet(`/recipes/${id}/similar`, new URLSearchParams({number: "6"}), uid);
-      const ids = (Array.isArray(similar) ? similar : []).map((r: any) => Number(r.id)).filter((i) => i > 0);
-      return {recipes: await recipesById(ids, uid)};
+      return withSearch(uid, async () => {
+        const similar = await spoonacularGet(`/recipes/${id}/similar`, new URLSearchParams({number: "6"}), uid);
+        const ids = (Array.isArray(similar) ? similar : []).map((r: any) => Number(r.id)).filter((i) => i > 0);
+        return {recipes: await recipesById(ids, uid)};
+      });
     }
     case "extract": {
       const url = text(data.url);
       if (!url || !/^https?:\/\//i.test(url)) throw new HttpsError("invalid-argument", "A web address is required.");
-      await chargeAgentQuota(uid, 1);
       const params = new URLSearchParams({url, analyze: "true", forceExtraction: "true", includeNutrition: "true"});
-      const raw = await spoonacularGet("/recipes/extract", params, uid);
+      const raw = await withSearch(uid, () => spoonacularGet("/recipes/extract", params, uid));
       const recipe = trimRecipe(raw, {requireImage: false});
       if (recipe === null) return {recipes: []};
       // Pages Spoonacular doesn't know get no id; the app needs a positive one.
@@ -427,19 +474,17 @@ export const spoonacular = onCall(
     case "substitutes": {
       const ingredient = text(data.ingredient);
       if (!ingredient) throw new HttpsError("invalid-argument", "An ingredient is required.");
-      await chargeAgentQuota(uid, 1);
       const params = new URLSearchParams({ingredientName: ingredient.slice(0, 60)});
-      const body = await spoonacularGet("/food/ingredients/substitutes", params, uid);
+      const body = await withSearch(uid, () => spoonacularGet("/food/ingredients/substitutes", params, uid));
       return {substitutes: stringList(body.substitutes), message: text(body.message) ?? ""};
     }
     case "winePairing": {
       const food = text(data.food);
       if (!food) throw new HttpsError("invalid-argument", "A dish or ingredient is required.");
-      await chargeAgentQuota(uid, 1);
       const params = new URLSearchParams({food: food.slice(0, 60)});
       const maxPrice = Number(data.maxPrice);
       if (Number.isFinite(maxPrice) && maxPrice > 0) params.set("maxPrice", String(Math.round(maxPrice)));
-      const body = await spoonacularGet("/food/wine/pairing", params, uid);
+      const body = await withSearch(uid, () => spoonacularGet("/food/wine/pairing", params, uid));
       return {
         wines: stringList(body.pairedWines),
         text: text(body.pairingText) ?? "",

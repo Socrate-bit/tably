@@ -7,6 +7,7 @@ import '../../../core/util/haptics.dart';
 import '../../../core/widget/check_circle.dart';
 import '../../../core/widget/circle_icon_button.dart';
 import '../../../core/widget/line_icon.dart';
+import '../../../core/widget/note_field.dart';
 import '../../../core/widget/primary_button.dart';
 import '../../../core/widget/recipe_photo.dart';
 import '../../../core/widget/segmented_toggle.dart';
@@ -175,7 +176,7 @@ class _RecipeScreenState extends State<RecipeScreen> {
                     style: AppTextStyles.sheetTitle,
                   ),
                   SizedBox(height: 12.h),
-                  _NoteField(controller: _noteController),
+                  NoteField(controller: _noteController, hint: l10n.recipeNotePlaceholder),
                   SizedBox(height: 18.h),
                   if (widget.slot != null)
                     Row(
@@ -373,36 +374,6 @@ class _StarRating extends StatelessWidget {
             ),
           ),
       ],
-    );
-  }
-}
-
-class _NoteField extends StatelessWidget {
-  const _NoteField({required this.controller});
-
-  final TextEditingController controller;
-
-  @override
-  Widget build(BuildContext context) {
-    final border = OutlineInputBorder(
-      borderRadius: BorderRadius.circular(20.r),
-      borderSide: const BorderSide(color: AppColors.border),
-    );
-    return TextField(
-      controller: controller,
-      minLines: 3,
-      maxLines: 6,
-      style: AppTextStyles.noteInput,
-      decoration: InputDecoration(
-        hintText: AppL10n.of(context).recipeNotePlaceholder,
-        hintStyle: AppTextStyles.noteInput.copyWith(color: AppColors.textDisabled),
-        filled: true,
-        fillColor: AppColors.surface,
-        contentPadding: EdgeInsets.all(16.r),
-        border: border,
-        enabledBorder: border,
-        focusedBorder: border,
-      ),
     );
   }
 }

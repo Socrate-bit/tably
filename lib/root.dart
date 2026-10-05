@@ -10,6 +10,7 @@ import 'features/plan/cubit/plan_cubit.dart';
 import 'features/preferences/cubit/profile_cubit.dart';
 import 'features/recipe/cubit/catalogue_cubit.dart';
 import 'features/recipe/cubit/recipe_cubit.dart';
+import 'features/recipe/cubit/search_quota_cubit.dart';
 import 'features/shopping/cubit/shopping_cubit.dart';
 import 'features/subscription/cubit/subscription_cubit.dart';
 
@@ -50,6 +51,7 @@ class RootScreen extends StatelessWidget {
     context.read<PlanCubit>().bind(uid);
     context.read<ShoppingCubit>().bind(uid);
     context.read<RecipeCubit>().bind(uid);
+    context.read<SearchQuotaCubit>().bind(uid);
     context.read<ChatCubit>().bind(uid);
     // Ties the paywall to the same user, so purchases and the referral
     // grant follow them across launches.

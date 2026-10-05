@@ -9,7 +9,8 @@ import '../../preferences/model/user_profile.dart';
 import '../model/recipe.dart';
 
 /// Reaches Spoonacular through the `searchRecipes` and `spoonacular` Cloud
-/// Functions, which hold the key. Each call spends quota.
+/// Functions, which hold the key. Each call spends one of the user's daily
+/// searches (see SearchQuotaCubit) and API quota.
 class RecipeSearchService {
   RecipeSearchService({FirebaseFunctions? functions}) : _functions = functions;
 
@@ -20,7 +21,7 @@ class RecipeSearchService {
 
   /// Returns up to [number] trimmed Spoonacular recipes matching the
   /// profile's hard constraints, narrowed by the optional search filters:
-  /// English [query] text, [cuisines], one [craving] and one [protein].
+  /// English [query] text, [cuisines] and one [craving].
   /// Throws [FirebaseFunctionsException] so the caller can tell a spent quota
   /// from an outage.
   Future<List<Map<String, dynamic>>> search(
@@ -29,7 +30,6 @@ class RecipeSearchService {
     String? query,
     Set<Cuisine> cuisines = const {},
     Craving? craving,
-    RecipeProtein? protein,
   }) async {
     final data = await _call('searchRecipes', {
       ..._constraints(profile),
@@ -37,15 +37,14 @@ class RecipeSearchService {
       'query': query,
       'cuisines': [for (final c in cuisines) c.id],
       'craving': craving?.id,
-      'protein': protein?.id,
     });
     final recipes = _recipes(data);
     debugPrint('[RecipeSearchService] found ${recipes.length} candidates');
     return recipes;
   }
 
-  // The AI chef's calls go through the `spoonacular` function, which caps
-  // each user's daily use so the chat can't spend the whole app's quota.
+  // The AI chef's calls go through the `spoonacular` function, and count
+  // against the same daily searches.
 
   /// A handful of recipes matching the profile's hard constraints, narrowed
   /// like [search], and using as many of [includeIngredients] as possible.
@@ -88,7 +87,7 @@ class RecipeSearchService {
         'diets': [for (final d in profile.diets) d.id],
         'allergies': [for (final a in profile.allergies) a.id],
         'proteins': [for (final p in profile.proteins) p.id],
-        'cookTime': profile.cookTime,
+        'maxReadyTime': profile.hasCookLimit ? profile.cookMinutes : null,
       };
 
   /// Calls the function [name]. Throws [FirebaseFunctionsException] so the

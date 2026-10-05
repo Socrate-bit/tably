@@ -3,7 +3,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../../core/theme/app_theme.dart';
-import '../../../core/util/error_feedback.dart';
 import '../../../core/util/haptics.dart';
 import '../../../core/util/option_labels.dart';
 import '../../../core/widget/circle_icon_button.dart';
@@ -11,6 +10,7 @@ import '../../../core/widget/count_badge.dart';
 import '../../../core/widget/line_icon.dart';
 import '../../../core/widget/recipe_photo.dart';
 import '../../../core/widget/search_field.dart';
+import '../../../core/widget/surface_card.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../home/cubit/home_cubit.dart';
 import '../../preferences/cubit/profile_cubit.dart';
@@ -21,6 +21,7 @@ import '../cubit/recipe_cubit.dart';
 import '../cubit/recipe_search_cubit.dart';
 import '../model/recipe.dart';
 import '../widget/filter_button.dart';
+import '../widget/quota_dialog.dart';
 import '../widget/recipe_row.dart';
 import 'filters_screen.dart';
 import 'recipe_screen.dart';
@@ -38,14 +39,18 @@ class RecipesScreen extends StatelessWidget {
     final catalogue = context.watch<CatalogueCubit>().state.recipes;
     final searchState = context.watch<RecipeSearchCubit>().state;
     // API results for exactly this search; otherwise the cached pool. The
-    // text was matched by the API (in English), so only the filters apply.
+    // API already matched the text and what it can filter on; the rest
+    // (several cravings, price, time) is checked here.
     final found = searchState.resultsFor(browse);
     final searching = searchState.isSearchingFor(browse);
+    // Text typed but not searched yet (or its search failed): the pool's
+    // matches under a prompt to search, never "no results" before asking.
+    final pending = browse.isSearching && found == null && !searching;
     final results = browse.apply(
       found ?? catalogue,
       store: profile.store,
       cravingLabel: l10n.cravingLabel,
-      searchText: found != null ? '' : null,
+      searched: found != null,
     );
     void search({bool reload = false}) =>
         context.read<RecipeSearchCubit>().search(context.read<RecipeBrowseCubit>().state, reload: reload);
@@ -63,7 +68,7 @@ class RecipesScreen extends StatelessWidget {
     return BlocListener<RecipeSearchCubit, RecipeSearchState>(
       listenWhen: (previous, current) => current.error != null && previous.error != current.error,
       listener: (context, state) {
-        showErrorBanner(context, l10n.catalogueError(state.error));
+        showSearchError(context, state.error);
         context.read<RecipeSearchCubit>().errorShown();
       },
       child: SingleChildScrollView(
@@ -91,18 +96,17 @@ class RecipesScreen extends StatelessWidget {
                   child: SearchField(
                     hint: l10n.exploreSearchPlaceholder,
                     initialValue: browse.query,
-                    // Typing narrows the cached pool; the search key asks the API.
-                    onChanged: context.read<RecipeBrowseCubit>().search,
+                    // Typing narrows the cached pool; the search key asks the
+                    // API. Emptied, it falls back to the filters' own search.
+                    onChanged: (value) {
+                      context.read<RecipeBrowseCubit>().search(value);
+                      if (value.trim().isEmpty) search();
+                    },
                     onSubmitted: (_) => search(),
                   ),
                 ),
                 SizedBox(width: 10.w),
-                FilterButton(
-                  onPressed: () async {
-                    await FiltersScreen.open(context);
-                    if (context.mounted) search();
-                  },
-                ),
+                FilterButton(onPressed: () => FiltersScreen.open(context)),
               ],
             ),
             if (browse.canReset)
@@ -118,24 +122,28 @@ class RecipesScreen extends StatelessWidget {
               ),
             SizedBox(height: 26.h),
             if (browse.isSearching || found != null || searching) ...[
-              Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      searching ? l10n.searchLoading : l10n.searchResultCount(results.length),
-                      style: AppTextStyles.resultCount,
+              if (pending)
+                _SearchPrompt(query: browse.query.trim(), onTap: search)
+              else
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        searching ? l10n.searchLoading : l10n.searchResultCount(results.length),
+                        style: AppTextStyles.resultCount,
+                      ),
                     ),
-                  ),
-                  if (browse.canSearch && !searching) _LinkButton(label: '↻ ${l10n.searchReload}', onPressed: () => search(reload: true)),
-                ],
-              ),
+                    if (browse.canSearch && !searching)
+                      _LinkButton(label: '↻ ${l10n.searchReload}', onPressed: () => search(reload: true)),
+                  ],
+                ),
               SizedBox(height: 12.h),
               if (searching)
-                const _Searching()
-              else if (results.isEmpty)
-                _EmptyText(browse.isSearching ? l10n.searchEmpty(browse.query.trim()) : l10n.filtersEmpty)
-              else
-                ..._separated([for (final r in results) row(r)], 11.h),
+                const _SearchingRows()
+              else if (results.isNotEmpty)
+                ..._separated([for (final r in results) row(r)], 11.h)
+              else if (!pending)
+                _EmptyText(browse.isSearching ? l10n.searchEmpty(browse.query.trim()) : l10n.filtersEmpty),
             ] else ...[
               // Hidden until the user has opened a recipe.
               if (recentlyViewed.isNotEmpty) ...[
@@ -221,20 +229,102 @@ class _LinkButton extends StatelessWidget {
   }
 }
 
-/// Shown while a search runs: the API call, then Gemini.
-class _Searching extends StatelessWidget {
-  const _Searching();
+/// "Rechercher « … »": asks the API for typed text not searched yet.
+class _SearchPrompt extends StatelessWidget {
+  const _SearchPrompt({required this.query, required this.onTap});
+
+  final String query;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.symmetric(vertical: 40.h),
-      child: Center(
-        child: SizedBox(
-          width: 28.r,
-          height: 28.r,
-          child: const CircularProgressIndicator(strokeWidth: 2.5, color: AppColors.brand),
-        ),
+    return SurfaceCard(
+      onTap: onTap,
+      radius: 20.r,
+      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 15.h),
+      child: Row(
+        children: [
+          LineIcon(LineGlyph.search, size: 20.r, color: AppColors.brand),
+          SizedBox(width: 12.w),
+          Expanded(
+            child: Text(
+              AppL10n.of(context).searchPrompt(query),
+              style: AppTextStyles.recipeRowTitle,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+          SizedBox(width: 8.w),
+          LineIcon(LineGlyph.chevronRight, size: 18.r, color: AppColors.chevron),
+        ],
+      ),
+    );
+  }
+}
+
+/// Shown while a search runs (the API call, then Gemini): placeholder rows
+/// shaped like the results, pulsing.
+class _SearchingRows extends StatefulWidget {
+  const _SearchingRows();
+
+  /// Title widths, so the placeholders don't look stamped.
+  static const _widths = [0.82, 0.6, 0.74, 0.52];
+
+  @override
+  State<_SearchingRows> createState() => _SearchingRowsState();
+}
+
+class _SearchingRowsState extends State<_SearchingRows> with SingleTickerProviderStateMixin {
+  late final AnimationController _pulse = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 850),
+    lowerBound: 0.5,
+  )..repeat(reverse: true);
+
+  @override
+  void dispose() {
+    _pulse.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    Widget block(double width, double height, double radius) => Container(
+      width: width,
+      height: height,
+      decoration: BoxDecoration(color: AppColors.track, borderRadius: BorderRadius.circular(radius)),
+    );
+    Widget bar(double widthFactor, double height) =>
+        FractionallySizedBox(widthFactor: widthFactor, child: block(double.infinity, height, height / 2));
+
+    return FadeTransition(
+      opacity: _pulse,
+      child: Column(
+        children: RecipesScreen._separated([
+          for (final width in _SearchingRows._widths)
+            SurfaceCard(
+              radius: 20.r,
+              padding: EdgeInsets.all(11.r),
+              child: Row(
+                children: [
+                  block(62.r, 62.r, 14.r),
+                  SizedBox(width: 13.w),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        bar(width, 15.h),
+                        SizedBox(height: 9.h),
+                        bar(0.32, 12.h),
+                        SizedBox(height: 9.h),
+                        bar(0.45, 11.h),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+        ], 11.h),
       ),
     );
   }

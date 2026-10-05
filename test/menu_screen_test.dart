@@ -16,6 +16,7 @@ import 'package:tably/features/preferences/cubit/profile_cubit.dart';
 import 'package:tably/features/preferences/model/user_profile.dart';
 import 'package:tably/features/preferences/service/profile_service.dart';
 import 'package:tably/features/recipe/cubit/recipe_cubit.dart';
+import 'package:tably/features/recipe/cubit/search_quota_cubit.dart';
 import 'package:tably/features/recipe/service/recipe_service.dart';
 import 'package:tably/features/shopping/cubit/shopping_cubit.dart';
 import 'package:tably/features/shopping/service/shopping_ai_service.dart';
@@ -26,14 +27,20 @@ import 'fixtures/recipe_fixtures.dart';
 
 /// Pumps the real menu with real cubits; nothing is bound to a user, so no
 /// Firebase call is made.
-Future<ProfileCubit> _pumpMenu(WidgetTester tester, {required Size physicalSize, required UserProfile profile}) async {
+Future<ProfileCubit> _pumpMenu(
+  WidgetTester tester, {
+  required Size physicalSize,
+  required UserProfile profile,
+  int searchesUsed = 0,
+}) async {
   tester.view.physicalSize = physicalSize;
   tester.view.devicePixelRatio = 2;
   addTearDown(tester.view.reset);
 
   const analytics = AnalyticsService();
   final profileCubit = ProfileCubit(service: ProfileService(), analytics: analytics);
-  final catalogueCubit = seededCatalogue(profileCubit);
+  final quotaCubit = searchesUsed > 0 ? await spentQuota(profileCubit, used: searchesUsed) : unboundQuota(profileCubit);
+  final catalogueCubit = seededCatalogue(profileCubit, quota: quotaCubit);
   final recipeCubit = RecipeCubit(service: RecipeService(), analytics: analytics);
   final planCubit = PlanCubit(
     service: PlanService(),
@@ -51,6 +58,7 @@ Future<ProfileCubit> _pumpMenu(WidgetTester tester, {required Size physicalSize,
     MultiBlocProvider(
       providers: [
         BlocProvider.value(value: profileCubit),
+        BlocProvider.value(value: quotaCubit),
         BlocProvider.value(value: catalogueCubit),
         BlocProvider.value(value: planCubit),
         BlocProvider(
@@ -112,6 +120,22 @@ void main() {
     });
   }
 
+  testWidgets('shows the searches left beside the store, and explains them on tap', (tester) async {
+    await _pumpMenu(tester, physicalSize: const Size(688, 672), profile: const UserProfile(), searchesUsed: 4);
+
+    expect(tester.takeException(), isNull);
+    expect(find.text('26/30'), findsOneWidget);
+    expect(find.text('Lidl'), findsOneWidget);
+    expect(tester.getRect(find.text('26/30')).right, lessThan(tester.getRect(find.text('Lidl')).left));
+
+    await tester.tap(find.text('26/30'));
+    await tester.pumpAndSettle();
+    expect(find.text('Recherches du jour'), findsOneWidget);
+    expect(find.textContaining('Il te reste 26 recherches de recettes sur 30'), findsOneWidget);
+    // Bound, so its rollover timer must stop before the test ends.
+    await tester.element(find.byType(MenuScreen)).read<SearchQuotaCubit>().close();
+  });
+
   testWidgets('shows only dinners, with no slot names, for one meal a day', (tester) async {
     await _pumpMenu(tester, physicalSize: const Size(804, 1748), profile: const UserProfile());
 
@@ -132,7 +156,7 @@ void main() {
     expect(find.text('DÉJEUNER'), findsNWidgets(7));
   });
 
-  testWidgets('dragging a meal by its dots moves it down the week', (tester) async {
+  testWidgets('dragging a meal by its grip moves it down the week', (tester) async {
     await _pumpMenu(tester, physicalSize: const Size(804, 1748), profile: const UserProfile());
     String titleAt(int i) => tester.widget<MealSlotCard>(find.byType(MealSlotCard).at(i)).slot.recipe.title;
     final monday = titleAt(0);
@@ -140,7 +164,11 @@ void main() {
 
     // Drag Monday's handle down onto Tuesday.
     final cards = find.byType(MealSlotCard);
-    final handle = find.descendant(of: cards.first, matching: find.byIcon(Icons.more_vert_rounded));
+    // The grip, not the long-press listener wrapping the whole card.
+    final handle = find.descendant(
+      of: cards.first,
+      matching: find.byWidgetPredicate((w) => w.runtimeType == ReorderableDragStartListener),
+    );
     final step = tester.getCenter(cards.at(1)).dy - tester.getCenter(cards.first).dy;
     final gesture = await tester.startGesture(tester.getCenter(handle));
     for (var i = 0; i < 10; i++) {

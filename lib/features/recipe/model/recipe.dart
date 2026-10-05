@@ -158,6 +158,21 @@ class Recipe extends Equatable {
   /// Cooking time shown in the recipe notes, e.g. "20-25m".
   final String cookTime;
 
+  /// [time] in minutes, or null when it holds no number.
+  int? get minutes => int.tryParse(time.replaceAll(RegExp(r'\D'), ''));
+
+  /// Whether this recipe answers [wanted]: its own badge, or for the
+  /// measurable cravings the thresholds the search and Gemini use. A recipe
+  /// has one badge, so a quick dish with 40 g of protein is high protein too.
+  bool satisfies(Craving wanted) =>
+      wanted == craving ||
+      switch (wanted) {
+        Craving.quick => (minutes ?? 0) > 0 && minutes! <= 25,
+        Craving.highProtein => macros.protein >= 30,
+        Craving.lowCalorie => macros.kcal > 0 && macros.kcal <= 450,
+        _ => false,
+      };
+
   /// Reference cost per portion, scaled by the store's price factor.
   final double price;
 

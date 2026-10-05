@@ -78,6 +78,9 @@ extension OptionLabels on AppL10n {
         'oven' => applianceOven,
         'air_fryer' => applianceAirFryer,
         'mixer' => applianceMixer,
+        'slow_cooker' => applianceSlowCooker,
+        'pressure_cooker' => appliancePressureCooker,
+        'barbecue' => applianceBarbecue,
         _ => id,
       };
 
@@ -133,8 +136,6 @@ extension OptionLabels on AppL10n {
         Cuisine.indian => cuisineIndianDesc,
         Cuisine.mediterranean => cuisineMediterraneanDesc,
       };
-
-  String proteinName(RecipeProtein protein) => optionLabel(protein.id);
 
   /// The message for a failed recipe build or search.
   String catalogueError(Object? error) => switch (CatalogueCubit.reasonFor(error)) {

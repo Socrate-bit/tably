@@ -13,6 +13,7 @@ import '../../../core/widget/app_slider.dart';
 import '../../../core/widget/household_stepper.dart';
 import '../../../core/widget/circle_icon_button.dart';
 import '../../../core/widget/line_icon.dart';
+import '../../../core/widget/note_field.dart';
 import '../../../core/widget/surface_card.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../home/cubit/home_cubit.dart';
@@ -20,7 +21,8 @@ import '../../onboarding/cubit/onboarding_cubit.dart';
 import '../../plan/widget/meals_per_day_options.dart';
 import '../../plan/widget/variety_options.dart';
 import '../cubit/profile_cubit.dart';
-import '../widget/custom_preferences.dart';
+import '../model/user_profile.dart';
+import '../widget/cook_time_slider.dart';
 import '../widget/preference_grid.dart';
 
 /// The preferences tab. Every control writes straight through to the profile,
@@ -144,6 +146,11 @@ class PreferencesScreen extends StatelessWidget {
                 ),
                 SizedBox(height: 28.h),
 
+                PreferenceSectionHeader(title: l10n.cookTimeTitle, subtitle: l10n.cookTimeSub),
+                SizedBox(height: 8.h),
+                CookTimeSlider(minutes: profile.cookMinutes, onChanged: cubit.setCookMinutes),
+                SizedBox(height: 28.h),
+
                 PreferenceSectionHeader(
                   title: l10n.prefsCravings,
                   subtitle: l10n.chooseUpToThree,
@@ -215,14 +222,13 @@ class PreferencesScreen extends StatelessWidget {
                 SizedBox(height: 28.h),
 
                 PreferenceSectionHeader(
-                  title: l10n.prefsCustom,
-                  subtitle: l10n.prefsCustomSub,
+                  title: l10n.prefsCustomInstructions,
+                  subtitle: l10n.prefsCustomInstructionsSub,
                 ),
                 SizedBox(height: 14.h),
-                CustomPreferences(
-                  rules: profile.customPreferences,
-                  onAdd: cubit.addCustomPreference,
-                  onRemove: cubit.removeCustomPreference,
+                _CustomInstructionsField(
+                  text: profile.customInstructions,
+                  onSaved: cubit.setCustomInstructions,
                 ),
               ],
             ),
@@ -234,6 +240,52 @@ class PreferencesScreen extends StatelessWidget {
 }
 
 /// Flag, name and currency chip.
+/// The custom instructions box. Saves when the user leaves it, or leaves
+/// the tab, rather than on every keystroke.
+class _CustomInstructionsField extends StatefulWidget {
+  const _CustomInstructionsField({required this.text, required this.onSaved});
+
+  final String text;
+  final ValueChanged<String> onSaved;
+
+  @override
+  State<_CustomInstructionsField> createState() => _CustomInstructionsFieldState();
+}
+
+class _CustomInstructionsFieldState extends State<_CustomInstructionsField> {
+  late final TextEditingController _controller = TextEditingController(text: widget.text);
+  late final FocusNode _focus = FocusNode()..addListener(_onFocusChange);
+
+  void _onFocusChange() {
+    if (!_focus.hasFocus) widget.onSaved(_controller.text);
+  }
+
+  /// Follows the stored text (e.g. once the profile loads) unless the user is typing.
+  @override
+  void didUpdateWidget(_CustomInstructionsField oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (!_focus.hasFocus && widget.text != _controller.text.trim()) _controller.text = widget.text;
+  }
+
+  @override
+  void dispose() {
+    widget.onSaved(_controller.text);
+    _focus.dispose();
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return NoteField(
+      controller: _controller,
+      focusNode: _focus,
+      hint: AppL10n.of(context).prefsCustomInstructionsHint,
+      maxLength: UserProfile.customInstructionsMax,
+    );
+  }
+}
+
 class _CountryRow extends StatelessWidget {
   const _CountryRow({required this.country});
 

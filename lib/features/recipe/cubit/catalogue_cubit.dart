@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:math';
 
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:equatable/equatable.dart';
@@ -14,6 +13,7 @@ import '../model/recipe.dart';
 import '../service/recipe_ai_service.dart';
 import '../service/recipe_search_service.dart';
 import '../service/recipe_service.dart';
+import 'search_quota_cubit.dart';
 
 part 'catalogue_state.dart';
 
@@ -26,12 +26,14 @@ class CatalogueCubit extends Cubit<CatalogueState> {
   CatalogueCubit({
     required RecipeService service,
     required RecipeSearchService search,
+    required SearchQuotaCubit quota,
     required RecipeAiService ai,
     required ProfileCubit profileCubit,
     required AnalyticsService analytics,
     List<Recipe> recipes = const [],
   })  : _service = service,
         _search = search,
+        _quota = quota,
         _ai = ai,
         _profileCubit = profileCubit,
         _analytics = analytics,
@@ -44,6 +46,7 @@ class CatalogueCubit extends Cubit<CatalogueState> {
 
   final RecipeService _service;
   final RecipeSearchService _search;
+  final SearchQuotaCubit _quota;
   final RecipeAiService _ai;
   final ProfileCubit _profileCubit;
   final AnalyticsService _analytics;
@@ -61,12 +64,10 @@ class CatalogueCubit extends Cubit<CatalogueState> {
   /// change — only when the user asks.
   String? _failedKey;
 
-  /// The smallest pool worth building, so even a short week has spares.
-  static const minPoolSize = 24;
-
-  /// How many candidates a build asks for: twice the recipes the week cooks,
-  /// so single-meal regenerations have spares, and never below [minPoolSize].
-  static int poolSizeFor(UserProfile profile) => max(minPoolSize, profile.recipesToCook * 2);
+  /// Candidates a build asks for. Gemini rejects a good share of them, and
+  /// the busiest week cooks 14 recipes, so this leaves spares for
+  /// single-meal regenerations. Still one request of the quota.
+  static const poolSize = 50;
 
   /// Identifies the preferences a catalogue depends on. Anything else in the
   /// profile (household, days, store…) only changes the plan, not the recipes.
@@ -78,16 +79,17 @@ class CatalogueCubit extends Cubit<CatalogueState> {
       ids(profile.allergies.map((a) => a.id)),
       ids(profile.proteins.map((p) => p.id)),
       ids(profile.appliances.map((a) => a.id)),
-      profile.cookTime ?? '',
-      // Only when set, so catalogues built before custom rules existed
-      // keep their key.
-      if (profile.customPreferences.isNotEmpty) ids(profile.customPreferences.map((p) => p.trim().toLowerCase())),
+      // Unchanged since onboarding, the answer stands in, so catalogues
+      // stored before the slider existed keep their key.
+      profile.cookMinutes == UserProfile.cookMinutesFor(profile.cookTime) ? profile.cookTime ?? '' : '${profile.cookMinutes}',
+      // Only when set, for the same reason.
+      if (profile.customInstructions.isNotEmpty) profile.customInstructions,
     ].join('|');
   }
 
   /// Why a build failed, for analytics and the error message.
   static String reasonFor(Object? error) => switch (error) {
-        FirebaseFunctionsException(code: 'resource-exhausted') => 'quota',
+        SearchLimitException() || FirebaseFunctionsException(code: 'resource-exhausted') => 'quota',
         FirebaseFunctionsException() => 'search',
         NoMatchingRecipesException() => 'no_match',
         FirebaseAIException() => 'ai',
@@ -175,7 +177,7 @@ class CatalogueCubit extends Cubit<CatalogueState> {
     });
   }
 
-  /// 1. Searches Spoonacular (one request of the daily quota)
+  /// 1. Searches Spoonacular (one of the user's daily searches)
   /// 2. Has Gemini drop what breaks a constraint and translate the rest
   /// 3. Replaces the stored catalogue, which the plan then reads
   Future<bool> _run(UserProfile profile, String key) async {
@@ -183,7 +185,8 @@ class CatalogueCubit extends Cubit<CatalogueState> {
     final stopwatch = Stopwatch()..start();
     emit(state.copyWith(status: CatalogueStatus.building, step: CatalogueStep.searching, clearError: true));
     try {
-      final raw = await _search.search(profile, number: poolSizeFor(profile));
+      _quota.ensureAvailable();
+      final raw = await _search.search(profile, number: poolSize);
       if (superseded()) return false;
       emit(state.copyWith(step: CatalogueStep.adapting));
 
