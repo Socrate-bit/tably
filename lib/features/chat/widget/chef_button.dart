@@ -5,14 +5,14 @@ import '../../../core/theme/app_theme.dart';
 import '../../../core/util/haptics.dart';
 import '../screen/chat_screen.dart';
 
-/// The round orange chef beside the tab bar, opening the AI chef's chat
-/// from every tab.
+/// The round orange chef beside the tab bar, as tall as the bar, opening
+/// the AI chef's chat from every tab.
 class ChefButton extends StatelessWidget {
   const ChefButton({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final size = 76.r;
+    final size = AppDimens.tabBarHeight;
     return GestureDetector(
       onTap: () {
         Haptics.confirm();

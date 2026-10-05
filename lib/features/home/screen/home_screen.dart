@@ -58,8 +58,8 @@ class HomeScreen extends StatelessWidget {
                 Expanded(
                   child: AppTabBar(current: home.tab, onSelected: context.read<HomeCubit>().select),
                 ),
-                SizedBox(width: 10.w),
-                Padding(padding: EdgeInsets.only(bottom: 8.h), child: const ChefButton()),
+                SizedBox(width: 12.w),
+                const ChefButton(),
                 // Hidden for now.
                 // _AddRecipeSlot(visible: home.tab == HomeTab.recipes && home.sub == HomeSub.none),
               ],

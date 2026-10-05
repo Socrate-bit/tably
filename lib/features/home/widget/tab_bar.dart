@@ -42,7 +42,7 @@ class AppTabBar extends StatelessWidget {
       // The shell owns the margins around the pill.
       horizontalPadding: 0,
       verticalPadding: 0,
-      barHeight: 92.h,
+      barHeight: AppDimens.tabBarHeight,
       barBorderRadius: 64.r,
       iconSize: _iconSize,
       textStyle: AppTextStyles.tabLabel,
