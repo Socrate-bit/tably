@@ -38,7 +38,7 @@ void main() {
     expect(size(2, Variety.low), 24);
   });
 
-  test('searches 24 recipes with the text in English and the filters', () async {
+  test('searches 50 recipes with the text in English and the filters', () async {
     final search = cubit();
     const browse = RecipeBrowseState(
       query: ' poulet curry ',
@@ -50,12 +50,20 @@ void main() {
     await search.search(browse);
 
     final call = api.calls.single;
-    expect(call.number, 24);
+    expect(call.number, 50);
     expect(call.query, 'en:poulet curry');
     expect(call.cuisines, {Cuisine.indian});
     expect(call.craving, Craving.quick);
     expect(call.protein, RecipeProtein.chicken);
     expect(search.state.resultsFor(browse), RecipeFixtures.recipes);
+  });
+
+  test('candidates over the price limit at the store never reach Gemini', () async {
+    final ai = FakeAi();
+    final search = cubit(ai: ai);
+    // 4 € at Lidl (×0.975) fits candidates costing 0 to 4 € at the reference.
+    await search.search(const RecipeBrowseState(maxPrice: 4));
+    expect([for (final r in ai.candidates.single) r['id']], [0, 1, 2, 3, 4]);
   });
 
   test('several cravings or proteins are left to the local filters', () async {

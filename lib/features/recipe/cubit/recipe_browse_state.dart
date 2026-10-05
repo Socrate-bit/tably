@@ -26,6 +26,10 @@ class RecipeBrowseState extends Equatable {
 
   bool get hasPriceLimit => maxPrice < RecipeBrowseCubit.priceCeiling;
 
+  /// Whether a portion costing [price] at the reference fits the price limit
+  /// once scaled to [store].
+  bool fitsPrice(double price, Store store) => !hasPriceLimit || price * store.priceFactor <= maxPrice;
+
   /// The badge count on the filter button: one per chip, plus one for price,
   /// plus one per diet, allergy or appliance narrower than the widest search,
   /// plus one for a time limit.
@@ -79,7 +83,7 @@ class RecipeBrowseState extends Equatable {
       if (checkCravings && !cravings.any(r.satisfies)) return false;
       if (!searched && cuisines.isNotEmpty && !cuisines.contains(r.cuisine)) return false;
       if (checkProteins && !proteins.contains(r.protein)) return false;
-      if (hasPriceLimit && r.price * store.priceFactor > maxPrice) return false;
+      if (!fitsPrice(r.price, store)) return false;
       if (constraints.hasCookLimit && (r.minutes ?? 0) > constraints.cookMinutes) return false;
       final haystack = '${r.title} ${cravingLabel(r.craving)}'.toLowerCase();
       return words.every(haystack.contains);
