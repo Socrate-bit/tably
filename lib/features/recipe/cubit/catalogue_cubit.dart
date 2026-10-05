@@ -81,6 +81,8 @@ class CatalogueCubit extends Cubit<CatalogueState> {
       // Unchanged since onboarding, the answer stands in, so catalogues
       // stored before the slider existed keep their key.
       profile.cookMinutes == UserProfile.cookMinutesFor(profile.cookTime) ? profile.cookTime ?? '' : '${profile.cookMinutes}',
+      // Only when set, for the same reason.
+      if (profile.customInstructions.isNotEmpty) profile.customInstructions,
     ].join('|');
   }
 

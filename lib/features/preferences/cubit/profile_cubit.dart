@@ -100,6 +100,13 @@ class ProfileCubit extends Cubit<ProfileState> {
   Future<void> setCookMinutes(int minutes) =>
       _update(state.profile.copyWith(cookMinutes: minutes), changed: 'cook_minutes');
 
+  /// Saved trimmed, and only when it actually changed.
+  Future<void> setCustomInstructions(String text) async {
+    final trimmed = text.trim();
+    if (trimmed == state.profile.customInstructions) return;
+    await _update(state.profile.copyWith(customInstructions: trimmed), changed: 'custom_instructions');
+  }
+
   Future<void> setStore(Store store) =>
       _update(state.profile.copyWith(store: store), changed: 'store');
 

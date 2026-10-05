@@ -2274,6 +2274,24 @@ abstract class AppL10n {
   /// In fr, this message translates to:
   /// **'Pas de limite'**
   String get cookTimeNoLimit;
+
+  /// No description provided for @prefsCustomInstructions.
+  ///
+  /// In fr, this message translates to:
+  /// **'Instructions personnalisées'**
+  String get prefsCustomInstructions;
+
+  /// No description provided for @prefsCustomInstructionsSub.
+  ///
+  /// In fr, this message translates to:
+  /// **'Tably en tient compte pour choisir tes recettes'**
+  String get prefsCustomInstructionsSub;
+
+  /// No description provided for @prefsCustomInstructionsHint.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ex. : pas de champignons, peu épicé, pas de poisson cru…'**
+  String get prefsCustomInstructionsHint;
 }
 
 class _AppL10nDelegate extends LocalizationsDelegate<AppL10n> {
