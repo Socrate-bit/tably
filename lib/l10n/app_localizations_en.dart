@@ -1239,6 +1239,11 @@ class AppL10nEn extends AppL10n {
   String get searchLoading => 'Searching for recipes…';
 
   @override
+  String searchPrompt(String query) {
+    return 'Search for “$query”';
+  }
+
+  @override
   String get filtersFromPreferences =>
       'Your preferences by default, adjustable for this search';
 

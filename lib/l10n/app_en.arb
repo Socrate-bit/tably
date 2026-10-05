@@ -501,6 +501,7 @@
   "errorCatalogueEmpty": "No recipes match your preferences.",
   "searchReload": "Search again",
   "searchLoading": "Searching for recipes…",
+  "searchPrompt": "Search for “{query}”",
   "filtersFromPreferences": "Your preferences by default, adjustable for this search",
   "proteinNoMeat": "No meat",
   "applianceMixer": "Blender"

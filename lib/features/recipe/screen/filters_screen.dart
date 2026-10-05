@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -14,6 +16,7 @@ import '../../../l10n/app_localizations.dart';
 import '../../preferences/cubit/profile_cubit.dart';
 import '../../../core/widget/app_slider.dart';
 import '../cubit/recipe_browse_cubit.dart';
+import '../cubit/recipe_search_cubit.dart';
 import '../model/recipe.dart';
 
 /// "Filtres": cravings, cuisine, protein, diets, allergies, appliances and
@@ -21,8 +24,14 @@ import '../model/recipe.dart';
 class FiltersScreen extends StatelessWidget {
   const FiltersScreen({super.key});
 
-  static Future<void> open(BuildContext context) =>
-      Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const FiltersScreen()));
+  /// Opens the filters; closing them searches again with the new ones,
+  /// wherever they were opened from.
+  static Future<void> open(BuildContext context) async {
+    final browse = context.read<RecipeBrowseCubit>();
+    final search = context.read<RecipeSearchCubit>();
+    await Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const FiltersScreen()));
+    unawaited(search.search(browse.state));
+  }
 
   @override
   Widget build(BuildContext context) {

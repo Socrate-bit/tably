@@ -20,6 +20,7 @@ enum LineGlyph {
     'M12 11.6a3.8 3.8 0 1 0 0-7.6 3.8 3.8 0 0 0 0 7.6z',
     'M4.8 20.2c.6-3.6 3.6-5.9 7.2-5.9s6.6 2.3 7.2 5.9',
   ]),
+  search(['M10.8 17.6a6.8 6.8 0 1 0 0-13.6 6.8 6.8 0 0 0 0 13.6z', 'M15.8 15.8L20 20']),
   filter(['M4 6.5h16', 'M7 12h10', 'M10 17.5h4']),
   /// Compass needle alone, drawn [LineIcon.filled] inside a brand disc.
   compass(['M17 7l-3.4 6.6L7 17l3.4-6.6z']),
