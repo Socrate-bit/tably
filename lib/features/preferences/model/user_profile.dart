@@ -214,7 +214,15 @@ class UserProfile extends Equatable {
       };
 
   factory UserProfile.fromMap(Map<String, dynamic> map) {
-    Set<T> parse<T extends Enum>(String key, List<T> values, String Function(T) id, Set<T> fallback) {
+    /// A missing key falls back; an empty list does too unless [allowEmpty],
+    /// for the choices a user may leave blank.
+    Set<T> parse<T extends Enum>(
+      String key,
+      List<T> values,
+      String Function(T) id,
+      Set<T> fallback, {
+      bool allowEmpty = false,
+    }) {
       final raw = map[key];
       if (raw is! List) return fallback;
       final parsed = raw
@@ -222,7 +230,7 @@ class UserProfile extends Equatable {
           .map((s) => values.where((v) => id(v) == s).firstOrNull)
           .whereType<T>()
           .toSet();
-      return parsed.isEmpty ? fallback : parsed;
+      return parsed.isEmpty && !(allowEmpty && raw.isEmpty) ? fallback : parsed;
     }
 
     Set<String> strings(String key) => (map[key] as List? ?? const []).whereType<String>().toSet();
@@ -241,11 +249,11 @@ class UserProfile extends Equatable {
       country: Country.fromId(map['country'] as String? ?? fallback.country.id),
       store: Store.fromId(map['store'] as String?),
       languageCode: map['languageCode'] as String? ?? fallback.languageCode,
-      cravings: parse('cravings', Craving.values, (c) => c.id, fallback.cravings),
+      cravings: parse('cravings', Craving.values, (c) => c.id, fallback.cravings, allowEmpty: true),
       diets: parse('diets', Diet.values, (d) => d.id, fallback.diets),
       allergies: parse('allergies', Allergy.values, (a) => a.id, fallback.allergies),
-      proteins: parse('proteins', Protein.values, (p) => p.id, fallback.proteins),
-      appliances: parse('appliances', Appliance.values, (a) => a.id, fallback.appliances),
+      proteins: parse('proteins', Protein.values, (p) => p.id, fallback.proteins, allowEmpty: true),
+      appliances: parse('appliances', Appliance.values, (a) => a.id, fallback.appliances, allowEmpty: true),
       ageRange: map['ageRange'] as String?,
       goals: strings('goals'),
       blockers: strings('blockers'),

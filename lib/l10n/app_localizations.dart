@@ -730,7 +730,7 @@ abstract class AppL10n {
   /// No description provided for @onbAppliancesHint.
   ///
   /// In fr, this message translates to:
-  /// **'Choisis au moins un pour planifier'**
+  /// **'Choisis tout ce que tu as'**
   String get onbAppliancesHint;
 
   /// No description provided for @applianceMicrowave.
@@ -1222,7 +1222,7 @@ abstract class AppL10n {
   /// No description provided for @prefsAppliancesSub.
   ///
   /// In fr, this message translates to:
-  /// **'Choisis au moins un pour planifier'**
+  /// **'Choisis tout ce que tu as'**
   String get prefsAppliancesSub;
 
   /// No description provided for @accountTitle.
@@ -2208,6 +2208,18 @@ abstract class AppL10n {
   /// In fr, this message translates to:
   /// **'Tes préférences par défaut, modifiables pour cette recherche'**
   String get filtersFromPreferences;
+
+  /// No description provided for @proteinNoMeat.
+  ///
+  /// In fr, this message translates to:
+  /// **'Pas de viande'**
+  String get proteinNoMeat;
+
+  /// No description provided for @applianceMixer.
+  ///
+  /// In fr, this message translates to:
+  /// **'Mixeur'**
+  String get applianceMixer;
 }
 
 class _AppL10nDelegate extends LocalizationsDelegate<AppL10n> {

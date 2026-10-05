@@ -189,6 +189,16 @@ class RecipeAiService {
     }
 
     final language = profile.languageCode == 'en' ? 'English' : 'French';
+    // No meat ticked means no preference; "no_meat" means none at all.
+    final proteins = profile.proteins.contains(Protein.noMeat)
+        ? 'none: the user eats no meat or fish at all'
+        : profile.proteins.isEmpty
+            ? 'any meat or fish'
+            : ids(profile.proteins.map((p) => p.id));
+    // No appliance ticked means literally none: only no-cook recipes pass.
+    final appliances = profile.appliances.isEmpty
+        ? 'no cooking appliance at all, so keep only recipes that need no cooking and no appliance'
+        : ids(profile.appliances.map((a) => a.id));
     return '''
 You adapt recipes for Tably, a weekly dinner-planning app. The input is a JSON
 array of recipes. Put every input recipe in exactly one of "kept" or
@@ -202,11 +212,12 @@ array of recipes. Put every input recipe in exactly one of "kept" or
   (e.g. nut_free excludes peanuts, tree nuts, nut butters and pesto;
   lactose_free excludes milk, butter, cream and cheese).
 - Its main protein is a meat or fish the user did not pick. Allowed:
-  ${ids(profile.proteins.map((p) => p.id))}. Vegetarian and tofu dishes are
-  always allowed unless a diet rules them out.
-- It needs equipment the user lacks. The user has: ${ids(profile.appliances.map((a) => a.id))}
-  (hob = stovetop). Reject anything that must be baked or roasted in an oven
-  when "oven" is missing.
+  $proteins. Vegetarian and tofu dishes are always allowed unless a diet
+  rules them out.
+- It needs equipment the user lacks. The user has: $appliances
+  (hob = stovetop, mixer = blender or food processor). Reject anything that
+  must be baked or roasted in an oven when "oven" is missing, or blended when
+  "mixer" is missing.
 - It is not a proper savoury main course: desserts, drinks, sauces, sides,
   snacks, or text that is not really a recipe.
 - Its steps need far longer than readyInMinutes, e.g. overnight marinating or

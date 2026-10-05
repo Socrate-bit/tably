@@ -98,9 +98,10 @@ class OnboardingCubit extends Cubit<OnboardingState> {
       StepIds.diet => draft.copyWith(diets: Selection.toggleWithNone(draft.diets, Diet.values.byId(optionId), Diet.none)),
       StepIds.allergies =>
         draft.copyWith(allergies: Selection.toggleWithNone(draft.allergies, Allergy.values.byId(optionId), Allergy.none)),
-      StepIds.proteins => draft.copyWith(proteins: Selection.toggle(draft.proteins, Protein.values.byId(optionId))),
+      StepIds.proteins =>
+        draft.copyWith(proteins: Selection.toggleExclusive(draft.proteins, Protein.values.byId(optionId), Protein.noMeat)),
       StepIds.appliances =>
-        draft.copyWith(appliances: Selection.toggleKeepOne(draft.appliances, Appliance.values.byId(optionId))),
+        draft.copyWith(appliances: Selection.toggle(draft.appliances, Appliance.values.byId(optionId))),
       _ => draft,
     };
     emit(state.copyWith(draft: next));

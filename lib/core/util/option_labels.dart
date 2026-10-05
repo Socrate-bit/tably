@@ -71,11 +71,13 @@ extension OptionLabels on AppL10n {
         'pork' => proteinPork,
         'chicken' => proteinChicken,
         'fish' => proteinFish,
+        'no_meat' => proteinNoMeat,
         'tofu' => proteinTofu,
         'microwave' => applianceMicrowave,
         'hob' => applianceHob,
         'oven' => applianceOven,
         'air_fryer' => applianceAirFryer,
+        'mixer' => applianceMixer,
         _ => id,
       };
 

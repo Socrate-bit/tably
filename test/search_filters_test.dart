@@ -66,7 +66,7 @@ void main() {
       expect(cubit.state.constraints.allergies, {Allergy.none}, reason: 'clearing everything falls back to "none"');
       cubit.toggleAppliance(Appliance.hob);
       cubit.toggleAppliance(Appliance.oven);
-      expect(cubit.state.constraints.appliances, {Appliance.oven}, reason: 'the last appliance stays');
+      expect(cubit.state.constraints.appliances, isEmpty, reason: 'no appliance at all is allowed');
     });
 
     test('follow later preference changes until the user changes them', () async {

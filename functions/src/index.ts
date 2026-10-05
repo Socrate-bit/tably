@@ -180,9 +180,12 @@ function searchParams(data: Record<string, unknown>): URLSearchParams {
   if (protein === "vegetarian" && !diet.includes("vegan")) diet.push("vegetarian");
   const intolerances = allergies.flatMap((a) => INTOLERANCES[a] ?? []);
   const excludes = diets.includes("halal") ? [...HALAL_EXCLUDES] : [];
-  if (diet.length === 0) {
+  // "no_meat" excludes every meat and fish; no meat ticked at all means no
+  // preference; otherwise the meats not ticked are excluded.
+  const noMeat = proteins.includes("no_meat");
+  if (diet.length === 0 && (noMeat || proteins.length > 0)) {
     for (const [protein, names] of Object.entries(PROTEIN_EXCLUDES)) {
-      if (!proteins.includes(protein)) excludes.push(...names);
+      if (noMeat || !proteins.includes(protein)) excludes.push(...names);
     }
   }
 

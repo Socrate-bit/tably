@@ -51,7 +51,6 @@ class OnboardingStep extends Equatable {
     this.multi = false,
     this.maxSelections,
     this.hasNone = false,
-    this.requiresOne = false,
     this.serif = false,
     this.continueLabelOverride,
   });
@@ -71,9 +70,6 @@ class OnboardingStep extends Equatable {
   /// The step has an exclusive "None" option.
   final bool hasNone;
 
-  /// At least one option must stay selected (appliances).
-  final bool requiresOne;
-
   /// Renders option labels in the serif face (language and country pickers).
   final bool serif;
 
@@ -87,7 +83,7 @@ class OnboardingStep extends Equatable {
   bool get showProgress => progress != null;
 
   @override
-  List<Object?> get props => [id, kind, progress, layout, options, multi, maxSelections, hasNone, requiresOne, serif, continueLabelOverride];
+  List<Object?> get props => [id, kind, progress, layout, options, multi, maxSelections, hasNone, serif, continueLabelOverride];
 }
 
 /// Identifiers for steps the cubit needs to reason about by name.
@@ -268,7 +264,6 @@ abstract final class OnboardingFlow {
       progress: 91,
       layout: OptionLayout.grid,
       multi: true,
-      requiresOne: true,
       continueLabelOverride: 'generate',
       options: _specs(Appliance.values, (a) => a.id, (a) => a.icon),
     ),

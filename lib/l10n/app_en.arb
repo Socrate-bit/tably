@@ -126,7 +126,7 @@
   "proteinChicken": "Chicken",
   "proteinFish": "Fish",
   "onbAppliancesTitle": "Which appliances do you have?",
-  "onbAppliancesHint": "Choose at least one to plan",
+  "onbAppliancesHint": "Choose everything you have",
   "applianceMicrowave": "Microwave",
   "applianceHob": "Hob",
   "applianceOven": "Oven",
@@ -266,7 +266,7 @@
   "prefsProteins": "Preferences",
   "prefsProteinsSub": "We'll steer your plan towards the proteins you choose",
   "prefsAppliances": "Kitchen appliances",
-  "prefsAppliancesSub": "Choose at least one to plan",
+  "prefsAppliancesSub": "Choose everything you have",
   "accountTitle": "Account",
   "accountSignInApple": "Sign in with Apple",
   "accountSignInSub": "Sign in to save your\npreferences to the cloud.",
@@ -500,5 +500,7 @@
   "errorCatalogueEmpty": "No recipes match your preferences.",
   "searchReload": "Search again",
   "searchLoading": "Searching for recipes…",
-  "filtersFromPreferences": "Your preferences by default, adjustable for this search"
+  "filtersFromPreferences": "Your preferences by default, adjustable for this search",
+  "proteinNoMeat": "No meat",
+  "applianceMixer": "Blender"
 }

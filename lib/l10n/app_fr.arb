@@ -126,7 +126,7 @@
   "proteinChicken": "Poulet",
   "proteinFish": "Poisson",
   "onbAppliancesTitle": "Quels appareils tu as ?",
-  "onbAppliancesHint": "Choisis au moins un pour planifier",
+  "onbAppliancesHint": "Choisis tout ce que tu as",
   "applianceMicrowave": "Micro-ondes",
   "applianceHob": "Plaques",
   "applianceOven": "Four",
@@ -266,7 +266,7 @@
   "prefsProteins": "Préférences",
   "prefsProteinsSub": "On orientera ton plan vers les protéines que tu choisis",
   "prefsAppliances": "Appareils de cuisine",
-  "prefsAppliancesSub": "Choisis au moins un pour planifier",
+  "prefsAppliancesSub": "Choisis tout ce que tu as",
   "accountTitle": "Compte",
   "accountSignInApple": "Se connecter avec Apple",
   "accountSignInSub": "Connecte-toi pour enregistrer tes\npréférences dans le cloud.",
@@ -631,5 +631,7 @@
   "errorCatalogueEmpty": "Aucune recette ne correspond à tes préférences.",
   "searchReload": "Relancer la recherche",
   "searchLoading": "Recherche de recettes…",
-  "filtersFromPreferences": "Tes préférences par défaut, modifiables pour cette recherche"
+  "filtersFromPreferences": "Tes préférences par défaut, modifiables pour cette recherche",
+  "proteinNoMeat": "Pas de viande",
+  "applianceMixer": "Mixeur"
 }

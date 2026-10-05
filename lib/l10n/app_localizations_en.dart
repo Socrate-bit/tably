@@ -349,7 +349,7 @@ class AppL10nEn extends AppL10n {
   String get onbAppliancesTitle => 'Which appliances do you have?';
 
   @override
-  String get onbAppliancesHint => 'Choose at least one to plan';
+  String get onbAppliancesHint => 'Choose everything you have';
 
   @override
   String get applianceMicrowave => 'Microwave';
@@ -618,7 +618,7 @@ class AppL10nEn extends AppL10n {
   String get prefsAppliances => 'Kitchen appliances';
 
   @override
-  String get prefsAppliancesSub => 'Choose at least one to plan';
+  String get prefsAppliancesSub => 'Choose everything you have';
 
   @override
   String get accountTitle => 'Account';
@@ -1238,4 +1238,10 @@ class AppL10nEn extends AppL10n {
   @override
   String get filtersFromPreferences =>
       'Your preferences by default, adjustable for this search';
+
+  @override
+  String get proteinNoMeat => 'No meat';
+
+  @override
+  String get applianceMixer => 'Blender';
 }
