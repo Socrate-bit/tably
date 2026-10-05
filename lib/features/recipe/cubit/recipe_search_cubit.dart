@@ -31,8 +31,8 @@ class RecipeSearchCubit extends Cubit<RecipeSearchState> {
         _analytics = analytics,
         super(const RecipeSearchState());
 
-  /// Candidates per search, before Gemini drops any that break a constraint.
-  static const size = 24;
+  /// Candidates per search, before the price limit and Gemini drop any.
+  static const size = 50;
 
   final RecipeSearchService _search;
   final RecipeAiService _ai;
@@ -70,10 +70,16 @@ class RecipeSearchCubit extends Cubit<RecipeSearchState> {
         craving: browse.searchCraving,
         protein: browse.searchProtein,
       );
-      final recipes = await _adapt(raw, profile);
+      // Over-budget candidates are dropped before Gemini spends time on them.
+      final affordable = [
+        for (final r in raw)
+          if (browse.fitsPrice((r['price'] as num? ?? 0).toDouble(), profile.store)) r,
+      ];
+      final recipes = await _adapt(affordable, profile);
       if (isClosed || run != _latest) return;
       emit(RecipeSearchState(status: RecipeSearchStatus.ready, searchedFor: browse, results: recipes));
-      debugPrint('[RecipeSearchCubit] "$text" → ${recipes.length} recipes in ${stopwatch.elapsedMilliseconds}ms');
+      debugPrint('[RecipeSearchCubit] "$text" → ${recipes.length} recipes '
+          '(${raw.length - affordable.length} over budget) in ${stopwatch.elapsedMilliseconds}ms');
       unawaited(_analytics.capture(AnalyticsEvents.recipeSearched, properties: {
         'has_query': text.isNotEmpty,
         'filters': browse.filterCount,

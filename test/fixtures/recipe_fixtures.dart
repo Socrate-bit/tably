@@ -42,7 +42,8 @@ class FakeSearch extends RecipeSearchService {
     RecipeProtein? protein,
   }) async {
     calls.add((profile: profile, number: number, query: query, cuisines: cuisines, craving: craving, protein: protein));
-    return [for (var i = 0; i < number; i++) {'id': i}];
+    // Candidate i costs i € per portion.
+    return [for (var i = 0; i < number; i++) {'id': i, 'price': i}];
   }
 }
 
@@ -56,12 +57,16 @@ class FakeAi extends RecipeAiService {
   /// The profile each Gemini check was given.
   final checkedFor = <UserProfile>[];
 
+  /// The candidates each Gemini check was given.
+  final candidates = <List<Map<String, dynamic>>>[];
+
   @override
   Future<String> toEnglish(String text, String languageCode) async => 'en:$text';
 
   @override
   Future<({List<Recipe> recipes, int rejected})> adapt(List<Map<String, dynamic>> raw, UserProfile profile) async {
     checkedFor.add(profile);
+    candidates.add(raw);
     if (recipes.isEmpty) throw const NoMatchingRecipesException(0);
     return (recipes: recipes, rejected: 0);
   }
