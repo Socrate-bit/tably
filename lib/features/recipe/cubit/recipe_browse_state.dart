@@ -8,7 +8,6 @@ class RecipeBrowseState extends Equatable {
     this.proteins = const {},
     this.maxPrice = RecipeBrowseCubit.priceCeiling,
     this.constraints = const DietaryConstraints(),
-    this.defaults = const DietaryConstraints(),
   });
 
   /// Text in the search box.
@@ -23,24 +22,32 @@ class RecipeBrowseState extends Equatable {
   /// Diets, allergies and appliances the search respects.
   final DietaryConstraints constraints;
 
-  /// The profile's own constraints, which [constraints] start from and
-  /// "Réinitialiser" restores. Only a difference counts as a filter.
-  final DietaryConstraints defaults;
-
   bool get isSearching => query.trim().isNotEmpty;
 
   bool get hasPriceLimit => maxPrice < RecipeBrowseCubit.priceCeiling;
 
   /// The badge count on the filter button: one per chip, plus one for price,
-  /// plus one per diet, allergy or appliance changed from the profile.
+  /// plus one per diet, allergy or appliance narrower than the widest search.
   int get filterCount =>
       cravings.length +
       cuisines.length +
       proteins.length +
       (hasPriceLimit ? 1 : 0) +
-      constraints.differencesFrom(defaults);
+      constraints.differencesFrom(widest);
 
   bool get hasFilters => filterCount > 0;
+
+  /// No diet, no allergy and every appliance.
+  static final widest = DietaryConstraints(appliances: Appliance.values.toSet());
+
+  /// This search with every filter at its most permissive.
+  RecipeBrowseState get cleared => RecipeBrowseState(
+        query: query,
+        constraints: widest,
+      );
+
+  /// Whether "Réinitialiser" would change anything.
+  bool get canReset => this != cleared;
 
   /// Whether there is anything to search the API for.
   bool get canSearch => isSearching || hasFilters;
@@ -72,7 +79,6 @@ class RecipeBrowseState extends Equatable {
     Set<RecipeProtein>? proteins,
     double? maxPrice,
     DietaryConstraints? constraints,
-    DietaryConstraints? defaults,
   }) =>
       RecipeBrowseState(
         query: query ?? this.query,
@@ -81,9 +87,8 @@ class RecipeBrowseState extends Equatable {
         proteins: proteins ?? this.proteins,
         maxPrice: maxPrice ?? this.maxPrice,
         constraints: constraints ?? this.constraints,
-        defaults: defaults ?? this.defaults,
       );
 
   @override
-  List<Object?> get props => [query, cravings, cuisines, proteins, maxPrice, constraints, defaults];
+  List<Object?> get props => [query, cravings, cuisines, proteins, maxPrice, constraints];
 }

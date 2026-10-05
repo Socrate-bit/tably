@@ -948,6 +948,9 @@ class AppL10nEn extends AppL10n {
   String get filtersReset => 'Reset';
 
   @override
+  String get filtersResetAll => 'Reset filters';
+
+  @override
   String get filtersCravings => 'Your cravings';
 
   @override

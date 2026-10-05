@@ -14,6 +14,8 @@ enum LineGlyph {
     'M7.4 7.8h6', 'M7.4 11.3h6', 'M7.4 14.8h3.6',
   ]),
   heart(['M12 20.2s-7.6-4.6-7.6-9.8A4.4 4.4 0 0 1 12 7.3a4.4 4.4 0 0 1 7.6 3.1c0 5.2-7.6 9.8-7.6 9.8z']),
+  /// Saved-recipe marker.
+  bookmark(['M6.5 4.8A1.8 1.8 0 0 1 8.3 3h7.4a1.8 1.8 0 0 1 1.8 1.8V20.5L12 16.6l-5.5 3.9z']),
   user([
     'M12 11.6a3.8 3.8 0 1 0 0-7.6 3.8 3.8 0 0 0 0 7.6z',
     'M4.8 20.2c.6-3.6 3.6-5.9 7.2-5.9s6.6 2.3 7.2 5.9',
@@ -44,7 +46,7 @@ enum LineGlyph {
 }
 
 /// Renders a [LineGlyph] in [color]; [filled] also fills closed shapes (the
-/// favourite heart).
+/// favourite bookmark).
 class LineIcon extends StatelessWidget {
   const LineIcon(this.glyph, {super.key, required this.size, required this.color, this.filled = false, this.strokeWidth = 1.9});
 

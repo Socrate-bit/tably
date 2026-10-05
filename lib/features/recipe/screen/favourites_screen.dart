@@ -14,7 +14,7 @@ import '../cubit/recipe_cubit.dart';
 import '../widget/recipe_row.dart';
 import 'recipe_screen.dart';
 
-/// "Favoris": every recipe the user has hearted.
+/// "Favoris": every recipe the user has bookmarked.
 class FavouritesScreen extends StatelessWidget {
   const FavouritesScreen({super.key});
 
@@ -41,7 +41,7 @@ class FavouritesScreen extends StatelessWidget {
               padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 50.h),
               child: Column(
                 children: [
-                  LineIcon(LineGlyph.heart, size: 52.r, color: AppColors.emptyStateIcon, strokeWidth: 1.6),
+                  LineIcon(LineGlyph.bookmark, size: 52.r, color: AppColors.emptyStateIcon, strokeWidth: 1.6),
                   SizedBox(height: 14.h),
                   Text(
                     l10n.favouritesEmpty,

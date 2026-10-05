@@ -475,6 +475,7 @@
   "filtersEmpty": "Aucune recette ne correspond à ces filtres.",
   "filtersTitle": "Filtres",
   "filtersReset": "Réinitialiser",
+  "filtersResetAll": "Réinitialiser les filtres",
   "filtersCravings": "Tes envies",
   "filtersCuisine": "Cuisine type",
   "filtersProtein": "Préférence",

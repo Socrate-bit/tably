@@ -11,7 +11,8 @@ import '../../../core/util/haptics.dart';
 import '../../../core/util/option_labels.dart';
 import '../../../core/widget/app_slider.dart';
 import '../../../core/widget/household_stepper.dart';
-import '../../../core/widget/store_pill.dart';
+import '../../../core/widget/circle_icon_button.dart';
+import '../../../core/widget/line_icon.dart';
 import '../../../core/widget/surface_card.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../home/cubit/home_cubit.dart';
@@ -50,7 +51,11 @@ class PreferencesScreen extends StatelessWidget {
                 Row(
                   children: [
                     Expanded(child: Text(l10n.prefsTitle, style: AppTextStyles.tabTitle)),
-                    StorePill(store: profile.store, onTap: openStores),
+                    CircleIconButton(
+                      size: 50.r,
+                      icon: LineIcon(LineGlyph.user, size: 28.r, color: AppColors.ink),
+                      onPressed: () => context.read<HomeCubit>().open(HomeSub.account),
+                    ),
                   ],
                 ),
                 SizedBox(height: 16.h),

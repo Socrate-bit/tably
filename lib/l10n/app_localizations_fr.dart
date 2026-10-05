@@ -955,6 +955,9 @@ class AppL10nFr extends AppL10n {
   String get filtersReset => 'Réinitialiser';
 
   @override
+  String get filtersResetAll => 'Réinitialiser les filtres';
+
+  @override
   String get filtersCravings => 'Tes envies';
 
   @override

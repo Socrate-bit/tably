@@ -10,8 +10,8 @@ import 'error_feedback.dart';
 abstract final class LegalLinks {
   /// GitHub Pages (Socrate-bit/app-support), not the repository's /blob/ URL:
   /// /blob/ opens GitHub's source viewer and shows the policy as raw HTML.
-  static const privacyPolicy = 'https://socrate-bit.github.io/app-support/tably-privacy.html';
-  static const terms = 'https://ecomparis.org/terms.html';
+  static const privacyPolicy = 'https://ecomparis.org/privacy_tably.html';
+  static const terms = 'https://ecomparis.org/terms_tably.html';
 }
 
 /// Opens a legal document in the device browser. Feedback is shown only when

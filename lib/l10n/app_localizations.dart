@@ -1789,6 +1789,12 @@ abstract class AppL10n {
   /// **'Réinitialiser'**
   String get filtersReset;
 
+  /// No description provided for @filtersResetAll.
+  ///
+  /// In fr, this message translates to:
+  /// **'Réinitialiser les filtres'**
+  String get filtersResetAll;
+
   /// No description provided for @filtersCravings.
   ///
   /// In fr, this message translates to:

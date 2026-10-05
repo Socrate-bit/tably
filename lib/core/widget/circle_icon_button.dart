@@ -4,7 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../theme/app_theme.dart';
 import '../util/haptics.dart';
 
-/// Round white button used for back arrows, the favourite heart and similar.
+/// Round white button used for back arrows, the favourite bookmark and similar.
 class CircleIconButton extends StatelessWidget {
   const CircleIconButton({
     super.key,

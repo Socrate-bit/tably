@@ -375,6 +375,7 @@
   "filtersEmpty": "No recipes match these filters.",
   "filtersTitle": "Filters",
   "filtersReset": "Reset",
+  "filtersResetAll": "Reset filters",
   "filtersCravings": "Your cravings",
   "filtersCuisine": "Cuisine",
   "filtersProtein": "Preference",

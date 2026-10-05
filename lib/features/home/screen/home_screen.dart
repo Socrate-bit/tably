@@ -5,17 +5,22 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/util/haptics.dart';
 import '../../../core/widget/slide_in.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../account/screen/account_screen.dart';
+import '../../onboarding/screen/generating_screen.dart';
+import '../../plan/cubit/plan_cubit.dart';
 import '../../plan/screen/menu_screen.dart';
 import '../../plan/screen/stores_screen.dart';
+import '../../preferences/cubit/profile_cubit.dart';
 import '../../preferences/screen/preferences_screen.dart';
+import '../../recipe/cubit/catalogue_cubit.dart';
 import '../../recipe/screen/favourites_screen.dart';
 import '../../recipe/screen/recipes_screen.dart';
 import '../../recipe/widget/add_recipe_sheet.dart';
 import '../cubit/home_cubit.dart';
 import '../widget/tab_bar.dart';
 
-/// The signed-in app shell: four tabs, the favourites and stores screens that
+/// The signed-in app shell: three tabs, the favourites, stores and account screens that
 /// keep the tab bar, and the add-recipe button on the recipes tab.
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -27,15 +32,15 @@ class HomeScreen extends StatelessWidget {
         final body = switch (home.sub) {
           HomeSub.favourites => const FavouritesScreen(),
           HomeSub.stores => const StoresScreen(),
+          HomeSub.account => const AccountScreen(),
           HomeSub.none => switch (home.tab) {
             HomeTab.menu => const MenuScreen(),
             HomeTab.recipes => const RecipesScreen(),
             HomeTab.preferences => const PreferencesScreen(),
-            HomeTab.account => const AccountScreen(),
           },
         };
 
-        return Scaffold(
+        final shell = Scaffold(
           backgroundColor: AppColors.scaffold,
           // Content scrolls beneath the floating glass bar.
           extendBody: true,
@@ -58,7 +63,44 @@ class HomeScreen extends StatelessWidget {
             ),
           ),
         );
+
+        final regenerating = context.select<PlanCubit, bool>((c) => c.state.regenerating);
+        return Stack(
+          children: [
+            shell,
+            // Covers the whole shell, tab bar included, while a new week is fetched.
+            Positioned.fill(
+              child: AnimatedSwitcher(
+                duration: const Duration(milliseconds: 250),
+                child: regenerating ? const _GeneratingOverlay() : const SizedBox.shrink(),
+              ),
+            ),
+          ],
+        );
       },
+    );
+  }
+}
+
+/// The onboarding build screen, shown over Home while the plan regenerates.
+class _GeneratingOverlay extends StatelessWidget {
+  const _GeneratingOverlay();
+
+  @override
+  Widget build(BuildContext context) {
+    final catalogue = context.watch<CatalogueCubit>().state;
+    final name = context.select<ProfileCubit, String>(
+      (c) => c.state.profile.displayName(AppL10n.of(context).defaultChefName),
+    );
+    return Scaffold(
+      backgroundColor: AppColors.scaffold,
+      body: SafeArea(
+        child: GeneratingScreen(
+          displayName: name,
+          // Once the recipes are saved, only the new week is left to deal.
+          generationStep: catalogue.isBuilding ? catalogue.step.index : CatalogueStep.values.length,
+        ),
+      ),
     );
   }
 }

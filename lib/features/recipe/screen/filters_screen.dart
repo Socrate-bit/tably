@@ -105,8 +105,8 @@ class FiltersScreen extends StatelessWidget {
                     onTap: () => cubit.toggleProtein(protein),
                   ),
               ]),
-              // Diets, allergies and appliances: the profile's by default,
-              // and changing them here only affects the search.
+              // Diets, allergies and appliances: seeded from the onboarding
+              // answers, then independent of the profile.
               for (final (title, chips) in [
                 (
                   l10n.prefsDiet,
