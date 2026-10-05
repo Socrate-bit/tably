@@ -5,11 +5,11 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../core/util/haptics.dart';
 import '../../../l10n/app_localizations.dart';
+import '../../plan/widget/week_meal_sheet.dart';
 import '../../preferences/cubit/profile_cubit.dart';
 import '../../recipe/model/recipe.dart';
 import '../../recipe/screen/recipe_screen.dart';
 import '../../recipe/widget/recipe_row.dart';
-import '../../recipe/widget/replace_sheet.dart';
 
 /// A recipe the chef suggested: opens on tap, saves with the bookmark, and
 /// [inWeek] offers to put it in the week in place of a planned dish.
@@ -38,7 +38,7 @@ class ChatRecipeCard extends StatelessWidget {
               behavior: HitTestBehavior.opaque,
               onTap: () {
                 Haptics.tap();
-                ReplaceSheet.show(context, recipe: recipe);
+                WeekMealSheet.show(context, recipe: recipe);
               },
               child: Padding(
                 padding: EdgeInsets.fromLTRB(12.w, 8.h, 6.w, 2.h),

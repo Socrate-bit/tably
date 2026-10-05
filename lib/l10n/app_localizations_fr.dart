@@ -1055,10 +1055,6 @@ class AppL10nFr extends AppL10n {
   String get replaceEmptyFavourites => 'Aucun favori pour l\'instant.';
 
   @override
-  String get replaceEmptySearch =>
-      'Aucun repas ne correspond à cette recherche.';
-
-  @override
   String get recipeCreatedBy => 'RECETTE DE';
 
   @override

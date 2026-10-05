@@ -403,7 +403,6 @@
   "replaceAll": "All",
   "replaceFavourites": "Favourites",
   "replaceEmptyFavourites": "No favourites yet.",
-  "replaceEmptySearch": "No meals match this search.",
   "recipeCreatedBy": "RECIPE BY",
   "recipeReplaceMeal": "Choose another meal",
   "recipeRegenerateMeal": "Regenerate",

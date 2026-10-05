@@ -221,7 +221,7 @@ List<ChatTool> recipeTools(ChatTools t) {
           recipes: [draft],
           commit: () async {
             await t.catalogue.addRecipe(draft);
-            if (slot != null) await t.plan.replace(slot.key, draft.id);
+            if (slot != null) await t.plan.replace(slot.key, draft);
             unawaited(t.analytics.capture(AnalyticsEvents.customRecipeCreated, properties: {'derived': false}));
             return {'ok': true, 'recipe': ToolPayloads.recipeSummary(draft, t.store)};
           },
