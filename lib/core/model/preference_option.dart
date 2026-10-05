@@ -69,6 +69,9 @@ enum Protein {
   const Protein(this.id, this.icon);
   final String id;
   final String icon;
+
+  /// Every meat and fish: ticking them all is the most permissive choice.
+  static const meats = {beef, pork, chicken, fish};
 }
 
 enum Appliance {

@@ -478,8 +478,6 @@
   "filtersResetAll": "Réinitialiser les filtres",
   "filtersCravings": "Tes envies",
   "filtersCuisine": "Cuisine type",
-  "filtersProtein": "Préférence",
-  "filtersProteinSub": "Le type de viande ou de protéine que tu veux voir",
   "filtersPrice": "Prix par portion",
   "filtersPriceRange": "{min} – {max}",
   "@filtersPriceRange": {

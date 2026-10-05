@@ -20,8 +20,8 @@ import '../cubit/recipe_browse_cubit.dart';
 import '../cubit/recipe_search_cubit.dart';
 import '../model/recipe.dart';
 
-/// "Filtres": cravings, cuisine, protein, diets, allergies, appliances and
-/// price per portion.
+/// "Filtres": cravings, cuisine, diets, allergies, meats, appliances, cooking
+/// time and price per portion.
 class FiltersScreen extends StatelessWidget {
   const FiltersScreen({super.key});
 
@@ -101,22 +101,9 @@ class FiltersScreen extends StatelessWidget {
                     ),
                 ],
               ),
-              SizedBox(height: 28.h),
-              Text(l10n.filtersProtein, style: AppTextStyles.filterSection),
-              SizedBox(height: 2.h),
-              Text(l10n.filtersProteinSub, style: AppTextStyles.caption.copyWith(fontSize: 14.5.sp)),
-              SizedBox(height: 12.h),
-              grid([
-                for (final protein in RecipeProtein.values)
-                  _FilterChip(
-                    icon: protein.icon,
-                    label: l10n.proteinName(protein),
-                    selected: state.proteins.contains(protein),
-                    onTap: () => cubit.toggleProtein(protein),
-                  ),
-              ]),
-              // Diets, allergies and appliances: seeded from the onboarding
-              // answers, then independent of the profile.
+              // Diets, allergies, meats and appliances: the preferences' own
+              // options, seeded from the onboarding answers, then independent
+              // of the profile.
               for (final (title, chips) in [
                 (
                   l10n.prefsDiet,
@@ -139,6 +126,18 @@ class FiltersScreen extends StatelessWidget {
                         label: l10n.optionLabel(allergy.id),
                         selected: state.constraints.allergies.contains(allergy),
                         onTap: () => cubit.toggleAllergy(allergy),
+                      ),
+                  ],
+                ),
+                (
+                  l10n.prefsProteins,
+                  [
+                    for (final protein in Protein.values)
+                      _FilterChip(
+                        icon: protein.icon,
+                        label: l10n.optionLabel(protein.id),
+                        selected: state.constraints.proteins.contains(protein),
+                        onTap: () => cubit.toggleProtein(protein),
                       ),
                   ],
                 ),

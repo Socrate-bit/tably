@@ -378,8 +378,6 @@
   "filtersResetAll": "Reset filters",
   "filtersCravings": "Your cravings",
   "filtersCuisine": "Cuisine",
-  "filtersProtein": "Preference",
-  "filtersProteinSub": "The meat or protein you want to see",
   "filtersPrice": "Price per portion",
   "filtersPriceRange": "{min} – {max}",
   "filtersPriceAll": "All recipes",

@@ -21,7 +21,7 @@ class RecipeSearchService {
 
   /// Returns up to [number] trimmed Spoonacular recipes matching the
   /// profile's hard constraints, narrowed by the optional search filters:
-  /// English [query] text, [cuisines], one [craving] and one [protein].
+  /// English [query] text, [cuisines] and one [craving].
   /// Throws [FirebaseFunctionsException] so the caller can tell a spent quota
   /// from an outage.
   Future<List<Map<String, dynamic>>> search(
@@ -30,7 +30,6 @@ class RecipeSearchService {
     String? query,
     Set<Cuisine> cuisines = const {},
     Craving? craving,
-    RecipeProtein? protein,
   }) async {
     final callable = _fn.httpsCallable(
       'searchRecipes',
@@ -45,7 +44,6 @@ class RecipeSearchService {
       'query': query,
       'cuisines': [for (final c in cuisines) c.id],
       'craving': craving?.id,
-      'protein': protein?.id,
     });
     // Platform channels hand back loosely typed nested maps; a JSON round trip
     // gives plain Map<String, dynamic> all the way down.

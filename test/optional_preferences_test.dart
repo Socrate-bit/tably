@@ -84,10 +84,19 @@ void main() {
   group('what Gemini is told', () {
     String rules(UserProfile profile) => RecipeAiService.instruction(profile);
 
-    test('no meat ticked means any meat; "no meat" means none', () {
-      expect(rules(const UserProfile(proteins: {})), contains('Allowed:\n  any meat or fish'));
+    test('no meat or every meat ticked means any meat; "no meat" means none', () {
+      expect(rules(const UserProfile(proteins: {})), isNot(contains('did not pick')));
+      expect(rules(const UserProfile(proteins: Protein.meats)), isNot(contains('did not pick')));
       expect(rules(const UserProfile(proteins: {Protein.noMeat})), contains('eats no meat or fish at all'));
       expect(rules(const UserProfile(proteins: {Protein.chicken})), contains('Allowed:\n  chicken.'));
+    });
+
+    test('meat-free dishes always pass the protein rule', () {
+      expect(rules(const UserProfile(proteins: {Protein.chicken})), contains('meat substitutes) are always\n  allowed'));
+    });
+
+    test('the default picks every meat but not "no meat"', () {
+      expect(const UserProfile().proteins, Protein.meats);
     });
 
     test('no appliance means only no-cook recipes, and the mixer is understood', () {
@@ -130,6 +139,13 @@ void main() {
       expect(none, isNot(contains("user's diets")));
       expect(none, isNot(contains('must avoid')));
       expect(rules(const UserProfile(allergies: {Allergy.nutFree})), contains('must avoid: nut_free.'));
+    });
+
+    test('allergy examples only cover the allergies picked', () {
+      final gluten = rules(const UserProfile(allergies: {Allergy.glutenFree}));
+      expect(gluten, contains('gluten_free excludes wheat'));
+      expect(gluten, isNot(contains('lactose')));
+      expect(gluten, isNot(contains('nut_free')));
     });
   });
 }
