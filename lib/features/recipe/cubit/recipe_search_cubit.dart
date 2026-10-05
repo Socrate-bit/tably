@@ -67,8 +67,8 @@ class RecipeSearchCubit extends Cubit<RecipeSearchState> {
         cuisines: browse.cuisines,
         // Spoonacular combines filters with AND, so only a single pick narrows
         // the search; several are applied to the results instead.
-        craving: browse.cravings.length == 1 ? browse.cravings.single : null,
-        protein: browse.proteins.length == 1 ? browse.proteins.single : null,
+        craving: browse.searchCraving,
+        protein: browse.searchProtein,
       );
       final recipes = await _adapt(raw, profile);
       if (isClosed || run != _latest) return;

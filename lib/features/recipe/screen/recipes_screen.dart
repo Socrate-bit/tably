@@ -39,7 +39,8 @@ class RecipesScreen extends StatelessWidget {
     final catalogue = context.watch<CatalogueCubit>().state.recipes;
     final searchState = context.watch<RecipeSearchCubit>().state;
     // API results for exactly this search; otherwise the cached pool. The
-    // text was matched by the API (in English), so only the filters apply.
+    // API already matched the text and what it can filter on; the rest
+    // (several cravings, price, time) is checked here.
     final found = searchState.resultsFor(browse);
     final searching = searchState.isSearchingFor(browse);
     // Text typed but not searched yet (or its search failed): the pool's
@@ -49,7 +50,7 @@ class RecipesScreen extends StatelessWidget {
       found ?? catalogue,
       store: profile.store,
       cravingLabel: l10n.cravingLabel,
-      searchText: found != null ? '' : null,
+      searched: found != null,
     );
     void search({bool reload = false}) =>
         context.read<RecipeSearchCubit>().search(context.read<RecipeBrowseCubit>().state, reload: reload);
