@@ -122,12 +122,15 @@ class ProfileCubit extends Cubit<ProfileState> {
         changed: 'allergies',
       );
 
-  Future<void> toggleProtein(Protein protein) =>
-      _update(state.profile.copyWith(proteins: Selection.toggle(state.profile.proteins, protein)), changed: 'proteins');
+  /// "No meat" is exclusive; ticking nothing means any meat is fine.
+  Future<void> toggleProtein(Protein protein) => _update(
+        state.profile.copyWith(proteins: Selection.toggleExclusive(state.profile.proteins, protein, Protein.noMeat)),
+        changed: 'proteins',
+      );
 
-  /// At least one appliance stays selected — the planner needs somewhere to cook.
+  /// Ticking nothing means no appliance at all: only no-cook recipes.
   Future<void> toggleAppliance(Appliance appliance) => _update(
-        state.profile.copyWith(appliances: Selection.toggleKeepOne(state.profile.appliances, appliance)),
+        state.profile.copyWith(appliances: Selection.toggle(state.profile.appliances, appliance)),
         changed: 'appliances',
       );
 

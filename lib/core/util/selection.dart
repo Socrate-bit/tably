@@ -22,6 +22,13 @@ abstract final class Selection {
     return next.isEmpty ? {none} : next;
   }
 
+  /// [exclusive] stands alone: picking it clears the rest, picking anything
+  /// else clears it. Unlike [toggleWithNone], nothing at all is allowed.
+  static Set<T> toggleExclusive<T>(Set<T> current, T value, T exclusive) {
+    if (value == exclusive) return current.contains(exclusive) ? <T>{} : {exclusive};
+    return toggle(Set<T>.from(current)..remove(exclusive), value);
+  }
+
   /// Like [toggle], but the last remaining value cannot be removed.
   static Set<T> toggleKeepOne<T>(Set<T> current, T value) {
     final next = toggle(current, value);

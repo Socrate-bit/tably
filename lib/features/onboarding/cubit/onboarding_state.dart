@@ -47,11 +47,8 @@ class OnboardingState extends Equatable {
         StepIds.blocker => draft.blockers.isNotEmpty,
         StepIds.cookTime => draft.cookTime != null,
         StepIds.days => draft.days.isNotEmpty,
-        StepIds.cravings => draft.cravings.isNotEmpty,
         StepIds.diet => draft.diets.isNotEmpty,
         StepIds.allergies => draft.allergies.isNotEmpty,
-        StepIds.proteins => draft.proteins.isNotEmpty,
-        StepIds.appliances => draft.appliances.isNotEmpty,
         _ => true,
       };
 

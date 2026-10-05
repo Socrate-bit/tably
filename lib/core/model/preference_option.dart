@@ -61,7 +61,10 @@ enum Protein {
   beef('beef', '🥩'),
   pork('pork', '🥓'),
   chicken('chicken', '🍗'),
-  fish('fish', '🐟');
+  fish('fish', '🐟'),
+
+  /// Exclusive: eats no meat or fish. Ticking nothing means no preference.
+  noMeat('no_meat', '🥦');
 
   const Protein(this.id, this.icon);
   final String id;
@@ -72,7 +75,8 @@ enum Appliance {
   microwave('microwave', '📺'),
   hob('hob', '🔥'),
   oven('oven', '🔲'),
-  airFryer('air_fryer', '🍟');
+  airFryer('air_fryer', '🍟'),
+  mixer('mixer', '🥤');
 
   const Appliance(this.id, this.icon);
   final String id;

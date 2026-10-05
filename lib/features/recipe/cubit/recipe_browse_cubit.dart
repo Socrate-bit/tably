@@ -71,11 +71,9 @@ class RecipeBrowseCubit extends Cubit<RecipeBrowseState> {
         ),
       ));
 
-  /// At least one appliance stays selected, as in the preferences.
+  /// As in the preferences, ticking nothing means no appliance at all.
   void toggleAppliance(Appliance appliance) => _filter(state.copyWith(
-        constraints: state.constraints.copyWith(
-          appliances: Selection.toggleKeepOne(state.constraints.appliances, appliance),
-        ),
+        constraints: state.constraints.copyWith(appliances: Selection.toggle(state.constraints.appliances, appliance)),
       ));
 
   /// "Réinitialiser": clears every filter and restores the profile's diets,

@@ -352,7 +352,7 @@ class AppL10nFr extends AppL10n {
   String get onbAppliancesTitle => 'Quels appareils tu as ?';
 
   @override
-  String get onbAppliancesHint => 'Choisis au moins un pour planifier';
+  String get onbAppliancesHint => 'Choisis tout ce que tu as';
 
   @override
   String get applianceMicrowave => 'Micro-ondes';
@@ -623,7 +623,7 @@ class AppL10nFr extends AppL10n {
   String get prefsAppliances => 'Appareils de cuisine';
 
   @override
-  String get prefsAppliancesSub => 'Choisis au moins un pour planifier';
+  String get prefsAppliancesSub => 'Choisis tout ce que tu as';
 
   @override
   String get accountTitle => 'Compte';
@@ -1250,4 +1250,10 @@ class AppL10nFr extends AppL10n {
   @override
   String get filtersFromPreferences =>
       'Tes préférences par défaut, modifiables pour cette recherche';
+
+  @override
+  String get proteinNoMeat => 'Pas de viande';
+
+  @override
+  String get applianceMixer => 'Mixeur';
 }
