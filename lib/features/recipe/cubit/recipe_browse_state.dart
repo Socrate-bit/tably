@@ -50,23 +50,35 @@ class RecipeBrowseState extends Equatable {
   /// Whether "Réinitialiser" would change anything.
   bool get canReset => this != cleared;
 
+  /// The craving and protein the API narrows by: only a single pick, as it
+  /// combines filters with AND. Several are left to [apply].
+  Craving? get searchCraving => cravings.length == 1 ? cravings.single : null;
+  RecipeProtein? get searchProtein => proteins.length == 1 ? proteins.single : null;
+
   /// Whether there is anything to search the API for.
   bool get canSearch => isSearching || hasFilters;
 
   /// Recipes that pass the filters and match every word of the search.
   /// [searchText] defaults to [query]; the replace sheet has its own box.
   /// [cravingLabel] lets the search match badge names in the user's language.
+  /// [searched] marks API results for this state: the API already matched
+  /// the text, the cuisines and a single craving or protein, so they are not
+  /// checked again against Gemini's labels, which often disagree.
   List<Recipe> apply(
     List<Recipe> recipes, {
     required Store store,
     required String Function(Craving) cravingLabel,
     String? searchText,
+    bool searched = false,
   }) {
-    final words = (searchText ?? query).trim().toLowerCase().split(RegExp(r'\s+')).where((w) => w.isNotEmpty);
+    final text = searched ? '' : searchText ?? query;
+    final words = text.trim().toLowerCase().split(RegExp(r'\s+')).where((w) => w.isNotEmpty);
+    final checkCravings = cravings.isNotEmpty && !(searched && searchCraving != null);
+    final checkProteins = proteins.isNotEmpty && !(searched && searchProtein != null);
     return recipes.where((r) {
-      if (cravings.isNotEmpty && !cravings.contains(r.craving)) return false;
-      if (cuisines.isNotEmpty && !cuisines.contains(r.cuisine)) return false;
-      if (proteins.isNotEmpty && !proteins.contains(r.protein)) return false;
+      if (checkCravings && !cravings.any(r.satisfies)) return false;
+      if (!searched && cuisines.isNotEmpty && !cuisines.contains(r.cuisine)) return false;
+      if (checkProteins && !proteins.contains(r.protein)) return false;
       if (hasPriceLimit && r.price * store.priceFactor > maxPrice) return false;
       if (constraints.hasCookLimit && (r.minutes ?? 0) > constraints.cookMinutes) return false;
       final haystack = '${r.title} ${cravingLabel(r.craving)}'.toLowerCase();

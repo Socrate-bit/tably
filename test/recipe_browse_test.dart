@@ -41,6 +41,33 @@ void main() {
     expect(_ids(state, store: Store.franprix), isEmpty);
   });
 
+  test('a craving filter also keeps recipes that meet it under another badge', () {
+    final strong = RecipeFixtures.recipes.where((r) => r.macros.protein >= 30 && r.craving != Craving.highProtein);
+    expect(strong, isNotEmpty, reason: 'fixtures need a high-protein dish badged otherwise');
+    final kept = _ids(const RecipeBrowseState(cravings: {Craving.highProtein}));
+    expect(kept, containsAll(strong.map((r) => r.id)));
+    expect(
+      kept,
+      unorderedEquals([
+        for (final r in RecipeFixtures.recipes)
+          if (r.craving == Craving.highProtein || r.macros.protein >= 30) r.id,
+      ]),
+    );
+  });
+
+  test('API results are not filtered again on what the API already matched', () {
+    // Nothing in the fixtures is Mexican, nor matches the text, yet the API said so.
+    const state = RecipeBrowseState(query: 'zzz', cuisines: {Cuisine.mexican}, cravings: {Craving.indulgent});
+    final searched = state.apply(RecipeFixtures.recipes, store: Store.carrefour, cravingLabel: _label, searched: true);
+    expect(searched, hasLength(RecipeFixtures.recipes.length));
+
+    // Several cravings are not sent to the API, so they still apply.
+    const several = RecipeBrowseState(cravings: {Craving.indulgent, Craving.lowCalorie});
+    final local = several.apply(RecipeFixtures.recipes, store: Store.carrefour, cravingLabel: _label, searched: true);
+    expect(local.every((r) => r.satisfies(Craving.indulgent) || r.satisfies(Craving.lowCalorie)), isTrue);
+    expect(local.length, lessThan(RecipeFixtures.recipes.length));
+  });
+
   test('filter count counts chips plus one for a price limit', () {
     final widest = RecipeBrowseState.widest;
     expect(RecipeBrowseState(constraints: widest).filterCount, 0);
