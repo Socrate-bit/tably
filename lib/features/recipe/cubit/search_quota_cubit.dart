@@ -54,7 +54,7 @@ class SearchQuotaCubit extends Cubit<SearchQuotaState> {
     _rollover ??= _scheduleRollover();
     _subscription = _service.watch(uid).listen(
           (usage) => emit(state.copyWith(day: usage.day, count: usage.count)),
-          onError: (Object e) => debugPrint('[SearchQuotaCubit] stream error: $e'),
+          onError: (Object e, StackTrace s) => AnalyticsService.reportError('SearchQuotaCubit', 'stream', e, stack: s),
         );
   }
 

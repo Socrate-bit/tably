@@ -24,6 +24,26 @@ class AnalyticsService {
     }
   }
 
+  /// Logs a handled error and records it as an `error` event, so failures
+  /// show up in Mixpanel. Fire-and-forget: never throws, never blocks.
+  static void reportError(String source, String action, Object error, {StackTrace? stack, bool fatal = false}) {
+    debugPrint('[$source] $action failed: $error');
+    final properties = <String, Object>{
+      'source': source,
+      'action': action,
+      'error_type': error.runtimeType.toString(),
+      'message': _clip(error.toString()),
+      'fatal': fatal,
+      if (stack != null) 'stack': _clip(stack.toString()),
+    };
+    _mixpanel?.track(AnalyticsEvents.error, properties: properties).catchError((Object e) {
+      debugPrint('[AnalyticsService] reportError failed: $e');
+    });
+  }
+
+  /// Mixpanel truncates string properties at 255 characters.
+  static String _clip(String value) => value.length <= 255 ? value : value.substring(0, 255);
+
   /// Records a product event with optional properties.
   Future<void> capture(String event, {Map<String, Object>? properties}) async {
     try {
@@ -67,6 +87,7 @@ class AnalyticsService {
 
 /// Event names, kept in one place so reporting stays consistent.
 abstract final class AnalyticsEvents {
+  static const error = 'error';
   static const screenViewed = 'screen_viewed';
   static const onboardingStarted = 'onboarding_started';
   static const onboardingStepCompleted = 'onboarding_step_completed';

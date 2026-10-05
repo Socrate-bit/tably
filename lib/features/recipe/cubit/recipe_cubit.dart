@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:equatable/equatable.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../core/analytics/analytics_service.dart';
@@ -30,8 +29,8 @@ class RecipeCubit extends Cubit<RecipeState> {
     _stateSubscription?.cancel();
     _stateSubscription = _service.watchInteractions(uid).listen(
       (interactions) => emit(state.copyWith(interactions: interactions, clearError: true)),
-      onError: (Object e) {
-        debugPrint('[RecipeCubit] interactions error: $e');
+      onError: (Object e, StackTrace s) {
+        AnalyticsService.reportError('RecipeCubit', 'interactions stream', e, stack: s);
         emit(state.copyWith(error: e));
       },
     );
@@ -83,8 +82,8 @@ class RecipeCubit extends Cubit<RecipeState> {
     if (uid == null) return;
     try {
       await _service.saveInteraction(uid, interaction);
-    } catch (e) {
-      debugPrint('[RecipeCubit] save failed: $e');
+    } catch (e, s) {
+      AnalyticsService.reportError('RecipeCubit', 'save', e, stack: s);
       emit(state.copyWith(interactions: previous, error: e));
     }
   }

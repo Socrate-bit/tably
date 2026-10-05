@@ -82,7 +82,7 @@ class ChatCubit extends Cubit<ChatState> {
     _subscription = _service.watch(uid).listen((messages) {
       _stored = messages;
       emit(state.copyWith(messages: _merged()));
-    }, onError: (Object e) => debugPrint('[ChatCubit] stream error: $e'));
+    }, onError: (Object e, StackTrace s) => AnalyticsService.reportError('ChatCubit', 'stream', e, stack: s));
   }
 
   /// Starts afresh when the chat opens, so the chef sees the latest week
@@ -122,8 +122,8 @@ class ChatCubit extends Cubit<ChatState> {
     Map<String, Object?> result;
     try {
       result = await (run ?? entry.proposal.commit)();
-    } catch (e) {
-      debugPrint('[ChatCubit] change failed: $e');
+    } catch (e, s) {
+      AnalyticsService.reportError('ChatCubit', 'change', e, stack: s);
       result = {'error': ChatTools.reasonFor(e)};
     }
     if (isClosed) return;
@@ -166,7 +166,8 @@ class ChatCubit extends Cubit<ChatState> {
     if (uid == null) return;
     try {
       await _service.clear(uid);
-    } catch (e) {
+    } catch (e, s) {
+      AnalyticsService.reportError('ChatCubit', 'clear', e, stack: s);
       emit(state.copyWith(error: e));
     }
   }
@@ -197,8 +198,8 @@ class ChatCubit extends Cubit<ChatState> {
       final reply = await ask();
       if (isClosed) return;
       await _handle(reply, round);
-    } catch (e) {
-      debugPrint('[ChatCubit] turn failed: $e');
+    } catch (e, s) {
+      AnalyticsService.reportError('ChatCubit', 'turn', e, stack: s);
       if (!isClosed) await _fail(e);
     }
   }
@@ -231,8 +232,8 @@ class ChatCubit extends Cubit<ChatState> {
       ToolOutcome outcome;
       try {
         outcome = await tool.run(call.args, _context);
-      } catch (e) {
-        debugPrint('[ChatCubit] ${call.name} failed: $e');
+      } catch (e, s) {
+        AnalyticsService.reportError('ChatCubit', call.name, e, stack: s);
         outcome = ToolResult({'error': ChatTools.reasonFor(e)});
       }
       if (isClosed) return;
@@ -336,9 +337,9 @@ class ChatCubit extends Cubit<ChatState> {
     try {
       await _service.save(uid, message);
       if (identical(_unsaved[message.id], message)) _unsaved.remove(message.id);
-    } catch (e) {
+    } catch (e, s) {
       // Stays on screen for this session; the conversation goes on.
-      debugPrint('[ChatCubit] save failed: $e');
+      AnalyticsService.reportError('ChatCubit', 'save', e, stack: s);
     }
   }
 

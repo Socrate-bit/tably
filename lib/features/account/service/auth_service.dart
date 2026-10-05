@@ -6,6 +6,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 
+import '../../../core/analytics/analytics_service.dart';
+
 /// Owns the Firebase Auth session. The app signs in anonymously on first launch
 /// so a profile exists immediately, then links an Apple credential when the
 /// user chooses to sign in — which keeps all their data.
@@ -80,8 +82,8 @@ class AuthService {
     if ((user.displayName ?? '').isNotEmpty) return;
     try {
       await user.updateDisplayName([given, apple.familyName?.trim()].whereType<String>().join(' ').trim());
-    } catch (e) {
-      debugPrint('[AuthService] updateDisplayName failed: $e');
+    } catch (e, s) {
+      AnalyticsService.reportError('AuthService', 'updateDisplayName', e, stack: s);
     }
   }
 

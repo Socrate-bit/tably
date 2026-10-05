@@ -110,8 +110,8 @@ class CatalogueCubit extends Cubit<CatalogueState> {
         ));
         _check(_profileCubit.state.profile);
       },
-      onError: (Object e) {
-        debugPrint('[CatalogueCubit] recipes stream error: $e');
+      onError: (Object e, StackTrace s) {
+        AnalyticsService.reportError('CatalogueCubit', 'recipes stream', e, stack: s);
         emit(state.copyWith(status: CatalogueStatus.failed, error: e));
       },
     );
@@ -121,7 +121,7 @@ class CatalogueCubit extends Cubit<CatalogueState> {
         emit(state.copyWith(key: keys.key, keptKey: keys.keptKey, clearKeptKey: keys.keptKey == null));
         _check(_profileCubit.state.profile);
       },
-      onError: (Object e) => debugPrint('[CatalogueCubit] key stream error: $e'),
+      onError: (Object e, StackTrace s) => AnalyticsService.reportError('CatalogueCubit', 'key stream', e, stack: s),
     );
   }
 
@@ -153,8 +153,8 @@ class CatalogueCubit extends Cubit<CatalogueState> {
     if (uid == null) return;
     try {
       await _service.keepCatalogue(uid, key);
-    } catch (e) {
-      debugPrint('[CatalogueCubit] keep failed: $e');
+    } catch (e, s) {
+      AnalyticsService.reportError('CatalogueCubit', 'keep', e, stack: s);
       emit(previous.copyWith(error: e));
     }
   }
@@ -217,8 +217,8 @@ class CatalogueCubit extends Cubit<CatalogueState> {
         'ms': stopwatch.elapsedMilliseconds,
       }));
       return true;
-    } catch (e) {
-      debugPrint('[CatalogueCubit] build failed: $e');
+    } catch (e, s) {
+      AnalyticsService.reportError('CatalogueCubit', 'build', e, stack: s);
       if (superseded()) return false;
       _failedKey = key;
       unawaited(_analytics.capture(AnalyticsEvents.catalogueBuildFailed, properties: {'reason': reasonFor(e)}));
@@ -236,8 +236,8 @@ class CatalogueCubit extends Cubit<CatalogueState> {
     if (profile.customInstructions.isEmpty) return null;
     try {
       return await _ai.wishQuery(profile.customInstructions);
-    } catch (e) {
-      debugPrint('[CatalogueCubit] wish query failed: $e');
+    } catch (e, s) {
+      AnalyticsService.reportError('CatalogueCubit', 'wish query', e, stack: s);
       return null;
     }
   }
@@ -253,8 +253,8 @@ class CatalogueCubit extends Cubit<CatalogueState> {
     if (uid == null) return;
     try {
       await _service.saveRecipe(uid, recipe);
-    } catch (e) {
-      debugPrint('[CatalogueCubit] addRecipe failed: $e');
+    } catch (e, s) {
+      AnalyticsService.reportError('CatalogueCubit', 'addRecipe', e, stack: s);
       emit(state.copyWith(recipes: previous, error: e));
     }
   }

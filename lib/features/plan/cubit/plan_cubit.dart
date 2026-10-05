@@ -71,8 +71,8 @@ class PlanCubit extends Cubit<PlanState> {
         week: _build(settings),
         clearError: true,
       )),
-      onError: (Object e) {
-        debugPrint('[PlanCubit] stream error: $e');
+      onError: (Object e, StackTrace s) {
+        AnalyticsService.reportError('PlanCubit', 'stream', e, stack: s);
         emit(state.copyWith(status: PlanStatus.failed, error: e));
       },
     );
@@ -161,8 +161,8 @@ class PlanCubit extends Cubit<PlanState> {
     if (uid == null) return;
     try {
       await _service.save(uid, next);
-    } catch (e) {
-      debugPrint('[PlanCubit] save failed: $e');
+    } catch (e, s) {
+      AnalyticsService.reportError('PlanCubit', 'save', e, stack: s);
       emit(state.copyWith(settings: previous, week: _build(previous), regenerating: false, error: e));
     }
   }
