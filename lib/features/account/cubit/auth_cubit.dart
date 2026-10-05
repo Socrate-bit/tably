@@ -20,8 +20,8 @@ class AuthCubit extends Cubit<AuthState> {
       super(const AuthState()) {
     _subscription = _auth.userChanges.listen(
       _onUserChanged,
-      onError: (Object e) {
-        debugPrint('[AuthCubit] userChanges error: $e');
+      onError: (Object e, StackTrace s) {
+        AnalyticsService.reportError('AuthCubit', 'userChanges', e, stack: s);
       },
     );
   }
@@ -50,8 +50,8 @@ class AuthCubit extends Cubit<AuthState> {
     try {
       await _auth.ensureSignedIn();
       _retryAttempt = 0;
-    } catch (e) {
-      debugPrint('[AuthCubit] start failed: $e');
+    } catch (e, s) {
+      AnalyticsService.reportError('AuthCubit', 'start', e, stack: s);
       emit(state.copyWith(status: AuthStatus.failed, error: e));
       _scheduleRetry();
     } finally {
@@ -97,14 +97,14 @@ class AuthCubit extends Cubit<AuthState> {
     try {
       await _auth.signInWithApple();
       unawaited(_analytics.capture(AnalyticsEvents.signInCompleted));
-    } catch (e) {
+    } catch (e, s) {
       // Closing the Apple sheet is a choice, not a failure — no banner.
       if (e is SignInWithAppleAuthorizationException && e.code == AuthorizationErrorCode.canceled) {
         debugPrint('[AuthCubit] signInWithApple canceled');
         emit(state.copyWith(busy: false));
         return;
       }
-      debugPrint('[AuthCubit] signInWithApple failed: $e');
+      AnalyticsService.reportError('AuthCubit', 'signInWithApple', e, stack: s);
       emit(state.copyWith(busy: false, error: e));
     }
   }
@@ -113,8 +113,8 @@ class AuthCubit extends Cubit<AuthState> {
     try {
       await _analytics.reset();
       await _auth.signOut();
-    } catch (e) {
-      debugPrint('[AuthCubit] signOut failed: $e');
+    } catch (e, s) {
+      AnalyticsService.reportError('AuthCubit', 'signOut', e, stack: s);
       emit(state.copyWith(error: e));
     }
   }
@@ -122,8 +122,8 @@ class AuthCubit extends Cubit<AuthState> {
   Future<void> deleteAccount() async {
     try {
       await _auth.deleteAccount();
-    } catch (e) {
-      debugPrint('[AuthCubit] deleteAccount failed: $e');
+    } catch (e, s) {
+      AnalyticsService.reportError('AuthCubit', 'deleteAccount', e, stack: s);
       emit(state.copyWith(error: e));
     }
   }

@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 
+import '../../../core/analytics/analytics_service.dart';
 import '../model/user_profile.dart';
 
 /// Reads and writes the user document at `users/{uid}`.
@@ -19,8 +20,8 @@ class ProfileService {
         final data = snap.data();
         if (!snap.exists || data == null) return null;
         return UserProfile.fromMap(data);
-      }).handleError((Object e) {
-        debugPrint('[ProfileService] watch failed: $e');
+      }).handleError((Object e, StackTrace s) {
+        AnalyticsService.reportError('ProfileService', 'watch', e, stack: s);
       });
 
   /// Writes the whole profile, creating the document if needed.

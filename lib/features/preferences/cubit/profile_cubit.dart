@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:equatable/equatable.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../core/analytics/analytics_service.dart';
@@ -42,8 +41,8 @@ class ProfileCubit extends Cubit<ProfileState> {
         }
         emit(state.copyWith(status: ProfileStatus.ready, profile: profile, clearError: true));
       },
-      onError: (Object e) {
-        debugPrint('[ProfileCubit] stream error: $e');
+      onError: (Object e, StackTrace s) {
+        AnalyticsService.reportError('ProfileCubit', 'stream', e, stack: s);
         emit(state.copyWith(status: ProfileStatus.failed, error: e));
       },
     );
@@ -62,8 +61,8 @@ class ProfileCubit extends Cubit<ProfileState> {
           properties: {'field': changed},
         ));
       }
-    } catch (e) {
-      debugPrint('[ProfileCubit] save failed: $e');
+    } catch (e, s) {
+      AnalyticsService.reportError('ProfileCubit', 'save', e, stack: s);
       emit(state.copyWith(error: e));
     }
   }

@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:flutter/foundation.dart';
 
+import '../../../core/analytics/analytics_service.dart';
 import '../../../core/model/user_type.dart';
 import '../../../core/util/functions_region.dart';
 
@@ -40,8 +41,8 @@ class ReferralService {
       if (type == null || numUse == null || maxUse == null) return null;
       if (numUse >= maxUse) return exhausted;
       return type;
-    } catch (e) {
-      debugPrint('[ReferralService] validateCode failed: $e');
+    } catch (e, s) {
+      AnalyticsService.reportError('ReferralService', 'validateCode', e, stack: s);
       return null;
     }
   }

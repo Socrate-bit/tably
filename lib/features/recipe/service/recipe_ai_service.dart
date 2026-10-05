@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:firebase_ai/firebase_ai.dart';
 import 'package:flutter/foundation.dart';
 
+import '../../../core/analytics/analytics_service.dart';
 import '../../../core/model/aisle.dart';
 import '../../../core/model/ingredient_unit.dart';
 import '../../../core/model/preference_option.dart';
@@ -203,8 +204,8 @@ class RecipeAiService {
         debugPrint('[RecipeAiService] rejected ${(r as Map)['id']}: ${r['reason']}');
       }
       return answer;
-    } catch (e) {
-      debugPrint('[RecipeAiService] chunk failed: $e');
+    } catch (e, s) {
+      AnalyticsService.reportError('RecipeAiService', 'chunk', e, stack: s);
       return e;
     }
   }
