@@ -52,7 +52,7 @@ class UserProfile extends Equatable {
   static const maxMealsPerDay = 2;
 
   /// Longest a cooked dish is kept before it is eaten, in hours.
-  static const leftoverHours = 32;
+  static const leftoverHours = 72;
 
   final String name;
   final int household;
@@ -97,26 +97,29 @@ class UserProfile extends Equatable {
           for (final slot in MealSlot.forMealsPerDay(mealsPerDay)) (day, slot),
       ];
 
-  /// The week's meals, as indexes into [meals], grouped into the fewest
-  /// windows a single pot can feed: each holds every meal eaten within
-  /// [leftoverHours] of its first, so whatever is cooked inside stays fresh.
-  List<List<int>> get freshWindows {
-    int hourOf((Weekday, MealSlot) meal) => meal.$1.index * 24 + meal.$2.hour;
-    final meals = this.meals;
-    final windows = <List<int>>[];
-    for (final (i, meal) in meals.indexed) {
-      if (windows.isEmpty || hourOf(meal) - hourOf(meals[windows.last.first]) > leftoverHours) windows.add([]);
-      windows.last.add(i);
+  /// When each of [meals] is eaten, in hours since Monday midnight.
+  List<int> get mealHours => [for (final (day, slot) in meals) day.index * 24 + slot.hour];
+
+  /// The fewest dishes that keep every leftover fresh: one more each time a
+  /// meal falls past [leftoverHours] after the last one started.
+  int get minFreshRecipes {
+    var count = 0;
+    int? cookedAt;
+    for (final hour in mealHours) {
+      if (cookedAt == null || hour - cookedAt > leftoverHours) {
+        count++;
+        cookedAt = hour;
+      }
     }
-    return windows;
+    return count;
   }
 
   /// Recipes to cook for [variety]: one per meal, per two meals, or per four —
-  /// but at least one per fresh window, so no leftover is kept too long.
+  /// but never fewer than [minFreshRecipes], so no leftover is kept too long.
   int get recipesToCook => min(
         mealCount,
         max(
-          freshWindows.length,
+          minFreshRecipes,
           switch (variety) {
             Variety.high => mealCount,
             Variety.balanced => (mealCount + 1) ~/ 2,
