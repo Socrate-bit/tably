@@ -657,5 +657,33 @@
   "cookTimeNoLimit": "Pas de limite",
   "prefsCustomInstructions": "Instructions personnalisées",
   "prefsCustomInstructionsSub": "Tably en tient compte pour choisir tes recettes",
-  "prefsCustomInstructionsHint": "Ex. : pas de champignons, peu épicé, pas de poisson cru…"
+  "prefsCustomInstructionsHint": "Ex. : pas de champignons, peu épicé, pas de poisson cru…",
+  "actionOk": "OK",
+  "quotaTitle": "Recherches du jour",
+  "quotaBody": "{remaining, plural, =1{Il te reste 1 recherche de recettes} other{Il te reste {remaining} recherches de recettes}} sur {limit} aujourd'hui. Le compteur se réinitialise demain à {time}.",
+  "@quotaBody": {
+    "placeholders": {
+      "remaining": {
+        "type": "int"
+      },
+      "limit": {
+        "type": "int"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "quotaReachedTitle": "Limite de recherches atteinte",
+  "quotaReachedBody": "Tu as utilisé tes {limit} recherches de recettes du jour. Elles se réinitialisent demain à {time}.",
+  "@quotaReachedBody": {
+    "placeholders": {
+      "limit": {
+        "type": "int"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
+  }
 }

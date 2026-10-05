@@ -49,7 +49,13 @@ Future<void> _pumpRecipes(WidgetTester tester, {required FakeSearch api, require
   final catalogueCubit = seededCatalogue(profileCubit);
   final recipeCubit = RecipeCubit(service: RecipeService(), analytics: analytics);
   final browseCubit = RecipeBrowseCubit(profileCubit: profileCubit, analytics: analytics);
-  final searchCubit = RecipeSearchCubit(search: api, ai: ai, profileCubit: profileCubit, analytics: analytics);
+  final searchCubit = RecipeSearchCubit(
+    search: api,
+    quota: unboundQuota(profileCubit),
+    ai: ai,
+    profileCubit: profileCubit,
+    analytics: analytics,
+  );
   for (final cubit in [searchCubit, browseCubit, recipeCubit, catalogueCubit, profileCubit]) {
     addTearDown(cubit.close);
   }

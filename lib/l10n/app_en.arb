@@ -512,5 +512,10 @@
   "cookTimeNoLimit": "No limit",
   "prefsCustomInstructions": "Custom instructions",
   "prefsCustomInstructionsSub": "Tably follows them when picking your recipes",
-  "prefsCustomInstructionsHint": "E.g. no mushrooms, not too spicy, no raw fish…"
+  "prefsCustomInstructionsHint": "E.g. no mushrooms, not too spicy, no raw fish…",
+  "actionOk": "OK",
+  "quotaTitle": "Today's searches",
+  "quotaBody": "{remaining, plural, =1{You have 1 recipe search left} other{You have {remaining} recipe searches left}} out of {limit} today. The counter resets tomorrow at {time}.",
+  "quotaReachedTitle": "Search limit reached",
+  "quotaReachedBody": "You've used your {limit} recipe searches for today. They reset tomorrow at {time}."
 }

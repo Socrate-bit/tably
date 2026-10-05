@@ -1280,4 +1280,29 @@ class AppL10nEn extends AppL10n {
   @override
   String get prefsCustomInstructionsHint =>
       'E.g. no mushrooms, not too spicy, no raw fish…';
+
+  @override
+  String get actionOk => 'OK';
+
+  @override
+  String get quotaTitle => 'Today\'s searches';
+
+  @override
+  String quotaBody(int remaining, int limit, String time) {
+    String _temp0 = intl.Intl.pluralLogic(
+      remaining,
+      locale: localeName,
+      other: 'You have $remaining recipe searches left',
+      one: 'You have 1 recipe search left',
+    );
+    return '$_temp0 out of $limit today. The counter resets tomorrow at $time.';
+  }
+
+  @override
+  String get quotaReachedTitle => 'Search limit reached';
+
+  @override
+  String quotaReachedBody(int limit, String time) {
+    return 'You\'ve used your $limit recipe searches for today. They reset tomorrow at $time.';
+  }
 }
