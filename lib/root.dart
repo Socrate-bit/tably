@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'core/widget/loading_view.dart';
 import 'features/account/cubit/auth_cubit.dart';
+import 'features/chat/cubit/chat_cubit.dart';
 import 'features/home/screen/home_screen.dart';
 import 'features/onboarding/screen/onboarding_screen.dart';
 import 'features/plan/cubit/plan_cubit.dart';
@@ -51,6 +52,7 @@ class RootScreen extends StatelessWidget {
     context.read<ShoppingCubit>().bind(uid);
     context.read<RecipeCubit>().bind(uid);
     context.read<SearchQuotaCubit>().bind(uid);
+    context.read<ChatCubit>().bind(uid);
     // Ties the paywall to the same user, so purchases and the referral
     // grant follow them across launches.
     context.read<SubscriptionCubit>().identify(uid);

@@ -18,12 +18,15 @@ class ShoppingState extends Equatable {
   final bool updating;
   final Object? error;
 
-  int get total => items.length;
+  /// What the list shows: everything but the items the user deleted.
+  List<ShoppingItem> get visibleItems => [for (final i in items) if (!i.removed) i];
 
-  int get checkedCount => items.where((i) => i.checked).length;
+  int get total => visibleItems.length;
+
+  int get checkedCount => visibleItems.where((i) => i.checked).length;
 
   /// Items grouped into aisle cards, in aisle order.
-  List<ShoppingCategory> get categories => ShoppingListBuilder.groupByAisle(items);
+  List<ShoppingCategory> get categories => ShoppingListBuilder.groupByAisle(visibleItems);
 
   ShoppingState copyWith({
     ShoppingStatus? status,

@@ -158,4 +158,18 @@ void main() {
       expect(search.calls, hasLength(1));
     });
   });
+
+  test("a rebuild keeps the chef's recipes and drops the rest", () async {
+    final profile = ProfileCubit(service: ProfileService(), analytics: const AnalyticsService());
+    final catalogue = seededCatalogue(profile, ai: FakeAi(recipes: RecipeFixtures.recipes.take(3).toList()));
+    addTearDown(profile.close);
+    addTearDown(catalogue.close);
+    final mine = RecipeFixtures.recipes.last.withOrigin(RecipeOrigin.chef);
+    await catalogue.addRecipe(Recipe.fromMap('custom_1', mine.toMap()));
+
+    expect(await catalogue.build(base), isTrue);
+
+    expect(catalogue.state.recipes.map((r) => r.id), containsAll(['custom_1', ...RecipeFixtures.recipes.take(3).map((r) => r.id)]));
+    expect(catalogue.state.recipes, hasLength(4));
+  });
 }

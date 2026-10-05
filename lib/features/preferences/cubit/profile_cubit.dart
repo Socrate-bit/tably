@@ -144,6 +144,10 @@ class ProfileCubit extends Cubit<ProfileState> {
         changed: 'appliances',
       );
 
+  /// Saves several changes at once, as the AI chef makes them; [changed]
+  /// names the fields for analytics.
+  Future<void> apply(UserProfile next, {required String changed}) => _update(next, changed: changed);
+
   void errorShown() => emit(state.copyWith(clearError: true));
 
   @override

@@ -81,25 +81,26 @@ class PlanCubit extends Cubit<PlanState> {
   /// "Régénérer le plan": fetches a fresh pool of recipes (Spoonacular, then
   /// Gemini), then deals a new week from it with every swap dropped. If the
   /// fetch fails the current week stays, and the catalogue reports the error.
-  Future<void> regenerate() async {
-    if (state.regenerating) return;
+  /// Returns whether the week was regenerated.
+  Future<bool> regenerate() async {
+    if (state.regenerating) return false;
     emit(state.copyWith(regenerating: true, clearError: true));
     final rebuilt = await _catalogueCubit.build(_profileCubit.state.profile);
-    if (isClosed) return;
+    if (isClosed) return false;
     if (rebuilt) await _apply(PlanSettings(seed: state.settings.seed + 1));
     emit(state.copyWith(regenerating: false));
     if (rebuilt) {
       unawaited(_analytics.capture(AnalyticsEvents.planRegenerated, properties: {'seed': state.settings.seed}));
     }
+    return rebuilt;
   }
 
   /// Swaps the meal in [slotKey] for [recipe]. One from neither the cached
   /// pool nor the saved favourites — a search result — joins the pool first,
   /// so the week can use it.
   Future<void> replace(String slotKey, Recipe recipe) async {
-    final known = _catalogueCubit.state.byId(recipe.id) != null ||
-        _recipeCubit.state.savedFavourites.any((r) => r.id == recipe.id);
-    if (!known) unawaited(_catalogueCubit.addRecipe(recipe));
+    final known = _catalogueCubit.state.byId(recipe.id) ?? _recipeCubit.state.savedRecipe(recipe.id);
+    if (known == null) unawaited(_catalogueCubit.addRecipe(recipe));
     await _apply(state.settings.copyWith(overrides: {...state.settings.overrides, slotKey: recipe.id}));
     debugPrint('[PlanCubit] meal replaced: $slotKey → ${recipe.id}');
     unawaited(_analytics.capture(
@@ -113,7 +114,7 @@ class PlanCubit extends Cubit<PlanState> {
   /// instructions — no API call — and returns the updated slot so
   /// the caller can show it.
   Future<PlanSlot?> regenerateMeal(PlanSlot slot) async {
-    final catalogue = _catalogueCubit.state.recipes;
+    final catalogue = _catalogueCubit.state.recipes.where((r) => r.origin == RecipeOrigin.built).toList();
     final inWeek = state.week.slots.map((s) => s.recipe.id).toSet();
     var pool = catalogue.where((r) => !inWeek.contains(r.id)).toList();
     if (pool.isEmpty) pool = catalogue.where((r) => r.id != slot.recipe.id).toList();
@@ -128,6 +129,19 @@ class PlanCubit extends Cubit<PlanState> {
       properties: {'slot': slot.key, 'recipe_id': recipeId},
     ));
     return state.week.slotByKey(slot.key);
+  }
+
+  /// Puts [recipeId] in place of [replacedRecipeId] wherever that dish is
+  /// cooked this week; its leftovers follow.
+  Future<void> replaceRecipe(String replacedRecipeId, String recipeId) async {
+    final keys = state.week.slots
+        .where((s) => !s.isLeftover && s.recipe.id == replacedRecipeId)
+        .map((s) => s.key);
+    await _apply(state.settings.copyWith(overrides: {
+      ...state.settings.overrides,
+      for (final key in keys) key: recipeId,
+    }));
+    unawaited(_analytics.capture(AnalyticsEvents.mealReplaced, properties: {'recipe_id': recipeId}));
   }
 
   /// Rearranges the week to show the meals [keys] in that order, as dragged

@@ -197,6 +197,27 @@ void main() {
     expect(plan.baseTotal, 0);
   });
 
+  test('adding a recipe to the catalogue never reshuffles the week', () {
+    final profile = _profile(1, [0, 1, 2, 3, 4, 5, 6]);
+    final before = WeekPlanner.build(profile: profile, settings: const PlanSettings(), catalogue: RecipeFixtures.recipes);
+    final added = RecipeFixtures.recipes.first.withOrigin(RecipeOrigin.chef);
+    final mine = Recipe.fromMap('custom_1', {...added.toMap(), 'title': 'Ma recette'});
+
+    final after = WeekPlanner.build(
+      profile: profile,
+      settings: const PlanSettings(),
+      catalogue: [...RecipeFixtures.recipes, mine],
+    );
+    expect(after, before);
+
+    final placed = WeekPlanner.build(
+      profile: profile,
+      settings: const PlanSettings(overrides: {'monday|dinner': 'custom_1'}),
+      catalogue: [...RecipeFixtures.recipes, mine],
+    );
+    expect(placed.slotByKey('monday|dinner')!.recipe, mine, reason: 'it is placed when chosen');
+  });
+
   test('serves the dishes matching the custom instructions first', () {
     final wished = {RecipeFixtures.recipes[3].id, RecipeFixtures.recipes[7].id};
     final catalogue = [

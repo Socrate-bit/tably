@@ -2304,6 +2304,414 @@ abstract class AppL10n {
   /// In fr, this message translates to:
   /// **'Tu as utilisé tes {limit} recherches de recettes du jour. Elles se réinitialisent demain à {time}.'**
   String quotaReachedBody(int limit, String time);
+
+  /// No description provided for @actionCancel.
+  ///
+  /// In fr, this message translates to:
+  /// **'Annuler'**
+  String get actionCancel;
+
+  /// No description provided for @actionSave.
+  ///
+  /// In fr, this message translates to:
+  /// **'Enregistrer'**
+  String get actionSave;
+
+  /// No description provided for @shoppingAddHint.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ajouter un article'**
+  String get shoppingAddHint;
+
+  /// No description provided for @shoppingDelete.
+  ///
+  /// In fr, this message translates to:
+  /// **'Supprimer'**
+  String get shoppingDelete;
+
+  /// No description provided for @shoppingEditTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Modifier l\'article'**
+  String get shoppingEditTitle;
+
+  /// No description provided for @shoppingEditName.
+  ///
+  /// In fr, this message translates to:
+  /// **'Nom'**
+  String get shoppingEditName;
+
+  /// No description provided for @shoppingEditAmount.
+  ///
+  /// In fr, this message translates to:
+  /// **'Quantité'**
+  String get shoppingEditAmount;
+
+  /// No description provided for @chatEyebrow.
+  ///
+  /// In fr, this message translates to:
+  /// **'TON CHEF IA'**
+  String get chatEyebrow;
+
+  /// No description provided for @chatTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Chef'**
+  String get chatTitle;
+
+  /// No description provided for @chatHint.
+  ///
+  /// In fr, this message translates to:
+  /// **'Demande au chef…'**
+  String get chatHint;
+
+  /// No description provided for @chatConfirmHint.
+  ///
+  /// In fr, this message translates to:
+  /// **'Accepte ou refuse la proposition'**
+  String get chatConfirmHint;
+
+  /// No description provided for @chatEmptyTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Que veux-tu cuisiner ?'**
+  String get chatEmptyTitle;
+
+  /// No description provided for @chatEmptySubtitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Je peux changer tes repas, trouver ou inventer des recettes, ajuster tes préférences et ta liste de courses.'**
+  String get chatEmptySubtitle;
+
+  /// No description provided for @chatStarterTonight.
+  ///
+  /// In fr, this message translates to:
+  /// **'Change mon dîner de ce soir'**
+  String get chatStarterTonight;
+
+  /// No description provided for @chatStarterFridge.
+  ///
+  /// In fr, this message translates to:
+  /// **'Que cuisiner avec des poireaux et des œufs ?'**
+  String get chatStarterFridge;
+
+  /// No description provided for @chatStarterRule.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ajoute « pas de coriandre » à mes règles'**
+  String get chatStarterRule;
+
+  /// No description provided for @chatStarterLighter.
+  ///
+  /// In fr, this message translates to:
+  /// **'Une version plus légère d\'un plat de ma semaine'**
+  String get chatStarterLighter;
+
+  /// No description provided for @chatThinking.
+  ///
+  /// In fr, this message translates to:
+  /// **'Le chef réfléchit…'**
+  String get chatThinking;
+
+  /// No description provided for @chatActivityReading.
+  ///
+  /// In fr, this message translates to:
+  /// **'Le chef regarde ta semaine…'**
+  String get chatActivityReading;
+
+  /// No description provided for @chatActivitySearching.
+  ///
+  /// In fr, this message translates to:
+  /// **'Le chef cherche des recettes…'**
+  String get chatActivitySearching;
+
+  /// No description provided for @chatActivityWriting.
+  ///
+  /// In fr, this message translates to:
+  /// **'Le chef écrit la recette…'**
+  String get chatActivityWriting;
+
+  /// No description provided for @chatActivityPreparing.
+  ///
+  /// In fr, this message translates to:
+  /// **'Le chef prépare sa proposition…'**
+  String get chatActivityPreparing;
+
+  /// No description provided for @chatErrorTurn.
+  ///
+  /// In fr, this message translates to:
+  /// **'Le chef n\'a pas pu répondre.'**
+  String get chatErrorTurn;
+
+  /// No description provided for @chatErrorGeneric.
+  ///
+  /// In fr, this message translates to:
+  /// **'Une erreur est survenue avec le chef.'**
+  String get chatErrorGeneric;
+
+  /// No description provided for @chatRetry.
+  ///
+  /// In fr, this message translates to:
+  /// **'Réessayer'**
+  String get chatRetry;
+
+  /// No description provided for @chatClearTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Effacer la conversation ?'**
+  String get chatClearTitle;
+
+  /// No description provided for @chatClearBody.
+  ///
+  /// In fr, this message translates to:
+  /// **'Le chef oubliera tout ce que vous vous êtes dit.'**
+  String get chatClearBody;
+
+  /// No description provided for @chatClearConfirm.
+  ///
+  /// In fr, this message translates to:
+  /// **'Effacer'**
+  String get chatClearConfirm;
+
+  /// No description provided for @chatAddToWeek.
+  ///
+  /// In fr, this message translates to:
+  /// **'Mettre au menu'**
+  String get chatAddToWeek;
+
+  /// No description provided for @chatActionEyebrow.
+  ///
+  /// In fr, this message translates to:
+  /// **'PROPOSITION'**
+  String get chatActionEyebrow;
+
+  /// No description provided for @chatApprove.
+  ///
+  /// In fr, this message translates to:
+  /// **'Accepter'**
+  String get chatApprove;
+
+  /// No description provided for @chatDecline.
+  ///
+  /// In fr, this message translates to:
+  /// **'Refuser'**
+  String get chatDecline;
+
+  /// No description provided for @chatStatusRunning.
+  ///
+  /// In fr, this message translates to:
+  /// **'En cours…'**
+  String get chatStatusRunning;
+
+  /// No description provided for @chatStatusApproved.
+  ///
+  /// In fr, this message translates to:
+  /// **'Fait ✓'**
+  String get chatStatusApproved;
+
+  /// No description provided for @chatStatusDeclined.
+  ///
+  /// In fr, this message translates to:
+  /// **'Refusé'**
+  String get chatStatusDeclined;
+
+  /// No description provided for @chatStatusFailed.
+  ///
+  /// In fr, this message translates to:
+  /// **'Échec, rien n\'a changé'**
+  String get chatStatusFailed;
+
+  /// No description provided for @chatStatusExpired.
+  ///
+  /// In fr, this message translates to:
+  /// **'Expiré'**
+  String get chatStatusExpired;
+
+  /// No description provided for @chatActRegenerateWeek.
+  ///
+  /// In fr, this message translates to:
+  /// **'Régénérer toute la semaine'**
+  String get chatActRegenerateWeek;
+
+  /// No description provided for @chatDetailRegenerateWeek.
+  ///
+  /// In fr, this message translates to:
+  /// **'De nouvelles recettes, sans tes changements actuels.'**
+  String get chatDetailRegenerateWeek;
+
+  /// No description provided for @chatActRerollMeal.
+  ///
+  /// In fr, this message translates to:
+  /// **'Un autre plat au hasard pour {day} ({meal})'**
+  String chatActRerollMeal(String day, String meal);
+
+  /// No description provided for @chatActChangeMeal.
+  ///
+  /// In fr, this message translates to:
+  /// **'Changer {day} ({meal})'**
+  String chatActChangeMeal(String day, String meal);
+
+  /// No description provided for @chatActReplaceEverywhere.
+  ///
+  /// In fr, this message translates to:
+  /// **'{count, plural, =1{Remplacer un plat (1 repas)} other{Remplacer un plat ({count} repas)}}'**
+  String chatActReplaceEverywhere(int count);
+
+  /// No description provided for @chatActSwapMeals.
+  ///
+  /// In fr, this message translates to:
+  /// **'Échanger deux repas'**
+  String get chatActSwapMeals;
+
+  /// No description provided for @chatActKeepRecipes.
+  ///
+  /// In fr, this message translates to:
+  /// **'Garder tes recettes actuelles'**
+  String get chatActKeepRecipes;
+
+  /// No description provided for @chatDetailFavourite.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ajouter aux favoris'**
+  String get chatDetailFavourite;
+
+  /// No description provided for @chatDetailUnfavourite.
+  ///
+  /// In fr, this message translates to:
+  /// **'Retirer des favoris'**
+  String get chatDetailUnfavourite;
+
+  /// No description provided for @chatDetailCooked.
+  ///
+  /// In fr, this message translates to:
+  /// **'Marquer comme cuisiné'**
+  String get chatDetailCooked;
+
+  /// No description provided for @chatDetailNotCooked.
+  ///
+  /// In fr, this message translates to:
+  /// **'Marquer comme non cuisiné'**
+  String get chatDetailNotCooked;
+
+  /// No description provided for @chatDetailRating.
+  ///
+  /// In fr, this message translates to:
+  /// **'Noter {rating}/5'**
+  String chatDetailRating(int rating);
+
+  /// No description provided for @chatDetailNoRating.
+  ///
+  /// In fr, this message translates to:
+  /// **'Retirer la note'**
+  String get chatDetailNoRating;
+
+  /// No description provided for @chatDetailNote.
+  ///
+  /// In fr, this message translates to:
+  /// **'Note : {note}'**
+  String chatDetailNote(String note);
+
+  /// No description provided for @chatActPreferences.
+  ///
+  /// In fr, this message translates to:
+  /// **'Modifier tes préférences'**
+  String get chatActPreferences;
+
+  /// No description provided for @chatDetailOutdated.
+  ///
+  /// In fr, this message translates to:
+  /// **'Tes recettes ne correspondront plus : il faudra les régénérer ou les garder.'**
+  String get chatDetailOutdated;
+
+  /// No description provided for @chatFieldName.
+  ///
+  /// In fr, this message translates to:
+  /// **'Prénom'**
+  String get chatFieldName;
+
+  /// No description provided for @chatFieldLanguage.
+  ///
+  /// In fr, this message translates to:
+  /// **'Langue'**
+  String get chatFieldLanguage;
+
+  /// No description provided for @chatActShopping.
+  ///
+  /// In fr, this message translates to:
+  /// **'Modifier ta liste de courses'**
+  String get chatActShopping;
+
+  /// No description provided for @chatActShare.
+  ///
+  /// In fr, this message translates to:
+  /// **'Partager ta liste de courses'**
+  String get chatActShare;
+
+  /// No description provided for @chatActCreateRecipe.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ajouter cette nouvelle recette'**
+  String get chatActCreateRecipe;
+
+  /// No description provided for @chatDetailInMeal.
+  ///
+  /// In fr, this message translates to:
+  /// **'Et la mettre au menu de {day}'**
+  String chatDetailInMeal(String day);
+
+  /// No description provided for @chatActDeriveRecipe.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ta version de « {title} »'**
+  String chatActDeriveRecipe(String title);
+
+  /// No description provided for @chatDetailReplaceInWeek.
+  ///
+  /// In fr, this message translates to:
+  /// **'Elle remplace l\'originale dans ta semaine.'**
+  String get chatDetailReplaceInWeek;
+
+  /// No description provided for @chatFieldChange.
+  ///
+  /// In fr, this message translates to:
+  /// **'{field} : {change}'**
+  String chatFieldChange(String field, String change);
+
+  /// No description provided for @chatActMemory.
+  ///
+  /// In fr, this message translates to:
+  /// **'Mettre à jour ma mémoire'**
+  String get chatActMemory;
+
+  /// No description provided for @chatDetailMemoryCleared.
+  ///
+  /// In fr, this message translates to:
+  /// **'Tout oublier'**
+  String get chatDetailMemoryCleared;
+
+  /// No description provided for @chatDetailMemoryWas.
+  ///
+  /// In fr, this message translates to:
+  /// **'Avant : {text}'**
+  String chatDetailMemoryWas(String text);
+
+  /// No description provided for @chatMemoryTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Mémoire du chef'**
+  String get chatMemoryTitle;
+
+  /// No description provided for @chatMemorySub.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ce que le chef retient de toi. Il s\'en sert pour te répondre et choisir tes recettes ; tu peux le modifier.'**
+  String get chatMemorySub;
+
+  /// No description provided for @chatQuotaReached.
+  ///
+  /// In fr, this message translates to:
+  /// **'Tu as utilisé toutes tes recherches du jour : le chef revient quand elles se rechargent. Touche pour voir quand.'**
+  String get chatQuotaReached;
 }
 
 class _AppL10nDelegate extends LocalizationsDelegate<AppL10n> {

@@ -684,5 +684,145 @@
         "type": "String"
       }
     }
+  },
+  "actionCancel": "Annuler",
+  "actionSave": "Enregistrer",
+  "shoppingAddHint": "Ajouter un article",
+  "shoppingDelete": "Supprimer",
+  "shoppingEditTitle": "Modifier l'article",
+  "shoppingEditName": "Nom",
+  "shoppingEditAmount": "Quantité",
+  "chatEyebrow": "TON CHEF IA",
+  "chatTitle": "Chef",
+  "chatHint": "Demande au chef…",
+  "chatConfirmHint": "Accepte ou refuse la proposition",
+  "chatEmptyTitle": "Que veux-tu cuisiner ?",
+  "chatEmptySubtitle": "Je peux changer tes repas, trouver ou inventer des recettes, ajuster tes préférences et ta liste de courses.",
+  "chatStarterTonight": "Change mon dîner de ce soir",
+  "chatStarterFridge": "Que cuisiner avec des poireaux et des œufs ?",
+  "chatStarterRule": "Ajoute « pas de coriandre » à mes règles",
+  "chatStarterLighter": "Une version plus légère d'un plat de ma semaine",
+  "chatThinking": "Le chef réfléchit…",
+  "chatActivityReading": "Le chef regarde ta semaine…",
+  "chatActivitySearching": "Le chef cherche des recettes…",
+  "chatActivityWriting": "Le chef écrit la recette…",
+  "chatActivityPreparing": "Le chef prépare sa proposition…",
+  "chatErrorTurn": "Le chef n'a pas pu répondre.",
+  "chatErrorGeneric": "Une erreur est survenue avec le chef.",
+  "chatRetry": "Réessayer",
+  "chatClearTitle": "Effacer la conversation ?",
+  "chatClearBody": "Le chef oubliera tout ce que vous vous êtes dit.",
+  "chatClearConfirm": "Effacer",
+  "chatAddToWeek": "Mettre au menu",
+  "chatActionEyebrow": "PROPOSITION",
+  "chatApprove": "Accepter",
+  "chatDecline": "Refuser",
+  "chatStatusRunning": "En cours…",
+  "chatStatusApproved": "Fait ✓",
+  "chatStatusDeclined": "Refusé",
+  "chatStatusFailed": "Échec, rien n'a changé",
+  "chatStatusExpired": "Expiré",
+  "chatActRegenerateWeek": "Régénérer toute la semaine",
+  "chatDetailRegenerateWeek": "De nouvelles recettes, sans tes changements actuels.",
+  "chatActRerollMeal": "Un autre plat au hasard pour {day} ({meal})",
+  "@chatActRerollMeal": {
+    "placeholders": {
+      "day": {
+        "type": "String"
+      },
+      "meal": {
+        "type": "String"
+      }
+    }
+  },
+  "chatActChangeMeal": "Changer {day} ({meal})",
+  "@chatActChangeMeal": {
+    "placeholders": {
+      "day": {
+        "type": "String"
+      },
+      "meal": {
+        "type": "String"
+      }
+    }
+  },
+  "chatActReplaceEverywhere": "{count, plural, =1{Remplacer un plat (1 repas)} other{Remplacer un plat ({count} repas)}}",
+  "@chatActReplaceEverywhere": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "chatActSwapMeals": "Échanger deux repas",
+  "chatActKeepRecipes": "Garder tes recettes actuelles",
+  "chatDetailFavourite": "Ajouter aux favoris",
+  "chatDetailUnfavourite": "Retirer des favoris",
+  "chatDetailCooked": "Marquer comme cuisiné",
+  "chatDetailNotCooked": "Marquer comme non cuisiné",
+  "chatDetailRating": "Noter {rating}/5",
+  "@chatDetailRating": {
+    "placeholders": {
+      "rating": {
+        "type": "int"
+      }
+    }
+  },
+  "chatDetailNoRating": "Retirer la note",
+  "chatDetailNote": "Note : {note}",
+  "@chatDetailNote": {
+    "placeholders": {
+      "note": {
+        "type": "String"
+      }
+    }
+  },
+  "chatActPreferences": "Modifier tes préférences",
+  "chatDetailOutdated": "Tes recettes ne correspondront plus : il faudra les régénérer ou les garder.",
+  "chatFieldName": "Prénom",
+  "chatFieldLanguage": "Langue",
+  "chatActShopping": "Modifier ta liste de courses",
+  "chatActShare": "Partager ta liste de courses",
+  "chatActCreateRecipe": "Ajouter cette nouvelle recette",
+  "chatDetailInMeal": "Et la mettre au menu de {day}",
+  "@chatDetailInMeal": {
+    "placeholders": {
+      "day": {
+        "type": "String"
+      }
+    }
+  },
+  "chatActDeriveRecipe": "Ta version de « {title} »",
+  "@chatActDeriveRecipe": {
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "chatDetailReplaceInWeek": "Elle remplace l'originale dans ta semaine.",
+  "chatFieldChange": "{field} : {change}",
+  "@chatFieldChange": {
+    "placeholders": {
+      "field": {
+        "type": "String"
+      },
+      "change": {
+        "type": "String"
+      }
+    }
+  },
+  "chatActMemory": "Mettre à jour ma mémoire",
+  "chatDetailMemoryCleared": "Tout oublier",
+  "chatDetailMemoryWas": "Avant : {text}",
+  "chatMemoryTitle": "Mémoire du chef",
+  "chatMemorySub": "Ce que le chef retient de toi. Il s'en sert pour te répondre et choisir tes recettes ; tu peux le modifier.",
+  "chatQuotaReached": "Tu as utilisé toutes tes recherches du jour : le chef revient quand elles se rechargent. Touche pour voir quand.",
+  "@chatDetailMemoryWas": {
+    "placeholders": {
+      "text": {
+        "type": "String"
+      }
+    }
   }
 }

@@ -85,7 +85,18 @@ void main() {
 
     await plan.replace('monday|dinner', found);
 
-    expect(plan.state.week.slotByKey('monday|dinner')!.recipe, found);
+    expect(plan.state.week.slotByKey('monday|dinner')!.recipe.id, found.id);
+  });
+
+  test('adding a recipe to the week takes the place of a chosen dish everywhere', () async {
+    final plan = await build(const UserProfile(mealsPerDay: 2, variety: Variety.balanced));
+    final week = plan.state.week;
+    final replaced = week.slots.firstWhere((s) => !s.isLeftover).recipe;
+    final incoming = RecipeFixtures.recipes.firstWhere((r) => r.id != replaced.id);
+
+    await plan.replaceRecipe(replaced.id, incoming.id);
+
+    expect(plan.state.week.slots.where((s) => s.recipe.id == replaced.id), isEmpty);
   });
 
   test('regenerating a meal swaps in a dish not already in the week', () async {
