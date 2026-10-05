@@ -248,7 +248,7 @@ class _PhotoHeader extends StatelessWidget {
             showBorder: false,
             background: favourite ? AppColors.brand : AppColors.surface,
             icon: LineIcon(
-              LineGlyph.heart,
+              LineGlyph.bookmark,
               size: 21.r,
               color: favourite ? AppColors.surface : AppColors.ink,
               filled: favourite,

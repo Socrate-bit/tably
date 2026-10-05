@@ -11,7 +11,7 @@ import '../model/recipe.dart';
 import 'craving_badge.dart';
 import 'favourite_button.dart';
 
-/// A recipe as a row: photo, title, badge, time and store price, plus a heart.
+/// A recipe as a row: photo, title, badge, time and store price, plus a bookmark.
 /// [large] is the variant used in the full recipe list and favourites.
 class RecipeRow extends StatelessWidget {
   const RecipeRow({

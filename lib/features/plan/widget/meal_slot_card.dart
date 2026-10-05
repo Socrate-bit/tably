@@ -12,7 +12,7 @@ import '../../../l10n/app_localizations.dart';
 import '../../recipe/widget/craving_badge.dart';
 import '../model/week_plan.dart';
 
-/// One meal of the week: drag dots, photo, optional slot name, title, badges,
+/// One meal of the week: drag grip, photo, optional slot name, title, badges,
 /// meta and an open chevron, with a produce decoration bleeding off the
 /// top-right.
 class MealSlotCard extends StatelessWidget {
@@ -41,7 +41,8 @@ class MealSlotCard extends StatelessWidget {
   /// The card's position in the week, which picks its decoration.
   final int index;
 
-  /// The card's index in the enclosing reorderable list, which its dots drag.
+  /// The card's index in the enclosing reorderable list: a long press anywhere
+  /// on the card drags it, and the grip drags it straight away.
   final int dragIndex;
   final VoidCallback onTap;
 
@@ -53,94 +54,97 @@ class MealSlotCard extends StatelessWidget {
     final price = recipe.price * servings * store.priceFactor;
     final divider = Text('  ·  ', style: AppTextStyles.rowMetaLarge.copyWith(color: AppColors.neutralBar));
     Widget icon(LineGlyph glyph, {bool filled = false}) => Padding(
-          padding: EdgeInsets.only(right: 5.w),
-          child: LineIcon(glyph, size: 18.r, color: AppColors.textSecondary, filled: filled),
-        );
+      padding: EdgeInsets.only(right: 5.w),
+      child: LineIcon(glyph, size: 18.r, color: AppColors.textSecondary, filled: filled),
+    );
     final photoSize = 120.r;
 
-    return SurfaceCard(
-      onTap: onTap,
-      radius: 24.r,
-      clip: true,
-      child: Stack(
-        children: [
-          // Painted first so text stays on top; the card clips its right edge.
-          Positioned(
-            top: 8.r,
-            right: -14.r,
-            child: Image.asset(
-              _decorations[index % _decorations.length],
-              width: 76.r,
-              filterQuality: FilterQuality.medium,
+    return ReorderableDelayedDragStartListener(
+      index: dragIndex,
+      child: SurfaceCard(
+        onTap: onTap,
+        radius: 24.r,
+        clip: true,
+        child: Stack(
+          children: [
+            // Painted first so text stays on top; the card clips its right edge.
+            Positioned(
+              top: 8.r,
+              right: -14.r,
+              child: Image.asset(
+                _decorations[index % _decorations.length],
+                width: 76.r,
+                filterQuality: FilterQuality.medium,
+              ),
             ),
-          ),
-          Padding(
-            padding: EdgeInsets.fromLTRB(0, 11.r, 11.r, 11.r),
-            child: Row(
-              children: [
-                _DragHandle(index: dragIndex, height: photoSize),
-                RecipePhoto(
-                  url: recipe.photoUrl,
-                  height: photoSize,
-                  width: photoSize,
-                  radius: 18.r,
-                  opacity: slot.isLeftover ? 0.8 : 1,
-                ),
-                SizedBox(width: 14.w),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      if (slot.showSlotLabel) ...[
-                        Text(l10n.slotName(slot.slot).toUpperCase(), style: AppTextStyles.slotLabel),
-                        SizedBox(height: 3.h),
-                      ],
-                      Text(recipe.title, style: AppTextStyles.mealTitle),
-                      Wrap(
-                        spacing: 5.w,
-                        children: [
-                          CravingBadge(craving: recipe.craving),
-                          if (slot.isLeftover) const _LeftoverBadge(),
+            Padding(
+              padding: EdgeInsets.fromLTRB(0, 11.r, 11.r, 11.r),
+              child: Row(
+                children: [
+                  _DragHandle(index: dragIndex, height: photoSize),
+                  RecipePhoto(
+                    url: recipe.photoUrl,
+                    height: photoSize,
+                    width: photoSize,
+                    radius: 18.r,
+                    opacity: slot.isLeftover ? 0.8 : 1,
+                  ),
+                  SizedBox(width: 14.w),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        if (slot.showSlotLabel) ...[
+                          Text(l10n.slotName(slot.slot).toUpperCase(), style: AppTextStyles.slotLabel),
+                          SizedBox(height: 3.h),
                         ],
-                      ),
-                      SizedBox(height: 7.h),
-                      FittedBox(
-                        fit: BoxFit.scaleDown,
-                        alignment: Alignment.centerLeft,
-                        child: Row(
+                        Text(recipe.title, style: AppTextStyles.mealTitle),
+                        Wrap(
+                          spacing: 5.w,
                           children: [
-                            icon(LineGlyph.clock),
-                            Text(slot.isLeftover ? leftoverTime : recipe.time, style: AppTextStyles.rowMetaLarge),
-                            SizedBox(width: 14.w),
-                            icon(LineGlyph.user, filled: true),
-                            Text('$servings', style: AppTextStyles.rowMetaLarge),
-                            divider,
-                            Text(formatMoney(country, price), style: AppTextStyles.rowMetaLarge),
+                            CravingBadge(craving: recipe.craving),
+                            if (slot.isLeftover) const _LeftoverBadge(),
                           ],
                         ),
-                      ),
-                    ],
+                        SizedBox(height: 7.h),
+                        FittedBox(
+                          fit: BoxFit.scaleDown,
+                          alignment: Alignment.centerLeft,
+                          child: Row(
+                            children: [
+                              icon(LineGlyph.clock),
+                              Text(slot.isLeftover ? leftoverTime : recipe.time, style: AppTextStyles.rowMetaLarge),
+                              SizedBox(width: 14.w),
+                              icon(LineGlyph.user, filled: true),
+                              Text('$servings', style: AppTextStyles.rowMetaLarge),
+                              divider,
+                              Text(formatMoney(country, price), style: AppTextStyles.rowMetaLarge),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-                SizedBox(width: 8.w),
-                // Sits in the lower half, under the decoration.
-                SizedBox(
-                  height: photoSize,
-                  child: Padding(
-                    padding: EdgeInsets.only(bottom: 6.r),
-                    child: const Align(alignment: Alignment.bottomCenter, child: _OpenChevron()),
+                  SizedBox(width: 8.w),
+                  // Sits in the lower half, under the decoration.
+                  SizedBox(
+                    height: photoSize,
+                    child: Padding(
+                      padding: EdgeInsets.only(bottom: 6.r),
+                      child: const Align(alignment: Alignment.bottomCenter, child: _OpenChevron()),
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
 }
 
-/// The three dots on the card's left edge: press and drag to move the meal
+/// The grip bar on the card's left edge: press and drag to move the meal
 /// up or down the week.
 class _DragHandle extends StatelessWidget {
   const _DragHandle({required this.index, required this.height});
@@ -156,9 +160,15 @@ class _DragHandle extends StatelessWidget {
       child: ColoredBox(
         color: Colors.transparent,
         child: SizedBox(
-          width: 28.w,
+          width: 22.w,
           height: height,
-          child: Icon(Icons.more_vert_rounded, size: 22.r, color: AppColors.textTertiary),
+          child: Center(
+            child: Container(
+              width: 5.w,
+              height: 36.h,
+              decoration: BoxDecoration(color: AppColors.neutralBar, borderRadius: BorderRadius.circular(3.r)),
+            ),
+          ),
         ),
       ),
     );
@@ -191,7 +201,10 @@ class _LeftoverBadge extends StatelessWidget {
       margin: EdgeInsets.only(top: 6.h),
       padding: EdgeInsets.symmetric(horizontal: 9.w, vertical: 4.h),
       decoration: BoxDecoration(color: AppColors.brandSoft, borderRadius: BorderRadius.circular(20.r)),
-      child: Text(AppL10n.of(context).leftoverBadge, style: AppTextStyles.badgeSmall.copyWith(color: AppColors.brandDark)),
+      child: Text(
+        AppL10n.of(context).leftoverBadge,
+        style: AppTextStyles.badgeSmall.copyWith(color: AppColors.brandDark),
+      ),
     );
   }
 }

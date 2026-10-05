@@ -8,14 +8,16 @@ import '../../../core/util/error_feedback.dart';
 import '../../../core/util/haptics.dart';
 import '../../../core/util/legal_links.dart';
 import '../../../core/widget/app_sheet.dart';
+import '../../../core/widget/sub_screen_header.dart';
 import '../../../l10n/app_localizations.dart';
+import '../../home/cubit/home_cubit.dart';
 import '../../onboarding/widget/steps/language_step.dart';
 import '../../preferences/cubit/profile_cubit.dart';
 import '../../subscription/widget/referral_code_dialog.dart';
 import '../cubit/auth_cubit.dart';
 import '../widget/account_rows.dart';
 
-/// The account tab: sign-in, profile and status, referral code, language,
+/// The account screen, opened from preferences: sign-in, profile and status, referral code, language,
 /// legal links and account actions.
 class AccountScreen extends StatelessWidget {
   const AccountScreen({super.key});
@@ -41,7 +43,7 @@ class AccountScreen extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    Text(l10n.accountTitle, style: AppTextStyles.tabTitle),
+                    SubScreenHeader(title: l10n.accountTitle, onBack: context.read<HomeCubit>().closeSub),
                     SizedBox(height: 16.h),
 
                     // Apple sign-in only appears where it is actually available.

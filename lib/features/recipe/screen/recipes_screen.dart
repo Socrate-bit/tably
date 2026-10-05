@@ -81,7 +81,8 @@ class RecipesScreen extends StatelessWidget {
                 CountBadge(
                   count: favourites.length,
                   child: CircleIconButton(
-                    icon: LineIcon(LineGlyph.heart, size: 20.r, color: AppColors.ink),
+                    size: 50.r,
+                    icon: LineIcon(LineGlyph.bookmark, size: 28.r, color: AppColors.ink),
                     onPressed: () => context.read<HomeCubit>().open(HomeSub.favourites),
                   ),
                 ),
@@ -107,6 +108,17 @@ class RecipesScreen extends StatelessWidget {
                 FilterButton(onPressed: () => FiltersScreen.open(context)),
               ],
             ),
+            if (browse.canReset)
+              Align(
+                alignment: Alignment.centerRight,
+                child: _LinkButton(
+                  label: l10n.filtersResetAll,
+                  onPressed: () {
+                    context.read<RecipeBrowseCubit>().resetFilters();
+                    search();
+                  },
+                ),
+              ),
             SizedBox(height: 26.h),
             if (browse.isSearching || found != null || searching) ...[
               if (pending)
@@ -120,7 +132,8 @@ class RecipesScreen extends StatelessWidget {
                         style: AppTextStyles.resultCount,
                       ),
                     ),
-                    if (browse.canSearch && !searching) _ReloadButton(onPressed: () => search(reload: true)),
+                    if (browse.canSearch && !searching)
+                      _LinkButton(label: '↻ ${l10n.searchReload}', onPressed: () => search(reload: true)),
                   ],
                 ),
               SizedBox(height: 12.h),
@@ -192,10 +205,11 @@ class _RecentCard extends StatelessWidget {
   }
 }
 
-/// "Relancer la recherche": asks the API again for fresh results.
-class _ReloadButton extends StatelessWidget {
-  const _ReloadButton({required this.onPressed});
+/// A tappable link, such as "Relancer la recherche" or "Réinitialiser les filtres".
+class _LinkButton extends StatelessWidget {
+  const _LinkButton({required this.label, required this.onPressed});
 
+  final String label;
   final VoidCallback onPressed;
 
   @override
@@ -208,7 +222,7 @@ class _ReloadButton extends StatelessWidget {
       behavior: HitTestBehavior.opaque,
       child: Padding(
         padding: EdgeInsets.symmetric(vertical: 4.h),
-        child: Text('↻ ${AppL10n.of(context).searchReload}', style: AppTextStyles.link.copyWith(fontSize: 15.sp)),
+        child: Text(label, style: AppTextStyles.link.copyWith(fontSize: 15.sp)),
       ),
     );
   }

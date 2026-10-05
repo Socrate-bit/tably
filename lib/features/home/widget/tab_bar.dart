@@ -29,7 +29,6 @@ class AppTabBar extends StatelessWidget {
       (HomeTab.menu, LineGlyph.calendar, l10n.tabMenu),
       (HomeTab.recipes, LineGlyph.book, l10n.tabRecipes),
       (HomeTab.preferences, LineGlyph.heart, l10n.tabPreferences),
-      (HomeTab.account, LineGlyph.user, l10n.tabAccount),
     ];
     // Inactive tabs are warm grey, as in the design.
     const idle = AppColors.textQuaternary;

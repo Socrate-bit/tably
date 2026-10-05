@@ -8,7 +8,7 @@ import '../../../core/widget/line_icon.dart';
 import '../cubit/recipe_cubit.dart';
 import '../model/recipe.dart';
 
-/// The heart on a recipe row: tinted and filled when the recipe is a favourite.
+/// The bookmark on a recipe row: tinted and filled when the recipe is a favourite.
 class FavouriteButton extends StatelessWidget {
   const FavouriteButton({super.key, required this.recipe});
 
@@ -31,7 +31,7 @@ class FavouriteButton extends StatelessWidget {
           shape: BoxShape.circle,
         ),
         child: LineIcon(
-          LineGlyph.heart,
+          LineGlyph.bookmark,
           size: 18.r,
           color: favourite ? AppColors.brand : AppColors.textDisabled,
           filled: favourite,
