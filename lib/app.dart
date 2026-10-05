@@ -7,6 +7,10 @@ import 'core/analytics/analytics_service.dart';
 import 'core/theme/app_theme.dart';
 import 'features/account/cubit/auth_cubit.dart';
 import 'features/account/service/auth_service.dart';
+import 'features/chat/cubit/chat_cubit.dart';
+import 'features/chat/service/chat_agent_service.dart';
+import 'features/chat/service/chat_service.dart';
+import 'features/chat/tool/chat_tools.dart';
 import 'features/home/cubit/home_cubit.dart';
 import 'features/onboarding/cubit/onboarding_cubit.dart';
 import 'features/plan/cubit/plan_cubit.dart';
@@ -51,6 +55,8 @@ class TablyApp extends StatelessWidget {
         RepositoryProvider(create: (_) => ShoppingAiService()),
         RepositoryProvider(create: (_) => const PaywallService()),
         RepositoryProvider(create: (_) => ReferralService()),
+        RepositoryProvider(create: (_) => ChatService()),
+        RepositoryProvider(create: (_) => ChatAgentService()),
       ],
       child: MultiBlocProvider(
         providers: [
@@ -119,6 +125,23 @@ class TablyApp extends StatelessWidget {
             create: (context) => OnboardingCubit(catalogueCubit: context.read<CatalogueCubit>(), analytics: analytics),
           ),
           BlocProvider(create: (_) => HomeCubit(analytics: analytics)),
+          BlocProvider(
+            create: (context) => ChatCubit(
+              service: context.read<ChatService>(),
+              agent: context.read<ChatAgentService>(),
+              tools: ChatTools(
+                profile: context.read<ProfileCubit>(),
+                catalogue: context.read<CatalogueCubit>(),
+                plan: context.read<PlanCubit>(),
+                recipes: context.read<RecipeCubit>(),
+                shopping: context.read<ShoppingCubit>(),
+                search: context.read<RecipeSearchService>(),
+                ai: context.read<RecipeAiService>(),
+                analytics: analytics,
+              ),
+              analytics: analytics,
+            ),
+          ),
         ],
         child: ScreenUtilInit(
           // The design was drawn at 402x860.

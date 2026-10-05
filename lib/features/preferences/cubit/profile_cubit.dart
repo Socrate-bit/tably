@@ -134,6 +134,31 @@ class ProfileCubit extends Cubit<ProfileState> {
         changed: 'appliances',
       );
 
+  Future<void> setCookTime(String cookTime) =>
+      _update(state.profile.copyWith(cookTime: cookTime), changed: 'cookTime');
+
+  /// Adds one of the user's own rules ("no coriander"), trimmed, unless it
+  /// is empty, already there, or the list is full.
+  Future<void> addCustomPreference(String text) async {
+    final rule = text.trim();
+    final current = state.profile.customPreferences;
+    if (rule.isEmpty || current.length >= UserProfile.maxCustomPreferences) return;
+    if (current.any((p) => p.toLowerCase() == rule.toLowerCase())) return;
+    final clipped = rule.length > UserProfile.maxCustomPreferenceLength
+        ? rule.substring(0, UserProfile.maxCustomPreferenceLength)
+        : rule;
+    await _update(state.profile.copyWith(customPreferences: [...current, clipped]), changed: 'customPreferences');
+  }
+
+  Future<void> removeCustomPreference(String rule) => _update(
+        state.profile.copyWith(customPreferences: [...state.profile.customPreferences.where((p) => p != rule)]),
+        changed: 'customPreferences',
+      );
+
+  /// Saves several changes at once, as the AI chef makes them; [changed]
+  /// names the fields for analytics.
+  Future<void> apply(UserProfile next, {required String changed}) => _update(next, changed: changed);
+
   void errorShown() => emit(state.copyWith(clearError: true));
 
   @override

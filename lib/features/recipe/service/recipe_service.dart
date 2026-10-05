@@ -62,11 +62,16 @@ class RecipeService {
   }
 
   /// Swaps the whole catalogue for [recipes] in one batch, recording [key].
+  /// The user's custom recipes stay.
   Future<void> replaceCatalogue(String uid, List<Recipe> recipes, String key) async {
     try {
       final col = _recipes(uid);
-      final keep = {for (final r in recipes) r.id};
       final existing = await col.get();
+      final keep = {
+        for (final r in recipes) r.id,
+        for (final doc in existing.docs)
+          if (doc.data()['origin'] == RecipeOrigin.chef.id) doc.id,
+      };
       final batch = _db.batch();
       for (final doc in existing.docs) {
         if (!keep.contains(doc.id)) batch.delete(doc.reference);

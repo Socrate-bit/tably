@@ -107,4 +107,53 @@ void main() {
     expect(none, contains('diets: none'));
     expect(none, contains('English'));
   });
+
+  test("the user's own rules are checked as strictly as allergies", () {
+    const plain = UserProfile();
+    expect(RecipeAiService.instruction(plain), isNot(contains('own rules')));
+    final text = RecipeAiService.instruction(const UserProfile(customPreferences: ['pas de coriandre']));
+    expect(text, contains('"pas de coriandre"'));
+    expect(RecipeAiService.writerInstruction(const UserProfile(customPreferences: ['pas de coriandre']), derived: true),
+        contains('"pas de coriandre"'));
+  });
+
+  test('a written recipe is the user\'s own, and a derived one keeps the base\'s ingredient ids', () {
+    final base = Recipe.fromMap('644761', {
+      'title': 'Côtelettes',
+      'photoUrl': 'https://img/1.jpg',
+      'price': 3.5,
+      'ingredients': [
+        {'id': 1001, 'name': 'beurre', 'amount': 20, 'unit': 'g'},
+        {'id': 10010062, 'name': 'côtelettes', 'amount': 1, 'unit': 'piece'},
+      ],
+    });
+    final recipe = RecipeAiService.written({
+      'refused': '',
+      'title': "Côtelettes à l'huile d'olive",
+      'minutes': 25,
+      'macros': {'kcal': 500, 'protein': 35, 'carbs': 10, 'fat': 30},
+      'craving': 'high_protein',
+      'protein': 'pork',
+      'cuisine': 'none',
+      'ingredients': [
+        {'base_id': 0, 'name': "huile d'olive", 'amount': 1, 'unit': 'tbsp', 'icon': '🫒', 'aisle': 'herbs_grocery'},
+        {'base_id': 10010062, 'name': 'côtelettes', 'amount': 1, 'unit': 'piece', 'icon': '🥩', 'aisle': 'meat_fish'},
+        {'base_id': 42, 'name': 'sel', 'amount': 0, 'unit': 'to_taste', 'icon': '🧂', 'aisle': 'herbs_grocery'},
+      ],
+      'steps': ['Chauffez.', 'Servez.'],
+    }, id: 'custom_1', base: base);
+
+    expect(recipe.custom, isTrue);
+    expect(recipe.photoUrl, base.photoUrl);
+    expect(recipe.time, '25m');
+    expect(recipe.ingredients.map((i) => i.id), [0, 10010062, 0], reason: 'an id not in the base is dropped');
+    expect(recipe.ingredients.first.unit, IngredientUnit.tbsp);
+  });
+
+  test('a refused recipe throws with the reason', () {
+    expect(
+      () => RecipeAiService.written({'refused': 'Contient des noix'}, id: 'x'),
+      throwsA(isA<RecipeRefusedException>().having((e) => e.reason, 'reason', 'Contient des noix')),
+    );
+  });
 }

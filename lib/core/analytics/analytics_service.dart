@@ -88,6 +88,14 @@ abstract final class AnalyticsEvents {
   static const shoppingItemToggled = 'shopping_item_toggled';
   static const shoppingListOpened = 'shopping_list_opened';
   static const shoppingListShared = 'shopping_list_shared';
+  static const shoppingListEdited = 'shopping_list_edited';
+  static const chatOpened = 'chat_opened';
+  static const chatMessageSent = 'chat_message_sent';
+  static const chatToolCalled = 'chat_tool_called';
+  static const chatActionResolved = 'chat_action_resolved';
+  static const chatFailed = 'chat_failed';
+  static const chatCleared = 'chat_cleared';
+  static const customRecipeCreated = 'custom_recipe_created';
   static const preferenceChanged = 'preference_changed';
   static const tabSelected = 'tab_selected';
   static const recipeFiltersChanged = 'recipe_filters_changed';

@@ -215,7 +215,11 @@ function searchParams(data: Record<string, unknown>): URLSearchParams {
     const current = params.get(key);
     params.set(key, current ? String(Math.min(Number(current), Number(value))) : value);
   }
-  if (protein && protein !== "vegetarian") params.set("includeIngredients", protein);
+  // Ingredients the user has ("what can I make with…"), most used first.
+  const include = stringList(data.includeIngredients).map((i) => i.trim()).filter(Boolean);
+  if (protein && protein !== "vegetarian") include.unshift(protein);
+  if (include.length > 0) params.set("includeIngredients", include.join(",").slice(0, 200));
+  if (stringList(data.includeIngredients).length > 0) params.set("sort", "max-used-ingredients");
   return params;
 }
 
@@ -224,11 +228,11 @@ function searchParams(data: Record<string, unknown>): URLSearchParams {
  * Ingredient amounts are per portion, prices are EUR per portion. Returns null
  * for results too thin to cook from.
  */
-function trimRecipe(r: any): Record<string, unknown> | null {
+function trimRecipe(r: any, {requireImage = true} = {}): Record<string, unknown> | null {
   const servings = Math.max(1, Number(r.servings) || 1);
   const rawSteps: any[] = (r.analyzedInstructions ?? []).flatMap((a: any) => a.steps ?? []);
   const steps = rawSteps.map((s) => String(s.step ?? "").trim()).filter((s) => s.length > 0);
-  if (typeof r.image !== "string" || steps.length < 2) return null;
+  if (steps.length < 2 || (requireImage && typeof r.image !== "string")) return null;
 
   const nutrient = (name: string): number =>
     Math.round(r.nutrition?.nutrients?.find((n: any) => n.name === name)?.amount ?? 0);
@@ -240,7 +244,7 @@ function trimRecipe(r: any): Record<string, unknown> | null {
     id: r.id,
     title: r.title,
     // The largest size Spoonacular serves; the search returns a smaller one.
-    image: r.image.replace(/-\d+x\d+\.(\w+)$/, "-636x393.$1"),
+    image: typeof r.image === "string" ? r.image.replace(/-\d+x\d+\.(\w+)$/, "-636x393.$1") : "",
     readyInMinutes: r.readyInMinutes,
     price: round((Number(r.pricePerServing) || 0) / 100 * USD_TO_EUR),
     sourceName: r.sourceName ?? null,
@@ -265,6 +269,41 @@ function trimRecipe(r: any): Record<string, unknown> | null {
 }
 
 /**
+ * One Spoonacular GET through RapidAPI with the secret key. A spent quota
+ * becomes "resource-exhausted", anything else "unavailable".
+ */
+async function spoonacularGet(path: string, params: URLSearchParams, uid: string): Promise<any> {
+  const url = `https://${SPOONACULAR_HOST}${path}?${params}`;
+  let response: Response;
+  try {
+    response = await fetch(url, {
+      headers: {
+        "x-rapidapi-key": spoonacularKey.value(),
+        "x-rapidapi-host": SPOONACULAR_HOST,
+      },
+      signal: AbortSignal.timeout(30_000),
+    });
+  } catch (e) {
+    logger.error(`spoonacular ${path}: request failed`, e);
+    throw new HttpsError("unavailable", "Recipe search is unavailable.");
+  }
+
+  logger.info(`spoonacular ${path}: quota`, {
+    uid,
+    status: response.status,
+    requestsRemaining: response.headers.get("x-ratelimit-requests-remaining"),
+  });
+  if (response.status === 402 || response.status === 429) {
+    throw new HttpsError("resource-exhausted", "Recipe search quota reached.");
+  }
+  if (!response.ok) {
+    logger.error(`spoonacular ${path}: bad status`, {status: response.status, body: await response.text()});
+    throw new HttpsError("unavailable", "Recipe search is unavailable.");
+  }
+  return response.json();
+}
+
+/**
  * Searches Spoonacular for main courses matching the caller's constraints.
  * 1. Maps the constraints and search filters to query parameters
  * 2. Calls complexSearch with the secret RapidAPI key (1 request of the quota,
@@ -279,40 +318,136 @@ export const searchRecipes = onCall(
       throw new HttpsError("unauthenticated", "Must be signed in.");
     }
     const data = (request.data ?? {}) as Record<string, unknown>;
-    const url = `https://${SPOONACULAR_HOST}/recipes/complexSearch?${searchParams(data)}`;
-
-    let response: Response;
-    try {
-      response = await fetch(url, {
-        headers: {
-          "x-rapidapi-key": spoonacularKey.value(),
-          "x-rapidapi-host": SPOONACULAR_HOST,
-        },
-        signal: AbortSignal.timeout(30_000),
-      });
-    } catch (e) {
-      logger.error("searchRecipes: request failed", e);
-      throw new HttpsError("unavailable", "Recipe search is unavailable.");
-    }
-
-    logger.info("searchRecipes: quota", {
-      uid: request.auth.uid,
-      status: response.status,
-      requestsRemaining: response.headers.get("x-ratelimit-requests-remaining"),
-    });
-    if (response.status === 402 || response.status === 429) {
-      throw new HttpsError("resource-exhausted", "Recipe search quota reached.");
-    }
-    if (!response.ok) {
-      logger.error("searchRecipes: bad status", {status: response.status, body: await response.text()});
-      throw new HttpsError("unavailable", "Recipe search is unavailable.");
-    }
-
-    const body = await response.json();
+    const body = await spoonacularGet("/recipes/complexSearch", searchParams(data), request.auth.uid);
     const recipes = (body.results ?? [])
-      .map(trimRecipe)
+      .map((r: any) => trimRecipe(r))
       .filter((r: unknown) => r !== null);
     logger.info("searchRecipes: done", {total: body.totalResults, returned: recipes.length});
     return {recipes};
+  }
+);
+
+/** Spoonacular requests one user's AI chef may spend a day. The quota is shared by the whole app. */
+const AGENT_DAILY_CAP = 10;
+
+/** Recipes the AI chef asks for per search; it shows a handful at a time. */
+const AGENT_SEARCH_SIZE = 8;
+
+/**
+ * Counts [requests] against the user's daily allowance for the AI chef, in
+ * `agentQuota/{uid}` (server-only: the rules deny every client). Throws
+ * "resource-exhausted" once the day's cap is reached.
+ */
+async function chargeAgentQuota(uid: string, requests: number): Promise<void> {
+  const ref = db.collection("agentQuota").doc(uid);
+  const day = new Date().toISOString().slice(0, 10);
+  await db.runTransaction(async (tx) => {
+    const snap = await tx.get(ref);
+    const count = snap.data()?.day === day ? Number(snap.data()?.count) || 0 : 0;
+    if (count + requests > AGENT_DAILY_CAP) {
+      throw new HttpsError("resource-exhausted", "Daily AI chef recipe quota reached.");
+    }
+    tx.set(ref, {day, count: count + requests});
+  });
+}
+
+/** Full, trimmed recipes for Spoonacular ids (1 request). */
+async function recipesById(ids: number[], uid: string): Promise<Record<string, unknown>[]> {
+  if (ids.length === 0) return [];
+  const params = new URLSearchParams({ids: ids.join(","), includeNutrition: "true"});
+  const body = await spoonacularGet("/recipes/informationBulk", params, uid);
+  return (Array.isArray(body) ? body : [])
+    .map((r: any) => trimRecipe(r))
+    .filter((r): r is Record<string, unknown> => r !== null);
+}
+
+/**
+ * A stable positive id for a recipe imported from [url] that Spoonacular
+ * gave none, so re-importing the same page finds the same recipe.
+ */
+function importedId(url: string): number {
+  let hash = 0x811c9dc5;
+  for (let i = 0; i < url.length; i++) {
+    hash ^= url.charCodeAt(i);
+    hash = Math.imul(hash, 0x01000193) >>> 0;
+  }
+  return 900_000_000 + (hash % 99_999_999);
+}
+
+/**
+ * Everything the AI chef can ask Spoonacular, one action per call, each
+ * capped per user per day (see AGENT_DAILY_CAP):
+ * - search: complexSearch with the profile's constraints, plus
+ *   includeIngredients for "what can I make with…" (1 request)
+ * - similar: recipes like a Spoonacular id, in full (2 requests)
+ * - extract: imports a recipe from a web page (1 request)
+ * - substitutes: replacements for an English ingredient name (1 request)
+ * - winePairing: wines for an English dish or ingredient (1 request)
+ * Recipes come back trimmed, like searchRecipes.
+ */
+export const spoonacular = onCall(
+  {region: REGION, secrets: [spoonacularKey], timeoutSeconds: 60},
+  async (request) => {
+    if (!request.auth) {
+      throw new HttpsError("unauthenticated", "Must be signed in.");
+    }
+    const uid = request.auth.uid;
+    const data = (request.data ?? {}) as Record<string, unknown>;
+    const action = text(data.action);
+
+    switch (action) {
+    case "search": {
+      await chargeAgentQuota(uid, 1);
+      const params = searchParams({number: AGENT_SEARCH_SIZE, ...data});
+      const body = await spoonacularGet("/recipes/complexSearch", params, uid);
+      const recipes = (body.results ?? []).map((r: any) => trimRecipe(r)).filter((r: unknown) => r !== null);
+      logger.info("spoonacular search: done", {uid, returned: recipes.length});
+      return {recipes};
+    }
+    case "similar": {
+      const id = Math.round(Number(data.id));
+      if (!Number.isFinite(id) || id <= 0) throw new HttpsError("invalid-argument", "A Spoonacular id is required.");
+      await chargeAgentQuota(uid, 2);
+      const similar = await spoonacularGet(`/recipes/${id}/similar`, new URLSearchParams({number: "6"}), uid);
+      const ids = (Array.isArray(similar) ? similar : []).map((r: any) => Number(r.id)).filter((i) => i > 0);
+      return {recipes: await recipesById(ids, uid)};
+    }
+    case "extract": {
+      const url = text(data.url);
+      if (!url || !/^https?:\/\//i.test(url)) throw new HttpsError("invalid-argument", "A web address is required.");
+      await chargeAgentQuota(uid, 1);
+      const params = new URLSearchParams({url, analyze: "true", forceExtraction: "true", includeNutrition: "true"});
+      const raw = await spoonacularGet("/recipes/extract", params, uid);
+      const recipe = trimRecipe(raw, {requireImage: false});
+      if (recipe === null) return {recipes: []};
+      // Pages Spoonacular doesn't know get no id; the app needs a positive one.
+      if (!(Number(recipe.id) > 0)) recipe.id = importedId(url);
+      return {recipes: [recipe]};
+    }
+    case "substitutes": {
+      const ingredient = text(data.ingredient);
+      if (!ingredient) throw new HttpsError("invalid-argument", "An ingredient is required.");
+      await chargeAgentQuota(uid, 1);
+      const params = new URLSearchParams({ingredientName: ingredient.slice(0, 60)});
+      const body = await spoonacularGet("/food/ingredients/substitutes", params, uid);
+      return {substitutes: stringList(body.substitutes), message: text(body.message) ?? ""};
+    }
+    case "winePairing": {
+      const food = text(data.food);
+      if (!food) throw new HttpsError("invalid-argument", "A dish or ingredient is required.");
+      await chargeAgentQuota(uid, 1);
+      const params = new URLSearchParams({food: food.slice(0, 60)});
+      const maxPrice = Number(data.maxPrice);
+      if (Number.isFinite(maxPrice) && maxPrice > 0) params.set("maxPrice", String(Math.round(maxPrice)));
+      const body = await spoonacularGet("/food/wine/pairing", params, uid);
+      return {
+        wines: stringList(body.pairedWines),
+        text: text(body.pairingText) ?? "",
+        products: (body.productMatches ?? []).slice(0, 3).map((p: any) => ({title: String(p.title ?? ""), price: String(p.price ?? "")})),
+      };
+    }
+    default:
+      throw new HttpsError("invalid-argument", `Unknown action: ${action}`);
+    }
   }
 );

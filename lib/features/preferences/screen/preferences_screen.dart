@@ -20,6 +20,7 @@ import '../../onboarding/cubit/onboarding_cubit.dart';
 import '../../plan/widget/meals_per_day_options.dart';
 import '../../plan/widget/variety_options.dart';
 import '../cubit/profile_cubit.dart';
+import '../widget/custom_preferences.dart';
 import '../widget/preference_grid.dart';
 
 /// The preferences tab. Every control writes straight through to the profile,
@@ -210,6 +211,18 @@ class PreferencesScreen extends StatelessWidget {
                   iconOf: (a) => a.icon,
                   selected: profile.appliances,
                   onToggle: cubit.toggleAppliance,
+                ),
+                SizedBox(height: 28.h),
+
+                PreferenceSectionHeader(
+                  title: l10n.prefsCustom,
+                  subtitle: l10n.prefsCustomSub,
+                ),
+                SizedBox(height: 14.h),
+                CustomPreferences(
+                  rules: profile.customPreferences,
+                  onAdd: cubit.addCustomPreference,
+                  onRemove: cubit.removeCustomPreference,
                 ),
               ],
             ),

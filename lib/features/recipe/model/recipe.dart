@@ -108,6 +108,24 @@ enum Cuisine {
   static Cuisine? fromId(String? id) => values.where((c) => c.id == id).firstOrNull;
 }
 
+/// How a recipe joined the user's catalogue. Only the [built] ones are dealt
+/// into the week, so adding a recipe never reshuffles it.
+enum RecipeOrigin {
+  /// Fetched by a catalogue build; replaced by the next one.
+  built('built'),
+
+  /// A search result the user put in their week.
+  added('added'),
+
+  /// Written by the AI chef for this user; kept across rebuilds.
+  chef('chef');
+
+  const RecipeOrigin(this.id);
+  final String id;
+
+  static RecipeOrigin fromId(String? id) => values.firstWhere((o) => o.id == id, orElse: () => built);
+}
+
 /// A recipe in the user's catalogue, stored at `users/{uid}/recipes/{id}`.
 class Recipe extends Equatable {
   const Recipe({
@@ -124,6 +142,7 @@ class Recipe extends Equatable {
     required this.steps,
     this.cuisine,
     this.creator,
+    this.origin = RecipeOrigin.built,
   });
 
   final String id;
@@ -152,6 +171,29 @@ class Recipe extends Equatable {
   final List<Ingredient> ingredients;
   final List<String> steps;
 
+  final RecipeOrigin origin;
+
+  /// Written by the AI chef for this user rather than found on Spoonacular.
+  bool get custom => origin == RecipeOrigin.chef;
+
+  /// This recipe as having joined the catalogue by [origin].
+  Recipe withOrigin(RecipeOrigin origin) => Recipe(
+        id: id,
+        title: title,
+        photoUrl: photoUrl,
+        macros: macros,
+        time: time,
+        cookTime: cookTime,
+        price: price,
+        craving: craving,
+        protein: protein,
+        cuisine: cuisine,
+        creator: creator,
+        ingredients: ingredients,
+        steps: steps,
+        origin: origin,
+      );
+
   Map<String, dynamic> toMap() => {
         'title': title,
         'photoUrl': photoUrl,
@@ -165,6 +207,7 @@ class Recipe extends Equatable {
         'creator': creator,
         'ingredients': [for (final i in ingredients) i.toMap()],
         'steps': steps,
+        if (origin != RecipeOrigin.built) 'origin': origin.id,
       };
 
   factory Recipe.fromMap(String id, Map<String, dynamic> map) => Recipe(
@@ -184,11 +227,12 @@ class Recipe extends Equatable {
             if (i is Map) Ingredient.fromMap(Map<String, dynamic>.from(i)),
         ],
         steps: (map['steps'] as List? ?? const []).whereType<String>().toList(),
+        origin: RecipeOrigin.fromId(map['origin'] as String?),
       );
 
   @override
   List<Object?> get props =>
-      [id, title, photoUrl, macros, time, cookTime, price, craving, protein, cuisine, creator, ingredients, steps];
+      [id, title, photoUrl, macros, time, cookTime, price, craving, protein, cuisine, creator, ingredients, steps, origin];
 }
 
 /// Maps a bundled photo key (cuisine tiles, onboarding art) to its asset.

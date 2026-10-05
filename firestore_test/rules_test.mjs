@@ -105,6 +105,16 @@ await check('owner can write their shopping list', () =>
   assertSucceeds(setDoc(doc(db, 'users', UID, 'shopping', 'item-1'), { checked: true })));
 await check('a different user cannot', () =>
   assertFails(setDoc(doc(other, 'users', UID, 'shopping', 'item-1'), { checked: true })));
+await check('owner can write their chat with the AI chef', () =>
+  assertSucceeds(setDoc(doc(db, 'users', UID, 'chat', 'msg-1'), { role: 'user', text: 'Salut' })));
+await check('a different user cannot read it', () =>
+  assertFails(getDoc(doc(other, 'users', UID, 'chat', 'msg-1'))));
+
+console.log('\nagentQuota — server-owned');
+await check('no client can reset their AI chef allowance', () =>
+  assertFails(setDoc(doc(db, 'agentQuota', UID), { day: '2026-10-05', count: 0 })));
+await check('no client can read it either', () =>
+  assertFails(getDoc(doc(db, 'agentQuota', UID))));
 
 console.log('\nreferralCodes');
 await env.withSecurityRulesDisabled(async (ctx) => {

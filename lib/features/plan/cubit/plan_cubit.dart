@@ -9,6 +9,7 @@ import '../../../core/analytics/analytics_service.dart';
 import '../../preferences/cubit/profile_cubit.dart';
 import '../../recipe/cubit/catalogue_cubit.dart';
 import '../../recipe/cubit/recipe_cubit.dart';
+import '../../recipe/model/recipe.dart';
 import '../model/plan_settings.dart';
 import '../model/week_plan.dart';
 import '../service/plan_service.dart';
@@ -80,16 +81,18 @@ class PlanCubit extends Cubit<PlanState> {
   /// "Régénérer le plan": fetches a fresh pool of recipes (Spoonacular, then
   /// Gemini), then deals a new week from it with every swap dropped. If the
   /// fetch fails the current week stays, and the catalogue reports the error.
-  Future<void> regenerate() async {
-    if (state.regenerating) return;
+  /// Returns whether the week was regenerated.
+  Future<bool> regenerate() async {
+    if (state.regenerating) return false;
     emit(state.copyWith(regenerating: true, clearError: true));
     final rebuilt = await _catalogueCubit.build(_profileCubit.state.profile);
-    if (isClosed) return;
+    if (isClosed) return false;
     if (rebuilt) await _apply(PlanSettings(seed: state.settings.seed + 1));
     emit(state.copyWith(regenerating: false));
     if (rebuilt) {
       unawaited(_analytics.capture(AnalyticsEvents.planRegenerated, properties: {'seed': state.settings.seed}));
     }
+    return rebuilt;
   }
 
   /// Swaps the meal in [slotKey] for [recipeId].
@@ -105,7 +108,7 @@ class PlanCubit extends Cubit<PlanState> {
   /// not already in the week — no API call — and returns the updated slot so
   /// the caller can show it.
   Future<PlanSlot?> regenerateMeal(PlanSlot slot) async {
-    final catalogue = _catalogueCubit.state.recipes;
+    final catalogue = _catalogueCubit.state.recipes.where((r) => r.origin == RecipeOrigin.built).toList();
     final inWeek = state.week.slots.map((s) => s.recipe.id).toSet();
     var pool = catalogue.where((r) => !inWeek.contains(r.id)).toList();
     if (pool.isEmpty) pool = catalogue.where((r) => r.id != slot.recipe.id).toList();

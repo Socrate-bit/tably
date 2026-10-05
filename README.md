@@ -71,6 +71,36 @@ For the emulator, put `SPOONACULAR_API_KEY=...` in `functions/.secret.local`
 App Check is not enforced yet, so the Gemini endpoint is reachable by anyone
 holding the app's Firebase config; enable it before release.
 
+### AI chef (chat)
+
+The chef button beside the tab bar opens a chat with an AI chef that can act on
+the whole app. `ChatCubit` runs a Gemini conversation (`gemini-3.5-flash`,
+Firebase AI Logic) with function calling, and the tools in
+`features/chat/tool/` call the same cubit methods a tap would:
+
+- **Reads** (week, preferences, recipes, history, shopping list, store prices)
+  run at once.
+- **Spoonacular** calls (search, "what can I make with…", similar recipes,
+  import from a URL, ingredient substitutes, wine pairing) go through the
+  `spoonacular` Cloud Function, which caps each user at 10 requests a day in
+  `agentQuota/{uid}` so the chat can't spend the app's shared quota.
+- **Changes** (regenerate the week or a meal, swap meals, preferences
+  including the user's own free-text rules, favourites and ratings, the
+  shopping list, writing a recipe or deriving one from another) are shown as
+  cards the user approves or declines; nothing runs before that.
+
+Recipes the chef writes are stored with the catalogue (`origin: chef`) and
+survive rebuilds. Only recipes a build fetched are dealt into the week, so
+adding one never reshuffles it. The user's own rules (`customPreferences`) are
+checked by Gemini as strictly as allergies.
+
+Deploy the function like `searchRecipes`:
+
+```bash
+firebase deploy --only functions:spoonacular --project tably-9f3c2
+gcloud run services update spoonacular --region europe-west1 --project tably-9f3c2 --no-invoker-iam-check
+```
+
 ### Data model
 
 ```
@@ -80,8 +110,11 @@ users/{uid}                     profile: name, household, meals per day, days,
 users/{uid}/plan/week           plan settings: shuffle seed + swapped meals
 users/{uid}/plan/catalogue      key of the preferences the recipes were built for
 users/{uid}/recipes/{id}        Recipe, id = Spoonacular id, text in the user's language
-users/{uid}/shopping/{itemId}   ShoppingItem derived from the week, with its checked state
+users/{uid}/shopping/{itemId}   ShoppingItem derived from the week or added by the user,
+                                with its checked, removed and edited state
 users/{uid}/recipeState/{id}    favourite, cooked, rating, note, viewedAt
+users/{uid}/chat/{messageId}    the conversation with the AI chef and its proposals
+agentQuota/{uid}                the AI chef's Spoonacular requests today (server only)
 ```
 
 The week itself is never stored. `WeekPlanner` derives it from the profile
@@ -92,7 +125,8 @@ the design prototype's algorithm exactly — `test/week_planner_test.dart` check
 
 The shopping list is derived from the week too (`ShoppingListBuilder`): every
 portion eaten, for the whole household, merged per ingredient and grouped by
-aisle. It is rewritten when the week or the household changes; ticks survive.
+aisle. It is rewritten when the week or the household changes; ticks,
+deletions and edits survive, and items the user added are never touched.
 
 ## Architecture
 
@@ -116,6 +150,7 @@ lib/
     recipe/                 recipes tab, filters, favourites, recipe detail,
                             replace sheet, catalogue (Spoonacular + Gemini)
     shopping/               shopping list
+    chat/                   AI chef: chat screen, Gemini session, tools (tool/)
     preferences/            preferences tab, UserProfile
     account/                account tab, auth
     home/                   tab shell

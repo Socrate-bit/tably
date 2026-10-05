@@ -48,4 +48,13 @@ void main() {
     expect(IngredientUnit.fromId('large bunches'), IngredientUnit.piece);
     expect(IngredientUnit.fromId(null), IngredientUnit.piece);
   });
+
+  test('where a recipe came from survives a round trip, and built is the default', () {
+    final recipe = RecipeFixtures.recipes.first;
+    expect(recipe.origin, RecipeOrigin.built);
+    expect(recipe.toMap().containsKey('origin'), isFalse, reason: 'existing documents stay unchanged');
+    final chef = recipe.withOrigin(RecipeOrigin.chef);
+    expect(Recipe.fromMap(chef.id, chef.toMap()), chef);
+    expect(chef.custom, isTrue);
+  });
 }

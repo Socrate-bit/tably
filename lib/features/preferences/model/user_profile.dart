@@ -35,6 +35,7 @@ class UserProfile extends Equatable {
     this.allergies = const {Allergy.none},
     this.proteins = const {Protein.beef, Protein.pork, Protein.chicken},
     this.appliances = const {Appliance.microwave, Appliance.hob},
+    this.customPreferences = const [],
     this.ageRange,
     this.goals = const {},
     this.blockers = const {},
@@ -50,6 +51,10 @@ class UserProfile extends Equatable {
 
   /// Meals planned per cooking day: dinner, then lunch.
   static const maxMealsPerDay = 2;
+
+  /// Bounds on the user's own free-text rules ("no coriander").
+  static const maxCustomPreferences = 10;
+  static const maxCustomPreferenceLength = 80;
 
   /// Longest a cooked dish is kept before it is eaten, in hours.
   static const leftoverHours = 72;
@@ -68,6 +73,10 @@ class UserProfile extends Equatable {
   final Set<Allergy> allergies;
   final Set<Protein> proteins;
   final Set<Appliance> appliances;
+
+  /// The user's own rules in their words ("no coriander", "kids hate
+  /// spicy"), applied as strictly as allergies when recipes are checked.
+  final List<String> customPreferences;
 
   /// Survey answers — captured once during onboarding for personalisation.
   final String? ageRange;
@@ -157,6 +166,7 @@ class UserProfile extends Equatable {
     Set<Allergy>? allergies,
     Set<Protein>? proteins,
     Set<Appliance>? appliances,
+    List<String>? customPreferences,
     String? ageRange,
     Set<String>? goals,
     Set<String>? blockers,
@@ -180,6 +190,7 @@ class UserProfile extends Equatable {
       allergies: allergies ?? this.allergies,
       proteins: proteins ?? this.proteins,
       appliances: appliances ?? this.appliances,
+      customPreferences: customPreferences ?? this.customPreferences,
       ageRange: ageRange ?? this.ageRange,
       goals: goals ?? this.goals,
       blockers: blockers ?? this.blockers,
@@ -207,6 +218,7 @@ class UserProfile extends Equatable {
         'allergies': allergies.map((a) => a.id).toList(),
         'proteins': proteins.map((p) => p.id).toList(),
         'appliances': appliances.map((a) => a.id).toList(),
+        'customPreferences': customPreferences,
         'ageRange': ageRange,
         'goals': goals.toList(),
         'blockers': blockers.toList(),
@@ -257,6 +269,7 @@ class UserProfile extends Equatable {
       allergies: parse('allergies', Allergy.values, (a) => a.id, fallback.allergies),
       proteins: parse('proteins', Protein.values, (p) => p.id, fallback.proteins, allowEmpty: true),
       appliances: parse('appliances', Appliance.values, (a) => a.id, fallback.appliances, allowEmpty: true),
+      customPreferences: (map['customPreferences'] as List? ?? const []).whereType<String>().toList(),
       ageRange: map['ageRange'] as String?,
       goals: strings('goals'),
       blockers: strings('blockers'),
@@ -283,6 +296,7 @@ class UserProfile extends Equatable {
         allergies,
         proteins,
         appliances,
+        customPreferences,
         ageRange,
         goals,
         blockers,
