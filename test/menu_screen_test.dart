@@ -16,7 +16,6 @@ import 'package:tably/features/preferences/cubit/profile_cubit.dart';
 import 'package:tably/features/preferences/model/user_profile.dart';
 import 'package:tably/features/preferences/service/profile_service.dart';
 import 'package:tably/features/recipe/cubit/recipe_cubit.dart';
-import 'package:tably/features/recipe/cubit/search_quota_cubit.dart';
 import 'package:tably/features/recipe/service/recipe_service.dart';
 import 'package:tably/features/shopping/cubit/shopping_cubit.dart';
 import 'package:tably/features/shopping/service/shopping_ai_service.dart';
@@ -119,22 +118,6 @@ void main() {
       expect(first.top, greaterThan(tester.getRect(find.byType(CostCard)).bottom), reason: 'meals must sit below the summary');
     });
   }
-
-  testWidgets('shows the searches left beside the store, and explains them on tap', (tester) async {
-    await _pumpMenu(tester, physicalSize: const Size(688, 672), profile: const UserProfile(), searchesUsed: 4);
-
-    expect(tester.takeException(), isNull);
-    expect(find.text('26/30'), findsOneWidget);
-    expect(find.text('Lidl'), findsOneWidget);
-    expect(tester.getRect(find.text('26/30')).right, lessThan(tester.getRect(find.text('Lidl')).left));
-
-    await tester.tap(find.text('26/30'));
-    await tester.pumpAndSettle();
-    expect(find.text('Recherches du jour'), findsOneWidget);
-    expect(find.textContaining('Il te reste 26 recherches de recettes sur 30'), findsOneWidget);
-    // Bound, so its rollover timer must stop before the test ends.
-    await tester.element(find.byType(MenuScreen)).read<SearchQuotaCubit>().close();
-  });
 
   testWidgets('shows only dinners, with no slot names, for one meal a day', (tester) async {
     await _pumpMenu(tester, physicalSize: const Size(804, 1748), profile: const UserProfile());

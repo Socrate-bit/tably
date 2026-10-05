@@ -124,6 +124,7 @@ class Recipe extends Equatable {
     required this.steps,
     this.cuisine,
     this.creator,
+    this.wished = false,
   });
 
   final String id;
@@ -164,6 +165,10 @@ class Recipe extends Equatable {
 
   /// Credited source, shown over the photo.
   final String? creator;
+
+  /// Whether Gemini found it matches what the user's custom instructions ask
+  /// for, so the week serves it first.
+  final bool wished;
   final List<Ingredient> ingredients;
   final List<String> steps;
 
@@ -178,6 +183,7 @@ class Recipe extends Equatable {
         'protein': protein.id,
         'cuisine': cuisine?.id,
         'creator': creator,
+        'wished': wished,
         'ingredients': [for (final i in ingredients) i.toMap()],
         'steps': steps,
       };
@@ -194,6 +200,7 @@ class Recipe extends Equatable {
         protein: RecipeProtein.fromId(map['protein'] as String?),
         cuisine: Cuisine.fromId(map['cuisine'] as String?),
         creator: map['creator'] as String?,
+        wished: map['wished'] as bool? ?? false,
         ingredients: [
           for (final i in map['ingredients'] as List? ?? const [])
             if (i is Map) Ingredient.fromMap(Map<String, dynamic>.from(i)),
@@ -203,7 +210,7 @@ class Recipe extends Equatable {
 
   @override
   List<Object?> get props =>
-      [id, title, photoUrl, macros, time, cookTime, price, craving, protein, cuisine, creator, ingredients, steps];
+      [id, title, photoUrl, macros, time, cookTime, price, craving, protein, cuisine, creator, wished, ingredients, steps];
 }
 
 /// Maps a bundled photo key (cuisine tiles, onboarding art) to its asset.

@@ -17,7 +17,9 @@ abstract final class WeekPlanner {
     final meals = profile.meals;
     final mealSlots = MealSlot.forMealsPerDay(profile.mealsPerDay);
     if (meals.isEmpty || catalogue.isEmpty) return const WeekPlan();
-    final shuffled = _shuffle(catalogue, settings.seed);
+    // Dishes matching the custom instructions come first, still shuffled.
+    final mixed = _shuffle(catalogue, settings.seed);
+    final shuffled = [...mixed.where((r) => r.wished), ...mixed.where((r) => !r.wished)];
     // Swaps may name a saved favourite that has left the catalogue; the
     // shuffle itself only ever draws from the catalogue.
     Recipe? byId(String? id) => id == null

@@ -102,6 +102,19 @@ void main() {
       expect(search.calls, hasLength(1));
     });
 
+    test('searches first for what the custom instructions ask for', () async {
+      await profile.setCustomInstructions('plus de poisson');
+      service.keys.add((key: null, keptKey: null));
+      await settle();
+      expect(search.calls.single.wish, 'wish:plus de poisson');
+    });
+
+    test('searches plainly without custom instructions', () async {
+      service.keys.add((key: null, keptKey: null));
+      await settle();
+      expect(search.calls.single.wish, isNull);
+    });
+
     test('asks instead of rebuilding, and only for what the recipes depend on', () async {
       service.keys.add((key: CatalogueCubit.keyFor(profile.state.profile), keptKey: null));
       await settle();

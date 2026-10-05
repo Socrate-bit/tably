@@ -64,6 +64,7 @@ class FakeSearch extends RecipeSearchService {
     String? query,
     Set<Cuisine> cuisines,
     Craving? craving,
+    String? wish,
   })>[];
 
   @override
@@ -73,8 +74,9 @@ class FakeSearch extends RecipeSearchService {
     String? query,
     Set<Cuisine> cuisines = const {},
     Craving? craving,
+    String? wish,
   }) async {
-    calls.add((profile: profile, number: number, query: query, cuisines: cuisines, craving: craving));
+    calls.add((profile: profile, number: number, query: query, cuisines: cuisines, craving: craving, wish: wish));
     // Candidate i costs i € per portion.
     return [for (var i = 0; i < number; i++) {'id': i, 'price': i}];
   }
@@ -95,6 +97,9 @@ class FakeAi extends RecipeAiService {
 
   @override
   Future<String> toEnglish(String text, String languageCode) async => 'en:$text';
+
+  @override
+  Future<String?> wishQuery(String instructions) async => 'wish:$instructions';
 
   @override
   Future<({List<Recipe> recipes, int rejected})> adapt(List<Map<String, dynamic>> raw, UserProfile profile) async {

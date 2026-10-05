@@ -177,7 +177,8 @@ class CatalogueCubit extends Cubit<CatalogueState> {
     });
   }
 
-  /// 1. Searches Spoonacular (one of the user's daily searches)
+  /// 1. Searches Spoonacular (one of the user's daily searches), favouring
+  ///    what the custom instructions ask for
   /// 2. Has Gemini drop what breaks a constraint and translate the rest
   /// 3. Replaces the stored catalogue, which the plan then reads
   Future<bool> _run(UserProfile profile, String key) async {
@@ -186,7 +187,7 @@ class CatalogueCubit extends Cubit<CatalogueState> {
     emit(state.copyWith(status: CatalogueStatus.building, step: CatalogueStep.searching, clearError: true));
     try {
       _quota.ensureAvailable();
-      final raw = await _search.search(profile, number: poolSize);
+      final raw = await _search.search(profile, number: poolSize, wish: await _wish(profile));
       if (superseded()) return false;
       emit(state.copyWith(step: CatalogueStep.adapting));
 
@@ -225,6 +226,18 @@ class CatalogueCubit extends Cubit<CatalogueState> {
         error: e,
       ));
       return false;
+    }
+  }
+
+  /// The English search for what the custom instructions ask for, or null.
+  /// A failure only loses the preference, never the build.
+  Future<String?> _wish(UserProfile profile) async {
+    if (profile.customInstructions.isEmpty) return null;
+    try {
+      return await _ai.wishQuery(profile.customInstructions);
+    } catch (e) {
+      debugPrint('[CatalogueCubit] wish query failed: $e');
+      return null;
     }
   }
 

@@ -102,7 +102,8 @@ class PlanCubit extends Cubit<PlanState> {
   }
 
   /// Swaps the meal in [slot] for a random dish from the cached pool that is
-  /// not already in the week — no API call — and returns the updated slot so
+  /// not already in the week, preferring one matching the custom
+  /// instructions — no API call — and returns the updated slot so
   /// the caller can show it.
   Future<PlanSlot?> regenerateMeal(PlanSlot slot) async {
     final catalogue = _catalogueCubit.state.recipes;
@@ -110,6 +111,7 @@ class PlanCubit extends Cubit<PlanState> {
     var pool = catalogue.where((r) => !inWeek.contains(r.id)).toList();
     if (pool.isEmpty) pool = catalogue.where((r) => r.id != slot.recipe.id).toList();
     if (pool.isEmpty) return null;
+    if (pool.any((r) => r.wished)) pool = pool.where((r) => r.wished).toList();
     final recipeId = pool[Random().nextInt(pool.length)].id;
 
     await _apply(state.settings.copyWith(overrides: {...state.settings.overrides, slot.key: recipeId}));

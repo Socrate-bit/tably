@@ -85,6 +85,27 @@ class RecipeAiService {
     return english.isEmpty ? text : english;
   }
 
+  /// Turns the user's custom [instructions] into a short English search for
+  /// what they want more of, e.g. "plus de poisson" → "fish". Null when they
+  /// only rule things out, since those are left to the check.
+  Future<String?> wishQuery(String instructions) async {
+    final gemini = FirebaseAI.googleAI().generativeModel(
+      model: model,
+      generationConfig: GenerationConfig(temperature: 0),
+      systemInstruction: Content.system(
+        'These are a user\'s instructions for their weekly dinners. If they ask '
+        'for more of a dish, ingredient or cuisine, reply with one or two '
+        'English words to search recipes for it, e.g. "fish" or "curry". '
+        'Ignore anything they want to avoid. Reply none if they ask for '
+        'nothing to search for. No quotes or punctuation.',
+      ),
+    );
+    final response = await gemini.generateContent([Content.text(instructions)]);
+    final query = response.text?.trim().toLowerCase() ?? '';
+    debugPrint('[RecipeAiService] wish "$instructions" → "$query"');
+    return query.isEmpty || query == 'none' ? null : query;
+  }
+
   /// One Gemini call. Returns the decoded answer, or the error so a single
   /// failed chunk doesn't sink the whole build.
   Future<Object> _ask(GenerativeModel gemini, List<Map<String, dynamic>> chunk) async {
@@ -158,6 +179,7 @@ class RecipeAiService {
       protein: RecipeProtein.fromId(kept['protein'] as String?),
       cuisine: Cuisine.fromId(kept['cuisine'] as String?),
       creator: source['sourceName'] as String?,
+      wished: kept['wished'] as bool? ?? false,
       ingredients: [
         for (final i in (source['ingredients'] as List? ?? const []).cast<Map<String, dynamic>>())
           () {
@@ -255,6 +277,11 @@ ${halal ? '  Halal means no pork and no alcohol.\n' : ''}''';
         ? ''
         : '''- It clearly goes against the user's own instructions: "${profile.customInstructions}"
 ''';
+    final wished = profile.customInstructions.isEmpty
+        ? ''
+        : '''- wished: true only if the recipe is clearly what the user's own
+  instructions ask for, else false.
+''';
     final time = profile.hasCookLimit
         ? '''- It takes clearly longer than ${profile.cookMinutes} minutes in total, counting
   marinating, resting, simmering and roasting.
@@ -290,7 +317,7 @@ When unsure about a diet or an allergen, reject.
 - protein: the main protein: beef, pork, chicken, fish (includes seafood),
   tofu, or vegetarian for anything else meat-free.
 - cuisine: italian, asian, mexican, indian, mediterranean, or none.
-''';
+$wished''';
   }
 
   static final _schema = Schema.object(
@@ -316,7 +343,9 @@ When unsure about a diet or an allergen, reject.
               ),
             ),
             'steps': Schema.array(items: Schema.string()),
+            'wished': Schema.boolean(),
           },
+          optionalProperties: ['wished'],
         ),
       ),
       'rejected': Schema.array(
