@@ -8,8 +8,8 @@ import 'chat_tools.dart';
 import 'tool_payloads.dart';
 
 /// Spoonacular, through the `spoonacular` Cloud Function. Each call spends
-/// the user's small daily allowance, so the prompt has the model look in
-/// their own recipes first.
+/// one of the user's daily searches, so none runs once they are gone, and
+/// the prompt has the model look in their own recipes first.
 List<ChatTool> spoonacularTools(ChatTools t) {
   /// Has Gemini check found recipes against the user's rules and translate
   /// them, as for the catalogue, then keeps them for later calls.
@@ -47,6 +47,7 @@ List<ChatTool> spoonacularTools(ChatTools t) {
         optionalParameters: ['query', 'include_ingredients', 'cuisine', 'craving', 'protein'],
       ),
       run: (args, context) async {
+        t.quota.ensureAvailable();
         final cuisine = Cuisine.fromId(args.string('cuisine'));
         final raw = await t.search.agentSearch(
           t.profile.state.profile,
@@ -67,6 +68,7 @@ List<ChatTool> spoonacularTools(ChatTools t) {
         parameters: {'recipe_id': Schema.string()},
       ),
       run: (args, context) async {
+        t.quota.ensureAvailable();
         final id = int.tryParse(args.string('recipe_id') ?? '');
         if (id == null || id <= 0) return const ToolResult({'error': 'not_a_spoonacular_recipe'});
         return found(await t.search.similar(id), context);
@@ -81,6 +83,7 @@ List<ChatTool> spoonacularTools(ChatTools t) {
         parameters: {'url': Schema.string(description: 'The full https:// address.')},
       ),
       run: (args, context) async {
+        t.quota.ensureAvailable();
         final url = args.string('url');
         if (url == null || Uri.tryParse(url)?.hasScheme != true) return const ToolResult({'error': 'invalid_url'});
         final raw = await t.search.extract(url);
@@ -97,6 +100,7 @@ List<ChatTool> spoonacularTools(ChatTools t) {
         parameters: {'ingredient': Schema.string(description: 'In English, e.g. "butter".')},
       ),
       run: (args, context) async {
+        t.quota.ensureAvailable();
         final ingredient = args.string('ingredient');
         if (ingredient == null) return const ToolResult({'error': 'missing_ingredient'});
         return ToolResult(await t.search.substitutes(ingredient));
@@ -115,6 +119,7 @@ List<ChatTool> spoonacularTools(ChatTools t) {
         optionalParameters: ['max_price_usd'],
       ),
       run: (args, context) async {
+        t.quota.ensureAvailable();
         final food = args.string('food');
         if (food == null) return const ToolResult({'error': 'missing_food'});
         return ToolResult(await t.search.winePairing(food, maxPrice: args.number('max_price_usd')));

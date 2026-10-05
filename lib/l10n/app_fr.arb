@@ -812,5 +812,18 @@
         "type": "String"
       }
     }
+  },
+  "chatActMemory": "Mettre à jour ma mémoire",
+  "chatDetailMemoryCleared": "Tout oublier",
+  "chatDetailMemoryWas": "Avant : {text}",
+  "chatMemoryTitle": "Mémoire du chef",
+  "chatMemorySub": "Ce que le chef retient de toi. Il s'en sert pour te répondre et choisir tes recettes ; tu peux le modifier.",
+  "chatQuotaReached": "Tu as utilisé toutes tes recherches du jour : le chef revient quand elles se rechargent. Touche pour voir quand.",
+  "@chatDetailMemoryWas": {
+    "placeholders": {
+      "text": {
+        "type": "String"
+      }
+    }
   }
 }

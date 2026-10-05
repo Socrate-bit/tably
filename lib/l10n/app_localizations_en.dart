@@ -1518,4 +1518,26 @@ class AppL10nEn extends AppL10n {
   String chatFieldChange(String field, String change) {
     return '$field: $change';
   }
+
+  @override
+  String get chatActMemory => 'Update my memory';
+
+  @override
+  String get chatDetailMemoryCleared => 'Forget everything';
+
+  @override
+  String chatDetailMemoryWas(String text) {
+    return 'Before: $text';
+  }
+
+  @override
+  String get chatMemoryTitle => 'Chef\'s memory';
+
+  @override
+  String get chatMemorySub =>
+      'What the chef remembers about you. It uses it to answer and to pick your recipes; you can edit it.';
+
+  @override
+  String get chatQuotaReached =>
+      'You\'ve used all of today\'s searches: the chef is back when they reset. Tap to see when.';
 }

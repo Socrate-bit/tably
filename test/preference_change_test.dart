@@ -38,14 +38,15 @@ void main() {
     expect(PreferenceChange.of(profile, {'language': 'de'}).error, contains('language'));
   });
 
-  test('custom instructions and the time limit are set as on the screen', () {
-    final change = PreferenceChange.of(profile, {'custom_instructions': '  pas de coriandre ', 'cook_minutes': 30});
-    expect(change.next.customInstructions, 'pas de coriandre');
+  test('the time limit is set within the slider\'s range', () {
+    final change = PreferenceChange.of(profile, {'cook_minutes': 30});
     expect(change.next.cookMinutes, 30);
-    expect(change.changes['custom_instructions'], {'from': '', 'to': 'pas de coriandre'});
-
-    expect(PreferenceChange.of(profile, {'custom_instructions': 'x' * 301}).error, isNotNull);
+    expect(change.changes['cook_minutes'], {'from': UserProfile.cookMinutesCeiling, 'to': 30});
     expect(PreferenceChange.of(profile, {'cook_minutes': 5}).error, contains('cook_minutes'));
+  });
+
+  test('custom instructions are left to update_memory', () {
+    expect(PreferenceChange.of(profile, {'custom_instructions': 'pas de coriandre'}).changes, isEmpty);
   });
 
   test('nothing to change gives no changes', () {

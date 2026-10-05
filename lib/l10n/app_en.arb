@@ -579,5 +579,11 @@
   "chatDetailInMeal": "And put it on {day}'s menu",
   "chatActDeriveRecipe": "Your version of \"{title}\"",
   "chatDetailReplaceInWeek": "It replaces the original in your week.",
-  "chatFieldChange": "{field}: {change}"
+  "chatFieldChange": "{field}: {change}",
+  "chatActMemory": "Update my memory",
+  "chatDetailMemoryCleared": "Forget everything",
+  "chatDetailMemoryWas": "Before: {text}",
+  "chatMemoryTitle": "Chef's memory",
+  "chatMemorySub": "What the chef remembers about you. It uses it to answer and to pick your recipes; you can edit it.",
+  "chatQuotaReached": "You've used all of today's searches: the chef is back when they reset. Tap to see when."
 }

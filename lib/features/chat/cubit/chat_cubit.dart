@@ -93,9 +93,11 @@ class ChatCubit extends Cubit<ChatState> {
     unawaited(_analytics.capture(AnalyticsEvents.chatOpened));
   }
 
+  /// Sends the user's message, unless today's searches are all spent: the
+  /// chat then waits for them to come back.
   Future<void> send(String text) async {
     final message = text.trim();
-    if (message.isEmpty || state.busy) return;
+    if (message.isEmpty || state.busy || _tools.quota.state.remaining == 0) return;
     _start();
     await _put(ChatMessage(id: _newId(), role: ChatRole.user, at: DateTime.now(), text: message));
     unawaited(_analytics.capture(AnalyticsEvents.chatMessageSent, properties: {'length': message.length}));
@@ -105,7 +107,7 @@ class ChatCubit extends Cubit<ChatState> {
   /// Sends the last message again after a failure.
   Future<void> retry() async {
     final last = state.messages.where((m) => m.role == ChatRole.user).lastOrNull;
-    if (last == null || state.busy) return;
+    if (last == null || state.busy || _tools.quota.state.remaining == 0) return;
     _start();
     await _run(() => _agent.send(last.text), round: 0);
   }

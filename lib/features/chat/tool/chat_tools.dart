@@ -7,6 +7,7 @@ import '../../plan/cubit/plan_cubit.dart';
 import '../../preferences/cubit/profile_cubit.dart';
 import '../../recipe/cubit/catalogue_cubit.dart';
 import '../../recipe/cubit/recipe_cubit.dart';
+import '../../recipe/cubit/search_quota_cubit.dart';
 import '../../recipe/model/recipe.dart';
 import '../../recipe/service/recipe_ai_service.dart';
 import '../../recipe/service/recipe_search_service.dart';
@@ -30,6 +31,7 @@ class ChatTools {
     required this.shopping,
     required this.search,
     required this.ai,
+    required this.quota,
     required this.analytics,
   });
 
@@ -40,6 +42,9 @@ class ChatTools {
   final ShoppingCubit shopping;
   final RecipeSearchService search;
   final RecipeAiService ai;
+
+  /// The user's daily recipe searches, which chat searches spend too.
+  final SearchQuotaCubit quota;
   final AnalyticsService analytics;
 
   late final List<ChatTool> all = [
@@ -72,7 +77,7 @@ class ChatTools {
   /// A short, stable reason for a failure, which the model explains to the
   /// user in their language.
   static String reasonFor(Object error) => switch (error) {
-    FirebaseFunctionsException(code: 'resource-exhausted') => 'quota_exhausted',
+    SearchLimitException() || FirebaseFunctionsException(code: 'resource-exhausted') => 'quota_exhausted',
     FirebaseFunctionsException(code: 'invalid-argument') => 'invalid_request',
     FirebaseFunctionsException() => 'recipe_service_unavailable',
     FirebaseAIException() => 'ai_unavailable',

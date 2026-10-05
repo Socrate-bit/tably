@@ -81,6 +81,7 @@ void main() {
       profileCubit: profile,
       analytics: analytics,
     );
+    final quota = unboundQuota(profile);
     await profile.completeOnboarding(const UserProfile());
     await tester.pump();
 
@@ -124,6 +125,7 @@ void main() {
         },
       ),
       ('share_shopping_list', {}),
+      ('update_memory', {'text': 'Pas de coriandre. Les enfants détestent le piquant.'}),
       ('create_custom_recipe', {'request': 'des pâtes crémeuses', 'slot_key': first.key}),
       ('derive_recipe', {'recipe_id': first.recipe.id, 'changes': "à l'huile d'olive", 'replace_in_week': true}),
     ];
@@ -144,11 +146,12 @@ void main() {
         shopping: shopping,
         search: FakeSearch(),
         ai: _WriterAi(),
+        quota: quota,
         analytics: analytics,
       ),
       analytics: analytics,
     );
-    for (final c in [chat, shopping, plan, recipes, catalogue, profile]) {
+    for (final c in [chat, shopping, plan, recipes, catalogue, quota, profile]) {
       addTearDown(c.close);
     }
 
@@ -160,6 +163,7 @@ void main() {
           BlocProvider.value(value: recipes),
           BlocProvider.value(value: plan),
           BlocProvider.value(value: shopping),
+          BlocProvider.value(value: quota),
           BlocProvider.value(value: chat),
         ],
         child: ScreenUtilInit(

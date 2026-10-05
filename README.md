@@ -89,6 +89,15 @@ Firebase AI Logic) with function calling, and the tools in
   shopping list, writing a recipe or deriving one from another) are shown as
   cards the user approves or declines; nothing runs before that.
 
+The user's custom instructions are the chef's **memory**: it reads them in
+every conversation and proposes `update_memory` (a confirmation card, like
+any change) when the user shares something lasting. The 🧠 button in the
+chat shows and edits the same text as Preferences.
+
+The chat follows the daily search quota: once today's searches are spent the
+message box gives way to a notice until they reset, and Spoonacular tools
+check the quota before calling.
+
 Recipes the chef writes are stored with the catalogue (`origin: chef`) and
 survive rebuilds. Only recipes a build fetched are dealt into the week, so
 adding one never reshuffles it. Written recipes follow the user's custom

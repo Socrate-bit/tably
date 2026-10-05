@@ -5,6 +5,7 @@ import 'package:tably/features/chat/cubit/chat_cubit.dart';
 import 'package:tably/features/chat/model/chat_message.dart';
 import 'package:tably/features/chat/service/chat_agent_service.dart';
 import 'package:tably/features/chat/service/chat_service.dart';
+import 'package:tably/features/chat/tool/chat_tool.dart';
 import 'package:tably/features/chat/tool/chat_tools.dart';
 import 'package:tably/features/plan/cubit/plan_cubit.dart';
 import 'package:tably/features/plan/service/plan_service.dart';
@@ -12,6 +13,8 @@ import 'package:tably/features/preferences/cubit/profile_cubit.dart';
 import 'package:tably/features/preferences/model/user_profile.dart';
 import 'package:tably/features/preferences/service/profile_service.dart';
 import 'package:tably/features/recipe/cubit/recipe_cubit.dart';
+import 'package:tably/features/recipe/cubit/search_quota_cubit.dart';
+import 'package:tably/features/recipe/model/recipe.dart';
 import 'package:tably/features/recipe/service/recipe_service.dart';
 import 'package:tably/features/shopping/cubit/shopping_cubit.dart';
 import 'package:tably/features/shopping/service/shopping_ai_service.dart';
@@ -52,6 +55,10 @@ class _FakeAgent extends ChatAgentService {
   }
 }
 
+const _noContext = ToolContext(recipe: _none, remember: _ignore, show: _ignore);
+Recipe? _none(String id) => null;
+void _ignore(List<Recipe> recipes) {}
+
 AgentReply _calls(List<FunctionCall> calls) => (text: '', calls: calls);
 AgentReply _text(String text) => (text: text, calls: const []);
 
@@ -61,9 +68,13 @@ void main() {
   late ProfileCubit profile;
   late PlanCubit plan;
 
-  Future<(ChatCubit, _FakeAgent)> build(List<AgentReply> replies) async {
+  late ChatTools tools;
+
+  Future<(ChatCubit, _FakeAgent)> build(List<AgentReply> replies, {int searchesUsed = 0}) async {
     const analytics = AnalyticsService();
     profile = ProfileCubit(service: ProfileService(), analytics: analytics);
+    final quota = searchesUsed == 0 ? unboundQuota(profile) : await spentQuota(profile, used: searchesUsed);
+
     final catalogue = seededCatalogue(profile);
     final recipes = RecipeCubit(service: RecipeService(), analytics: analytics);
     plan = PlanCubit(
@@ -84,7 +95,7 @@ void main() {
     final chat = ChatCubit(
       service: ChatService(),
       agent: agent,
-      tools: ChatTools(
+      tools: tools = ChatTools(
         profile: profile,
         catalogue: catalogue,
         plan: plan,
@@ -92,11 +103,12 @@ void main() {
         shopping: shopping,
         search: FakeSearch(),
         ai: FakeAi(),
+        quota: quota,
         analytics: analytics,
       ),
       analytics: analytics,
     );
-    for (final c in [chat, shopping, plan, recipes, catalogue, profile]) {
+    for (final c in [chat, shopping, plan, recipes, catalogue, quota, profile]) {
       addTearDown(c.close);
     }
     await profile.completeOnboarding(const UserProfile(household: 2));
@@ -165,12 +177,12 @@ void main() {
     final (chat, agent) = await build([
       _calls([
         const FunctionCall('get_preferences', {}, id: '1'),
-        const FunctionCall('set_preferences', {'household': 3, 'custom_instructions': 'pas de coriandre'}, id: '2'),
+        const FunctionCall('set_preferences', {'household': 3, 'cook_minutes': 30}, id: '2'),
       ]),
       _text('Noté.'),
     ]);
 
-    await chat.send('On est 3, et pas de coriandre');
+    await chat.send('On est 3, et 30 minutes max');
     expect(chat.state.status, ChatStatus.confirming);
     await chat.approve(chat.state.messages.last.id);
 
@@ -179,7 +191,7 @@ void main() {
     expect(answers.first.response['household'], 2);
     expect(answers.last.response['ok'], true);
     expect(profile.state.profile.household, 3);
-    expect(profile.state.profile.customInstructions, 'pas de coriandre');
+    expect(profile.state.profile.cookMinutes, 30);
   });
 
   test('made-up ids and tools are answered with an error, without a card', () async {
@@ -221,5 +233,49 @@ void main() {
 
     expect(chat.state.status, ChatStatus.failed);
     expect(chat.state.error, isA<ChatLoopException>());
+  });
+
+  test('the memory is rewritten whole, only once the user approves', () async {
+    final (chat, agent) = await build([
+      _calls([const FunctionCall('update_memory', {'text': 'Pas de coriandre. Les enfants détestent le piquant.'}, id: 'm')]),
+      _text('Je retiens.'),
+    ]);
+    await profile.setCustomInstructions('Pas de coriandre.');
+
+    await chat.send('Mes enfants détestent le piquant');
+    final card = chat.state.messages.last;
+    expect(card.action!.preview, {'from': 'Pas de coriandre.', 'to': 'Pas de coriandre. Les enfants détestent le piquant.'});
+    expect(profile.state.profile.customInstructions, 'Pas de coriandre.');
+
+    await chat.approve(card.id);
+    expect(profile.state.profile.customInstructions, 'Pas de coriandre. Les enfants détestent le piquant.');
+    expect(answersAt(agent, 1).single.response['memory'], 'Pas de coriandre. Les enfants détestent le piquant.');
+  });
+
+  test('a memory over the limit is sent back to be shortened', () async {
+    final (chat, agent) = await build([
+      _calls([FunctionCall('update_memory', {'text': 'x' * (UserProfile.customInstructionsMax + 1)}, id: 'm')]),
+      _text('Je raccourcis.'),
+    ]);
+    await chat.send('Retiens tout ça');
+    expect(answersAt(agent, 1).single.response['error'], 'too_long');
+    expect(chat.state.messages.where((m) => m.role == ChatRole.action), isEmpty);
+  });
+
+  test('no message goes out once the day\'s searches are spent', () async {
+    final (chat, agent) = await build([_text('Salut')], searchesUsed: 30);
+
+    await chat.send('Bonjour');
+
+    expect(agent.sent, isEmpty);
+    expect(chat.state.messages, isEmpty);
+  });
+
+  test('a Spoonacular tool never runs without a search left', () async {
+    await build(const [], searchesUsed: 30);
+    final search = tools.byName['search_recipes']!;
+
+    await expectLater(search.run(const {'query': 'curry'}, _noContext), throwsA(isA<SearchLimitException>()));
+    expect(ChatTools.reasonFor(const SearchLimitException()), 'quota_exhausted');
   });
 }

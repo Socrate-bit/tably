@@ -8,10 +8,15 @@ import '../../../core/util/haptics.dart';
 import '../../../core/widget/circle_icon_button.dart';
 import '../../../core/widget/input_bar.dart';
 import '../../../core/widget/sub_screen_header.dart';
+import '../../../core/widget/surface_card.dart';
 import '../../../l10n/app_localizations.dart';
+import '../../recipe/cubit/search_quota_cubit.dart';
+import '../../recipe/widget/quota_dialog.dart';
+import '../../recipe/widget/search_quota_badge.dart';
 import '../cubit/chat_cubit.dart';
 import '../model/chat_message.dart';
 import '../widget/action_card.dart';
+import '../widget/memory_sheet.dart';
 import '../widget/message_bubble.dart';
 import '../widget/starter_prompts.dart';
 import '../widget/typing_indicator.dart';
@@ -83,6 +88,7 @@ class _ChatScreenState extends State<ChatScreen> {
             cubit.errorShown();
           },
           builder: (context, state) {
+            final spent = context.select<SearchQuotaCubit, bool>((c) => c.state.remaining == 0);
             // Newest at the bottom, as the list is reversed.
             final items = <Widget>[
               if (state.status == ChatStatus.thinking) TypingIndicator(activity: state.activity),
@@ -97,9 +103,18 @@ class _ChatScreenState extends State<ChatScreen> {
                     eyebrow: l10n.chatEyebrow,
                     title: l10n.chatTitle,
                     onBack: () => Navigator.of(context).pop(),
-                    trailing: state.messages.isEmpty
-                        ? null
-                        : CircleIconButton(glyph: '🗑', fontSize: 16, onPressed: () => _confirmClear(context)),
+                    trailing: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const SearchQuotaBadge(),
+                        SizedBox(width: 8.w),
+                        CircleIconButton(glyph: '🧠', fontSize: 16, onPressed: () => MemorySheet.show(context)),
+                        if (state.messages.isNotEmpty) ...[
+                          SizedBox(width: 8.w),
+                          CircleIconButton(glyph: '🗑', fontSize: 16, onPressed: () => _confirmClear(context)),
+                        ],
+                      ],
+                    ),
                   ),
                 ),
                 Expanded(
@@ -115,13 +130,16 @@ class _ChatScreenState extends State<ChatScreen> {
                 ),
                 Padding(
                   padding: EdgeInsets.fromLTRB(AppDimens.pageH, 8.h, AppDimens.pageH, 12.h),
-                  child: InputBar(
-                    hint: state.status == ChatStatus.confirming ? l10n.chatConfirmHint : l10n.chatHint,
-                    glyph: '↑',
-                    multiline: true,
-                    enabled: !state.busy,
-                    onSubmitted: cubit.send,
-                  ),
+                  // No searches left today means no messages either, until midnight UTC.
+                  child: spent
+                      ? const _QuotaReached()
+                      : InputBar(
+                          hint: state.status == ChatStatus.confirming ? l10n.chatConfirmHint : l10n.chatHint,
+                          glyph: '↑',
+                          multiline: true,
+                          enabled: !state.busy,
+                          onSubmitted: cubit.send,
+                        ),
                 ),
               ],
             );
@@ -140,6 +158,27 @@ class _MessageItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) =>
       message.role == ChatRole.action ? ActionCard(message: message) : MessageBubble(message: message);
+}
+
+/// Stands in for the message box once today's searches are spent; tapping
+/// explains when they come back.
+class _QuotaReached extends StatelessWidget {
+  const _QuotaReached();
+
+  @override
+  Widget build(BuildContext context) {
+    return SurfaceCard(
+      radius: AppDimens.radiusTile,
+      color: AppColors.brandSoft,
+      borderColor: AppColors.brandSoftBorder,
+      padding: EdgeInsets.symmetric(horizontal: 18.w, vertical: 14.h),
+      onTap: () {
+        context.read<SearchQuotaCubit>().opened();
+        QuotaDialog.show(context);
+      },
+      child: Text(AppL10n.of(context).chatQuotaReached, style: AppTextStyles.body.copyWith(color: AppColors.brandSoftInk)),
+    );
+  }
 }
 
 /// Shown in place of the chef's answer when a turn failed.

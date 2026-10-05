@@ -149,6 +149,7 @@ class TablyApp extends StatelessWidget {
                 shopping: context.read<ShoppingCubit>(),
                 search: context.read<RecipeSearchService>(),
                 ai: context.read<RecipeAiService>(),
+                quota: context.read<SearchQuotaCubit>(),
                 analytics: analytics,
               ),
               analytics: analytics,

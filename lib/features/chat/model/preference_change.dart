@@ -79,10 +79,6 @@ class PreferenceChange {
     if (language != null && !AppL10n.supportedLocales.any((l) => l.languageCode == language)) {
       throw FormatException('language: unsupported "$language"');
     }
-    final instructions = (args['custom_instructions'] as String?)?.trim();
-    if (instructions != null && instructions.length > UserProfile.customInstructionsMax) {
-      throw FormatException('custom_instructions: ${UserProfile.customInstructionsMax} characters at most');
-    }
     final store = args['store'] as String?;
     if (store != null && !Store.values.any((s) => s.id == store)) throw FormatException('store: unknown "$store"');
 
@@ -102,7 +98,6 @@ class PreferenceChange {
       appliances: pick('appliances', Appliance.values, (a) => a.id),
       // The slider's ceiling means no limit.
       cookMinutes: whole('cook_minutes', UserProfile.cookMinutesFloor, UserProfile.cookMinutesCeiling),
-      customInstructions: instructions,
     );
   }
 
@@ -138,7 +133,6 @@ class PreferenceChange {
     list('proteins', from.proteins.map((p) => p.id), to.proteins.map((p) => p.id));
     list('appliances', from.appliances.map((a) => a.id), to.appliances.map((a) => a.id));
     value('cook_minutes', from.cookMinutes, to.cookMinutes);
-    value('custom_instructions', from.customInstructions, to.customInstructions);
     return changes;
   }
 }

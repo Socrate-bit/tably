@@ -113,6 +113,13 @@ class ActionCard extends StatelessWidget {
           for (final name in list(preview['uncheck'])) '○ $name',
         ],
       ),
+      'update_memory' => (
+          l10n.chatActMemory,
+          [
+            '${preview['to']}'.isEmpty ? l10n.chatDetailMemoryCleared : '${preview['to']}',
+            if ('${preview['from']}'.isNotEmpty) l10n.chatDetailMemoryWas('${preview['from']}'),
+          ],
+        ),
       'share_shopping_list' => (l10n.chatActShare, const []),
       'create_custom_recipe' => (
         l10n.chatActCreateRecipe,
@@ -137,7 +144,7 @@ class ActionCard extends StatelessWidget {
       ('store', _) => Store.fromId('$value').displayName,
       ('language', _) => languageFor('$value').name,
       ('cook_minutes', final num n) => n >= UserProfile.cookMinutesCeiling ? l10n.cookTimeNoLimit : l10n.cookTimeMinutes('${n.toInt()}'),
-          ('name' || 'household' || 'custom_instructions', _) => '$value',
+          ('name' || 'household', _) => '$value',
       _ => l10n.optionLabel('$value'),
     };
     final name = switch (field) {
@@ -155,7 +162,6 @@ class ActionCard extends StatelessWidget {
       'proteins' => l10n.prefsProteins,
       'appliances' => l10n.prefsAppliances,
       'cook_minutes' => l10n.cookTimeTitle,
-      'custom_instructions' => l10n.prefsCustomInstructions,
       _ => field,
     };
     if (change.containsKey('from')) return l10n.chatFieldChange(name, '${label(change['from'])} → ${label(change['to'])}');

@@ -2682,6 +2682,42 @@ abstract class AppL10n {
   /// In fr, this message translates to:
   /// **'{field} : {change}'**
   String chatFieldChange(String field, String change);
+
+  /// No description provided for @chatActMemory.
+  ///
+  /// In fr, this message translates to:
+  /// **'Mettre à jour ma mémoire'**
+  String get chatActMemory;
+
+  /// No description provided for @chatDetailMemoryCleared.
+  ///
+  /// In fr, this message translates to:
+  /// **'Tout oublier'**
+  String get chatDetailMemoryCleared;
+
+  /// No description provided for @chatDetailMemoryWas.
+  ///
+  /// In fr, this message translates to:
+  /// **'Avant : {text}'**
+  String chatDetailMemoryWas(String text);
+
+  /// No description provided for @chatMemoryTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Mémoire du chef'**
+  String get chatMemoryTitle;
+
+  /// No description provided for @chatMemorySub.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ce que le chef retient de toi. Il s\'en sert pour te répondre et choisir tes recettes ; tu peux le modifier.'**
+  String get chatMemorySub;
+
+  /// No description provided for @chatQuotaReached.
+  ///
+  /// In fr, this message translates to:
+  /// **'Tu as utilisé toutes tes recherches du jour : le chef revient quand elles se rechargent. Touche pour voir quand.'**
+  String get chatQuotaReached;
 }
 
 class _AppL10nDelegate extends LocalizationsDelegate<AppL10n> {

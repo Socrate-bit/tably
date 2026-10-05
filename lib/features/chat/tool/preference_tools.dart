@@ -4,6 +4,7 @@ import '../../../core/model/preference_option.dart';
 import '../../../core/model/store.dart';
 import '../../../core/model/weekday.dart';
 import '../../recipe/cubit/catalogue_cubit.dart';
+import '../../preferences/model/user_profile.dart';
 import '../model/preference_change.dart';
 import 'chat_tool.dart';
 import 'chat_tools.dart';
@@ -42,10 +43,8 @@ List<ChatTool> preferenceTools(ChatTools t) {
       declaration: FunctionDeclaration(
         'set_preferences',
         'Changes any of the user\'s preferences in one go. Give only the fields that change; a list replaces '
-            'the whole list, so include what stays. custom_instructions is the user\'s own free text (e.g. "no '
-            'coriander, kids hate spicy food"), checked on every recipe: it replaces the whole text, so keep what '
-            'stays. Changing diets, allergies, proteins, appliances, cook_minutes, language or custom_instructions '
-            'makes the current '
+            'the whole list, so include what stays. Changing diets, allergies, proteins, appliances, '
+            'cook_minutes or language makes the current '
             'recipes outdated: then offer regenerate_week or keep_current_recipes.',
         parameters: {
           'name': Schema.string(),
@@ -65,7 +64,6 @@ List<ChatTool> preferenceTools(ChatTools t) {
           'proteins': ids([for (final p in Protein.values) p.id]),
           'appliances': ids([for (final a in Appliance.values) a.id]),
           'cook_minutes': Schema.integer(description: 'Longest a recipe may take, 15-90; 90 means no limit.'),
-          'custom_instructions': Schema.string(description: 'At most 300 characters; empty clears it.'),
         },
         optionalParameters: [
           'name',
@@ -82,7 +80,6 @@ List<ChatTool> preferenceTools(ChatTools t) {
           'proteins',
           'appliances',
           'cook_minutes',
-          'custom_instructions',
         ],
       ),
       run: (args, context) async {
@@ -99,6 +96,34 @@ List<ChatTool> preferenceTools(ChatTools t) {
             if (latest.error != null) return {'error': latest.error};
             await t.profile.apply(latest.next, changed: latest.changes.keys.join(','));
             return {'ok': true, 'recipes_outdated': t.catalogue.state.outdated, 'week': t.weekJson()};
+          },
+        );
+      },
+    ),
+    ChatTool(
+      kind: ToolKind.write,
+      declaration: FunctionDeclaration(
+        'update_memory',
+        "Rewrites the user's custom instructions: your long-term memory of them, which they can read and edit "
+            'in the app, and which also guides every recipe they get. Use it when they share something lasting '
+            '(tastes, dislikes, who they cook for, goals, kitchen quirks) or ask you to remember or forget '
+            'something. Give the whole new text: keep what still holds and change only what is new, in their '
+            'language, as short notes, ${UserProfile.customInstructionsMax} characters at most. Saving it makes the '
+            'current recipes outdated: then offer regenerate_week or keep_current_recipes.',
+        parameters: {'text': Schema.string(description: 'The complete new instructions; empty forgets everything.')},
+      ),
+      run: (args, context) async {
+        final text = (args['text'] as String? ?? '').trim();
+        if (text.length > UserProfile.customInstructionsMax) {
+          return ToolResult({'error': 'too_long', 'max_characters': UserProfile.customInstructionsMax, 'length': text.length});
+        }
+        final current = t.profile.state.profile.customInstructions;
+        if (text == current) return const ToolResult({'unchanged': true});
+        return ToolProposal(
+          preview: {'from': current, 'to': text},
+          commit: () async {
+            await t.profile.setCustomInstructions(text);
+            return {'ok': true, 'memory': t.profile.state.profile.customInstructions, 'recipes_outdated': t.catalogue.state.outdated};
           },
         );
       },
