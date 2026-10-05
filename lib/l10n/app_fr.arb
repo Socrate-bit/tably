@@ -656,5 +656,8 @@
       }
     }
   },
-  "cookTimeNoLimit": "Pas de limite"
+  "cookTimeNoLimit": "Pas de limite",
+  "prefsCustomInstructions": "Instructions personnalisées",
+  "prefsCustomInstructionsSub": "Tably en tient compte pour choisir tes recettes",
+  "prefsCustomInstructionsHint": "Ex. : pas de champignons, peu épicé, pas de poisson cru…"
 }

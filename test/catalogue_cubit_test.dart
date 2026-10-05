@@ -56,6 +56,12 @@ void main() {
     expect(CatalogueCubit.keyFor(base.copyWith(appliances: {Appliance.oven})), isNot(key));
     expect(CatalogueCubit.keyFor(base.copyWith(cookTime: '15_30')), isNot(key));
     expect(CatalogueCubit.keyFor(base.copyWith(proteins: {Protein.fish})), isNot(key));
+    expect(CatalogueCubit.keyFor(base.copyWith(customInstructions: 'no mushrooms')), isNot(key));
+  });
+
+  test('keys stored before the slider and custom instructions existed still match', () {
+    final answered = base.copyWith(cookTime: '30_45', cookMinutes: UserProfile.cookMinutesFor('30_45'));
+    expect(CatalogueCubit.keyFor(answered), endsWith('|30_45'));
   });
 
   test('failures map to reasons the UI and analytics can tell apart', () {

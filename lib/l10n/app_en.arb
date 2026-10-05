@@ -511,5 +511,8 @@
   "cookTimeTitle": "Cooking time",
   "cookTimeSub": "The longest a recipe may take",
   "cookTimeMinutes": "{minutes} min",
-  "cookTimeNoLimit": "No limit"
+  "cookTimeNoLimit": "No limit",
+  "prefsCustomInstructions": "Custom instructions",
+  "prefsCustomInstructionsSub": "Tably follows them when picking your recipes",
+  "prefsCustomInstructionsHint": "E.g. no mushrooms, not too spicy, no raw fish…"
 }

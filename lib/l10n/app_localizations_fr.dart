@@ -1287,4 +1287,15 @@ class AppL10nFr extends AppL10n {
 
   @override
   String get cookTimeNoLimit => 'Pas de limite';
+
+  @override
+  String get prefsCustomInstructions => 'Instructions personnalisées';
+
+  @override
+  String get prefsCustomInstructionsSub =>
+      'Tably en tient compte pour choisir tes recettes';
+
+  @override
+  String get prefsCustomInstructionsHint =>
+      'Ex. : pas de champignons, peu épicé, pas de poisson cru…';
 }

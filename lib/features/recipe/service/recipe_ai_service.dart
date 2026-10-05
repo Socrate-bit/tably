@@ -217,6 +217,26 @@ class RecipeAiService {
   knives, is available.
 ''';
     // No limit means time is never a reason to reject.
+    // A rule left in with "none" still primes the model (halal's "no alcohol"
+    // got applied with no diet), so diets and allergies only appear when set.
+    final diets = profile.diets.where((d) => d != Diet.none);
+    final halal = diets.contains(Diet.halal);
+    final diet = diets.isEmpty
+        ? ''
+        : '''- It breaks one of the user's diets: ${ids(diets.map((d) => d.id))}.
+${halal ? '  Halal means no pork and no alcohol.\n' : ''}''';
+    final allergies = profile.allergies.where((a) => a != Allergy.none);
+    final allergy = allergies.isEmpty
+        ? ''
+        : '''- It contains something the user must avoid: ${ids(allergies.map((a) => a.id))}.
+  Check every ingredient, including stocks, sauces, pastes and garnishes
+  (e.g. nut_free excludes peanuts, tree nuts, nut butters and pesto;
+  lactose_free excludes milk, butter, cream and cheese).
+''';
+    final custom = profile.customInstructions.isEmpty
+        ? ''
+        : '''- It clearly goes against the user's own instructions: "${profile.customInstructions}"
+''';
     final time = profile.hasCookLimit
         ? '''- It takes clearly longer than ${profile.cookMinutes} minutes in total, counting
   marinating, resting, simmering and roasting.
@@ -228,19 +248,13 @@ array of recipes. Put every input recipe in exactly one of "kept" or
 "rejected", by its id.
 
 1. CHECK. Reject a recipe, with a short reason, if ANY of these is true:
-- It breaks one of the user's diets: ${ids(profile.diets.map((d) => d.id))}.
-  Halal means no pork and no alcohol. Alcohol is fine for every other diet.
-- It contains something the user must avoid: ${ids(profile.allergies.map((a) => a.id))}.
-  Check every ingredient, including stocks, sauces, pastes and garnishes
-  (e.g. nut_free excludes peanuts, tree nuts, nut butters and pesto;
-  lactose_free excludes milk, butter, cream and cheese).
-- Its main protein is a meat or fish the user did not pick. Allowed:
+$diet$allergy- Its main protein is a meat or fish the user did not pick. Allowed:
   $proteins. Vegetarian and tofu dishes are always allowed unless a diet
   rules them out.
 $equipment- It is not a proper savoury main course: desserts, drinks, sauces, sides,
   snacks, or text that is not really a recipe.
-${time}Never reject for any other reason. When unsure about a diet or an allergen,
-reject.
+$time${custom}Never reject for any other reason${halal ? '' : ': alcohol, wine and spirits are fine'}.
+When unsure about a diet or an allergen, reject.
 
 2. ADAPT every kept recipe, writing all text in $language:
 - title: short and appetising, at most 60 characters.

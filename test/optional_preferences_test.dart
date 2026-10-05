@@ -43,6 +43,17 @@ void main() {
     expect(cubit.state.profile.appliances, {Appliance.mixer});
   });
 
+  test('custom instructions are saved trimmed, and only when they change', () async {
+    final cubit = ProfileCubit(service: ProfileService(), analytics: const AnalyticsService());
+    addTearDown(cubit.close);
+    await cubit.completeOnboarding(const UserProfile());
+
+    await cubit.setCustomInstructions('  no mushrooms ');
+    expect(cubit.state.profile.customInstructions, 'no mushrooms');
+    final read = UserProfile.fromMap(cubit.state.profile.toMap());
+    expect(read.customInstructions, 'no mushrooms');
+  });
+
   test('an emptied choice survives the round trip through Firestore', () {
     const blank = UserProfile(cravings: {}, proteins: {}, appliances: {});
     final read = UserProfile.fromMap(blank.toMap());
@@ -51,6 +62,7 @@ void main() {
     expect(read.appliances, isEmpty);
 
     // A profile saved before these fields existed still gets the defaults.
+    expect(UserProfile.fromMap(blank.toMap()..remove('customInstructions')).customInstructions, isEmpty);
     final legacy = UserProfile.fromMap(blank.toMap()..remove('proteins'));
     expect(legacy.proteins, const UserProfile().proteins);
   });
@@ -95,7 +107,29 @@ void main() {
     });
 
     test('alcohol is only ruled out by halal', () {
-      expect(rules(const UserProfile()), contains('Alcohol is fine for every other diet.'));
+      final none = rules(const UserProfile());
+      expect(none, isNot(contains('alcohol.')));
+      expect(none, contains('alcohol, wine and spirits are fine'));
+      final vegetarian = rules(const UserProfile(diets: {Diet.vegetarian}));
+      expect(vegetarian, isNot(contains('Halal')));
+      final halal = rules(const UserProfile(diets: {Diet.halal}));
+      expect(halal, contains('Halal means no pork and no alcohol.'));
+      expect(halal, isNot(contains('spirits are fine')));
+    });
+
+    test('custom instructions only appear when written', () {
+      expect(rules(const UserProfile()), isNot(contains('own instructions')));
+      expect(
+        rules(const UserProfile(customInstructions: 'no mushrooms')),
+        contains('goes against the user\'s own instructions: "no mushrooms"'),
+      );
+    });
+
+    test('no diet or allergy leaves those rules out entirely', () {
+      final none = rules(const UserProfile());
+      expect(none, isNot(contains("user's diets")));
+      expect(none, isNot(contains('must avoid')));
+      expect(rules(const UserProfile(allergies: {Allergy.nutFree})), contains('must avoid: nut_free.'));
     });
   });
 }

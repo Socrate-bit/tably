@@ -40,6 +40,7 @@ class UserProfile extends Equatable {
     this.blockers = const {},
     this.cookTime,
     this.cookMinutes = cookMinutesCeiling,
+    this.customInstructions = '',
     this.onboardingComplete = false,
     this.weeklyReminder = false,
     this.userType = UserType.normal,
@@ -58,6 +59,9 @@ class UserProfile extends Equatable {
   /// Cooking-time slider bounds, in minutes; the ceiling means "no limit".
   static const cookMinutesFloor = 15;
   static const cookMinutesCeiling = 90;
+
+  /// Longest custom instruction, in characters.
+  static const customInstructionsMax = 300;
 
   /// The time limit an onboarding [cookTime] answer stands for.
   static int cookMinutesFor(String? cookTime) => switch (cookTime) {
@@ -93,6 +97,10 @@ class UserProfile extends Equatable {
   final int cookMinutes;
 
   bool get hasCookLimit => cookMinutes < cookMinutesCeiling;
+
+  /// Free text from the preferences that Gemini follows when checking
+  /// recipes, e.g. "no mushrooms"; empty when none.
+  final String customInstructions;
 
   final bool onboardingComplete;
   final bool weeklyReminder;
@@ -181,6 +189,7 @@ class UserProfile extends Equatable {
     Set<String>? blockers,
     String? cookTime,
     int? cookMinutes,
+    String? customInstructions,
     bool? onboardingComplete,
     bool? weeklyReminder,
     UserType? userType,
@@ -205,6 +214,7 @@ class UserProfile extends Equatable {
       blockers: blockers ?? this.blockers,
       cookTime: cookTime ?? this.cookTime,
       cookMinutes: cookMinutes ?? this.cookMinutes,
+      customInstructions: customInstructions ?? this.customInstructions,
       onboardingComplete: onboardingComplete ?? this.onboardingComplete,
       weeklyReminder: weeklyReminder ?? this.weeklyReminder,
       userType: userType ?? this.userType,
@@ -233,6 +243,7 @@ class UserProfile extends Equatable {
         'blockers': blockers.toList(),
         'cookTime': cookTime,
         'cookMinutes': cookMinutes,
+        'customInstructions': customInstructions,
         'onboardingComplete': onboardingComplete,
         'weeklyReminder': weeklyReminder,
         'updatedAt': FieldValue.serverTimestamp(),
@@ -286,6 +297,7 @@ class UserProfile extends Equatable {
       // Profiles saved before the slider existed take their onboarding answer.
       cookMinutes: ((map['cookMinutes'] as num?)?.toInt() ?? cookMinutesFor(map['cookTime'] as String?))
           .clamp(cookMinutesFloor, cookMinutesCeiling),
+      customInstructions: map['customInstructions'] as String? ?? '',
       onboardingComplete: map['onboardingComplete'] as bool? ?? false,
       weeklyReminder: map['weeklyReminder'] as bool? ?? false,
       userType: UserType.fromId(map['userType'] as String?),
@@ -313,6 +325,7 @@ class UserProfile extends Equatable {
         blockers,
         cookTime,
         cookMinutes,
+        customInstructions,
         onboardingComplete,
         weeklyReminder,
         userType,

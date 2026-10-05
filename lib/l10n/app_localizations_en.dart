@@ -1275,4 +1275,15 @@ class AppL10nEn extends AppL10n {
 
   @override
   String get cookTimeNoLimit => 'No limit';
+
+  @override
+  String get prefsCustomInstructions => 'Custom instructions';
+
+  @override
+  String get prefsCustomInstructionsSub =>
+      'Tably follows them when picking your recipes';
+
+  @override
+  String get prefsCustomInstructionsHint =>
+      'E.g. no mushrooms, not too spicy, no raw fish…';
 }

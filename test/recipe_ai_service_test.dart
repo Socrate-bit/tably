@@ -104,7 +104,7 @@ void main() {
     expect(text, contains('French'));
 
     final none = RecipeAiService.instruction(const UserProfile(languageCode: 'en', diets: {Diet.none}));
-    expect(none, contains('diets: none'));
+    expect(none, isNot(contains("user's diets")));
     expect(none, contains('English'));
   });
 }
