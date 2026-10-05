@@ -16,9 +16,9 @@ import 'recipe_browse_cubit.dart';
 part 'recipe_search_state.dart';
 
 /// Searches Spoonacular for the recipes tab: the search text (translated to
-/// English by Gemini) and the browse filters, including the diets, allergies
-/// and appliances chosen there in place of the profile's. Gemini then checks and translates the results, as it does the
-/// cached pool. Results live in memory; one added to the week joins the pool.
+/// English by Gemini) and the browse filters, including the diets, allergies,
+/// meats and appliances chosen there in place of the profile's. Gemini then
+/// checks and translates the results, as it does the cached pool. Results live in memory; one added to the week joins the pool.
 class RecipeSearchCubit extends Cubit<RecipeSearchState> {
   RecipeSearchCubit({
     required RecipeSearchService search,
@@ -68,7 +68,6 @@ class RecipeSearchCubit extends Cubit<RecipeSearchState> {
         // Spoonacular combines filters with AND, so only a single pick narrows
         // the search; several are applied to the results instead.
         craving: browse.searchCraving,
-        protein: browse.searchProtein,
       );
       // Over-budget candidates are dropped before Gemini spends time on them.
       final affordable = [

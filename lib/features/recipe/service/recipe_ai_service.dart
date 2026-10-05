@@ -193,12 +193,17 @@ class RecipeAiService {
     }
 
     final language = profile.languageCode == 'en' ? 'English' : 'French';
-    // No meat ticked means no preference; "no_meat" means none at all.
-    final proteins = profile.proteins.contains(Protein.noMeat)
-        ? 'none: the user eats no meat or fish at all'
-        : profile.proteins.isEmpty
-            ? 'any meat or fish'
-            : ids(profile.proteins.map((p) => p.id));
+    // No meat ticked or every meat ticked means no preference, so the rule is
+    // left out; "no_meat" means none at all. Meat-free dishes always pass it.
+    final noMeat = profile.proteins.contains(Protein.noMeat);
+    final anyMeat = !noMeat && (profile.proteins.isEmpty || profile.proteins.containsAll(Protein.meats));
+    final protein = anyMeat
+        ? ''
+        : '''- Its main protein is a meat or fish the user did not pick. Allowed:
+  ${noMeat ? 'none: the user eats no meat or fish at all' : ids(profile.proteins.map((p) => p.id))}.
+  Meat-free dishes (vegetarian, vegan, tofu, meat substitutes) are always
+  allowed unless a diet rules them out.
+''';
     // The optional rules below end in a newline, so a skipped one leaves no
     // gap. Appliances are listed by what is missing: the model reads a short
     // "does not have" list far more reliably than the full kitchen.
@@ -248,10 +253,7 @@ array of recipes. Put every input recipe in exactly one of "kept" or
 "rejected", by its id.
 
 1. CHECK. Reject a recipe, with a short reason, if ANY of these is true:
-$diet$allergy- Its main protein is a meat or fish the user did not pick. Allowed:
-  $proteins. Vegetarian and tofu dishes are always allowed unless a diet
-  rules them out.
-$equipment- It is not a proper savoury main course: desserts, drinks, sauces, sides,
+$diet$allergy$protein$equipment- It is not a proper savoury main course: desserts, drinks, sauces, sides,
   snacks, or text that is not really a recipe.
 $time${custom}Never reject for any other reason${halal ? '' : ': alcohol, wine and spirits are fine'}.
 When unsure about a diet or an allergen, reject.

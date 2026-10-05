@@ -2,6 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:tably/core/model/preference_option.dart';
 import 'package:tably/core/model/store.dart';
 import 'package:tably/features/recipe/cubit/recipe_browse_cubit.dart';
+import 'package:tably/features/recipe/model/dietary_constraints.dart';
 import 'package:tably/features/recipe/model/recipe.dart';
 
 import 'fixtures/recipe_fixtures.dart';
@@ -27,11 +28,22 @@ void main() {
     expect(_ids(const RecipeBrowseState(query: 'zzz')), isEmpty);
   });
 
-  test('craving, cuisine and protein filters combine', () {
-    const state = RecipeBrowseState(cuisines: {Cuisine.italian}, proteins: {RecipeProtein.pork});
-    expect(_ids(state), unorderedEquals(['carbonara_haricots_asperges', 'fusilli_pois_lard_ricotta']));
+  test('craving, cuisine and meat filters combine', () {
+    const state = RecipeBrowseState(cuisines: {Cuisine.italian}, constraints: DietaryConstraints(proteins: {Protein.pork}));
+    expect(
+      _ids(state),
+      unorderedEquals(['farfalle_feta_feves', 'carbonara_haricots_asperges', 'fusilli_pois_lard_ricotta']),
+      reason: 'meat-free dishes always pass',
+    );
     expect(_ids(const RecipeBrowseState(cravings: {Craving.indulgent})), ['wraps_big_mac']);
     expect(_ids(const RecipeBrowseState(cuisines: {Cuisine.mexican})), isEmpty);
+  });
+
+  test('meats follow the preferences: none or all means any, "no meat" none', () {
+    List<String> meats(Set<Protein> proteins) => _ids(RecipeBrowseState(constraints: DietaryConstraints(proteins: proteins)));
+    expect(meats({}), hasLength(RecipeFixtures.recipes.length));
+    expect(meats(Protein.meats), hasLength(RecipeFixtures.recipes.length));
+    expect(meats({Protein.noMeat}), unorderedEquals(['nouilles_tofu_satay', 'farfalle_feta_feves']));
   });
 
   test('price limit uses the store price the cards show', () {
@@ -71,10 +83,8 @@ void main() {
   test('filter count counts chips plus one for a price limit', () {
     final widest = RecipeBrowseState.widest;
     expect(RecipeBrowseState(constraints: widest).filterCount, 0);
-    expect(
-      RecipeBrowseState(constraints: widest, cravings: {Craving.quick}, proteins: {RecipeProtein.tofu}, maxPrice: 8)
-          .filterCount,
-      3,
-    );
+    expect(RecipeBrowseState(constraints: widest.copyWith(proteins: {})).filterCount, 0, reason: 'no meat ticked is any meat');
+    final noFish = widest.copyWith(proteins: {Protein.beef, Protein.pork, Protein.chicken});
+    expect(RecipeBrowseState(constraints: noFish, cravings: {Craving.quick}, maxPrice: 8).filterCount, 3);
   });
 }

@@ -1807,18 +1807,6 @@ abstract class AppL10n {
   /// **'Cuisine type'**
   String get filtersCuisine;
 
-  /// No description provided for @filtersProtein.
-  ///
-  /// In fr, this message translates to:
-  /// **'Préférence'**
-  String get filtersProtein;
-
-  /// No description provided for @filtersProteinSub.
-  ///
-  /// In fr, this message translates to:
-  /// **'Le type de viande ou de protéine que tu veux voir'**
-  String get filtersProteinSub;
-
   /// No description provided for @filtersPrice.
   ///
   /// In fr, this message translates to:
