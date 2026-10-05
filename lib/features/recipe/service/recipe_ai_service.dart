@@ -19,11 +19,26 @@ class NoMatchingRecipesException implements Exception {
   String toString() => 'NoMatchingRecipesException($rejected rejected)';
 }
 
+/// Thrown when Gemini won't write a recipe because the request breaks one of
+/// the user's rules. [reason] is in the user's language.
+class RecipeRefusedException implements Exception {
+  const RecipeRefusedException(this.reason);
+
+  final String reason;
+
+  @override
+  String toString() => 'RecipeRefusedException($reason)';
+}
+
 /// Checks Spoonacular candidates against the user's constraints and adapts
 /// the survivors with Gemini: translation, craving, protein, cuisine, emoji,
 /// unit and aisle. Numbers, photos and sources always come from Spoonacular.
 class RecipeAiService {
   static const model = 'gemini-3.1-flash-lite';
+
+  /// Writing a whole recipe that respects every rule takes more judgement
+  /// than the lite model has, so it uses the stronger one.
+  static const writerModel = 'gemini-3.5-flash';
 
   /// Recipes per Gemini call. Small chunks keep each answer short and fast,
   /// and a failed chunk only loses these few.
@@ -83,6 +98,65 @@ class RecipeAiService {
     final english = response.text?.trim() ?? '';
     debugPrint('[RecipeAiService] search "$text" → "$english"');
     return english.isEmpty ? text : english;
+  }
+
+  /// Writes a whole recipe for [request], or with [base] a copy of it
+  /// changed only as asked ("olive oil instead of butter"). The result is a
+  /// custom recipe the user owns, with a fresh id. Throws
+  /// [RecipeRefusedException] when the request breaks the user's rules.
+  Future<Recipe> write(String request, UserProfile profile, {Recipe? base}) async {
+    final gemini = FirebaseAI.googleAI().generativeModel(
+      model: writerModel,
+      systemInstruction: Content.system(writerInstruction(profile, derived: base != null)),
+      generationConfig: GenerationConfig(
+        responseMimeType: 'application/json',
+        responseSchema: _writerSchema,
+        thinkingConfig: ThinkingConfig.withThinkingLevel(ThinkingLevel.low),
+      ),
+    );
+    final input = {'request': request, if (base != null) 'base': {'id': base.id, ...base.toMap()}};
+    final response = await gemini.generateContent([Content.text(jsonEncode(input))]);
+    final answer = jsonDecode(response.text ?? '') as Map<String, dynamic>;
+    final recipe = written(answer, id: 'custom_${DateTime.now().microsecondsSinceEpoch}', base: base);
+    debugPrint('[RecipeAiService] wrote "${recipe.title}"${base == null ? '' : ' from ${base.id}'}');
+    return recipe;
+  }
+
+  /// Builds the custom recipe Gemini wrote in [answer]. A derived recipe
+  /// keeps the [base]'s photo and credit, and its ingredient ids where Gemini
+  /// kept the line, so the shopping list still merges them.
+  @visibleForTesting
+  static Recipe written(Map<String, dynamic> answer, {required String id, Recipe? base}) {
+    final refused = (answer['refused'] as String? ?? '').trim();
+    if (refused.isNotEmpty) throw RecipeRefusedException(refused);
+    final baseIds = {for (final i in base?.ingredients ?? const <Ingredient>[]) i.id};
+    final minutes = '${(answer['minutes'] as num?)?.toInt() ?? 0}m';
+    return Recipe(
+      id: id,
+      title: (answer['title'] as String? ?? '').trim(),
+      photoUrl: base?.photoUrl ?? '',
+      macros: Macros.fromMap(Map<String, dynamic>.from(answer['macros'] as Map? ?? const {})),
+      time: minutes,
+      cookTime: minutes,
+      price: (answer['price'] as num?)?.toDouble() ?? base?.price ?? 0,
+      craving: Craving.values.firstWhere((c) => c.id == answer['craving'], orElse: () => Craving.quick),
+      protein: RecipeProtein.fromId(answer['protein'] as String?),
+      cuisine: Cuisine.fromId(answer['cuisine'] as String?),
+      creator: base?.creator,
+      ingredients: [
+        for (final i in (answer['ingredients'] as List? ?? const []).cast<Map<String, dynamic>>())
+          Ingredient(
+            id: baseIds.contains((i['base_id'] as num?)?.toInt()) ? (i['base_id'] as num).toInt() : 0,
+            icon: i['icon'] as String? ?? '🍽️',
+            name: i['name'] as String? ?? '',
+            amount: (i['amount'] as num?)?.toDouble() ?? 0,
+            unit: IngredientUnit.fromId(i['unit'] as String?),
+            aisle: Aisle.fromId(i['aisle'] as String?),
+          ),
+      ],
+      steps: (answer['steps'] as List? ?? const []).whereType<String>().toList(),
+      origin: RecipeOrigin.chef,
+    );
   }
 
   /// Turns the user's custom [instructions] into a short English search for
@@ -320,6 +394,73 @@ When unsure about a diet or an allergen, reject.
 $wished''';
   }
 
+  /// The rules Gemini follows to write a recipe, or with [derived] to change
+  /// one, filled in with the user's constraints.
+  @visibleForTesting
+  static String writerInstruction(UserProfile profile, {required bool derived}) {
+    String ids(Iterable<String> values) {
+      final list = values.where((v) => v != OptionIds.none).toList();
+      return list.isEmpty ? 'none' : list.join(', ');
+    }
+
+    final language = profile.languageCode == 'en' ? 'English' : 'French';
+    final proteins = profile.proteins.contains(Protein.noMeat)
+        ? 'none: the user eats no meat or fish at all'
+        : profile.proteins.isEmpty
+            ? 'any meat or fish'
+            : ids(profile.proteins.map((p) => p.id));
+    final appliances = profile.appliances.isEmpty
+        ? 'none at all, so the recipe must need no cooking'
+        : ids(profile.appliances.map((a) => a.id));
+    final task = derived
+        ? '''The input has a "base" recipe and a "request". Return a copy of the base
+changed only as requested. Keep every other ingredient with its id as
+base_id, its amount and its unit, and keep the steps, adjusting only what
+the change affects. The title may say what changed.'''
+        : '''The input has a "request". Write one savoury main course that fulfils it,
+with realistic amounts and clear steps a home cook can follow.''';
+    return '''
+You are Tably's chef and write recipes for a weekly dinner-planning app.
+$task
+
+Every recipe MUST respect the user's constraints:
+- Diets: ${ids(profile.diets.map((d) => d.id))}. Halal means no pork and no alcohol.
+- Must avoid: ${ids(profile.allergies.map((a) => a.id))}, including in stocks, sauces,
+  pastes and garnishes.
+- Main protein allowed: $proteins. Meat-free dishes are always fine unless
+  a diet rules them out.
+- Appliances the user has: $appliances (hob = stovetop, mixer = blender or
+  food processor, slow_cooker = crockpot, pressure_cooker = Instant Pot,
+  barbecue = outdoor grill).
+${profile.hasCookLimit ? '- At most ${profile.cookMinutes} minutes in total.\n' : ''}${profile.customInstructions.isEmpty ? '' : '- The user\'s own instructions: "${profile.customInstructions}"\n'}If the request cannot be met without breaking one of these, set "refused"
+to a short reason in $language and leave everything else empty. Otherwise
+set "refused" to an empty string.
+
+Write all text in $language:
+- title: short and appetising, at most 60 characters.
+- minutes: total time from start to plate.
+- price: estimated cost of one portion in euros at a French discount
+  supermarket.
+- macros: estimated per portion.
+- ingredients: amounts for ONE portion.
+  base_id: the base ingredient's id when the line comes from the base,
+  else 0.
+  name: lower case unless a proper noun.
+  unit: g, kg, ml or l for weights and volumes; tbsp, tsp, piece, clove,
+  slice, bunch, sprig, leaf, pinch, can or pack otherwise; to_taste with
+  amount 0 for seasoning.
+  icon: one emoji for the ingredient.
+  aisle: $aisleGuide
+- steps: concise, one action each, temperatures in °C.
+- craving: the best fit among quick (25 minutes or less), high_protein (30 g
+  protein or more), low_calorie (450 kcal or less), family_favourites,
+  healthy_comfort, fakeaway (takeaway-style), easy_digestion, indulgent.
+- protein: the main protein: beef, pork, chicken, fish (includes seafood),
+  tofu, or vegetarian for anything else meat-free.
+- cuisine: italian, asian, mexican, indian, mediterranean, or none.
+''';
+  }
+
   static final _schema = Schema.object(
     properties: {
       'kept': Schema.array(
@@ -356,6 +497,39 @@ $wished''';
           },
         ),
       ),
+    },
+  );
+
+  static final _writerSchema = Schema.object(
+    properties: {
+      'refused': Schema.string(),
+      'title': Schema.string(),
+      'minutes': Schema.integer(),
+      'price': Schema.number(),
+      'macros': Schema.object(
+        properties: {
+          'kcal': Schema.integer(),
+          'protein': Schema.integer(),
+          'carbs': Schema.integer(),
+          'fat': Schema.integer(),
+        },
+      ),
+      'craving': Schema.enumString(enumValues: [for (final c in Craving.values) c.id]),
+      'protein': Schema.enumString(enumValues: [for (final p in RecipeProtein.values) p.id]),
+      'cuisine': Schema.enumString(enumValues: [for (final c in Cuisine.values) c.id, 'none']),
+      'ingredients': Schema.array(
+        items: Schema.object(
+          properties: {
+            'base_id': Schema.integer(),
+            'name': Schema.string(),
+            'amount': Schema.number(),
+            'unit': Schema.enumString(enumValues: [for (final u in IngredientUnit.values) u.id]),
+            'icon': Schema.string(),
+            'aisle': Schema.enumString(enumValues: [for (final a in Aisle.values) a.id]),
+          },
+        ),
+      ),
+      'steps': Schema.array(items: Schema.string()),
     },
   );
 }

@@ -1305,4 +1305,239 @@ class AppL10nEn extends AppL10n {
   String quotaReachedBody(int limit, String time) {
     return 'You\'ve used your $limit recipe searches for today. They reset tomorrow at $time.';
   }
+
+  @override
+  String get actionCancel => 'Cancel';
+
+  @override
+  String get actionSave => 'Save';
+
+  @override
+  String get shoppingAddHint => 'Add an item';
+
+  @override
+  String get shoppingDelete => 'Delete';
+
+  @override
+  String get shoppingEditTitle => 'Edit item';
+
+  @override
+  String get shoppingEditName => 'Name';
+
+  @override
+  String get shoppingEditAmount => 'Amount';
+
+  @override
+  String get chatEyebrow => 'YOUR AI CHEF';
+
+  @override
+  String get chatTitle => 'Chef';
+
+  @override
+  String get chatHint => 'Ask the chef…';
+
+  @override
+  String get chatConfirmHint => 'Approve or decline the proposal';
+
+  @override
+  String get chatEmptyTitle => 'What shall we cook?';
+
+  @override
+  String get chatEmptySubtitle =>
+      'I can change your meals, find or invent recipes, and adjust your preferences and shopping list.';
+
+  @override
+  String get chatStarterTonight => 'Change tonight\'s dinner';
+
+  @override
+  String get chatStarterFridge => 'What can I make with leeks and eggs?';
+
+  @override
+  String get chatStarterRule => 'Add \"no coriander\" to my rules';
+
+  @override
+  String get chatStarterLighter => 'A lighter version of a dish this week';
+
+  @override
+  String get chatThinking => 'The chef is thinking…';
+
+  @override
+  String get chatActivityReading => 'The chef is looking at your week…';
+
+  @override
+  String get chatActivitySearching => 'The chef is looking for recipes…';
+
+  @override
+  String get chatActivityWriting => 'The chef is writing the recipe…';
+
+  @override
+  String get chatActivityPreparing => 'The chef is preparing a proposal…';
+
+  @override
+  String get chatErrorTurn => 'The chef couldn\'t answer.';
+
+  @override
+  String get chatErrorGeneric => 'Something went wrong with the chef.';
+
+  @override
+  String get chatRetry => 'Retry';
+
+  @override
+  String get chatClearTitle => 'Clear the conversation?';
+
+  @override
+  String get chatClearBody =>
+      'The chef will forget everything you talked about.';
+
+  @override
+  String get chatClearConfirm => 'Clear';
+
+  @override
+  String get chatAddToWeek => 'Add to my week';
+
+  @override
+  String get chatActionEyebrow => 'PROPOSAL';
+
+  @override
+  String get chatApprove => 'Approve';
+
+  @override
+  String get chatDecline => 'Decline';
+
+  @override
+  String get chatStatusRunning => 'Applying…';
+
+  @override
+  String get chatStatusApproved => 'Done ✓';
+
+  @override
+  String get chatStatusDeclined => 'Declined';
+
+  @override
+  String get chatStatusFailed => 'Failed, nothing changed';
+
+  @override
+  String get chatStatusExpired => 'Expired';
+
+  @override
+  String get chatActRegenerateWeek => 'Regenerate the whole week';
+
+  @override
+  String get chatDetailRegenerateWeek =>
+      'New recipes, without your current changes.';
+
+  @override
+  String chatActRerollMeal(String day, String meal) {
+    return 'A random new dish for $day ($meal)';
+  }
+
+  @override
+  String chatActChangeMeal(String day, String meal) {
+    return 'Change $day ($meal)';
+  }
+
+  @override
+  String chatActReplaceEverywhere(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Replace a dish ($count meals)',
+      one: 'Replace a dish (1 meal)',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get chatActSwapMeals => 'Swap two meals';
+
+  @override
+  String get chatActKeepRecipes => 'Keep your current recipes';
+
+  @override
+  String get chatDetailFavourite => 'Save to favourites';
+
+  @override
+  String get chatDetailUnfavourite => 'Remove from favourites';
+
+  @override
+  String get chatDetailCooked => 'Mark as cooked';
+
+  @override
+  String get chatDetailNotCooked => 'Mark as not cooked';
+
+  @override
+  String chatDetailRating(int rating) {
+    return 'Rate $rating/5';
+  }
+
+  @override
+  String get chatDetailNoRating => 'Clear the rating';
+
+  @override
+  String chatDetailNote(String note) {
+    return 'Note: $note';
+  }
+
+  @override
+  String get chatActPreferences => 'Change your preferences';
+
+  @override
+  String get chatDetailOutdated =>
+      'Your recipes will no longer match: you\'ll regenerate or keep them.';
+
+  @override
+  String get chatFieldName => 'Name';
+
+  @override
+  String get chatFieldLanguage => 'Language';
+
+  @override
+  String get chatActShopping => 'Edit your shopping list';
+
+  @override
+  String get chatActShare => 'Share your shopping list';
+
+  @override
+  String get chatActCreateRecipe => 'Add this new recipe';
+
+  @override
+  String chatDetailInMeal(String day) {
+    return 'And put it on $day\'s menu';
+  }
+
+  @override
+  String chatActDeriveRecipe(String title) {
+    return 'Your version of \"$title\"';
+  }
+
+  @override
+  String get chatDetailReplaceInWeek =>
+      'It replaces the original in your week.';
+
+  @override
+  String chatFieldChange(String field, String change) {
+    return '$field: $change';
+  }
+
+  @override
+  String get chatActMemory => 'Update my memory';
+
+  @override
+  String get chatDetailMemoryCleared => 'Forget everything';
+
+  @override
+  String chatDetailMemoryWas(String text) {
+    return 'Before: $text';
+  }
+
+  @override
+  String get chatMemoryTitle => 'Chef\'s memory';
+
+  @override
+  String get chatMemorySub =>
+      'What the chef remembers about you. It uses it to answer and to pick your recipes; you can edit it.';
+
+  @override
+  String get chatQuotaReached =>
+      'You\'ve used all of today\'s searches: the chef is back when they reset. Tap to see when.';
 }

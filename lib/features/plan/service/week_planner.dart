@@ -17,11 +17,13 @@ abstract final class WeekPlanner {
     final meals = profile.meals;
     final mealSlots = MealSlot.forMealsPerDay(profile.mealsPerDay);
     if (meals.isEmpty || catalogue.isEmpty) return const WeekPlan();
-    // Dishes matching the custom instructions come first, still shuffled.
-    final mixed = _shuffle(catalogue, settings.seed);
+    // Only recipes a build fetched are dealt, so adding one never reshuffles
+    // the week; dishes matching the custom instructions come first, still
+    // shuffled. Swaps may name any recipe, or a saved favourite that has
+    // left the catalogue.
+    final built = catalogue.where((r) => r.origin == RecipeOrigin.built).toList();
+    final mixed = _shuffle(built.isEmpty ? catalogue : built, settings.seed);
     final shuffled = [...mixed.where((r) => r.wished), ...mixed.where((r) => !r.wished)];
-    // Swaps may name a saved favourite that has left the catalogue; the
-    // shuffle itself only ever draws from the catalogue.
     Recipe? byId(String? id) => id == null
         ? null
         : catalogue.where((r) => r.id == id).firstOrNull ?? favourites.where((r) => r.id == id).firstOrNull;

@@ -7,6 +7,7 @@ import '../../../core/util/haptics.dart';
 import '../../../core/widget/slide_in.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../account/screen/account_screen.dart';
+import '../../chat/widget/chef_button.dart';
 import '../../onboarding/screen/generating_screen.dart';
 import '../../plan/cubit/plan_cubit.dart';
 import '../../plan/screen/menu_screen.dart';
@@ -21,7 +22,7 @@ import '../cubit/home_cubit.dart';
 import '../widget/tab_bar.dart';
 
 /// The signed-in app shell: three tabs, the favourites, stores and account screens that
-/// keep the tab bar, and the add-recipe button on the recipes tab.
+/// keep the tab bar, and the AI chef's button beside it.
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
@@ -57,6 +58,8 @@ class HomeScreen extends StatelessWidget {
                 Expanded(
                   child: AppTabBar(current: home.tab, onSelected: context.read<HomeCubit>().select),
                 ),
+                SizedBox(width: 12.w),
+                const ChefButton(),
                 // Hidden for now.
                 // _AddRecipeSlot(visible: home.tab == HomeTab.recipes && home.sub == HomeSub.none),
               ],

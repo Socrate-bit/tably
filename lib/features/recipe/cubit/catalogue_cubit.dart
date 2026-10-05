@@ -203,7 +203,8 @@ class CatalogueCubit extends Cubit<CatalogueState> {
       _failedKey = null;
       emit(state.copyWith(
         status: CatalogueStatus.ready,
-        recipes: recipes,
+        // The user's custom recipes survive a rebuild.
+        recipes: [...recipes, ...state.recipes.where((r) => r.custom)]..sort((a, b) => a.id.compareTo(b.id)),
         key: key,
         clearKeptKey: true,
         outdated: false,
@@ -241,10 +242,11 @@ class CatalogueCubit extends Cubit<CatalogueState> {
     }
   }
 
-  /// Adds a recipe found by search to the pool, so the week can use it.
-  /// Search results already passed the Gemini check for this user.
+  /// Adds a recipe found by search or written by the AI chef to the pool,
+  /// so the week can use it. Both already respect this user's constraints.
   Future<void> addRecipe(Recipe recipe) async {
     if (state.byId(recipe.id) != null) return;
+    if (recipe.origin == RecipeOrigin.built) recipe = recipe.withOrigin(RecipeOrigin.added);
     final previous = state.recipes;
     emit(state.copyWith(recipes: [...previous, recipe]..sort((a, b) => a.id.compareTo(b.id))));
     final uid = _uid;
@@ -252,6 +254,7 @@ class CatalogueCubit extends Cubit<CatalogueState> {
     try {
       await _service.saveRecipe(uid, recipe);
     } catch (e) {
+      debugPrint('[CatalogueCubit] addRecipe failed: $e');
       emit(state.copyWith(recipes: previous, error: e));
     }
   }

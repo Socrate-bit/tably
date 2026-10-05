@@ -9,6 +9,7 @@ import '../../../core/util/haptics.dart';
 import '../../../core/util/option_labels.dart';
 import '../../../core/util/quantity.dart';
 import '../../../core/widget/check_circle.dart';
+import '../../../core/widget/input_bar.dart';
 import '../../../core/widget/primary_button.dart';
 import '../../../core/widget/sub_screen_header.dart';
 import '../../../core/widget/surface_card.dart';
@@ -16,8 +17,10 @@ import '../../../l10n/app_localizations.dart';
 import '../../preferences/cubit/profile_cubit.dart';
 import '../cubit/shopping_cubit.dart';
 import '../model/shopping_item.dart';
+import '../widget/shopping_item_dialog.dart';
 
-/// The full shopping list, grouped by aisle. Ticking an item is optimistic.
+/// The full shopping list, grouped by aisle. Ticking, adding, deleting and
+/// editing items are optimistic.
 class ShoppingScreen extends StatelessWidget {
   const ShoppingScreen({super.key});
 
@@ -80,6 +83,11 @@ class ShoppingScreen extends StatelessWidget {
                         ),
                       ],
                     ),
+                    SizedBox(height: 16.h),
+                    InputBar(
+                      hint: l10n.shoppingAddHint,
+                      onSubmitted: context.read<ShoppingCubit>().addItem,
+                    ),
                     SizedBox(height: 24.h),
                     // The old items belong to the previous week, so they
                     // give way to a spinner until the new list lands.
@@ -113,16 +121,22 @@ class ShoppingScreen extends StatelessWidget {
   /// Opens the native share sheet, anchored to the share button.
   Future<void> _shareList(BuildContext context) async {
     Haptics.confirm();
+    final shared = await share(context);
+    if (!shared && context.mounted) showErrorBanner(context, AppL10n.of(context).errorShoppingShare);
+  }
+
+  /// Shares the list as text from the widget at [context], which anchors the
+  /// iPad popover. Also used by the AI chef. Returns false on failure.
+  static Future<bool> share(BuildContext context) {
     final l10n = AppL10n.of(context);
     final box = context.findRenderObject() as RenderBox?;
-    final shared = await context.read<ShoppingCubit>().share(
+    return context.read<ShoppingCubit>().share(
           subject: l10n.shoppingList,
           header: l10n.shoppingShareHeader,
           aisleName: l10n.aisleName,
           amount: (i) => formatQuantity(i.amount, i.unit, l10n),
           origin: box == null ? null : box.localToGlobal(Offset.zero) & box.size,
         );
-    if (!shared && context.mounted) showErrorBanner(context, l10n.errorShoppingShare);
   }
 }
 
@@ -210,10 +224,28 @@ class _ItemRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppL10n.of(context);
-    return GestureDetector(
+    // Swipe to delete; long press to rename or change the amount.
+    return Dismissible(
+      key: ValueKey(item.id),
+      direction: DismissDirection.endToStart,
+      onDismissed: (_) {
+        Haptics.confirm();
+        context.read<ShoppingCubit>().removeItem(item.id);
+      },
+      background: Container(
+        color: AppColors.danger,
+        alignment: Alignment.centerRight,
+        padding: EdgeInsets.only(right: 22.w),
+        child: Text(l10n.shoppingDelete, style: AppTextStyles.secondaryButton.copyWith(color: AppColors.surface)),
+      ),
+      child: GestureDetector(
       onTap: () {
         Haptics.toggle();
         context.read<ShoppingCubit>().toggle(item);
+      },
+      onLongPress: () {
+        Haptics.confirm();
+        ShoppingItemDialog.show(context, item);
       },
       behavior: HitTestBehavior.opaque,
       child: Container(
@@ -249,6 +281,7 @@ class _ItemRow extends StatelessWidget {
             CheckCircle(checked: item.checked),
           ],
         ),
+      ),
       ),
     );
   }
