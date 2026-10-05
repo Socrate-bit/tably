@@ -26,6 +26,7 @@ Ingredient _ingredient(int id, String name, double amount, IngredientUnit unit, 
     Ingredient(id: id, icon: '🍽️', name: name, amount: amount, unit: unit, aisle: aisle);
 
 PlanSlot _slot(Weekday day, Recipe recipe, {bool leftover = false}) => PlanSlot(
+  key: PlanSlot.keyFor(day, MealSlot.dinner),
   day: day,
   slot: MealSlot.dinner,
   recipe: recipe,

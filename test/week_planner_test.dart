@@ -138,6 +138,40 @@ void main() {
     expect(swapped.slotByKey('monday|lunch')!.portions, 2, reason: 'the swap is cooked for its leftover too');
   });
 
+  test('a moved meal keeps its dish, and its pot is cooked wherever it now comes first', () {
+    final profile = _profile(2, [0, 1, 2, 3, 4, 5, 6], variety: Variety.balanced);
+    final base = WeekPlanner.build(profile: profile, settings: const PlanSettings(), catalogue: RecipeFixtures.recipes);
+    final keys = [for (final s in base.slots) s.key];
+    expect(base.slotByKey('tuesday|lunch')!.isLeftover, isTrue);
+
+    // Drag Tuesday's leftover lunch to the top of the week.
+    final order = ['tuesday|lunch', ...keys.where((k) => k != 'tuesday|lunch')];
+    final moved = WeekPlanner.build(profile: profile, settings: PlanSettings(order: order), catalogue: RecipeFixtures.recipes);
+
+    expect([for (final s in moved.slots) s.key], order);
+    final first = moved.slots.first;
+    expect((first.day, first.slot), (Weekday.monday, MealSlot.lunch), reason: 'it shows at the first place');
+    expect(first.recipe, base.slotByKey('tuesday|lunch')!.recipe);
+    expect(first.isLeftover, isFalse, reason: 'it now comes first, so its pot is cooked here');
+    expect(first.portions, 2);
+    final second = moved.slots[1];
+    expect(second.key, 'monday|lunch');
+    expect((second.day, second.slot), (Weekday.monday, MealSlot.dinner));
+    expect(second.isLeftover, isTrue);
+    expect(moved.baseTotal, closeTo(base.baseTotal, 1e-9), reason: 'moving meals never changes what is bought');
+  });
+
+  test('an order that no longer matches the week is ignored', () {
+    final profile = _profile(1, [0, 1, 2]);
+    final base = WeekPlanner.build(profile: profile, settings: const PlanSettings(), catalogue: RecipeFixtures.recipes);
+    final stale = WeekPlanner.build(
+      profile: profile,
+      settings: const PlanSettings(order: ['friday|dinner', 'monday|dinner', 'tuesday|dinner']),
+      catalogue: RecipeFixtures.recipes,
+    );
+    expect(stale, base);
+  });
+
   test('a cooked meal pays for every portion of its pot, leftovers are free', () {
     final plan = WeekPlanner.build(
       profile: _profile(2, [0, 1, 2, 3, 4, 5, 6], variety: Variety.balanced, household: 3),

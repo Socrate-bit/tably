@@ -134,6 +134,15 @@ class PlanCubit extends Cubit<PlanState> {
     unawaited(_analytics.capture(AnalyticsEvents.mealReplaced, properties: {'recipe_id': recipeId}));
   }
 
+  /// Rearranges the week to show the meals [keys] in that order, as dragged
+  /// on the menu. Leftovers follow: each pot is cooked at its first meal.
+  Future<void> reorder(List<String> keys) async {
+    if (listEquals(keys, [for (final s in state.week.slots) s.key])) return;
+    await _apply(state.settings.copyWith(order: keys));
+    debugPrint('[PlanCubit] week reordered');
+    unawaited(_analytics.capture(AnalyticsEvents.mealMoved));
+  }
+
   /// Shows the change immediately, persists it, and rolls back on failure.
   Future<void> _apply(PlanSettings next) async {
     final previous = state.settings;

@@ -79,6 +79,7 @@ abstract final class AnalyticsEvents {
   static const planRegenerated = 'plan_regenerated';
   static const mealReplaced = 'meal_replaced';
   static const mealRegenerated = 'meal_regenerated';
+  static const mealMoved = 'meal_moved';
   static const storeSwitchAccepted = 'store_switch_accepted';
   static const storeSwitchDeclined = 'store_switch_declined';
   static const recipeOpened = 'recipe_opened';
