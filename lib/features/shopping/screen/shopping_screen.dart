@@ -101,7 +101,7 @@ class ShoppingScreen extends StatelessWidget {
     Haptics.confirm();
     final l10n = AppL10n.of(context);
     Clipboard.setData(ClipboardData(
-      text: context.read<ShoppingCubit>().asPlainText(l10n.aisleName, (q) => formatQuantities(q, l10n)),
+      text: context.read<ShoppingCubit>().asPlainText(l10n.aisleName, (i) => formatQuantity(i.amount, i.unit, l10n)),
     ));
   }
 
@@ -114,7 +114,7 @@ class ShoppingScreen extends StatelessWidget {
           subject: l10n.shoppingList,
           header: l10n.shoppingShareHeader,
           aisleName: l10n.aisleName,
-          quantities: (q) => formatQuantities(q, l10n),
+          amount: (i) => formatQuantity(i.amount, i.unit, l10n),
           origin: box == null ? null : box.localToGlobal(Offset.zero) & box.size,
         );
     if (!shared && context.mounted) showErrorBanner(context, l10n.errorShoppingShare);
@@ -210,9 +210,9 @@ class _ItemRow extends StatelessWidget {
                       decorationColor: AppColors.textDisabled,
                     ),
                   ),
-                  if (item.quantities.isNotEmpty) ...[
+                  if (item.hasAmount) ...[
                     SizedBox(height: 1.h),
-                    Text(l10n.shoppingNeeded(formatQuantities(item.quantities, l10n)), style: AppTextStyles.metaMuted),
+                    Text(l10n.shoppingNeeded(formatQuantity(item.amount, item.unit, l10n)), style: AppTextStyles.metaMuted),
                   ],
                 ],
               ),

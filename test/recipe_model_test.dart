@@ -35,10 +35,7 @@ void main() {
     expect(formatQuantity(1.4, IngredientUnit.piece, fr), '1.4');
     expect(formatQuantity(0, IngredientUnit.toTaste, fr), 'au goût');
     expect(formatQuantity(2, IngredientUnit.clove, lookupAppL10n(const Locale('en'))), '2 cloves');
-    expect(
-      formatQuantities(const [Quantity(2, IngredientUnit.piece), Quantity(150, IngredientUnit.g)], fr),
-      '2 + 150g',
-    );
+    expect(formatQuantity(1.5, IngredientUnit.kg, fr), '1½kg');
   });
 
   test('units read from ids, legacy labels and Spoonacular labels', () {

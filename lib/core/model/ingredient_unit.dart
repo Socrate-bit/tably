@@ -1,15 +1,12 @@
-import 'package:equatable/equatable.dart';
-
 /// The fixed set of units an ingredient can be measured in. Only the id is
-/// persisted; the label comes from l10n. Weights and volumes carry their
-/// size in a [base] unit so amounts can be summed across recipes.
+/// persisted; the label comes from l10n.
 enum IngredientUnit {
   g('g'),
-  kg('kg', base: 'g', factor: 1000),
+  kg('kg'),
   ml('ml'),
-  l('l', base: 'ml', factor: 1000),
-  tbsp('tbsp', base: 'ml', factor: 15),
-  tsp('tsp', base: 'ml', factor: 5),
+  l('l'),
+  tbsp('tbsp'),
+  tsp('tsp'),
   piece('piece'),
   clove('clove'),
   slice('slice'),
@@ -21,16 +18,8 @@ enum IngredientUnit {
   pack('pack'),
   toTaste('to_taste');
 
-  const IngredientUnit(this.id, {String? base, this.factor = 1}) : _base = base;
+  const IngredientUnit(this.id);
   final String id;
-  final String? _base;
-
-  /// How many [baseUnit] one of this unit is, e.g. 15 for a tablespoon.
-  final double factor;
-
-  /// The unit this one converts into: g for weights, ml for volumes, itself
-  /// for anything counted.
-  IngredientUnit get baseUnit => _base == null ? this : fromId(_base);
 
   /// Weights and volumes are written glued to the number ("150g", "15ml").
   bool get isMetric => const {g, kg, ml, l}.contains(this);
@@ -58,20 +47,4 @@ enum IngredientUnit {
     'boîte': can, 'boîtes': can, 'cans': can,
     'au goût': toTaste, 'to taste': toTaste,
   };
-}
-
-/// An amount in a unit, e.g. one part of a shopping-list line.
-class Quantity extends Equatable {
-  const Quantity(this.amount, this.unit);
-
-  final double amount;
-  final IngredientUnit unit;
-
-  Map<String, dynamic> toMap() => {'amount': amount, 'unit': unit.id};
-
-  factory Quantity.fromMap(Map<String, dynamic> map) =>
-      Quantity((map['amount'] as num?)?.toDouble() ?? 0, IngredientUnit.fromId(map['unit'] as String?));
-
-  @override
-  List<Object?> get props => [amount, unit];
 }
