@@ -173,6 +173,13 @@ class RecipeAiService {
     );
   }
 
+  /// How Gemini sorts an ingredient into an aisle; shared with the shopping
+  /// list so both agree.
+  static const aisleGuide = '''produce (fresh fruit, vegetables, fresh herbs), meat_fish,
+  pasta_rice (pasta, rice, noodles, grains), tins_sauces (tins, jars, sauces,
+  condiments, stock), herbs_grocery (spices, dried herbs, oils, dairy, eggs,
+  baking, anything else).''';
+
   /// The rules Gemini applies, filled in with the user's constraints.
   @visibleForTesting
   static String instruction(UserProfile profile) {
@@ -216,10 +223,7 @@ When unsure about a diet or an allergen, reject.
   g, kg, ml and l; Tbsp is tbsp and tsp is tsp. Plain counts, sizes (large,
   medium) and servings are piece; use to_taste when the amount is 0.
   icon: one emoji for the ingredient.
-  aisle: produce (fresh fruit, vegetables, fresh herbs), meat_fish,
-  pasta_rice (pasta, rice, noodles, grains), tins_sauces (tins, jars, sauces,
-  condiments, stock), herbs_grocery (spices, dried herbs, oils, dairy, eggs,
-  baking, anything else).
+  aisle: $aisleGuide
 - craving: the best fit among quick (25 minutes or less), high_protein (30 g
   protein or more), low_calorie (450 kcal or less), family_favourites,
   healthy_comfort, fakeaway (takeaway-style), easy_digestion, indulgent.

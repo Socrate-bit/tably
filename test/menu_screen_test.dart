@@ -18,6 +18,7 @@ import 'package:tably/features/preferences/service/profile_service.dart';
 import 'package:tably/features/recipe/cubit/recipe_cubit.dart';
 import 'package:tably/features/recipe/service/recipe_service.dart';
 import 'package:tably/features/shopping/cubit/shopping_cubit.dart';
+import 'package:tably/features/shopping/service/shopping_ai_service.dart';
 import 'package:tably/features/shopping/service/shopping_service.dart';
 import 'package:tably/l10n/app_localizations.dart';
 
@@ -55,6 +56,7 @@ Future<ProfileCubit> _pumpMenu(WidgetTester tester, {required Size physicalSize,
         BlocProvider(
           create: (_) => ShoppingCubit(
             service: ShoppingService(),
+            ai: ShoppingAiService(),
             planCubit: planCubit,
             profileCubit: profileCubit,
             analytics: analytics,

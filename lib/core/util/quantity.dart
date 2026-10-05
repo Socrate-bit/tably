@@ -3,18 +3,17 @@ import '../model/ingredient_unit.dart';
 import 'option_labels.dart';
 
 /// Formats an ingredient amount with its unit: "150g", "½", "2 gousses".
-/// Weights and volumes are whole numbers; small counts use common fractions.
+/// Grams and millilitres are whole numbers; other amounts use common fractions.
 String formatQuantity(double amount, IngredientUnit unit, AppL10n l10n) {
   final label = l10n.unitLabel(unit, amount);
   if (amount <= 0 || unit == IngredientUnit.toTaste) return label;
-  final number = unit.isMetric ? _whole(amount) : _count(amount);
+  // Grams and millilitres round to whole numbers; kilos and litres keep
+  // fractions ("1½kg").
+  final whole = unit == IngredientUnit.g || unit == IngredientUnit.ml;
+  final number = whole ? _whole(amount) : _count(amount);
   if (label.isEmpty) return number;
   return unit.isMetric ? '$number$label' : '$number $label';
 }
-
-/// Formats a shopping-list line's parts, e.g. "2 + 150g".
-String formatQuantities(List<Quantity> quantities, AppL10n l10n) =>
-    quantities.map((q) => formatQuantity(q.amount, q.unit, l10n)).join(' + ');
 
 String _whole(double amount) => amount < 1 ? _count(amount) : '${amount.round()}';
 

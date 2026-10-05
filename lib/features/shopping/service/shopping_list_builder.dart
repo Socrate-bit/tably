@@ -1,68 +1,46 @@
 import '../../../core/model/aisle.dart';
-import '../../../core/model/ingredient_unit.dart';
 import '../../plan/model/week_plan.dart';
 import '../../recipe/model/recipe.dart';
 import '../model/shopping_item.dart';
 
-/// Derives the shopping list from the week. Pure, so the same week always
-/// gives the same list.
+/// Derives the raw shopping lines from the week. Pure, so the same week
+/// always gives the same lines; merging similar ones is left to
+/// ShoppingAiService.
 abstract final class ShoppingListBuilder {
-  /// Every ingredient the week needs, summed across meals: each slot is one
-  /// portion per household member, leftovers included since they are cooked
-  /// in the same pot. The same ingredient merges into one line whatever its
-  /// units. Sorted by aisle, then name.
-  static List<ShoppingItem> fromWeek(WeekPlan week, int household) {
-    final lines = <String, ({Ingredient first, Map<IngredientUnit, double> amounts})>{};
+  /// Every ingredient line the week needs, summed across meals: each slot is
+  /// one portion per household member, leftovers included since they are
+  /// cooked in the same pot. Only the same ingredient in the same unit sums
+  /// here. In order of first appearance.
+  static List<Ingredient> linesFromWeek(WeekPlan week, int household) {
+    final lines = <(Object, String), Ingredient>{};
     for (final slot in week.slots) {
-      for (final ingredient in slot.recipe.ingredients) {
-        final line = lines.putIfAbsent(_key(ingredient), () => (first: ingredient, amounts: {}));
-        if (ingredient.amount <= 0 || ingredient.unit == IngredientUnit.toTaste) continue;
-        final amount = ingredient.amount * household;
-        line.amounts.update(ingredient.unit, (sum) => sum + amount, ifAbsent: () => amount);
+      for (final i in slot.recipe.ingredients) {
+        // Spoonacular gives a few ingredients no id; those sum by name.
+        final key = (i.id > 0 ? i.id : i.name, i.unit.id);
+        final previous = lines[key];
+        lines[key] = Ingredient(
+          id: i.id,
+          icon: i.icon,
+          name: previous?.name ?? i.name,
+          amount: (previous?.amount ?? 0) + i.amount * household,
+          unit: i.unit,
+          aisle: previous?.aisle ?? i.aisle,
+        );
       }
     }
-    final sorted = lines.entries.toList()
-      ..sort((a, b) {
-        final byAisle = a.value.first.aisle.index.compareTo(b.value.first.aisle.index);
-        return byAisle != 0
-            ? byAisle
-            : a.value.first.name.toLowerCase().compareTo(b.value.first.name.toLowerCase());
-      });
-    return [
-      for (final (index, MapEntry(key: id, value: line)) in sorted.indexed)
-        ShoppingItem(
-          id: id,
-          aisle: line.first.aisle,
-          icon: line.first.icon,
-          name: line.first.name,
-          quantities: _merge(line.amounts),
-          order: index,
-        ),
-    ];
+    return lines.values.toList();
   }
 
-  /// Sums the amounts that share a base unit. A unit used alone keeps its
-  /// own name ("3 c. à s."); mixed weights or volumes convert to g or ml.
-  /// Counts never convert, so they stay separate parts.
-  static List<Quantity> _merge(Map<IngredientUnit, double> amounts) {
-    final byBase = <IngredientUnit, Map<IngredientUnit, double>>{};
-    for (final MapEntry(key: unit, value: amount) in amounts.entries) {
-      byBase.putIfAbsent(unit.baseUnit, () => {})[unit] = amount;
+  /// What a list is built from: the language, the household and how many
+  /// slots each recipe fills. The list is only rebuilt when this changes.
+  static String sourceOf(WeekPlan week, int household, String languageCode) {
+    final counts = <String, int>{};
+    for (final slot in week.slots) {
+      counts.update(slot.recipe.id, (n) => n + 1, ifAbsent: () => 1);
     }
-    return [
-      for (final MapEntry(key: base, value: units) in byBase.entries)
-        units.length == 1
-            ? Quantity(units.values.single, units.keys.single)
-            : Quantity(units.entries.fold(0, (sum, e) => sum + e.value * e.key.factor), base),
-    ];
+    final recipes = [for (final e in counts.entries) '${e.key}x${e.value}']..sort();
+    return '$languageCode|$household|${recipes.join(',')}';
   }
-
-  /// A stable document id per ingredient. Spoonacular's id when there is
-  /// one; otherwise the name, with anything but letters and digits as "_" so
-  /// it can never form a path separator.
-  static String _key(Ingredient ingredient) => ingredient.id > 0
-      ? '${ingredient.id}'
-      : 'name_${ingredient.name.toLowerCase().replaceAll(RegExp(r'[^a-z0-9]+'), '_')}';
 
   /// Groups items into aisle cards, in aisle order.
   static List<ShoppingCategory> groupByAisle(List<ShoppingItem> items) {

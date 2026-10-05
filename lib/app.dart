@@ -21,6 +21,7 @@ import 'features/recipe/service/recipe_ai_service.dart';
 import 'features/recipe/service/recipe_search_service.dart';
 import 'features/recipe/service/recipe_service.dart';
 import 'features/shopping/cubit/shopping_cubit.dart';
+import 'features/shopping/service/shopping_ai_service.dart';
 import 'features/shopping/service/shopping_service.dart';
 import 'features/subscription/cubit/subscription_cubit.dart';
 import 'features/subscription/service/paywall_service.dart';
@@ -47,6 +48,7 @@ class TablyApp extends StatelessWidget {
         RepositoryProvider<RecipeService>.value(value: recipeService),
         RepositoryProvider(create: (_) => RecipeSearchService()),
         RepositoryProvider(create: (_) => RecipeAiService()),
+        RepositoryProvider(create: (_) => ShoppingAiService()),
         RepositoryProvider(create: (_) => const PaywallService()),
         RepositoryProvider(create: (_) => ReferralService()),
       ],
@@ -96,6 +98,7 @@ class TablyApp extends StatelessWidget {
           BlocProvider(
             create: (context) => ShoppingCubit(
               service: context.read<ShoppingService>(),
+              ai: context.read<ShoppingAiService>(),
               planCubit: context.read<PlanCubit>(),
               profileCubit: context.read<ProfileCubit>(),
               analytics: analytics,
