@@ -16,6 +16,7 @@ import '../../../l10n/app_localizations.dart';
 import '../../home/cubit/home_cubit.dart';
 import '../../plan/cubit/plan_cubit.dart';
 import '../../plan/model/week_plan.dart';
+import '../../plan/widget/week_meal_sheet.dart';
 import '../../preferences/cubit/profile_cubit.dart';
 import '../cubit/catalogue_cubit.dart';
 import '../cubit/recipe_cubit.dart';
@@ -77,9 +78,11 @@ class _RecipeScreenState extends State<RecipeScreen> {
     super.dispose();
   }
 
-  Future<void> _replace(Recipe recipe) async {
-    final changed = await ReplaceSheet.show(context, recipe: recipe, slot: widget.slot);
-    if (!changed || !mounted) return;
+  /// Opens [sheet] — another dish for this planned meal, or the meal this
+  /// recipe takes the place of — and goes back to the menu once the week
+  /// changed.
+  Future<void> _changeWeek(Future<bool> Function() sheet) async {
+    if (!await sheet() || !mounted) return;
     context.read<HomeCubit>().select(HomeTab.menu);
     Navigator.of(context).pop();
   }
@@ -195,7 +198,7 @@ class _RecipeScreenState extends State<RecipeScreen> {
                             label: l10n.recipeReplaceMeal,
                             fontSize: 15,
                             verticalPadding: 19.h,
-                            onPressed: () => _replace(recipe),
+                            onPressed: () => _changeWeek(() => ReplaceSheet.show(context, slot: widget.slot!)),
                           ),
                         ),
                       ],
@@ -205,7 +208,7 @@ class _RecipeScreenState extends State<RecipeScreen> {
                       label: l10n.recipeAddToWeek,
                       fontSize: 17,
                       verticalPadding: 19.h,
-                      onPressed: () => _replace(recipe),
+                      onPressed: () => _changeWeek(() => WeekMealSheet.show(context, recipe: recipe)),
                     ),
                 ],
               ),

@@ -59,7 +59,6 @@ class RecipeBrowseState extends Equatable {
   bool get canSearch => isSearching || hasFilters;
 
   /// Recipes that pass the filters and match every word of the search.
-  /// [searchText] defaults to [query]; the replace sheet has its own box.
   /// [cravingLabel] lets the search match badge names in the user's language.
   /// [searched] marks API results for this state: the API already matched
   /// the text, the cuisines and a single craving, so they are not
@@ -68,10 +67,9 @@ class RecipeBrowseState extends Equatable {
     List<Recipe> recipes, {
     required Store store,
     required String Function(Craving) cravingLabel,
-    String? searchText,
     bool searched = false,
   }) {
-    final text = searched ? '' : searchText ?? query;
+    final text = searched ? '' : query;
     final words = text.trim().toLowerCase().split(RegExp(r'\s+')).where((w) => w.isNotEmpty);
     final checkCravings = cravings.isNotEmpty && !(searched && searchCraving != null);
     return recipes.where((r) {

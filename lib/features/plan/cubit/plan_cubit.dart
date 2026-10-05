@@ -9,6 +9,7 @@ import '../../../core/analytics/analytics_service.dart';
 import '../../preferences/cubit/profile_cubit.dart';
 import '../../recipe/cubit/catalogue_cubit.dart';
 import '../../recipe/cubit/recipe_cubit.dart';
+import '../../recipe/model/recipe.dart';
 import '../model/plan_settings.dart';
 import '../model/week_plan.dart';
 import '../service/plan_service.dart';
@@ -92,12 +93,18 @@ class PlanCubit extends Cubit<PlanState> {
     }
   }
 
-  /// Swaps the meal in [slotKey] for [recipeId].
-  Future<void> replace(String slotKey, String recipeId) async {
-    await _apply(state.settings.copyWith(overrides: {...state.settings.overrides, slotKey: recipeId}));
+  /// Swaps the meal in [slotKey] for [recipe]. One from neither the cached
+  /// pool nor the saved favourites — a search result — joins the pool first,
+  /// so the week can use it.
+  Future<void> replace(String slotKey, Recipe recipe) async {
+    final known = _catalogueCubit.state.byId(recipe.id) != null ||
+        _recipeCubit.state.savedFavourites.any((r) => r.id == recipe.id);
+    if (!known) unawaited(_catalogueCubit.addRecipe(recipe));
+    await _apply(state.settings.copyWith(overrides: {...state.settings.overrides, slotKey: recipe.id}));
+    debugPrint('[PlanCubit] meal replaced: $slotKey → ${recipe.id}');
     unawaited(_analytics.capture(
       AnalyticsEvents.mealReplaced,
-      properties: {'slot': slotKey, 'recipe_id': recipeId},
+      properties: {'slot': slotKey, 'recipe_id': recipe.id},
     ));
   }
 
@@ -121,19 +128,6 @@ class PlanCubit extends Cubit<PlanState> {
       properties: {'slot': slot.key, 'recipe_id': recipeId},
     ));
     return state.week.slotByKey(slot.key);
-  }
-
-  /// Puts [recipeId] in place of [replacedRecipeId] wherever that dish is
-  /// cooked this week; its leftovers follow.
-  Future<void> replaceRecipe(String replacedRecipeId, String recipeId) async {
-    final keys = state.week.slots
-        .where((s) => !s.isLeftover && s.recipe.id == replacedRecipeId)
-        .map((s) => s.key);
-    await _apply(state.settings.copyWith(overrides: {
-      ...state.settings.overrides,
-      for (final key in keys) key: recipeId,
-    }));
-    unawaited(_analytics.capture(AnalyticsEvents.mealReplaced, properties: {'recipe_id': recipeId}));
   }
 
   /// Rearranges the week to show the meals [keys] in that order, as dragged

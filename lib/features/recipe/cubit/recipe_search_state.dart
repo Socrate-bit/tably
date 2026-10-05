@@ -24,6 +24,11 @@ class RecipeSearchState extends Equatable {
 
   bool isSearchingFor(RecipeBrowseState browse) => status == RecipeSearchStatus.searching && searchedFor == browse;
 
+  /// Whether a list shows the search for [browse] — typed text, its results
+  /// or the search running — rather than the cached pool.
+  bool showsSearch(RecipeBrowseState browse) =>
+      browse.isSearching || resultsFor(browse) != null || isSearchingFor(browse);
+
   Recipe? byId(String id) => results.where((r) => r.id == id).firstOrNull;
 
   @override

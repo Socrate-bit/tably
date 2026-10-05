@@ -1957,12 +1957,6 @@ abstract class AppL10n {
   /// **'Aucun favori pour l\'instant.'**
   String get replaceEmptyFavourites;
 
-  /// No description provided for @replaceEmptySearch.
-  ///
-  /// In fr, this message translates to:
-  /// **'Aucun repas ne correspond à cette recherche.'**
-  String get replaceEmptySearch;
-
   /// No description provided for @recipeCreatedBy.
   ///
   /// In fr, this message translates to:

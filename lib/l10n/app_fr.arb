@@ -534,7 +534,6 @@
   "replaceAll": "Toutes",
   "replaceFavourites": "Favoris",
   "replaceEmptyFavourites": "Aucun favori pour l'instant.",
-  "replaceEmptySearch": "Aucun repas ne correspond à cette recherche.",
   "recipeCreatedBy": "RECETTE DE",
   "recipeReplaceMeal": "Choisir un autre repas",
   "recipeRegenerateMeal": "Régénérer",

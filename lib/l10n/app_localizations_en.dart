@@ -1047,9 +1047,6 @@ class AppL10nEn extends AppL10n {
   String get replaceEmptyFavourites => 'No favourites yet.';
 
   @override
-  String get replaceEmptySearch => 'No meals match this search.';
-
-  @override
   String get recipeCreatedBy => 'RECIPE BY';
 
   @override
