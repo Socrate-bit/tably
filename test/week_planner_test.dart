@@ -74,7 +74,7 @@ void main() {
     expect(profile.varietyRecipes, {Variety.high: 7, Variety.balanced: 4});
   });
 
-  test('leftovers stay fresh and alternate for every week shape', () {
+  test('leftovers stay fresh for every week shape', () {
     int hourOf(PlanSlot s) => s.day.index * 24 + s.slot.hour;
     for (var mask = 1; mask < 128; mask++) {
       for (final mealsPerDay in [1, 2]) {
@@ -89,34 +89,32 @@ void main() {
             final cooked = plan.slots.take(i).lastWhere((c) => !c.isLeftover && c.recipe.id == s.recipe.id);
             expect(hourOf(s) - hourOf(cooked), lessThanOrEqualTo(UserProfile.leftoverHours), reason: '$where, ${s.key}');
           }
-          // A dish only comes back to back inside a window with a single pot.
-          final windows = profile.freshWindows;
-          for (final window in windows) {
-            final slots = [for (final i in window) plan.slots[i]];
-            if (slots.where((s) => !s.isLeftover).length < 2) continue;
-            for (var j = 1; j < slots.length; j++) {
-              expect(slots[j].recipe.id, isNot(slots[j - 1].recipe.id), reason: '$where, ${slots[j].key}');
-            }
-          }
         }
       }
     }
   });
 
-  test('two meals a day on balanced alternates dishes across each pair of days', () {
-    final plan = WeekPlanner.build(
-      profile: _profile(2, [0, 1, 2, 3, 4, 5, 6], variety: Variety.balanced),
-      settings: const PlanSettings(),
-      catalogue: RecipeFixtures.recipes,
-    );
-    final ids = plan.slots.map((s) => s.recipe.id).toList();
-    // Monday and Tuesday: A B A B.
-    expect([ids[2], ids[3]], [ids[0], ids[1]]);
-    expect(ids[0], isNot(ids[1]));
-    expect([for (final s in plan.slots.take(4)) s.isLeftover], [false, false, true, true]);
-    // Sunday stands alone, so its dinner is the only back-to-back repeat.
-    final repeats = [for (var i = 1; i < ids.length; i++) if (ids[i] == ids[i - 1]) plan.slots[i].key];
-    expect(repeats, ['sunday|dinner']);
+  test('dishes alternate as much as freshness allows, in even shares', () {
+    // Each letter is a dish, in the order it is first cooked.
+    String pattern(int mealsPerDay, List<int> days, Variety variety) {
+      final plan = WeekPlanner.build(
+        profile: _profile(mealsPerDay, days, variety: variety),
+        settings: const PlanSettings(),
+        catalogue: RecipeFixtures.recipes,
+      );
+      final letters = <String, String>{};
+      return plan.slots.map((s) => letters.putIfAbsent(s.recipe.id, () => String.fromCharCode(65 + letters.length))).join();
+    }
+
+    // Balanced: two days at a time, A B A B; the lone Sunday repeats.
+    expect(pattern(2, [0, 1, 2, 3, 4, 5, 6], Variety.balanced), 'ABABCDCDEFEFGG');
+    // Batch cooking: a dish eaten three or four times within 32h can't avoid
+    // repeats, but they're kept to the fewest, in even shares.
+    expect(pattern(2, [2, 3, 4], Variety.low), 'AABABB');
+    expect(pattern(2, [0, 1, 2, 3, 4], Variety.low), 'AABABBCCCC');
+    expect(pattern(2, [0, 1, 2, 3, 4, 5, 6], Variety.low), 'AABABBCCCCDDDD');
+    // One meal a day: a dinner only keeps until the next day's dinner.
+    expect(pattern(1, [0, 1, 2, 3, 4, 5, 6], Variety.balanced), 'ABBCCDD');
   });
 
   test('a swapped meal carries through to its leftover', () {
