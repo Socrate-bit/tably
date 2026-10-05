@@ -84,6 +84,7 @@ void main() {
       catalogue = CatalogueCubit(
         service: service,
         search: search,
+        quota: unboundQuota(profile),
         ai: FakeAi(),
         profileCubit: profile,
         analytics: const AnalyticsService(),

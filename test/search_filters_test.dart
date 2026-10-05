@@ -111,7 +111,13 @@ void main() {
     final (browseCubit, profileCubit) = await browse(onboarding);
     final api = FakeSearch();
     final ai = FakeAi();
-    final search = RecipeSearchCubit(search: api, ai: ai, profileCubit: profileCubit, analytics: analytics);
+    final search = RecipeSearchCubit(
+      search: api,
+      quota: unboundQuota(profileCubit),
+      ai: ai,
+      profileCubit: profileCubit,
+      analytics: analytics,
+    );
     addTearDown(search.close);
 
     browseCubit.search('curry');

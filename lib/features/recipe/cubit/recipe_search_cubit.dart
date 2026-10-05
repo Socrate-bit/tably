@@ -12,6 +12,7 @@ import '../service/recipe_ai_service.dart';
 import '../service/recipe_search_service.dart';
 import 'catalogue_cubit.dart';
 import 'recipe_browse_cubit.dart';
+import 'search_quota_cubit.dart';
 
 part 'recipe_search_state.dart';
 
@@ -22,10 +23,12 @@ part 'recipe_search_state.dart';
 class RecipeSearchCubit extends Cubit<RecipeSearchState> {
   RecipeSearchCubit({
     required RecipeSearchService search,
+    required SearchQuotaCubit quota,
     required RecipeAiService ai,
     required ProfileCubit profileCubit,
     required AnalyticsService analytics,
   })  : _search = search,
+        _quota = quota,
         _ai = ai,
         _profileCubit = profileCubit,
         _analytics = analytics,
@@ -35,6 +38,7 @@ class RecipeSearchCubit extends Cubit<RecipeSearchState> {
   static const size = 50;
 
   final RecipeSearchService _search;
+  final SearchQuotaCubit _quota;
   final RecipeAiService _ai;
   final ProfileCubit _profileCubit;
   final AnalyticsService _analytics;
@@ -58,6 +62,8 @@ class RecipeSearchCubit extends Cubit<RecipeSearchState> {
     final stopwatch = Stopwatch()..start();
     emit(RecipeSearchState(status: RecipeSearchStatus.searching, searchedFor: browse));
     try {
+      // Spent searches stop here, before Gemini translates the text.
+      _quota.ensureAvailable();
       final text = browse.query.trim();
       final query = text.isEmpty ? null : await _ai.toEnglish(text, profile.languageCode);
       final raw = await _search.search(

@@ -7,6 +7,7 @@ import 'package:tably/features/preferences/service/profile_service.dart';
 import 'package:tably/features/recipe/cubit/catalogue_cubit.dart';
 import 'package:tably/features/recipe/cubit/recipe_browse_cubit.dart';
 import 'package:tably/features/recipe/cubit/recipe_search_cubit.dart';
+import 'package:tably/features/recipe/cubit/search_quota_cubit.dart';
 import 'package:tably/features/recipe/model/recipe.dart';
 
 import 'fixtures/recipe_fixtures.dart';
@@ -16,11 +17,12 @@ void main() {
 
   late FakeSearch api;
 
-  RecipeSearchCubit cubit({FakeAi? ai}) {
+  RecipeSearchCubit cubit({FakeAi? ai, SearchQuotaCubit? quota}) {
     api = FakeSearch();
     final profileCubit = ProfileCubit(service: ProfileService(), analytics: const AnalyticsService());
     final cubit = RecipeSearchCubit(
       search: api,
+      quota: quota ?? unboundQuota(profileCubit),
       ai: ai ?? FakeAi(),
       profileCubit: profileCubit,
       analytics: const AnalyticsService(),

@@ -91,6 +91,51 @@ const SPOONACULAR_HOST = "spoonacular-recipe-food-nutrition-v1.p.rapidapi.com";
 const SEARCH_SIZE = 24;
 const MAX_SEARCH_SIZE = 100;
 
+/**
+ * Searches per UTC day: admins and creators (a granted userType) get more.
+ * The app shows the same numbers.
+ */
+const DAILY_SEARCH_LIMIT = 30;
+const GRANTED_SEARCH_LIMIT = 200;
+
+/** Today's UTC date, "YYYY-MM-DD": the quota resets at midnight UTC. */
+const utcDay = (): string => new Date().toISOString().slice(0, 10);
+
+/**
+ * Spends one of the caller's daily searches at `searchQuota/{uid}` (server
+ * only, so the client can't reset it). The limit follows the user's type.
+ * Returns the searches left, or throws resource-exhausted once the day's
+ * are spent.
+ */
+async function spendSearch(uid: string, day: string): Promise<number> {
+  const ref = db.collection("searchQuota").doc(uid);
+  const userRef = db.collection("users").doc(uid);
+  return db.runTransaction(async (tx) => {
+    const [quota, user] = await Promise.all([tx.get(ref), tx.get(userRef)]);
+    const limit = GRANTABLE_TYPES.includes(user.data()?.userType) ? GRANTED_SEARCH_LIMIT : DAILY_SEARCH_LIMIT;
+    const data = quota.data();
+    const count = data?.day === day ? Number(data.count) || 0 : 0;
+    if (count >= limit) {
+      throw new HttpsError("resource-exhausted", "Daily search limit reached.", {reason: "daily-limit"});
+    }
+    tx.set(ref, {day, count: count + 1});
+    return limit - count - 1;
+  });
+}
+
+/** Gives back a search whose Spoonacular call failed, unless the day rolled over. */
+async function refundSearch(uid: string, day: string): Promise<void> {
+  const ref = db.collection("searchQuota").doc(uid);
+  try {
+    await db.runTransaction(async (tx) => {
+      const data = (await tx.get(ref)).data();
+      if (data?.day === day && Number(data.count) > 0) tx.update(ref, {count: FieldValue.increment(-1)});
+    });
+  } catch (e) {
+    logger.error("searchRecipes: refund failed", e);
+  }
+}
+
 /** Spoonacular prices are US cents; everyone is on EUR for now. Approximate. */
 const USD_TO_EUR = 0.86;
 
@@ -271,9 +316,11 @@ function trimRecipe(r: any): Record<string, unknown> | null {
 /**
  * Searches Spoonacular for main courses matching the caller's constraints.
  * 1. Maps the constraints and search filters to query parameters
- * 2. Calls complexSearch with the secret RapidAPI key (1 request of the quota,
- *    for up to 100 recipes)
- * 3. Trims each result to the fields the app and Gemini use
+ * 2. Spends one of the caller's searches for today (30, or 200 for admins
+ *    and creators)
+ * 3. Calls complexSearch with the secret RapidAPI key (1 request of the quota,
+ *    for up to 100 recipes); a failed call gives the search back
+ * 4. Trims each result to the fields the app and Gemini use
  * Live and uncached: every call spends quota.
  */
 export const searchRecipes = onCall(
@@ -282,8 +329,11 @@ export const searchRecipes = onCall(
     if (!request.auth) {
       throw new HttpsError("unauthenticated", "Must be signed in.");
     }
+    const uid = request.auth.uid;
     const data = (request.data ?? {}) as Record<string, unknown>;
     const url = `https://${SPOONACULAR_HOST}/recipes/complexSearch?${searchParams(data)}`;
+    const day = utcDay();
+    const left = await spendSearch(uid, day);
 
     let response: Response;
     try {
@@ -296,14 +346,17 @@ export const searchRecipes = onCall(
       });
     } catch (e) {
       logger.error("searchRecipes: request failed", e);
+      await refundSearch(uid, day);
       throw new HttpsError("unavailable", "Recipe search is unavailable.");
     }
 
     logger.info("searchRecipes: quota", {
-      uid: request.auth.uid,
+      uid,
       status: response.status,
+      userSearchesLeft: left,
       requestsRemaining: response.headers.get("x-ratelimit-requests-remaining"),
     });
+    if (!response.ok) await refundSearch(uid, day);
     if (response.status === 402 || response.status === 429) {
       throw new HttpsError("resource-exhausted", "Recipe search quota reached.");
     }

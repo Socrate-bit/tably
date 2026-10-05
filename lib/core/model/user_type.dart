@@ -15,4 +15,7 @@ enum UserType {
 
   /// Admins and creators get the app without paying.
   bool get skipsPaywall => this != UserType.normal;
+
+  /// Recipe searches per UTC day; `searchRecipes` enforces the same numbers.
+  int get dailySearches => this == UserType.normal ? 30 : 200;
 }

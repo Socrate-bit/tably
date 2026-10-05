@@ -3,7 +3,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../../core/theme/app_theme.dart';
-import '../../../core/util/error_feedback.dart';
 import '../../../core/util/haptics.dart';
 import '../../../core/util/option_labels.dart';
 import '../../../core/widget/circle_icon_button.dart';
@@ -22,6 +21,7 @@ import '../cubit/recipe_cubit.dart';
 import '../cubit/recipe_search_cubit.dart';
 import '../model/recipe.dart';
 import '../widget/filter_button.dart';
+import '../widget/quota_dialog.dart';
 import '../widget/recipe_row.dart';
 import 'filters_screen.dart';
 import 'recipe_screen.dart';
@@ -68,7 +68,7 @@ class RecipesScreen extends StatelessWidget {
     return BlocListener<RecipeSearchCubit, RecipeSearchState>(
       listenWhen: (previous, current) => current.error != null && previous.error != current.error,
       listener: (context, state) {
-        showErrorBanner(context, l10n.catalogueError(state.error));
+        showSearchError(context, state.error);
         context.read<RecipeSearchCubit>().errorShown();
       },
       child: SingleChildScrollView(

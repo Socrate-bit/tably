@@ -14,6 +14,7 @@ import '../model/recipe.dart';
 import '../service/recipe_ai_service.dart';
 import '../service/recipe_search_service.dart';
 import '../service/recipe_service.dart';
+import 'search_quota_cubit.dart';
 
 part 'catalogue_state.dart';
 
@@ -26,12 +27,14 @@ class CatalogueCubit extends Cubit<CatalogueState> {
   CatalogueCubit({
     required RecipeService service,
     required RecipeSearchService search,
+    required SearchQuotaCubit quota,
     required RecipeAiService ai,
     required ProfileCubit profileCubit,
     required AnalyticsService analytics,
     List<Recipe> recipes = const [],
   })  : _service = service,
         _search = search,
+        _quota = quota,
         _ai = ai,
         _profileCubit = profileCubit,
         _analytics = analytics,
@@ -44,6 +47,7 @@ class CatalogueCubit extends Cubit<CatalogueState> {
 
   final RecipeService _service;
   final RecipeSearchService _search;
+  final SearchQuotaCubit _quota;
   final RecipeAiService _ai;
   final ProfileCubit _profileCubit;
   final AnalyticsService _analytics;
@@ -88,7 +92,7 @@ class CatalogueCubit extends Cubit<CatalogueState> {
 
   /// Why a build failed, for analytics and the error message.
   static String reasonFor(Object? error) => switch (error) {
-        FirebaseFunctionsException(code: 'resource-exhausted') => 'quota',
+        SearchLimitException() || FirebaseFunctionsException(code: 'resource-exhausted') => 'quota',
         FirebaseFunctionsException() => 'search',
         NoMatchingRecipesException() => 'no_match',
         FirebaseAIException() => 'ai',
@@ -176,7 +180,7 @@ class CatalogueCubit extends Cubit<CatalogueState> {
     });
   }
 
-  /// 1. Searches Spoonacular (one request of the daily quota)
+  /// 1. Searches Spoonacular (one of the user's daily searches)
   /// 2. Has Gemini drop what breaks a constraint and translate the rest
   /// 3. Replaces the stored catalogue, which the plan then reads
   Future<bool> _run(UserProfile profile, String key) async {
@@ -184,6 +188,7 @@ class CatalogueCubit extends Cubit<CatalogueState> {
     final stopwatch = Stopwatch()..start();
     emit(state.copyWith(status: CatalogueStatus.building, step: CatalogueStep.searching, clearError: true));
     try {
+      _quota.ensureAvailable();
       final raw = await _search.search(profile, number: poolSizeFor(profile));
       if (superseded()) return false;
       emit(state.copyWith(step: CatalogueStep.adapting));

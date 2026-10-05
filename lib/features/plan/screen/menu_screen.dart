@@ -18,6 +18,8 @@ import '../../preferences/cubit/profile_cubit.dart';
 import '../../preferences/model/user_profile.dart';
 import '../../recipe/cubit/catalogue_cubit.dart';
 import '../../recipe/screen/recipe_screen.dart';
+import '../../recipe/widget/quota_dialog.dart';
+import '../../recipe/widget/search_quota_badge.dart';
 import '../../shopping/cubit/shopping_cubit.dart';
 import '../../shopping/screen/shopping_screen.dart';
 import '../cubit/plan_cubit.dart';
@@ -54,11 +56,15 @@ class MenuScreen extends StatelessWidget {
           },
         ),
         // A rebuild after a preferences change failed; the old recipes stay.
+        // Without recipes the status below explains, but a spent quota
+        // always gets its pop-up.
         BlocListener<CatalogueCubit, CatalogueState>(
           listenWhen: (previous, current) =>
-              current.error != null && previous.error != current.error && current.recipes.isNotEmpty,
+              current.error != null &&
+              previous.error != current.error &&
+              (current.recipes.isNotEmpty || CatalogueCubit.reasonFor(current.error) == 'quota'),
           listener: (context, state) {
-            showErrorBanner(context, l10n.catalogueError(state.error));
+            showSearchError(context, state.error);
             context.read<CatalogueCubit>().errorShown();
           },
         ),
@@ -69,10 +75,20 @@ class MenuScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                // Sized off the width so it spans the same share of every phone.
-                AppWordmark(height: 64.w),
-                const Spacer(),
+                // Sized off the width so it spans the same share of every phone,
+                // shrinking only when a long store name needs the room.
+                Flexible(
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    alignment: Alignment.centerLeft,
+                    child: AppWordmark(height: 64.w),
+                  ),
+                ),
+                SizedBox(width: 8.w),
+                const SearchQuotaBadge(),
+                SizedBox(width: 6.w),
                 StorePill(store: profile.store, onTap: openStores),
               ],
             ),

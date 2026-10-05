@@ -9,7 +9,8 @@ import '../../preferences/model/user_profile.dart';
 import '../model/recipe.dart';
 
 /// Finds candidate recipes through the `searchRecipes` Cloud Function, which
-/// holds the Spoonacular key. Each call spends one request of the daily quota.
+/// holds the Spoonacular key. Each call spends one of the user's daily
+/// searches (see SearchQuotaCubit) and one request of the API quota.
 class RecipeSearchService {
   RecipeSearchService({FirebaseFunctions? functions}) : _functions = functions;
 

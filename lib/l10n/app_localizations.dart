@@ -2292,6 +2292,36 @@ abstract class AppL10n {
   /// In fr, this message translates to:
   /// **'Ex. : pas de champignons, peu épicé, pas de poisson cru…'**
   String get prefsCustomInstructionsHint;
+
+  /// No description provided for @actionOk.
+  ///
+  /// In fr, this message translates to:
+  /// **'OK'**
+  String get actionOk;
+
+  /// No description provided for @quotaTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Recherches du jour'**
+  String get quotaTitle;
+
+  /// No description provided for @quotaBody.
+  ///
+  /// In fr, this message translates to:
+  /// **'{remaining, plural, =1{Il te reste 1 recherche de recettes} other{Il te reste {remaining} recherches de recettes}} sur {limit} aujourd\'hui. Le compteur se réinitialise demain à {time}.'**
+  String quotaBody(int remaining, int limit, String time);
+
+  /// No description provided for @quotaReachedTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Limite de recherches atteinte'**
+  String get quotaReachedTitle;
+
+  /// No description provided for @quotaReachedBody.
+  ///
+  /// In fr, this message translates to:
+  /// **'Tu as utilisé tes {limit} recherches de recettes du jour. Elles se réinitialisent demain à {time}.'**
+  String quotaReachedBody(int limit, String time);
 }
 
 class _AppL10nDelegate extends LocalizationsDelegate<AppL10n> {

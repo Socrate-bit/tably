@@ -76,6 +76,7 @@ abstract final class AnalyticsEvents {
   static const catalogueKept = 'catalogue_kept';
   static const recipeSearched = 'recipe_searched';
   static const recipeSearchFailed = 'recipe_search_failed';
+  static const searchQuotaOpened = 'search_quota_opened';
   static const planRegenerated = 'plan_regenerated';
   static const mealReplaced = 'meal_replaced';
   static const mealRegenerated = 'meal_regenerated';
