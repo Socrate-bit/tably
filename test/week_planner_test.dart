@@ -217,4 +217,18 @@ void main() {
     );
     expect(placed.slotByKey('monday|dinner')!.recipe, mine, reason: 'it is placed when chosen');
   });
+
+  test('serves the dishes matching the custom instructions first', () {
+    final wished = {RecipeFixtures.recipes[3].id, RecipeFixtures.recipes[7].id};
+    final catalogue = [
+      for (final r in RecipeFixtures.recipes) Recipe.fromMap(r.id, {...r.toMap(), 'wished': wished.contains(r.id)}),
+    ];
+    final plan = WeekPlanner.build(
+      profile: _profile(1, [0, 1, 2, 3, 4, 5, 6]),
+      settings: const PlanSettings(seed: 3),
+      catalogue: catalogue,
+    );
+    final cooked = [for (final s in plan.slots.where((s) => !s.isLeftover)) s.recipe.id];
+    expect(cooked.take(2).toSet(), wished);
+  });
 }

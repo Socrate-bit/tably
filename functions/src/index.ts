@@ -334,6 +334,39 @@ function trimRecipe(r: any, {requireImage = true} = {}): Record<string, unknown>
   };
 }
 
+/** One complexSearch call, trimmed; a network failure reads as status 0. */
+async function complexSearch(
+  params: URLSearchParams,
+  uid: string,
+  userSearchesLeft: number,
+): Promise<{ok: boolean; status: number; body?: string; total?: number; recipes: Record<string, unknown>[]}> {
+  let response: Response;
+  try {
+    response = await fetch(`https://${SPOONACULAR_HOST}/recipes/complexSearch?${params}`, {
+      headers: {
+        "x-rapidapi-key": spoonacularKey.value(),
+        "x-rapidapi-host": SPOONACULAR_HOST,
+      },
+      signal: AbortSignal.timeout(30_000),
+    });
+  } catch (e) {
+    logger.error("searchRecipes: request failed", e);
+    return {ok: false, status: 0, recipes: []};
+  }
+  logger.info("searchRecipes: quota", {
+    uid,
+    status: response.status,
+    userSearchesLeft,
+    requestsRemaining: response.headers.get("x-ratelimit-requests-remaining"),
+  });
+  if (!response.ok) return {ok: false, status: response.status, body: await response.text(), recipes: []};
+  const body = await response.json();
+  const recipes = (body.results ?? [])
+    .map((r: any) => trimRecipe(r))
+    .filter((r: unknown): r is Record<string, unknown> => r !== null);
+  return {ok: true, status: response.status, total: body.totalResults, recipes};
+}
+
 /**
  * One Spoonacular GET through RapidAPI with the secret key. A spent quota
  * becomes "resource-exhausted", anything else "unavailable".
@@ -375,7 +408,9 @@ async function spoonacularGet(path: string, params: URLSearchParams, uid: string
  * 2. Spends one of the caller's searches for today (30, or 200 for admins
  *    and creators)
  * 3. Calls complexSearch with the secret RapidAPI key (1 request of the quota,
- *    for up to 100 recipes); a failed call gives the search back
+ *    for up to 100 recipes); a failed call gives the search back. A wish
+ *    from the custom instructions is searched first, and topped up with a
+ *    second plain request when it finds too few
  * 4. Trims each result to the fields the app and Gemini use
  * Live and uncached: every call spends quota.
  */
@@ -387,11 +422,38 @@ export const searchRecipes = onCall(
     }
     const uid = request.auth.uid;
     const data = (request.data ?? {}) as Record<string, unknown>;
-    const body = await withSearch(uid, () => spoonacularGet("/recipes/complexSearch", searchParams(data), uid));
-    const recipes = (body.results ?? [])
-      .map((r: any) => trimRecipe(r))
-      .filter((r: unknown) => r !== null);
-    logger.info("searchRecipes: done", {total: body.totalResults, returned: recipes.length});
+    const params = searchParams(data);
+    // The custom instructions' wish, searched first when there's no query.
+    const wish = params.has("query") ? null : text(data.wish);
+    const day = utcDay();
+    const left = await spendSearch(uid, day);
+
+    const first = new URLSearchParams(params);
+    if (wish) first.set("query", wish.slice(0, 100));
+    const response = await complexSearch(first, uid, left);
+    if (!response.ok) await refundSearch(uid, day);
+    if (response.status === 402 || response.status === 429) {
+      throw new HttpsError("resource-exhausted", "Recipe search quota reached.");
+    }
+    if (!response.ok) {
+      logger.error("searchRecipes: bad status", {status: response.status, body: response.body});
+      throw new HttpsError("unavailable", "Recipe search is unavailable.");
+    }
+    const recipes = response.recipes;
+
+    // A wish that matched too few recipes is topped up with plain results.
+    // A failed top-up keeps what the wish found.
+    const number = Number(params.get("number"));
+    // Thin results trimmed away don't count, so this only fires when
+    // Spoonacular itself ran short.
+    if (wish && (response.total ?? 0) < number) {
+      const rest = new URLSearchParams(params);
+      rest.set("number", String(number - recipes.length));
+      const top = await complexSearch(rest, uid, left);
+      const seen = new Set(recipes.map((r) => r.id));
+      recipes.push(...top.recipes.filter((r) => !seen.has(r.id)));
+    }
+    logger.info("searchRecipes: done", {wish, total: response.total, returned: recipes.length});
     return {recipes};
   }
 );

@@ -21,7 +21,9 @@ class RecipeSearchService {
 
   /// Returns up to [number] trimmed Spoonacular recipes matching the
   /// profile's hard constraints, narrowed by the optional search filters:
-  /// English [query] text, [cuisines] and one [craving].
+  /// English [query] text, [cuisines] and one [craving]. An English [wish]
+  /// from the custom instructions is searched first, then topped up with
+  /// plain results, still one search of the quota.
   /// Throws [FirebaseFunctionsException] so the caller can tell a spent quota
   /// from an outage.
   Future<List<Map<String, dynamic>>> search(
@@ -30,6 +32,7 @@ class RecipeSearchService {
     String? query,
     Set<Cuisine> cuisines = const {},
     Craving? craving,
+    String? wish,
   }) async {
     final data = await _call('searchRecipes', {
       ..._constraints(profile),
@@ -37,6 +40,7 @@ class RecipeSearchService {
       'query': query,
       'cuisines': [for (final c in cuisines) c.id],
       'craving': craving?.id,
+      'wish': wish,
     });
     final recipes = _recipes(data);
     debugPrint('[RecipeSearchService] found ${recipes.length} candidates');
