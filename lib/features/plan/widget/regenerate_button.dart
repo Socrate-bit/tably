@@ -3,12 +3,13 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../../core/theme/app_theme.dart';
 import '../../../core/util/haptics.dart';
-import '../../../l10n/app_localizations.dart';
 
-/// The gradient "régénérer le plan" pill; its icon spins while a new week is built.
+/// The gradient "↻" pill, such as "régénérer le plan" or "relancer la
+/// recherche"; its icon spins while [regenerating].
 class RegenerateButton extends StatefulWidget {
-  const RegenerateButton({super.key, required this.regenerating, required this.onPressed});
+  const RegenerateButton({super.key, required this.label, required this.regenerating, required this.onPressed});
 
+  final String label;
   final bool regenerating;
   final VoidCallback onPressed;
 
@@ -33,7 +34,6 @@ class _RegenerateButtonState extends State<RegenerateButton> with SingleTickerPr
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppL10n.of(context);
     return GestureDetector(
       onTap: () {
         Haptics.confirm();
@@ -67,7 +67,7 @@ class _RegenerateButtonState extends State<RegenerateButton> with SingleTickerPr
               ),
             ),
             SizedBox(width: 9.w),
-            Text(widget.regenerating ? l10n.regeneratingPlan : l10n.regeneratePlan, style: AppTextStyles.regenerate),
+            Text(widget.label, style: AppTextStyles.regenerate),
           ],
         ),
       ),

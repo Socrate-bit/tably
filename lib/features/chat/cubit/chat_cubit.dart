@@ -153,24 +153,6 @@ class ChatCubit extends Cubit<ChatState> {
     await _answer(turn, entry.index, const {'declined_by_user': true});
   }
 
-  /// Deletes the conversation and starts a new one.
-  Future<void> clear() async {
-    _forgetTurn();
-    _agent.reset();
-    _found.clear();
-    _unsaved.clear();
-    _stored = const [];
-    emit(const ChatState());
-    unawaited(_analytics.capture(AnalyticsEvents.chatCleared));
-    final uid = _uid;
-    if (uid == null) return;
-    try {
-      await _service.clear(uid);
-    } catch (e) {
-      emit(state.copyWith(error: e));
-    }
-  }
-
   void errorShown() => emit(state.copyWith(clearError: true));
 
   /// How the tool [name] runs, for the typing indicator.

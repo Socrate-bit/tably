@@ -95,7 +95,6 @@ abstract final class AnalyticsEvents {
   static const chatToolCalled = 'chat_tool_called';
   static const chatActionResolved = 'chat_action_resolved';
   static const chatFailed = 'chat_failed';
-  static const chatCleared = 'chat_cleared';
   static const customRecipeCreated = 'custom_recipe_created';
   static const preferenceChanged = 'preference_changed';
   static const tabSelected = 'tab_selected';

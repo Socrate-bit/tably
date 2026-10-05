@@ -13,6 +13,7 @@ class SubScreenHeader extends StatelessWidget {
     this.subtitle,
     this.eyebrow,
     this.trailing,
+    this.backSize,
   });
 
   final String title;
@@ -23,11 +24,19 @@ class SubScreenHeader extends StatelessWidget {
   final String? eyebrow;
   final Widget? trailing;
 
+  /// The back button's size, 42 by default.
+  final double? backSize;
+
   @override
   Widget build(BuildContext context) {
     return Row(
       children: [
-        CircleIconButton(glyph: '←', onPressed: onBack),
+        CircleIconButton(
+          glyph: '←',
+          size: backSize,
+          fontSize: backSize == null ? null : 22,
+          onPressed: onBack,
+        ),
         SizedBox(width: 14.w),
         Expanded(
           child: Column(

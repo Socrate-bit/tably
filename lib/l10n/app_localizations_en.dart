@@ -1328,7 +1328,7 @@ class AppL10nEn extends AppL10n {
   String get chatEyebrow => 'YOUR AI CHEF';
 
   @override
-  String get chatTitle => 'Chef';
+  String get chatTitle => 'Tably';
 
   @override
   String get chatHint => 'Ask the chef…';
@@ -1378,16 +1378,6 @@ class AppL10nEn extends AppL10n {
 
   @override
   String get chatRetry => 'Retry';
-
-  @override
-  String get chatClearTitle => 'Clear the conversation?';
-
-  @override
-  String get chatClearBody =>
-      'The chef will forget everything you talked about.';
-
-  @override
-  String get chatClearConfirm => 'Clear';
 
   @override
   String get chatAddToWeek => 'Add to my week';

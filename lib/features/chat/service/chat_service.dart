@@ -52,20 +52,4 @@ class ChatService {
       debugPrint('[ChatService] expirePending failed: $e');
     }
   }
-
-  /// Deletes the whole conversation.
-  Future<void> clear(String uid) async {
-    try {
-      final all = await _col(uid).get();
-      final batch = _db.batch();
-      for (final doc in all.docs) {
-        batch.delete(doc.reference);
-      }
-      await batch.commit();
-      debugPrint('[ChatService] cleared ${all.docs.length} messages');
-    } catch (e) {
-      debugPrint('[ChatService] clear failed: $e');
-      rethrow;
-    }
-  }
 }

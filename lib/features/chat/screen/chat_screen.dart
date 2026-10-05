@@ -39,37 +39,6 @@ class _ChatScreenState extends State<ChatScreen> {
     context.read<ChatCubit>().refresh();
   }
 
-  Future<void> _confirmClear(BuildContext context) async {
-    final l10n = AppL10n.of(context);
-    final cubit = context.read<ChatCubit>();
-    final clear = await showDialog<bool>(
-      context: context,
-      builder: (dialogContext) => AlertDialog(
-        backgroundColor: AppColors.surface,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(22.r)),
-        title: Text(l10n.chatClearTitle, style: AppTextStyles.sheetTitle),
-        content: Text(l10n.chatClearBody, style: AppTextStyles.settingsRowSub),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Haptics.tap();
-              Navigator.of(dialogContext).pop(false);
-            },
-            child: Text(l10n.actionCancel, style: AppTextStyles.secondaryButton),
-          ),
-          TextButton(
-            onPressed: () {
-              Haptics.confirm();
-              Navigator.of(dialogContext).pop(true);
-            },
-            child: Text(l10n.chatClearConfirm, style: AppTextStyles.secondaryButton.copyWith(color: AppColors.danger)),
-          ),
-        ],
-      ),
-    );
-    if (clear == true) await cubit.clear();
-  }
-
   @override
   Widget build(BuildContext context) {
     final l10n = AppL10n.of(context);
@@ -79,8 +48,8 @@ class _ChatScreenState extends State<ChatScreen> {
       backgroundColor: AppColors.scaffold,
       body: SafeArea(
         child: BlocConsumer<ChatCubit, ChatState>(
-          // A failed turn shows inline with a retry; only other failures,
-          // such as clearing, need a banner.
+          // A failed turn shows inline with a retry; only other failures
+          // need a banner.
           listenWhen: (previous, current) =>
               current.error != null && previous.error != current.error && current.status != ChatStatus.failed,
           listener: (context, state) {
@@ -102,17 +71,18 @@ class _ChatScreenState extends State<ChatScreen> {
                   child: SubScreenHeader(
                     eyebrow: l10n.chatEyebrow,
                     title: l10n.chatTitle,
+                    backSize: 50.r,
                     onBack: () => Navigator.of(context).pop(),
                     trailing: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         const SearchQuotaBadge(),
                         SizedBox(width: 8.w),
-                        CircleIconButton(glyph: '🧠', fontSize: 16, onPressed: () => MemorySheet.show(context)),
-                        if (state.messages.isNotEmpty) ...[
-                          SizedBox(width: 8.w),
-                          CircleIconButton(glyph: '🗑', fontSize: 16, onPressed: () => _confirmClear(context)),
-                        ],
+                        CircleIconButton(
+                          size: 50.r,
+                          icon: Icon(Icons.psychology_outlined, size: 28.r, color: AppColors.ink),
+                          onPressed: () => MemorySheet.show(context),
+                        ),
                       ],
                     ),
                   ),
@@ -137,6 +107,7 @@ class _ChatScreenState extends State<ChatScreen> {
                           hint: state.status == ChatStatus.confirming ? l10n.chatConfirmHint : l10n.chatHint,
                           glyph: '↑',
                           multiline: true,
+                          size: 64.r,
                           enabled: !state.busy,
                           onSubmitted: cubit.send,
                         ),

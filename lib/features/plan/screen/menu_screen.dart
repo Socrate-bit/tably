@@ -143,6 +143,7 @@ class MenuScreen extends StatelessWidget {
               padding: EdgeInsets.only(top: 36.h, bottom: 18.h),
               child: Center(
                 child: RegenerateButton(
+                  label: plan.regenerating ? l10n.regeneratingPlan : l10n.regeneratePlan,
                   regenerating: plan.regenerating,
                   onPressed: context.read<PlanCubit>().regenerate,
                 ),

@@ -1338,7 +1338,7 @@ class AppL10nFr extends AppL10n {
   String get chatEyebrow => 'TON CHEF IA';
 
   @override
-  String get chatTitle => 'Chef';
+  String get chatTitle => 'Tably';
 
   @override
   String get chatHint => 'Demande au chef…';
@@ -1390,16 +1390,6 @@ class AppL10nFr extends AppL10n {
 
   @override
   String get chatRetry => 'Réessayer';
-
-  @override
-  String get chatClearTitle => 'Effacer la conversation ?';
-
-  @override
-  String get chatClearBody =>
-      'Le chef oubliera tout ce que vous vous êtes dit.';
-
-  @override
-  String get chatClearConfirm => 'Effacer';
 
   @override
   String get chatAddToWeek => 'Mettre au menu';

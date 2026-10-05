@@ -2356,7 +2356,7 @@ abstract class AppL10n {
   /// No description provided for @chatTitle.
   ///
   /// In fr, this message translates to:
-  /// **'Chef'**
+  /// **'Tably'**
   String get chatTitle;
 
   /// No description provided for @chatHint.
@@ -2454,24 +2454,6 @@ abstract class AppL10n {
   /// In fr, this message translates to:
   /// **'Réessayer'**
   String get chatRetry;
-
-  /// No description provided for @chatClearTitle.
-  ///
-  /// In fr, this message translates to:
-  /// **'Effacer la conversation ?'**
-  String get chatClearTitle;
-
-  /// No description provided for @chatClearBody.
-  ///
-  /// In fr, this message translates to:
-  /// **'Le chef oubliera tout ce que vous vous êtes dit.'**
-  String get chatClearBody;
-
-  /// No description provided for @chatClearConfirm.
-  ///
-  /// In fr, this message translates to:
-  /// **'Effacer'**
-  String get chatClearConfirm;
 
   /// No description provided for @chatAddToWeek.
   ///

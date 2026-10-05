@@ -8,6 +8,7 @@ import '../../../core/widget/line_icon.dart';
 import '../../../core/widget/search_field.dart';
 import '../../../core/widget/surface_card.dart';
 import '../../../l10n/app_localizations.dart';
+import '../../plan/widget/regenerate_button.dart';
 import '../cubit/recipe_browse_cubit.dart';
 import '../cubit/recipe_search_cubit.dart';
 import '../model/recipe.dart';
@@ -90,9 +91,9 @@ class RecipeSearchBar extends StatelessWidget {
   }
 }
 
-/// A search's list: a prompt to search typed text, or the result count with
-/// "Relancer"; then placeholder rows while it runs, [results] built by [row],
-/// or why there are none.
+/// A search's list: a prompt to search typed text, or the result count; then
+/// placeholder rows while it runs, [results] built by [row], or why there are
+/// none; and "Relancer la recherche" at the bottom, like the menu's regenerate.
 class RecipeSearchResults extends StatelessWidget {
   const RecipeSearchResults({super.key, required this.results, required this.row, this.emptyText});
 
@@ -119,17 +120,9 @@ class RecipeSearchResults extends StatelessWidget {
         if (pending)
           _SearchPrompt(query: browse.query.trim(), onTap: () => searchRecipes(context))
         else
-          Row(
-            children: [
-              Expanded(
-                child: Text(
-                  searching ? l10n.searchLoading : l10n.searchResultCount(results.length),
-                  style: AppTextStyles.resultCount,
-                ),
-              ),
-              if (browse.canSearch && !searching)
-                _LinkButton(label: '↻ ${l10n.searchReload}', onPressed: () => searchRecipes(context, reload: true)),
-            ],
+          Text(
+            searching ? l10n.searchLoading : l10n.searchResultCount(results.length),
+            style: AppTextStyles.resultCount,
           ),
         SizedBox(height: 12.h),
         if (searching)
@@ -138,6 +131,17 @@ class RecipeSearchResults extends StatelessWidget {
           ...withGaps([for (final r in results) row(r)], 11.h)
         else if (!pending)
           RecipeListEmpty(emptyText ?? (browse.isSearching ? l10n.searchEmpty(browse.query.trim()) : l10n.filtersEmpty)),
+        if (browse.canSearch && !searching && !pending)
+          Padding(
+            padding: EdgeInsets.only(top: 36.h, bottom: 18.h),
+            child: Center(
+              child: RegenerateButton(
+                label: l10n.searchReload,
+                regenerating: false,
+                onPressed: () => searchRecipes(context, reload: true),
+              ),
+            ),
+          ),
       ],
     );
   }
@@ -162,7 +166,7 @@ class RecipeListEmpty extends StatelessWidget {
   }
 }
 
-/// A tappable link, such as "Relancer la recherche" or "Réinitialiser les filtres".
+/// A tappable link, such as "Réinitialiser les filtres".
 class _LinkButton extends StatelessWidget {
   const _LinkButton({required this.label, required this.onPressed});
 

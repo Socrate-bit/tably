@@ -16,6 +16,7 @@ class InputBar extends StatefulWidget {
     this.enabled = true,
     this.maxLength,
     this.multiline = false,
+    this.size,
   });
 
   final String hint;
@@ -33,12 +34,21 @@ class InputBar extends StatefulWidget {
   /// Grows up to a few lines, for chat messages.
   final bool multiline;
 
+  /// The button's size and a single line's height; 48 by default.
+  final double? size;
+
   @override
   State<InputBar> createState() => _InputBarState();
 }
 
 class _InputBarState extends State<InputBar> {
   final _controller = TextEditingController();
+
+  double get _height => widget.size ?? 48.r;
+
+  /// The typed text, scaled up with a larger [InputBar.size].
+  TextStyle get _textStyle =>
+      widget.size == null ? AppTextStyles.noteInput : AppTextStyles.noteInput.copyWith(fontSize: 17.sp);
 
   bool get _canSubmit => widget.enabled && _controller.text.trim().isNotEmpty;
 
@@ -75,10 +85,14 @@ class _InputBarState extends State<InputBar> {
             textInputAction: TextInputAction.send,
             textCapitalization: TextCapitalization.sentences,
             inputFormatters: [if (widget.maxLength != null) LengthLimitingTextInputFormatter(widget.maxLength)],
-            style: AppTextStyles.noteInput,
+            style: _textStyle,
+            textAlignVertical: TextAlignVertical.center,
             decoration: InputDecoration(
+              // One line is exactly as tall as the button beside it.
+              isDense: true,
+              constraints: BoxConstraints(minHeight: _height),
               hintText: widget.hint,
-              hintStyle: AppTextStyles.noteInput.copyWith(color: AppColors.textDisabled),
+              hintStyle: _textStyle.copyWith(color: AppColors.textDisabled),
               filled: true,
               fillColor: AppColors.surface,
               contentPadding: EdgeInsets.symmetric(horizontal: 20.w, vertical: 14.h),
@@ -93,14 +107,14 @@ class _InputBarState extends State<InputBar> {
           onTap: _submit,
           child: AnimatedContainer(
             duration: const Duration(milliseconds: 150),
-            width: 48.r,
-            height: 48.r,
+            width: _height,
+            height: _height,
             alignment: Alignment.center,
             decoration: BoxDecoration(
               color: _canSubmit ? AppColors.brand : AppColors.neutralBar,
               shape: BoxShape.circle,
             ),
-            child: Text(widget.glyph, style: AppTextStyles.primaryButtonSmall.copyWith(height: 1)),
+            child: Text(widget.glyph, style: AppTextStyles.primaryButtonSmall.copyWith(height: 1, fontSize: widget.size == null ? null : _height * 0.45)),
           ),
         ),
       ],
