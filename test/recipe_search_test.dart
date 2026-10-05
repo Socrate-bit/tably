@@ -7,6 +7,7 @@ import 'package:tably/features/preferences/service/profile_service.dart';
 import 'package:tably/features/recipe/cubit/catalogue_cubit.dart';
 import 'package:tably/features/recipe/cubit/recipe_browse_cubit.dart';
 import 'package:tably/features/recipe/cubit/recipe_search_cubit.dart';
+import 'package:tably/features/recipe/model/dietary_constraints.dart';
 import 'package:tably/features/recipe/model/recipe.dart';
 
 import 'fixtures/recipe_fixtures.dart';
@@ -44,7 +45,6 @@ void main() {
       query: ' poulet curry ',
       cuisines: {Cuisine.indian},
       cravings: {Craving.quick},
-      proteins: {RecipeProtein.chicken},
     );
 
     await search.search(browse);
@@ -54,7 +54,6 @@ void main() {
     expect(call.query, 'en:poulet curry');
     expect(call.cuisines, {Cuisine.indian});
     expect(call.craving, Craving.quick);
-    expect(call.protein, RecipeProtein.chicken);
     expect(search.state.resultsFor(browse), RecipeFixtures.recipes);
   });
 
@@ -66,14 +65,16 @@ void main() {
     expect([for (final r in ai.candidates.single) r['id']], [0, 1, 2, 3, 4]);
   });
 
-  test('several cravings or proteins are left to the local filters', () async {
+  test('several cravings are left to the local filters', () async {
     final search = cubit();
-    await search.search(const RecipeBrowseState(
-      cravings: {Craving.quick, Craving.lowCalorie},
-      proteins: {RecipeProtein.beef, RecipeProtein.fish},
-    ));
+    await search.search(const RecipeBrowseState(cravings: {Craving.quick, Craving.lowCalorie}));
     expect(api.calls.single.craving, isNull);
-    expect(api.calls.single.protein, isNull);
+  });
+
+  test('the meats picked in the filters replace the profile\'s', () async {
+    final search = cubit();
+    await search.search(const RecipeBrowseState(constraints: DietaryConstraints(proteins: {Protein.noMeat})));
+    expect(api.calls.single.profile.proteins, {Protein.noMeat});
   });
 
   test('the same search is not repeated, but reload always calls the API', () async {

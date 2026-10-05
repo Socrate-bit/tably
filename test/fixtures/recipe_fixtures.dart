@@ -29,7 +29,6 @@ class FakeSearch extends RecipeSearchService {
     String? query,
     Set<Cuisine> cuisines,
     Craving? craving,
-    RecipeProtein? protein,
   })>[];
 
   @override
@@ -39,9 +38,8 @@ class FakeSearch extends RecipeSearchService {
     String? query,
     Set<Cuisine> cuisines = const {},
     Craving? craving,
-    RecipeProtein? protein,
   }) async {
-    calls.add((profile: profile, number: number, query: query, cuisines: cuisines, craving: craving, protein: protein));
+    calls.add((profile: profile, number: number, query: query, cuisines: cuisines, craving: craving));
     // Candidate i costs i € per portion.
     return [for (var i = 0; i < number; i++) {'id': i, 'price': i}];
   }

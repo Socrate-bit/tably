@@ -957,12 +957,6 @@ class AppL10nEn extends AppL10n {
   String get filtersCuisine => 'Cuisine';
 
   @override
-  String get filtersProtein => 'Preference';
-
-  @override
-  String get filtersProteinSub => 'The meat or protein you want to see';
-
-  @override
   String get filtersPrice => 'Price per portion';
 
   @override

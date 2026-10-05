@@ -16,7 +16,7 @@ part 'recipe_browse_state.dart';
 
 /// Search text and filters for browsing recipes. Shared by the recipes tab,
 /// the filters screen and the replace-meal sheet so they always agree.
-/// Diets, allergies and appliances start at their widest, except right after
+/// Diets, allergies, meats and appliances start at their widest, except right after
 /// onboarding, when they are seeded from the answers just given. After that
 /// they are the search's own, and preference changes never touch them.
 class RecipeBrowseCubit extends Cubit<RecipeBrowseState> {
@@ -27,8 +27,8 @@ class RecipeBrowseCubit extends Cubit<RecipeBrowseState> {
     _watchOnboarding(profileCubit.state);
   }
 
-  /// Price-per-portion slider bounds, matching the design.
-  static const priceFloor = 3.0;
+  /// Price-per-portion slider bounds.
+  static const priceFloor = 1.0;
   static const priceCeiling = 12.0;
 
   final AnalyticsService _analytics;
@@ -37,7 +37,7 @@ class RecipeBrowseCubit extends Cubit<RecipeBrowseState> {
   /// Whether a loaded profile was seen still onboarding.
   bool _onboarding = false;
 
-  /// Seeds the search from the profile's diets, allergies and appliances once
+  /// Seeds the search from the profile's diets, allergies, meats and appliances once
   /// the user finishes onboarding; a profile already onboarded at launch is
   /// ignored.
   void _watchOnboarding(ProfileState profile) {
@@ -61,9 +61,6 @@ class RecipeBrowseCubit extends Cubit<RecipeBrowseState> {
   void toggleCuisine(Cuisine cuisine) =>
       _filter(state.copyWith(cuisines: Selection.toggle(state.cuisines, cuisine)));
 
-  void toggleProtein(RecipeProtein protein) =>
-      _filter(state.copyWith(proteins: Selection.toggle(state.proteins, protein)));
-
   void setMaxPrice(double price) =>
       _filter(state.copyWith(maxPrice: price.clamp(priceFloor, priceCeiling)));
 
@@ -78,6 +75,13 @@ class RecipeBrowseCubit extends Cubit<RecipeBrowseState> {
         ),
       ));
 
+  /// Same rules as the preferences: "no meat" is exclusive.
+  void toggleProtein(Protein protein) => _filter(state.copyWith(
+        constraints: state.constraints.copyWith(
+          proteins: Selection.toggleExclusive(state.constraints.proteins, protein, Protein.noMeat),
+        ),
+      ));
+
   /// The ceiling means no time limit.
   void setCookMinutes(int minutes) =>
       _filter(state.copyWith(constraints: state.constraints.copyWith(cookMinutes: minutes)));
@@ -88,7 +92,8 @@ class RecipeBrowseCubit extends Cubit<RecipeBrowseState> {
       ));
 
   /// "Réinitialiser": the most permissive search — no chips, no price limit,
-  /// no diet or allergy and every appliance — keeping the search text.
+  /// no diet or allergy, every meat and every appliance — keeping the search
+  /// text.
   void resetFilters() => _filter(state.cleared);
 
   void _filter(RecipeBrowseState next) {

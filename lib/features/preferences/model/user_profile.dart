@@ -33,7 +33,7 @@ class UserProfile extends Equatable {
     this.cravings = const {Craving.quick, Craving.highProtein},
     this.diets = const {Diet.none},
     this.allergies = const {Allergy.none},
-    this.proteins = const {Protein.beef, Protein.pork, Protein.chicken},
+    this.proteins = Protein.meats,
     this.appliances = const {Appliance.microwave, Appliance.hob},
     this.ageRange,
     this.goals = const {},

@@ -137,8 +137,6 @@ extension OptionLabels on AppL10n {
         Cuisine.mediterranean => cuisineMediterraneanDesc,
       };
 
-  String proteinName(RecipeProtein protein) => optionLabel(protein.id);
-
   /// The message for a failed recipe build or search.
   String catalogueError(Object? error) => switch (CatalogueCubit.reasonFor(error)) {
         'quota' => errorCatalogueQuota,
