@@ -184,6 +184,17 @@ class RecipeAiService {
   condiments, stock), herbs_grocery (spices, dried herbs, oils, dairy, eggs,
   baking, anything else).''';
 
+  /// What each allergy rules out, beyond the obvious, for the allergy rule.
+  static const _allergyExamples = {
+    Allergy.glutenFree: 'wheat, flour, bread, pasta, couscous, soy sauce and beer',
+    Allergy.lactoseFree: 'milk, butter, cream, cheese and yoghurt',
+    Allergy.nutFree: 'peanuts, tree nuts, nut butters and pesto',
+    Allergy.eggFree: 'eggs, mayonnaise and fresh egg pasta',
+    Allergy.shellfishFree: 'prawns, crab, lobster, mussels, clams and scallops',
+    Allergy.sesameFree: 'sesame seeds, sesame oil and tahini',
+    Allergy.soyFree: 'soy sauce, tofu, edamame and miso',
+  };
+
   /// The rules Gemini applies, filled in with the user's constraints.
   @visibleForTesting
   static String instruction(UserProfile profile) {
@@ -231,12 +242,14 @@ class RecipeAiService {
         : '''- It breaks one of the user's diets: ${ids(diets.map((d) => d.id))}.
 ${halal ? '  Halal means no pork and no alcohol.\n' : ''}''';
     final allergies = profile.allergies.where((a) => a != Allergy.none);
+    // Examples only for the allergies picked: one for an allergy the user
+    // doesn't have gets applied anyway.
+    final watchFor = [for (final a in allergies) '${a.id} excludes ${_allergyExamples[a]}'];
     final allergy = allergies.isEmpty
         ? ''
         : '''- It contains something the user must avoid: ${ids(allergies.map((a) => a.id))}.
   Check every ingredient, including stocks, sauces, pastes and garnishes
-  (e.g. nut_free excludes peanuts, tree nuts, nut butters and pesto;
-  lactose_free excludes milk, butter, cream and cheese).
+  (${watchFor.join('; ')}).
 ''';
     final custom = profile.customInstructions.isEmpty
         ? ''
