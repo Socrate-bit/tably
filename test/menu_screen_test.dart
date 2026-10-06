@@ -146,14 +146,16 @@ void main() {
     expect(find.text('DÉJEUNER'), findsNWidgets(7));
   });
 
-  testWidgets('hides the store comparison in App Review builds', (tester) async {
+  testWidgets('hides the store comparison and the savings in App Review builds', (tester) async {
     await _pumpMenu(tester, physicalSize: const Size(804, 1748), profile: const UserProfile());
     expect(find.byType(StorePill), findsOneWidget);
     expect(tester.widget<CostCard>(find.byType(CostCard)).onTap, isNotNull);
+    expect(find.textContaining("d'économie"), findsOneWidget);
 
     await _pumpMenu(tester, physicalSize: const Size(804, 1748), profile: const UserProfile(), inReview: true);
     expect(find.byType(StorePill), findsNothing);
     expect(tester.widget<CostCard>(find.byType(CostCard)).onTap, isNull);
+    expect(find.textContaining("d'économie"), findsNothing);
   });
 
   testWidgets('dragging a meal by its grip moves it down the week', (tester) async {

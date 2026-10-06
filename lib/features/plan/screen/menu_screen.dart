@@ -44,7 +44,7 @@ class MenuScreen extends StatelessWidget {
     final total = week.totalAt(profile.store);
     // Hidden while the new week is being fetched.
     final outdated = catalogue.outdated && !plan.regenerating && !catalogue.isBuilding;
-    // App Review builds hide the store comparison.
+    // App Review builds hide the store comparison and the savings.
     final inReview = context.select<ReviewCubit, bool>((c) => c.state.inReview);
     void openStores() => context.read<HomeCubit>().open(HomeSub.stores);
 
@@ -107,6 +107,7 @@ class MenuScreen extends StatelessWidget {
                       budget: profile.budget,
                       country: profile.country,
                       onTap: inReview ? null : openStores,
+                      showSavings: !inReview,
                     ),
                   ),
                   SizedBox(width: 13.w),

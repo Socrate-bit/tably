@@ -33,14 +33,15 @@ class OnboardingState extends Equatable {
   /// The recipes built for [draft], empty until generation succeeds.
   final List<Recipe> catalogue;
 
-  /// This build is in App Review, which hides the store choice.
+  /// This build is in App Review, which hides the store choice and the
+  /// savings promise.
   final bool inReview;
 
   /// The Europe follow-up only appears when the user picked Europe; the store
-  /// choice is skipped in App Review builds.
+  /// choice and the savings promise are skipped in App Review builds.
   List<OnboardingStep> get steps => OnboardingFlow.steps
       .where((s) => s.id != StepIds.europeCountry || draft.country == Country.europe)
-      .where((s) => s.id != StepIds.store || !inReview)
+      .where((s) => !inReview || (s.id != StepIds.store && s.id != StepIds.infoMoney))
       .toList();
 
   OnboardingStep get currentStep => steps[stepIndex.clamp(0, steps.length - 1)];
