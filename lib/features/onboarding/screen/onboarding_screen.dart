@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -35,13 +33,8 @@ class OnboardingScreen extends StatelessWidget {
       listenWhen: (previous, current) =>
           previous.phase != current.phase &&
           current.phase == OnboardingPhase.done,
-      listener: (context, state) {
-        // Not awaited: the paywall floats over the app, so dismissing it lands
-        // the user on Home rather than stranding them in onboarding. Users with
-        // a redeemed referral code never see it.
-        unawaited(context.read<SubscriptionCubit>().presentPaywallAfterOnboarding());
-        context.read<ProfileCubit>().completeOnboarding(state.draft);
-      },
+      // The paywall gate in RootScreen takes over once the profile is saved.
+      listener: (context, state) => context.read<ProfileCubit>().completeOnboarding(state.draft),
       builder: (context, state) {
         return Scaffold(
           backgroundColor: AppColors.scaffold,

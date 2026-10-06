@@ -23,6 +23,10 @@ class SubscriptionState extends Equatable {
   /// True when the user may use the app without being asked to pay.
   bool get hasAccess => skipsPaywall || isActive;
 
+  /// True once [hasAccess] can be trusted: a granted type is known up front,
+  /// anyone else waits for Superwall so the paywall never flashes at them.
+  bool get isResolved => skipsPaywall || status != SubscriptionGateStatus.unknown;
+
   bool get isSubmitting => redeemStatus == RedeemStatus.submitting;
 
   SubscriptionState copyWith({

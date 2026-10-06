@@ -59,4 +59,17 @@ void main() {
       expect(state.hasAccess, isTrue);
     });
   });
+
+  group('SubscriptionState.isResolved', () {
+    test('a normal user waits for Superwall', () {
+      expect(const SubscriptionState().isResolved, isFalse);
+      expect(const SubscriptionState(status: SubscriptionGateStatus.inactive).isResolved, isTrue);
+      expect(const SubscriptionState(status: SubscriptionGateStatus.active).isResolved, isTrue);
+    });
+
+    test('a referral grant is resolved before Superwall reports', () {
+      expect(const SubscriptionState(userType: UserType.admin).isResolved, isTrue);
+      expect(const SubscriptionState(userType: UserType.ugc).isResolved, isTrue);
+    });
+  });
 }
