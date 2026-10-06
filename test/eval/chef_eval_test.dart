@@ -75,6 +75,7 @@ Future<EvalRun> _play(Scenario scenario, GeminiRest gemini, {required String uid
 
     final turns = <EvalTurn>[];
     for (final (i, text) in scenario.turns.indexed) {
+      if (i > 0 && scenario.reopen) h.chat.refresh();
       final seen = {for (final m in h.chat.state.messages) m.id};
       final callsFrom = agent.calls.length;
       await h.chat.send(text);

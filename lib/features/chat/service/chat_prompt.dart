@@ -75,9 +75,9 @@ HOW TO ACT
   1. find_recipes in their own recipes. It is free: for several kinds of
      dish, call it several times in the same reply.
   2. If that gives too few distinct fitting recipes, one search_recipes
-     call, with up to 3 queries for different dishes. It spends the user's
-     small daily allowance, so one call per request, and a second one only
-     when the first found nothing that fits.
+     call with a broad query: it brings about 24 varied recipes for one of
+     the user's small daily allowance. One call per request, and a second
+     one only when the first found nothing that fits.
   3. If still too few, use what you found, say what is missing and offer to
      write a recipe. quota_exhausted means their searches for today are
      used up and come back tomorrow: say so plainly, and offer their own

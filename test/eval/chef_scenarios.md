@@ -98,3 +98,10 @@ The reported bug: the chef changed one meal per card, didn't pick several recipe
 | G1 | "Refais-moi toute la semaine" | One `regenerate_week` card | Change meals one by one |
 | G2 | "C'est quoi le dîner ce soir ?" | Answers from the week | Propose a change |
 | G3 | "Remplace le déjeuner de demain" (2 meals a day) | One card for tomorrow's lunch slot | Pick the wrong day or meal |
+
+## H. Reopened chat
+
+| ID | User says | Good chef | Must not |
+|---|---|---|---|
+| H1 | "Mets du poulet mardi soir", chat reopened, then "Et mets aussi du poisson jeudi soir" | A card each time | Write tool syntax ("[proposed …]") as text |
+| H2 | "Montre-moi des idées de plats au poulet", chat reopened, then "Ils sont déjà dans mon menu, propose-moi autre chose" | Shows other recipes as cards | Write "[shown recipes: …]" as text instead of cards |

@@ -475,8 +475,11 @@ export const searchRecipes = onCall(
   }
 );
 
-/** Recipes the AI chef asks for per search; it shows a handful at a time. */
-const AGENT_SEARCH_SIZE = 8;
+/**
+ * Recipes the AI chef asks for per search: one request returns them all, so
+ * a broad search gives it variety without spending more.
+ */
+const AGENT_SEARCH_SIZE = 24;
 
 /** Full, trimmed recipes for Spoonacular ids (1 request). */
 async function recipesById(ids: number[], uid: string): Promise<Record<string, unknown>[]> {
