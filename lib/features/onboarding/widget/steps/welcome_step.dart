@@ -19,7 +19,7 @@ class WelcomeStep extends StatelessWidget {
   const WelcomeStep({
     super.key,
     required this.languageCode,
-    required this.store,
+    this.store,
     required this.country,
     required this.onOpenLanguage,
     required this.onNext,
@@ -28,11 +28,15 @@ class WelcomeStep extends StatelessWidget {
   });
 
   final String languageCode;
-  final Store store;
+
+  /// Named in the mock-up's "planned for" pill; null hides the pill.
+  final Store? store;
   final Country country;
   final VoidCallback onOpenLanguage;
   final VoidCallback onNext;
-  final VoidCallback onEnterCode;
+
+  /// Opens the referral code dialog; null hides the link.
+  final VoidCallback? onEnterCode;
 
   /// True once a referral code has been redeemed, which is the only signal the
   /// user gets here that their code took effect.
@@ -58,31 +62,33 @@ class WelcomeStep extends StatelessWidget {
 
         const Spacer(),
         PrimaryButton(label: l10n.actionStart, onPressed: onNext),
-        SizedBox(height: 16.h),
-        if (codeApplied)
-          Text(
-            l10n.haveACodeApplied,
-            textAlign: TextAlign.center,
-            style: AppTextStyles.metaSmall.copyWith(fontSize: 14.sp, color: AppColors.brand),
-          )
-        else
-          GestureDetector(
-            onTap: () {
-              Haptics.tap();
-              onEnterCode();
-            },
-            behavior: HitTestBehavior.opaque,
-            child: Text(
-              l10n.haveACode,
+        if (onEnterCode case final enterCode?) ...[
+          SizedBox(height: 16.h),
+          if (codeApplied)
+            Text(
+              l10n.haveACodeApplied,
               textAlign: TextAlign.center,
-              style: AppTextStyles.metaSmall.copyWith(
-                fontSize: 14.sp,
-                color: AppColors.brand,
-                decoration: TextDecoration.underline,
-                decorationColor: AppColors.brand,
+              style: AppTextStyles.metaSmall.copyWith(fontSize: 14.sp, color: AppColors.brand),
+            )
+          else
+            GestureDetector(
+              onTap: () {
+                Haptics.tap();
+                enterCode();
+              },
+              behavior: HitTestBehavior.opaque,
+              child: Text(
+                l10n.haveACode,
+                textAlign: TextAlign.center,
+                style: AppTextStyles.metaSmall.copyWith(
+                  fontSize: 14.sp,
+                  color: AppColors.brand,
+                  decoration: TextDecoration.underline,
+                  decorationColor: AppColors.brand,
+                ),
               ),
             ),
-          ),
+        ],
       ],
     );
   }
@@ -128,7 +134,7 @@ class _LanguagePill extends StatelessWidget {
 class _PhoneMockup extends StatelessWidget {
   const _PhoneMockup({required this.store, required this.country});
 
-  final Store store;
+  final Store? store;
   final Country country;
 
   @override
@@ -174,16 +180,18 @@ class _PhoneMockup extends StatelessWidget {
               ),
               SizedBox(height: 7.h),
               Center(child: AppWordmark(height: 20.h)),
-              SizedBox(height: 6.h),
-              Container(
-                padding: EdgeInsets.all(4.r),
-                decoration: BoxDecoration(color: AppColors.brandSoft, borderRadius: BorderRadius.circular(20.r)),
-                child: Text(
-                  l10n.plannedFor(store.displayName),
-                  textAlign: TextAlign.center,
-                  style: AppTextStyles.mock(8, color: AppColors.brandDark),
+              if (store case final store?) ...[
+                SizedBox(height: 6.h),
+                Container(
+                  padding: EdgeInsets.all(4.r),
+                  decoration: BoxDecoration(color: AppColors.brandSoft, borderRadius: BorderRadius.circular(20.r)),
+                  child: Text(
+                    l10n.plannedFor(store.displayName),
+                    textAlign: TextAlign.center,
+                    style: AppTextStyles.mock(8, color: AppColors.brandDark),
+                  ),
                 ),
-              ),
+              ],
               SizedBox(height: 6.h),
               IntrinsicHeight(
                 child: Row(

@@ -26,6 +26,8 @@ import 'features/recipe/service/recipe_ai_service.dart';
 import 'features/recipe/service/recipe_search_service.dart';
 import 'features/recipe/service/recipe_service.dart';
 import 'features/recipe/service/search_quota_service.dart';
+import 'features/review/cubit/review_cubit.dart';
+import 'features/review/service/review_service.dart';
 import 'features/shopping/cubit/shopping_cubit.dart';
 import 'features/shopping/service/shopping_ai_service.dart';
 import 'features/shopping/service/shopping_service.dart';
@@ -60,9 +62,11 @@ class TablyApp extends StatelessWidget {
         RepositoryProvider(create: (_) => ReferralService()),
         RepositoryProvider(create: (_) => ChatService()),
         RepositoryProvider(create: (_) => ChatAgentService()),
+        RepositoryProvider(create: (_) => ReviewService()),
       ],
       child: MultiBlocProvider(
         providers: [
+          BlocProvider(create: (context) => ReviewCubit(service: context.read<ReviewService>())..start()),
           BlocProvider(
             create: (context) => AuthCubit(
               authService: context.read<AuthService>(),
@@ -134,7 +138,11 @@ class TablyApp extends StatelessWidget {
             ),
           ),
           BlocProvider(
-            create: (context) => OnboardingCubit(catalogueCubit: context.read<CatalogueCubit>(), analytics: analytics),
+            create: (context) => OnboardingCubit(
+              catalogueCubit: context.read<CatalogueCubit>(),
+              reviewCubit: context.read<ReviewCubit>(),
+              analytics: analytics,
+            ),
           ),
           BlocProvider(create: (_) => HomeCubit(analytics: analytics)),
           BlocProvider(

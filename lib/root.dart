@@ -11,10 +11,11 @@ import 'features/preferences/cubit/profile_cubit.dart';
 import 'features/recipe/cubit/catalogue_cubit.dart';
 import 'features/recipe/cubit/recipe_cubit.dart';
 import 'features/recipe/cubit/search_quota_cubit.dart';
+import 'features/review/cubit/review_cubit.dart';
 import 'features/shopping/cubit/shopping_cubit.dart';
 import 'features/subscription/cubit/subscription_cubit.dart';
 
-/// Decides what the user sees: a spinner while auth and the profile resolve, onboarding for a
+/// Decides what the user sees: a spinner while auth, the review flag and the profile resolve, onboarding for a
 /// new user, or the app. Also binds every cubit to the signed-in uid.
 class RootScreen extends StatelessWidget {
   const RootScreen({super.key});
@@ -26,7 +27,9 @@ class RootScreen extends StatelessWidget {
       listener: (context, state) => _bind(context, state.uid),
       child: BlocBuilder<AuthCubit, AuthState>(
         builder: (context, authState) {
-          if (!authState.isReady) return const LoadingView();
+          // Waiting on the review flag keeps hidden features from flashing in.
+          final reviewReady = context.select<ReviewCubit, bool>((c) => c.state.isReady);
+          if (!authState.isReady || !reviewReady) return const LoadingView();
           // BlocListener skips the state it starts with, so a uid that was
           // already set on mount would never bind and the splash would hang.
           // Every bind is idempotent, so this is a no-op once bound.

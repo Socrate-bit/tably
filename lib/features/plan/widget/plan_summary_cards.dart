@@ -10,14 +10,14 @@ import '../../../core/widget/surface_card.dart';
 import '../../../l10n/app_localizations.dart';
 
 /// The cost card: spend so far against the weekly budget. Tapping it opens
-/// the store price comparison.
+/// the store price comparison, unless [onTap] is null.
 class CostCard extends StatelessWidget {
   const CostCard({super.key, required this.total, required this.budget, required this.country, required this.onTap});
 
   final double total;
   final double budget;
   final Country country;
-  final VoidCallback onTap;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {

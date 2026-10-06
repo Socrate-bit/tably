@@ -11,6 +11,8 @@ import 'package:tably/features/preferences/cubit/profile_cubit.dart';
 import 'package:tably/features/preferences/model/user_profile.dart';
 import 'package:tably/features/preferences/screen/preferences_screen.dart';
 import 'package:tably/features/preferences/service/profile_service.dart';
+import 'package:tably/features/review/cubit/review_cubit.dart';
+import 'package:tably/features/review/service/review_service.dart';
 import 'package:tably/l10n/app_localizations.dart';
 
 void main() {
@@ -33,6 +35,7 @@ void main() {
       providers: [
         BlocProvider.value(value: profileCubit),
         BlocProvider(create: (_) => HomeCubit(analytics: analytics)),
+        BlocProvider(create: (_) => ReviewCubit(service: ReviewService())),
       ],
       child: ScreenUtilInit(
         designSize: const Size(AppDimens.designWidth, AppDimens.designHeight),

@@ -19,6 +19,7 @@ import '../../home/cubit/home_cubit.dart';
 import '../../onboarding/cubit/onboarding_cubit.dart';
 import '../../plan/widget/meals_per_day_options.dart';
 import '../../plan/widget/variety_options.dart';
+import '../../review/cubit/review_cubit.dart';
 import '../cubit/profile_cubit.dart';
 import '../widget/cook_time_slider.dart';
 import '../widget/custom_instructions_field.dart';
@@ -43,6 +44,8 @@ class PreferencesScreen extends StatelessWidget {
         builder: (context, state) {
           final cubit = context.read<ProfileCubit>();
           final profile = state.profile;
+          // App Review builds hide the store choice.
+          final inReview = context.select<ReviewCubit, bool>((c) => c.state.inReview);
           void openStores() => context.read<HomeCubit>().open(HomeSub.stores);
 
           return SingleChildScrollView(
@@ -67,10 +70,12 @@ class PreferencesScreen extends StatelessWidget {
                 _CountryRow(country: profile.country),
                 SizedBox(height: 26.h),
 
-                PreferenceSectionHeader(title: l10n.prefsStore),
-                SizedBox(height: 10.h),
-                _StoreRow(store: profile.store, onTap: openStores),
-                SizedBox(height: 26.h),
+                if (!inReview) ...[
+                  PreferenceSectionHeader(title: l10n.prefsStore),
+                  SizedBox(height: 10.h),
+                  _StoreRow(store: profile.store, onTap: openStores),
+                  SizedBox(height: 26.h),
+                ],
 
                 PreferenceSectionHeader(
                   title: l10n.prefsHousehold,

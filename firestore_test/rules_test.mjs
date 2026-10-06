@@ -142,6 +142,15 @@ await check('owner cannot reset it', () =>
 await check('owner cannot delete it', () =>
   assertFails(deleteDoc(doc(db, 'searchQuota', UID))));
 
+console.log('\nsettings — app-wide flags');
+await env.withSecurityRulesDisabled(async (ctx) => {
+  await setDoc(doc(ctx.firestore(), 'settings', 'review'), { app_version: '0.1.0.3' });
+});
+await check('any client can read the review flag, even before sign-in', () =>
+  assertSucceeds(getDoc(doc(anon, 'settings', 'review'))));
+await check('no client can change it', () =>
+  assertFails(setDoc(doc(db, 'settings', 'review'), { app_version: '' })));
+
 await env.cleanup();
 console.log(`\n${passed} passed, ${failed} failed`);
 process.exit(failed === 0 ? 0 : 1);

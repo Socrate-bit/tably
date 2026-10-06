@@ -45,5 +45,12 @@ service cloud.firestore {
       allow read: if isOwner(uid);
       allow write: if false;
     }
+
+    // App-wide flags, e.g. settings/review naming the builds in App Review.
+    // Read before sign-in finishes, so open to every client; console-only writes.
+    match /settings/{doc} {
+      allow read: if true;
+      allow write: if false;
+    }
   }
 }

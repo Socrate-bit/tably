@@ -8,6 +8,8 @@ import 'package:tably/features/preferences/cubit/profile_cubit.dart';
 import 'package:tably/features/preferences/model/user_profile.dart';
 import 'package:tably/features/preferences/service/profile_service.dart';
 import 'package:tably/features/recipe/service/recipe_ai_service.dart';
+import 'package:tably/features/review/cubit/review_cubit.dart';
+import 'package:tably/features/review/service/review_service.dart';
 
 import 'fixtures/recipe_fixtures.dart';
 
@@ -70,8 +72,10 @@ void main() {
   test('onboarding continues with nothing picked for cravings, meats and appliances', () {
     final profileCubit = ProfileCubit(service: ProfileService(), analytics: const AnalyticsService());
     final catalogue = seededCatalogue(profileCubit);
-    final cubit = OnboardingCubit(catalogueCubit: catalogue, analytics: const AnalyticsService());
+    final review = ReviewCubit(service: ReviewService());
+    final cubit = OnboardingCubit(catalogueCubit: catalogue, reviewCubit: review, analytics: const AnalyticsService());
     addTearDown(cubit.close);
+    addTearDown(review.close);
     addTearDown(catalogue.close);
     addTearDown(profileCubit.close);
     const draft = UserProfile(cravings: {}, proteins: {}, appliances: {});
