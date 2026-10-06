@@ -52,20 +52,13 @@ class RecipeAiService {
     List<Map<String, dynamic>> raw,
     UserProfile profile,
   ) async {
-    final gemini = FirebaseAI.googleAI().generativeModel(
-      model: model,
-      systemInstruction: Content.system(instruction(profile)),
-      generationConfig: GenerationConfig(
-        responseMimeType: 'application/json',
-        responseSchema: _schema,
-        temperature: 0.2,
-      ),
-    );
+    final system = instruction(profile);
+    final config = GenerationConfig(responseMimeType: 'application/json', responseSchema: _schema, temperature: 0.2);
 
     final chunks = [
       for (var i = 0; i < raw.length; i += chunkSize) raw.sublist(i, (i + chunkSize).clamp(0, raw.length)),
     ];
-    final answers = await Future.wait(chunks.map((chunk) => _ask(gemini, chunk)));
+    final answers = await Future.wait(chunks.map((chunk) => _ask(system, config, chunk)));
 
     final failures = answers.where((a) => a is! Map).toList();
     if (chunks.isNotEmpty && failures.length == chunks.length) throw failures.first;
@@ -87,16 +80,15 @@ class RecipeAiService {
   /// through untouched.
   Future<String> toEnglish(String text, String languageCode) async {
     if (languageCode == 'en') return text;
-    final gemini = FirebaseAI.googleAI().generativeModel(
+    final answer = await generate(
       model: model,
-      generationConfig: GenerationConfig(temperature: 0),
-      systemInstruction: Content.system(
-        'Translate this recipe search into English, using common food words. '
-        'Reply with the translation only, no quotes or punctuation.',
-      ),
+      system:
+          'Translate this recipe search into English, using common food words. '
+          'Reply with the translation only, no quotes or punctuation.',
+      config: GenerationConfig(temperature: 0),
+      input: text,
     );
-    final response = await gemini.generateContent([Content.text(text)]);
-    final english = response.text?.trim() ?? '';
+    final english = answer?.trim() ?? '';
     debugPrint('[RecipeAiService] search "$text" → "$english"');
     return english.isEmpty ? text : english;
   }
@@ -106,18 +98,18 @@ class RecipeAiService {
   /// custom recipe the user owns, with a fresh id. Throws
   /// [RecipeRefusedException] when the request breaks the user's rules.
   Future<Recipe> write(String request, UserProfile profile, {Recipe? base}) async {
-    final gemini = FirebaseAI.googleAI().generativeModel(
+    final input = {'request': request, if (base != null) 'base': {'id': base.id, ...base.toMap()}};
+    final text = await generate(
       model: writerModel,
-      systemInstruction: Content.system(writerInstruction(profile, derived: base != null)),
-      generationConfig: GenerationConfig(
+      system: writerInstruction(profile, derived: base != null),
+      config: GenerationConfig(
         responseMimeType: 'application/json',
         responseSchema: _writerSchema,
         thinkingConfig: ThinkingConfig.withThinkingLevel(ThinkingLevel.low),
       ),
+      input: jsonEncode(input),
     );
-    final input = {'request': request, if (base != null) 'base': {'id': base.id, ...base.toMap()}};
-    final response = await gemini.generateContent([Content.text(jsonEncode(input))]);
-    final answer = jsonDecode(response.text ?? '') as Map<String, dynamic>;
+    final answer = jsonDecode(text ?? '') as Map<String, dynamic>;
     final recipe = written(answer, id: 'custom_${DateTime.now().microsecondsSinceEpoch}', base: base);
     debugPrint('[RecipeAiService] wrote "${recipe.title}"${base == null ? '' : ' from ${base.id}'}');
     return recipe;
@@ -164,26 +156,43 @@ class RecipeAiService {
   /// what they want more of, e.g. "plus de poisson" → "fish". Null when they
   /// only rule things out, since those are left to the check.
   Future<String?> wishQuery(String instructions) async {
-    final gemini = FirebaseAI.googleAI().generativeModel(
+    final answer = await generate(
       model: model,
-      generationConfig: GenerationConfig(temperature: 0),
-      systemInstruction: Content.system(
-        'These are a user\'s instructions for their weekly dinners. If they ask '
-        'for more of a dish, ingredient or cuisine, reply with one or two '
-        'English words to search recipes for it, e.g. "fish" or "curry". '
-        'Ignore anything they want to avoid. Reply none if they ask for '
-        'nothing to search for. No quotes or punctuation.',
-      ),
+      system:
+          'These are a user\'s instructions for their weekly dinners. If they ask '
+          'for more of a dish, ingredient or cuisine, reply with one or two '
+          'English words to search recipes for it, e.g. "fish" or "curry". '
+          'Ignore anything they want to avoid. Reply none if they ask for '
+          'nothing to search for. No quotes or punctuation.',
+      config: GenerationConfig(temperature: 0),
+      input: instructions,
     );
-    final response = await gemini.generateContent([Content.text(instructions)]);
-    final query = response.text?.trim().toLowerCase() ?? '';
+    final query = answer?.trim().toLowerCase() ?? '';
     debugPrint('[RecipeAiService] wish "$instructions" → "$query"');
     return query.isEmpty || query == 'none' ? null : query;
   }
 
+  /// Gemini's text answer to [input]: the one place this service reaches
+  /// Gemini, which the AI chef eval replaces to run outside the app.
+  @protected
+  Future<String?> generate({
+    required String model,
+    required String system,
+    required GenerationConfig config,
+    required String input,
+  }) async {
+    final gemini = FirebaseAI.googleAI().generativeModel(
+      model: model,
+      systemInstruction: Content.system(system),
+      generationConfig: config,
+    );
+    final response = await gemini.generateContent([Content.text(input)]);
+    return response.text;
+  }
+
   /// One Gemini call. Returns the decoded answer, or the error so a single
   /// failed chunk doesn't sink the whole build.
-  Future<Object> _ask(GenerativeModel gemini, List<Map<String, dynamic>> chunk) async {
+  Future<Object> _ask(String system, GenerationConfig config, List<Map<String, dynamic>> chunk) async {
     try {
       // Gemini only needs what it checks or translates.
       final input = [
@@ -198,8 +207,8 @@ class RecipeAiService {
             'equipment': r['equipment'],
           },
       ];
-      final response = await gemini.generateContent([Content.text(jsonEncode(input))]);
-      final answer = jsonDecode(response.text ?? '') as Map<String, dynamic>;
+      final text = await generate(model: model, system: system, config: config, input: jsonEncode(input));
+      final answer = jsonDecode(text ?? '') as Map<String, dynamic>;
       for (final r in answer['rejected'] as List? ?? const []) {
         debugPrint('[RecipeAiService] rejected ${(r as Map)['id']}: ${r['reason']}');
       }
@@ -282,7 +291,7 @@ class RecipeAiService {
   baking, anything else).''';
 
   /// What each allergy rules out, beyond the obvious, for the allergy rule.
-  static const _allergyExamples = {
+  static const allergyExamples = {
     Allergy.glutenFree: 'wheat, flour, bread, pasta, couscous, soy sauce and beer',
     Allergy.lactoseFree: 'milk, butter, cream, cheese and yoghurt',
     Allergy.nutFree: 'peanuts, tree nuts, nut butters and pesto',
@@ -341,7 +350,7 @@ ${halal ? '  Halal means no pork and no alcohol.\n' : ''}''';
     final allergies = profile.allergies.where((a) => a != Allergy.none);
     // Examples only for the allergies picked: one for an allergy the user
     // doesn't have gets applied anyway.
-    final watchFor = [for (final a in allergies) '${a.id} excludes ${_allergyExamples[a]}'];
+    final watchFor = [for (final a in allergies) '${a.id} excludes ${allergyExamples[a]}'];
     final allergy = allergies.isEmpty
         ? ''
         : '''- It contains something the user must avoid: ${ids(allergies.map((a) => a.id))}.

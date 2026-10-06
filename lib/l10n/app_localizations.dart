@@ -2539,6 +2539,18 @@ abstract class AppL10n {
   /// **'{count, plural, =1{Remplacer un plat (1 repas)} other{Remplacer un plat ({count} repas)}}'**
   String chatActReplaceEverywhere(int count);
 
+  /// No description provided for @chatActChangeMeals.
+  ///
+  /// In fr, this message translates to:
+  /// **'{count, plural, =1{Changer 1 repas} other{Changer {count} repas}}'**
+  String chatActChangeMeals(int count);
+
+  /// No description provided for @chatDetailRandomDish.
+  ///
+  /// In fr, this message translates to:
+  /// **'un plat au hasard'**
+  String get chatDetailRandomDish;
+
   /// No description provided for @chatActSwapMeals.
   ///
   /// In fr, this message translates to:

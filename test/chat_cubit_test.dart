@@ -1,25 +1,17 @@
 import 'package:firebase_ai/firebase_ai.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:tably/core/analytics/analytics_service.dart';
 import 'package:tably/features/chat/cubit/chat_cubit.dart';
 import 'package:tably/features/chat/model/chat_message.dart';
 import 'package:tably/features/chat/service/chat_agent_service.dart';
-import 'package:tably/features/chat/service/chat_service.dart';
 import 'package:tably/features/chat/tool/chat_tool.dart';
 import 'package:tably/features/chat/tool/chat_tools.dart';
 import 'package:tably/features/plan/cubit/plan_cubit.dart';
-import 'package:tably/features/plan/service/plan_service.dart';
 import 'package:tably/features/preferences/cubit/profile_cubit.dart';
 import 'package:tably/features/preferences/model/user_profile.dart';
-import 'package:tably/features/preferences/service/profile_service.dart';
-import 'package:tably/features/recipe/cubit/recipe_cubit.dart';
 import 'package:tably/features/recipe/cubit/search_quota_cubit.dart';
 import 'package:tably/features/recipe/model/recipe.dart';
-import 'package:tably/features/recipe/service/recipe_service.dart';
-import 'package:tably/features/shopping/cubit/shopping_cubit.dart';
-import 'package:tably/features/shopping/service/shopping_ai_service.dart';
-import 'package:tably/features/shopping/service/shopping_service.dart';
 
+import 'fixtures/chat_fixtures.dart';
 import 'fixtures/recipe_fixtures.dart';
 
 /// Plays scripted model replies and records what the cubit sent back.
@@ -70,50 +62,19 @@ void main() {
 
   late ChatTools tools;
 
-  Future<(ChatCubit, _FakeAgent)> build(List<AgentReply> replies, {int searchesUsed = 0}) async {
-    const analytics = AnalyticsService();
-    profile = ProfileCubit(service: ProfileService(), analytics: analytics);
-    final quota = searchesUsed == 0 ? unboundQuota(profile) : await spentQuota(profile, used: searchesUsed);
-
-    final catalogue = seededCatalogue(profile);
-    final recipes = RecipeCubit(service: RecipeService(), analytics: analytics);
-    plan = PlanCubit(
-      service: PlanService(),
-      profileCubit: profile,
-      catalogueCubit: catalogue,
-      recipeCubit: recipes,
-      analytics: analytics,
-    );
-    final shopping = ShoppingCubit(
-      service: ShoppingService(),
-      ai: ShoppingAiService(),
-      planCubit: plan,
-      profileCubit: profile,
-      analytics: analytics,
-    );
+  Future<(ChatCubit, _FakeAgent)> build(
+    List<AgentReply> replies, {
+    int searchesUsed = 0,
+    FakeSearch? search,
+    FakeAi? ai,
+  }) async {
     final agent = _FakeAgent(replies);
-    final chat = ChatCubit(
-      service: ChatService(),
-      agent: agent,
-      tools: tools = ChatTools(
-        profile: profile,
-        catalogue: catalogue,
-        plan: plan,
-        recipes: recipes,
-        shopping: shopping,
-        search: FakeSearch(),
-        ai: FakeAi(),
-        quota: quota,
-        analytics: analytics,
-      ),
-      analytics: analytics,
-    );
-    for (final c in [chat, shopping, plan, recipes, catalogue, quota, profile]) {
-      addTearDown(c.close);
-    }
-    await profile.completeOnboarding(const UserProfile(household: 2));
-    await Future<void>.delayed(Duration.zero);
-    return (chat, agent);
+    final harness = await ChatHarness.start(agent, searchesUsed: searchesUsed, search: search, ai: ai);
+    addTearDown(harness.close);
+    profile = harness.profile;
+    plan = harness.plan;
+    tools = harness.tools;
+    return (harness.chat, agent);
   }
 
   List<FunctionResponse> answersAt(_FakeAgent agent, int index) => agent.sent[index] as List<FunctionResponse>;
@@ -139,7 +100,13 @@ void main() {
     final slot = plan.state.week.slots.first;
     final other = RecipeFixtures.recipes.firstWhere((r) => plan.state.week.slots.every((s) => s.recipe.id != r.id));
     agent.replies.addAll([
-      _calls([FunctionCall('change_meal', {'slot_key': slot.key, 'recipe_id': other.id}, id: 'c')]),
+      _calls([
+        FunctionCall('change_meals', {
+          'changes': [
+            {'slot_key': slot.key, 'recipe_id': other.id},
+          ],
+        }, id: 'c'),
+      ]),
       _text("C'est fait."),
     ]);
 
@@ -157,6 +124,106 @@ void main() {
     expect(answersAt(agent, 1).single.response['ok'], true);
     expect(chat.state.messages.last.text, "C'est fait.");
     expect(chat.state.status, ChatStatus.idle);
+  });
+
+  test('several meals change in one card, all at once on approval', () async {
+    final (chat, agent) = await build([]);
+    final week = plan.state.week.slots.where((s) => !s.isLeftover).toList();
+    final unused = RecipeFixtures.recipes.where((r) => week.every((s) => s.recipe.id != r.id)).toList();
+    final (a, b, c) = (week[0], week[1], week[2]);
+    agent.replies.addAll([
+      _calls([
+        FunctionCall('change_meals', {
+          'changes': [
+            {'slot_key': a.key, 'recipe_id': unused[0].id},
+            {'slot_key': b.key, 'recipe_id': unused[1].id},
+            {'slot_key': c.key},
+          ],
+        }, id: 'c'),
+      ]),
+      _text('Voilà.'),
+    ]);
+
+    await chat.send('Change mes trois premiers repas');
+
+    final cards = chat.state.messages.where((m) => m.role == ChatRole.action).toList();
+    expect(cards, hasLength(1));
+    expect(cards.single.action!.preview['meals'], hasLength(3));
+    expect(cards.single.recipes, [unused[0], unused[1]]);
+
+    await chat.approve(cards.single.id);
+
+    expect(plan.state.week.slotByKey(a.key)!.recipe, unused[0]);
+    expect(plan.state.week.slotByKey(b.key)!.recipe, unused[1]);
+    expect(
+      plan.state.week.slotByKey(c.key)!.recipe.id,
+      isNot(anyOf(a.recipe.id, b.recipe.id, c.recipe.id)),
+      reason: 'the random pick is a new dish, not one these meals just gave up',
+    );
+    expect(answersAt(agent, 1).single.response['ok'], true);
+  });
+
+  test('a batch with an unknown or repeated meal is sent back, without a card', () async {
+    final (chat, agent) = await build([]);
+    final slot = plan.state.week.slots.first;
+    agent.replies.addAll([
+      _calls([
+        FunctionCall('change_meals', {
+          'changes': [
+            {'slot_key': slot.key},
+            {'slot_key': 'someday|dinner'},
+          ],
+        }, id: '1'),
+        FunctionCall('change_meals', {
+          'changes': [
+            {'slot_key': slot.key},
+            {'slot_key': slot.key},
+          ],
+        }, id: '2'),
+      ]),
+      _text('Oups.'),
+    ]);
+
+    await chat.send('Change tout');
+
+    final answers = answersAt(agent, 1);
+    expect(answers.first.response['error'], 'unknown_slot_key');
+    expect(answers.last.response['error'], 'duplicate_slot_key');
+    expect(chat.state.messages.where((m) => m.role == ChatRole.action), isEmpty);
+  });
+
+  test('random picks the pool cannot fill without repeats are sent back', () async {
+    await build(const []);
+    final every = [
+      for (final s in plan.state.week.slots) {'slot_key': s.key},
+    ];
+
+    final result = await tools.byName['change_meals']!.run({'changes': every}, _noContext);
+
+    expect((result as ToolResult).json['error'], 'too_few_new_recipes_in_pool');
+  });
+
+  test("find_recipes matches any word of the query, best matches first", () async {
+    await build(const []);
+
+    final result = await tools.byName['find_recipes']!.run(const {'query': 'poulet rôti'}, _noContext);
+
+    final found = (result as ToolResult).json['recipes'] as List;
+    final chicken = RecipeFixtures.recipes.where((r) => r.title.toLowerCase().contains('poulet'));
+    expect(found.map((r) => (r as Map)['id']), containsAll(chicken.map((r) => r.id)));
+  });
+
+  test('search_recipes runs each query, one search each, and drops repeats', () async {
+    final search = FakeSearch();
+    final ai = FakeAi();
+    await build(const [], search: search, ai: ai);
+
+    await tools.byName['search_recipes']!.run(const {
+      'queries': ['lemon chicken', 'chicken curry'],
+    }, _noContext);
+
+    expect(search.agentQueries, ['en:lemon chicken', 'en:chicken curry'], reason: 'queries are put in English');
+    expect(ai.candidates.last, hasLength(2), reason: 'both searches found the same two candidates');
   });
 
   test('a declined change never runs and the model is told', () async {
@@ -197,7 +264,11 @@ void main() {
   test('made-up ids and tools are answered with an error, without a card', () async {
     final (chat, agent) = await build([
       _calls([
-        const FunctionCall('change_meal', {'slot_key': 'monday|dinner', 'recipe_id': 'nope'}, id: '1'),
+        const FunctionCall('change_meals', {
+          'changes': [
+            {'slot_key': 'monday|dinner', 'recipe_id': 'nope'},
+          ],
+        }, id: '1'),
         const FunctionCall('launch_rocket', {}, id: '2'),
       ]),
       _text('Oups.'),
@@ -275,7 +346,9 @@ void main() {
     await build(const [], searchesUsed: 30);
     final search = tools.byName['search_recipes']!;
 
-    await expectLater(search.run(const {'query': 'curry'}, _noContext), throwsA(isA<SearchLimitException>()));
+    await expectLater(search.run(const {
+          'queries': ['curry'],
+        }, _noContext), throwsA(isA<SearchLimitException>()));
     expect(ChatTools.reasonFor(const SearchLimitException()), 'quota_exhausted');
   });
 }

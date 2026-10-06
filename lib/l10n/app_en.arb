@@ -556,6 +556,8 @@
   "chatActRerollMeal": "A random new dish for {day} ({meal})",
   "chatActChangeMeal": "Change {day} ({meal})",
   "chatActReplaceEverywhere": "{count, plural, =1{Replace a dish (1 meal)} other{Replace a dish ({count} meals)}}",
+  "chatActChangeMeals": "{count, plural, =1{Change 1 meal} other{Change {count} meals}}",
+  "chatDetailRandomDish": "a random dish",
   "chatActSwapMeals": "Swap two meals",
   "chatActKeepRecipes": "Keep your current recipes",
   "chatDetailFavourite": "Save to favourites",

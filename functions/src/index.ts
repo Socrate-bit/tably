@@ -270,9 +270,13 @@ function searchParams(data: Record<string, unknown>): URLSearchParams {
   if (excludes.length > 0) params.set("excludeIngredients", [...new Set(excludes)].join(","));
   if (maxReadyTime) params.set("maxReadyTime", String(maxReadyTime));
 
-  // Search filters, all optional.
+  // Search filters, all optional. A meat picked in the filters joins the
+  // text: as an included ingredient, Spoonacular finds nothing once sorted
+  // at random.
   const query = text(data.query);
-  if (query) params.set("query", query.slice(0, 100));
+  const meat = protein && protein !== "vegetarian" && !query?.toLowerCase().includes(protein) ? protein : undefined;
+  const words = [meat, query].filter(Boolean).join(" ");
+  if (words) params.set("query", words.slice(0, 100));
   const cuisines = stringList(data.cuisines).map((c) => CUISINES[c]).filter(Boolean);
   if (cuisines.length > 0) params.set("cuisine", cuisines.join(","));
   const craving = text(data.craving);
@@ -282,10 +286,15 @@ function searchParams(data: Record<string, unknown>): URLSearchParams {
     params.set(key, current ? String(Math.min(Number(current), Number(value))) : value);
   }
   // Ingredients the user has ("what can I make with…"), most used first.
+  // That sort ignores the query text, so with a query they join the text.
   const include = stringList(data.includeIngredients).map((i) => i.trim()).filter(Boolean);
-  if (protein && protein !== "vegetarian") include.unshift(protein);
-  if (include.length > 0) params.set("includeIngredients", include.join(",").slice(0, 200));
-  if (stringList(data.includeIngredients).length > 0) params.set("sort", "max-used-ingredients");
+  if (include.length > 0 && words) {
+    const missing = include.filter((i) => !words.toLowerCase().includes(i.toLowerCase()));
+    params.set("query", [words, ...missing].join(" ").slice(0, 100));
+  } else if (include.length > 0) {
+    params.set("includeIngredients", include.join(",").slice(0, 200));
+    params.set("sort", "max-used-ingredients");
+  }
   return params;
 }
 
@@ -334,6 +343,26 @@ function trimRecipe(r: any, {requireImage = true} = {}): Record<string, unknown>
   };
 }
 
+/**
+ * A GET to Spoonacular through RapidAPI with the secret key. The plan allows
+ * only a few requests per second, so a 429 is retried after a pause; one
+ * still refused stands, as a spent quota does.
+ */
+async function rapidGet(url: string): Promise<Response> {
+  for (let attempt = 1; ; attempt++) {
+    const response = await fetch(url, {
+      headers: {
+        "x-rapidapi-key": spoonacularKey.value(),
+        "x-rapidapi-host": SPOONACULAR_HOST,
+      },
+      signal: AbortSignal.timeout(30_000),
+    });
+    if (response.status !== 429 || attempt === 3) return response;
+    logger.info("spoonacular: rate limited, retrying", {attempt});
+    await new Promise((resolve) => setTimeout(resolve, 1200 * attempt));
+  }
+}
+
 /** One complexSearch call, trimmed; a network failure reads as status 0. */
 async function complexSearch(
   params: URLSearchParams,
@@ -342,13 +371,7 @@ async function complexSearch(
 ): Promise<{ok: boolean; status: number; body?: string; total?: number; recipes: Record<string, unknown>[]}> {
   let response: Response;
   try {
-    response = await fetch(`https://${SPOONACULAR_HOST}/recipes/complexSearch?${params}`, {
-      headers: {
-        "x-rapidapi-key": spoonacularKey.value(),
-        "x-rapidapi-host": SPOONACULAR_HOST,
-      },
-      signal: AbortSignal.timeout(30_000),
-    });
+    response = await rapidGet(`https://${SPOONACULAR_HOST}/recipes/complexSearch?${params}`);
   } catch (e) {
     logger.error("searchRecipes: request failed", e);
     return {ok: false, status: 0, recipes: []};
@@ -368,20 +391,14 @@ async function complexSearch(
 }
 
 /**
- * One Spoonacular GET through RapidAPI with the secret key. A spent quota
- * becomes "resource-exhausted", anything else "unavailable".
+ * One Spoonacular GET. A spent quota becomes "resource-exhausted", anything
+ * else "unavailable".
  */
 async function spoonacularGet(path: string, params: URLSearchParams, uid: string): Promise<any> {
   const url = `https://${SPOONACULAR_HOST}${path}?${params}`;
   let response: Response;
   try {
-    response = await fetch(url, {
-      headers: {
-        "x-rapidapi-key": spoonacularKey.value(),
-        "x-rapidapi-host": SPOONACULAR_HOST,
-      },
-      signal: AbortSignal.timeout(30_000),
-    });
+    response = await rapidGet(url);
   } catch (e) {
     logger.error(`spoonacular ${path}: request failed`, e);
     throw new HttpsError("unavailable", "Recipe search is unavailable.");

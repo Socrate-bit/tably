@@ -3,9 +3,9 @@ import 'package:firebase_ai/firebase_ai.dart';
 import '../../../core/model/store.dart';
 import '../../plan/model/week_plan.dart';
 import '../../recipe/cubit/catalogue_cubit.dart';
+import '../../recipe/model/recipe.dart';
 import 'chat_tool.dart';
 import 'chat_tools.dart';
-import 'tool_payloads.dart';
 
 /// Reading and changing the week.
 List<ChatTool> planTools(ChatTools t) {
@@ -68,35 +68,85 @@ List<ChatTool> planTools(ChatTools t) {
     ChatTool(
       kind: ToolKind.write,
       declaration: FunctionDeclaration(
-        'change_meal',
-        'Puts a recipe in one meal of the week, or a random new one from the pool when recipe_id is left out. '
-            "The meal's leftovers follow it. recipe_id can be any recipe the user can see, including one found "
-            'or written in this chat.',
+        'change_meals',
+        'Changes one or more meals of the week in a single card the user approves once. Put every meal to '
+            'change in this one call, never one call per meal. Each meal gets the recipe given, or a random '
+            "new one from the pool when recipe_id is left out; its leftovers follow it. recipe_id can be any "
+            'recipe the user can see, including one found or written in this chat. When the pool has too few '
+            'new dishes for the random picks, it answers too_few_new_recipes_in_pool: then find or search '
+            'recipes and give their ids.',
         parameters: {
-          'slot_key': Schema.string(description: 'The meal to change, from get_week_plan, e.g. "tuesday|dinner".'),
-          'recipe_id': Schema.string(description: 'The recipe to put there; leave out for a random one.'),
+          'changes': Schema.array(
+            items: Schema.object(
+              properties: {
+                'slot_key': Schema.string(
+                  description: 'The meal to change, from get_week_plan, e.g. "tuesday|dinner".',
+                ),
+                'recipe_id': Schema.string(description: 'The recipe to put there; leave out for a random one.'),
+              },
+              optionalProperties: ['recipe_id'],
+            ),
+          ),
         },
-        optionalParameters: ['recipe_id'],
       ),
       run: (args, context) async {
-        final key = args.string('slot_key');
-        final slot = key == null ? null : t.plan.state.week.slotByKey(key);
-        if (slot == null) return unknownSlot(key);
-        final id = args.string('recipe_id');
-        final recipe = id == null ? null : context.recipe(id);
-        if (id != null && recipe == null) return unknownRecipe(id);
+        // Every meal is checked before the card shows, so it never half applies.
+        final changes = <({PlanSlot slot, Recipe? recipe})>[];
+        for (final change in args.objects('changes')) {
+          final key = change.string('slot_key');
+          final slot = key == null ? null : t.plan.state.week.slotByKey(key);
+          if (slot == null) return unknownSlot(key);
+          if (changes.any((c) => c.slot.key == slot.key)) {
+            return ToolResult({'error': 'duplicate_slot_key', 'slot_key': key});
+          }
+          final id = change.string('recipe_id');
+          final recipe = id == null ? null : context.recipe(id);
+          if (id != null && recipe == null) return unknownRecipe(id);
+          changes.add((slot: slot, recipe: recipe));
+        }
+        if (changes.isEmpty) return const ToolResult({'error': 'no_changes'});
+        // Random picks come from the pool's dishes not yet in the week; with
+        // too few of them a pick would repeat a dish, so the model is told
+        // to give recipes for the rest instead.
+        final random = changes.where((c) => c.recipe == null).length;
+        if (random > 0) {
+          final taken = {
+            ...t.plan.state.week.slots.map((s) => s.recipe.id),
+            for (final c in changes) ?c.recipe?.id,
+          };
+          final fresh = t.catalogue.state.recipes.where((r) => r.origin == RecipeOrigin.built && !taken.contains(r.id));
+          if (fresh.length < random) {
+            return ToolResult({
+              'error': 'too_few_new_recipes_in_pool',
+              'random_picks_possible': fresh.length,
+              'next': 'pick recipes with find_recipes or search_recipes, then call change_meals with their ids',
+            });
+          }
+        }
         return ToolProposal(
-          preview: {...slotJson(slot), 'to': recipe?.title},
-          recipes: [?recipe],
+          preview: {
+            'meals': [
+              for (final c in changes) {...slotJson(c.slot), 'to': c.recipe?.title},
+            ],
+          },
+          recipes: {for (final c in changes) ?c.recipe}.toList(),
           commit: () async {
-            if (recipe == null) {
-              final next = await t.plan.regenerateMeal(slot);
-              if (next == null) return {'error': 'no_other_recipe_in_pool'};
-              return {'ok': true, 'new_recipe': ToolPayloads.recipeSummary(next.recipe, t.store)};
+            final chosen = {
+              for (final c in changes)
+                if (c.recipe != null) c.slot.key: c.recipe!,
+            };
+            for (final recipe in chosen.values) {
+              await t.ensureInPool(recipe);
             }
-            await t.ensureInPool(recipe);
-            await t.plan.replace(slot.key, recipe);
-            return {'ok': true, 'week': t.weekJson()};
+            if (chosen.isNotEmpty) await t.plan.replaceMany(chosen);
+            // Random picks go one by one, each skipping the dishes in the week
+            // and the ones these meals had, so none just moves to another day.
+            final before = {for (final c in changes) c.slot.recipe.id};
+            final unchanged = [
+              for (final c in changes)
+                if (c.recipe == null && await t.plan.regenerateMeal(c.slot, avoid: before) == null) c.slot.key,
+            ];
+            return {'ok': true, 'week': t.weekJson(), if (unchanged.isNotEmpty) 'no_other_recipe_for': unchanged};
           },
         );
       },

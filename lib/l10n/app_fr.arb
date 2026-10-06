@@ -751,6 +751,15 @@
       }
     }
   },
+  "chatActChangeMeals": "{count, plural, =1{Changer 1 repas} other{Changer {count} repas}}",
+  "@chatActChangeMeals": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "chatDetailRandomDish": "un plat au hasard",
   "chatActSwapMeals": "Échanger deux repas",
   "chatActKeepRecipes": "Garder tes recettes actuelles",
   "chatDetailFavourite": "Ajouter aux favoris",

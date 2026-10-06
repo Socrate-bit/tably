@@ -67,13 +67,22 @@ class ActionCard extends StatelessWidget {
 
     return switch (tool) {
       'regenerate_week' => (l10n.chatActRegenerateWeek, [l10n.chatDetailRegenerateWeek]),
-      'change_meal' =>
-        preview['to'] == null
-            ? (l10n.chatActRerollMeal(day(preview['day']), meal(preview['meal'])), ['${preview['title']}'])
-            : (
-                l10n.chatActChangeMeal(day(preview['day']), meal(preview['meal'])),
-                ['${preview['title']} → ${preview['to']}'],
-              ),
+      // One meal reads as before; several list one line per meal. Cards
+      // saved before change_meals carry a single meal at the top level.
+      'change_meals' || 'change_meal' => switch (tool == 'change_meal' ? [preview] : [...list(preview['meals']).map(map)]) {
+        [final one] when one['to'] == null => (
+          l10n.chatActRerollMeal(day(one['day']), meal(one['meal'])),
+          ['${one['title']}'],
+        ),
+        [final one] => (l10n.chatActChangeMeal(day(one['day']), meal(one['meal'])), ['${one['title']} → ${one['to']}']),
+        final meals => (
+          l10n.chatActChangeMeals(meals.length),
+          [
+            for (final m in meals)
+              '${day(m['day'])} (${meal(m['meal'])}) : ${m['title']} → ${m['to'] ?? l10n.chatDetailRandomDish}',
+          ],
+        ),
+      },
       'replace_recipe_everywhere' => (
         l10n.chatActReplaceEverywhere((preview['meals'] as num?)?.toInt() ?? 1),
         ['${preview['from']} → ${preview['to']}'],

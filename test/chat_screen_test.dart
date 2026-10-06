@@ -90,8 +90,31 @@ void main() {
     final other = RecipeFixtures.recipes.firstWhere((r) => week.slots.every((s) => s.recipe.id != r.id));
     final writes = <(String, Map<String, Object?>)>[
       ('regenerate_week', {}),
-      ('change_meal', {'slot_key': first.key, 'recipe_id': other.id}),
-      ('change_meal', {'slot_key': week.slots[1].key}),
+      (
+        'change_meals',
+        {
+          'changes': [
+            {'slot_key': first.key, 'recipe_id': other.id},
+          ],
+        },
+      ),
+      (
+        'change_meals',
+        {
+          'changes': [
+            {'slot_key': week.slots[1].key},
+          ],
+        },
+      ),
+      (
+        'change_meals',
+        {
+          'changes': [
+            {'slot_key': week.slots[1].key, 'recipe_id': other.id},
+            {'slot_key': week.slots[2].key},
+          ],
+        },
+      ),
       ('replace_recipe_everywhere', {'old_recipe_id': first.recipe.id, 'new_recipe_id': other.id}),
       ('swap_meals', {'slot_a': first.key, 'slot_b': week.slots.last.key}),
       ('update_recipe', {'recipe_id': other.id, 'favourite': true, 'cooked': true, 'rating': 4, 'note': 'Top'}),

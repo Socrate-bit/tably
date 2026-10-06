@@ -14,7 +14,13 @@ import 'package:tably/features/recipe/service/search_quota_service.dart';
 
 /// A catalogue cubit holding the fixtures. Never bound to a user, and its
 /// search and Gemini steps are fakes, so it makes no network call.
-CatalogueCubit seededCatalogue(ProfileCubit profileCubit, {FakeSearch? search, FakeAi? ai, SearchQuotaCubit? quota}) =>
+CatalogueCubit seededCatalogue(
+  ProfileCubit profileCubit, {
+  RecipeSearchService? search,
+  RecipeAiService? ai,
+  SearchQuotaCubit? quota,
+  List<Recipe>? recipes,
+}) =>
     CatalogueCubit(
       service: RecipeService(),
       search: search ?? FakeSearch(),
@@ -22,7 +28,7 @@ CatalogueCubit seededCatalogue(ProfileCubit profileCubit, {FakeSearch? search, F
       ai: ai ?? FakeAi(),
       profileCubit: profileCubit,
       analytics: const AnalyticsService(),
-      recipes: RecipeFixtures.recipes,
+      recipes: recipes ?? RecipeFixtures.recipes,
     );
 
 /// A quota cubit never bound to a user: all of today's searches are left,
@@ -79,6 +85,26 @@ class FakeSearch extends RecipeSearchService {
     calls.add((profile: profile, number: number, query: query, cuisines: cuisines, craving: craving, wish: wish));
     // Candidate i costs i € per portion.
     return [for (var i = 0; i < number; i++) {'id': i, 'price': i}];
+  }
+
+  /// The query of each AI chef search.
+  final agentQueries = <String?>[];
+
+  /// Each AI chef search finds the same two candidates.
+  @override
+  Future<List<Map<String, dynamic>>> agentSearch(
+    UserProfile profile, {
+    String? query,
+    List<String> includeIngredients = const [],
+    Set<Cuisine> cuisines = const {},
+    Craving? craving,
+    RecipeProtein? protein,
+  }) async {
+    agentQueries.add(query);
+    return [
+      {'id': 1},
+      {'id': 2},
+    ];
   }
 }
 

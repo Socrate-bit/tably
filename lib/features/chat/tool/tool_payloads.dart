@@ -46,6 +46,8 @@ abstract final class ToolPayloads {
           'recipe_id': s.recipe.id,
           'title': s.recipe.title,
           if (s.isLeftover) 'leftover': true,
+          // So the rules can be checked against what is actually in the dish.
+          if (!s.isLeftover) 'ingredients': [for (final i in s.recipe.ingredients) i.name],
         },
     ],
   };

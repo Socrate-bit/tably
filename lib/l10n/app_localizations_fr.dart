@@ -1447,6 +1447,20 @@ class AppL10nFr extends AppL10n {
   }
 
   @override
+  String chatActChangeMeals(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Changer $count repas',
+      one: 'Changer 1 repas',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get chatDetailRandomDish => 'un plat au hasard';
+
+  @override
   String get chatActSwapMeals => 'Échanger deux repas';
 
   @override
