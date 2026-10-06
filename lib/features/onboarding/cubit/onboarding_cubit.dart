@@ -15,6 +15,7 @@ import '../../plan/service/week_planner.dart';
 import '../../preferences/model/user_profile.dart';
 import '../../recipe/cubit/catalogue_cubit.dart';
 import '../../recipe/model/recipe.dart';
+import '../../review/cubit/review_cubit.dart';
 import '../model/onboarding_step.dart';
 
 part 'onboarding_state.dart';
@@ -22,15 +23,22 @@ part 'onboarding_state.dart';
 /// Drives the onboarding flow and assembles the profile as the user answers.
 /// Nothing is written to Firestore until the store-switch offer is answered.
 class OnboardingCubit extends Cubit<OnboardingState> {
-  OnboardingCubit({required CatalogueCubit catalogueCubit, required AnalyticsService analytics})
-      : _catalogueCubit = catalogueCubit,
+  OnboardingCubit({
+    required CatalogueCubit catalogueCubit,
+    required ReviewCubit reviewCubit,
+    required AnalyticsService analytics,
+  })  : _catalogueCubit = catalogueCubit,
         _analytics = analytics,
-        super(const OnboardingState()) {
+        super(OnboardingState(inReview: reviewCubit.state.inReview)) {
     unawaited(_analytics.capture(AnalyticsEvents.onboardingStarted));
+    _review = reviewCubit.stream.listen((review) => emit(state.copyWith(inReview: review.inReview)));
   }
 
   final CatalogueCubit _catalogueCubit;
   final AnalyticsService _analytics;
+
+  /// Follows the App Review flag, which skips the store choice and offer.
+  late final StreamSubscription<ReviewState> _review;
 
   /// Follows the catalogue build to tick the generating checklist.
   StreamSubscription<CatalogueState>? _buildProgress;
@@ -184,9 +192,9 @@ class OnboardingCubit extends Cubit<OnboardingState> {
 
   /// Ends the build, then offers a cheaper store if one exists. Users already
   /// at the cheapest store go straight in, rather than being told a pricier
-  /// store would save them money.
+  /// store would save them money. App Review builds never see the offer.
   void _finishGeneration() {
-    if (!state.hasCheaperStore) {
+    if (state.inReview || !state.hasCheaperStore) {
       _complete(state.draft);
       return;
     }
@@ -225,6 +233,7 @@ class OnboardingCubit extends Cubit<OnboardingState> {
   @override
   Future<void> close() {
     _buildProgress?.cancel();
+    _review.cancel();
     return super.close();
   }
 }

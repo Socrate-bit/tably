@@ -19,6 +19,7 @@ import '../../preferences/model/user_profile.dart';
 import '../../recipe/cubit/catalogue_cubit.dart';
 import '../../recipe/screen/recipe_screen.dart';
 import '../../recipe/widget/quota_dialog.dart';
+import '../../review/cubit/review_cubit.dart';
 import '../../shopping/cubit/shopping_cubit.dart';
 import '../../shopping/screen/shopping_screen.dart';
 import '../cubit/plan_cubit.dart';
@@ -43,6 +44,8 @@ class MenuScreen extends StatelessWidget {
     final total = week.totalAt(profile.store);
     // Hidden while the new week is being fetched.
     final outdated = catalogue.outdated && !plan.regenerating && !catalogue.isBuilding;
+    // App Review builds hide the store comparison.
+    final inReview = context.select<ReviewCubit, bool>((c) => c.state.inReview);
     void openStores() => context.read<HomeCubit>().open(HomeSub.stores);
 
     return MultiBlocListener(
@@ -85,8 +88,10 @@ class MenuScreen extends StatelessWidget {
                     child: AppWordmark(height: 64.w),
                   ),
                 ),
-                SizedBox(width: 8.w),
-                StorePill(store: profile.store, onTap: openStores),
+                if (!inReview) ...[
+                  SizedBox(width: 8.w),
+                  StorePill(store: profile.store, onTap: openStores),
+                ],
               ],
             ),
             SizedBox(height: 16.h),
@@ -101,7 +106,7 @@ class MenuScreen extends StatelessWidget {
                       total: total,
                       budget: profile.budget,
                       country: profile.country,
-                      onTap: openStores,
+                      onTap: inReview ? null : openStores,
                     ),
                   ),
                   SizedBox(width: 13.w),

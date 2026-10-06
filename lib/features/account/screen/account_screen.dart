@@ -13,6 +13,7 @@ import '../../../l10n/app_localizations.dart';
 import '../../home/cubit/home_cubit.dart';
 import '../../onboarding/widget/steps/language_step.dart';
 import '../../preferences/cubit/profile_cubit.dart';
+import '../../review/cubit/review_cubit.dart';
 import '../../subscription/widget/referral_code_dialog.dart';
 import '../cubit/auth_cubit.dart';
 import '../widget/account_rows.dart';
@@ -25,6 +26,7 @@ class AccountScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppL10n.of(context);
+    final inReview = context.select<ReviewCubit, bool>((c) => c.state.inReview);
 
     return BlocListener<AuthCubit, AuthState>(
       listenWhen: (previous, current) => current.error != null && previous.error != current.error,
@@ -66,7 +68,8 @@ class AccountScreen extends StatelessWidget {
 
                     ProfileSummaryCard(
                       name: profile.displayName(l10n.defaultChefName),
-                      store: profile.store.displayName,
+                      // App Review builds never name a store.
+                      store: inReview ? null : profile.store.displayName,
                       onEdit: () => _editName(context, profile.name),
                     ),
                     SizedBox(height: 26.h),
@@ -74,11 +77,13 @@ class AccountScreen extends StatelessWidget {
                     AccountSection(
                       label: l10n.accountSectionApp,
                       rows: [
-                        AccountRow(
-                          title: l10n.accountEnterReferralCode,
-                          arrow: true,
-                          onTap: () => ReferralCodeDialog.show(context),
-                        ),
+                        // App Review builds offer no referral code.
+                        if (!inReview)
+                          AccountRow(
+                            title: l10n.accountEnterReferralCode,
+                            arrow: true,
+                            onTap: () => ReferralCodeDialog.show(context),
+                          ),
                         AccountRow(
                           title: l10n.accountLanguage,
                           subtitle: languageFor(profile.languageCode).name,

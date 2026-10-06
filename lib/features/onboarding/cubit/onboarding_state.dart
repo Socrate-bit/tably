@@ -12,6 +12,7 @@ class OnboardingState extends Equatable {
     this.generationStep = 0,
     this.generationFailed = false,
     this.catalogue = const [],
+    this.inReview = false,
   });
 
   final OnboardingPhase phase;
@@ -32,9 +33,14 @@ class OnboardingState extends Equatable {
   /// The recipes built for [draft], empty until generation succeeds.
   final List<Recipe> catalogue;
 
-  /// The Europe follow-up only appears when the user picked Europe.
+  /// This build is in App Review, which hides the store choice.
+  final bool inReview;
+
+  /// The Europe follow-up only appears when the user picked Europe; the store
+  /// choice is skipped in App Review builds.
   List<OnboardingStep> get steps => OnboardingFlow.steps
       .where((s) => s.id != StepIds.europeCountry || draft.country == Country.europe)
+      .where((s) => s.id != StepIds.store || !inReview)
       .toList();
 
   OnboardingStep get currentStep => steps[stepIndex.clamp(0, steps.length - 1)];
@@ -91,6 +97,7 @@ class OnboardingState extends Equatable {
     int? generationStep,
     bool? generationFailed,
     List<Recipe>? catalogue,
+    bool? inReview,
   }) =>
       OnboardingState(
         phase: phase ?? this.phase,
@@ -100,8 +107,10 @@ class OnboardingState extends Equatable {
         generationStep: generationStep ?? this.generationStep,
         generationFailed: generationFailed ?? this.generationFailed,
         catalogue: catalogue ?? this.catalogue,
+        inReview: inReview ?? this.inReview,
       );
 
   @override
-  List<Object?> get props => [phase, stepIndex, showLanguage, draft, generationStep, generationFailed, catalogue];
+  List<Object?> get props =>
+      [phase, stepIndex, showLanguage, draft, generationStep, generationFailed, catalogue, inReview];
 }

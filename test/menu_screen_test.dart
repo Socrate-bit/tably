@@ -6,6 +6,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:tably/core/model/preference_option.dart';
 import 'package:tably/core/analytics/analytics_service.dart';
 import 'package:tably/core/theme/app_theme.dart';
+import 'package:tably/core/widget/store_pill.dart';
 import 'package:tably/features/home/cubit/home_cubit.dart';
 import 'package:tably/features/plan/cubit/plan_cubit.dart';
 import 'package:tably/features/plan/screen/menu_screen.dart';
@@ -17,12 +18,14 @@ import 'package:tably/features/preferences/model/user_profile.dart';
 import 'package:tably/features/preferences/service/profile_service.dart';
 import 'package:tably/features/recipe/cubit/recipe_cubit.dart';
 import 'package:tably/features/recipe/service/recipe_service.dart';
+import 'package:tably/features/review/cubit/review_cubit.dart';
 import 'package:tably/features/shopping/cubit/shopping_cubit.dart';
 import 'package:tably/features/shopping/service/shopping_ai_service.dart';
 import 'package:tably/features/shopping/service/shopping_service.dart';
 import 'package:tably/l10n/app_localizations.dart';
 
 import 'fixtures/recipe_fixtures.dart';
+import 'fixtures/review_fixtures.dart';
 
 /// Pumps the real menu with real cubits; nothing is bound to a user, so no
 /// Firebase call is made.
@@ -31,6 +34,7 @@ Future<ProfileCubit> _pumpMenu(
   required Size physicalSize,
   required UserProfile profile,
   int searchesUsed = 0,
+  bool inReview = false,
 }) async {
   tester.view.physicalSize = physicalSize;
   tester.view.devicePixelRatio = 2;
@@ -48,6 +52,8 @@ Future<ProfileCubit> _pumpMenu(
     recipeCubit: recipeCubit,
     analytics: analytics,
   );
+  final reviewCubit = await startedReview(inReview: inReview);
+  addTearDown(reviewCubit.close);
   addTearDown(planCubit.close);
   addTearDown(recipeCubit.close);
   addTearDown(catalogueCubit.close);
@@ -70,6 +76,7 @@ Future<ProfileCubit> _pumpMenu(
           ),
         ),
         BlocProvider(create: (_) => HomeCubit(analytics: analytics)),
+        BlocProvider<ReviewCubit>.value(value: reviewCubit),
       ],
       child: ScreenUtilInit(
         designSize: const Size(AppDimens.designWidth, AppDimens.designHeight),
@@ -137,6 +144,16 @@ void main() {
 
     expect(find.byType(MealSlotCard), findsNWidgets(14));
     expect(find.text('DÉJEUNER'), findsNWidgets(7));
+  });
+
+  testWidgets('hides the store comparison in App Review builds', (tester) async {
+    await _pumpMenu(tester, physicalSize: const Size(804, 1748), profile: const UserProfile());
+    expect(find.byType(StorePill), findsOneWidget);
+    expect(tester.widget<CostCard>(find.byType(CostCard)).onTap, isNotNull);
+
+    await _pumpMenu(tester, physicalSize: const Size(804, 1748), profile: const UserProfile(), inReview: true);
+    expect(find.byType(StorePill), findsNothing);
+    expect(tester.widget<CostCard>(find.byType(CostCard)).onTap, isNull);
   });
 
   testWidgets('dragging a meal by its grip moves it down the week', (tester) async {

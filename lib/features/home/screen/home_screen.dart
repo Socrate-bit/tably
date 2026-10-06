@@ -16,11 +16,12 @@ import '../../preferences/screen/preferences_screen.dart';
 import '../../recipe/cubit/catalogue_cubit.dart';
 import '../../recipe/screen/favourites_screen.dart';
 import '../../recipe/screen/recipes_screen.dart';
+import '../../review/cubit/review_cubit.dart';
 import '../cubit/home_cubit.dart';
 import '../widget/tab_bar.dart';
 
 /// The signed-in app shell: three tabs, the favourites, stores and account screens that
-/// keep the tab bar, and the AI chef's button beside it on the menu tab.
+/// keep the tab bar, and the AI chef's button beside it on the menu tab (hidden in App Review).
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
@@ -28,6 +29,7 @@ class HomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<HomeCubit, HomeState>(
       builder: (context, home) {
+        final inReview = context.select<ReviewCubit, bool>((c) => c.state.inReview);
         final body = switch (home.sub) {
           HomeSub.favourites => const FavouritesScreen(),
           HomeSub.stores => const StoresScreen(),
@@ -57,7 +59,10 @@ class HomeScreen extends StatelessWidget {
                   child: AppTabBar(current: home.tab, onSelected: context.read<HomeCubit>().select),
                 ),
                 // The AI chef pops in beside the bar on the menu tab only.
-                _FabSlot(visible: home.tab == HomeTab.menu && home.sub == HomeSub.none, child: const ChefButton()),
+                _FabSlot(
+                  visible: home.tab == HomeTab.menu && home.sub == HomeSub.none && !inReview,
+                  child: const ChefButton(),
+                ),
               ],
             ),
           ),

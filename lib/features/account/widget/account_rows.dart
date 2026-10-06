@@ -58,17 +58,17 @@ class AppleSignInButton extends StatelessWidget {
   }
 }
 
-/// "Salut, Chef ✎" with the store subtitle and the Active pill.
+/// "Salut, Chef ✎" with the store subtitle (unless [store] is null) and the Active pill.
 class ProfileSummaryCard extends StatelessWidget {
   const ProfileSummaryCard({
     super.key,
     required this.name,
-    required this.store,
+    this.store,
     required this.onEdit,
   });
 
   final String name;
-  final String store;
+  final String? store;
   final VoidCallback onEdit;
 
   @override
@@ -88,11 +88,13 @@ class ProfileSummaryCard extends StatelessWidget {
                   l10n.accountGreeting(name),
                   style: AppTextStyles.sheetTitle.copyWith(fontSize: 18.sp),
                 ),
-                SizedBox(height: 2.h),
-                Text(
-                  l10n.accountShoppingAt(store),
-                  style: AppTextStyles.metaMuted.copyWith(color: AppColors.textQuaternary),
-                ),
+                if (store case final store?) ...[
+                  SizedBox(height: 2.h),
+                  Text(
+                    l10n.accountShoppingAt(store),
+                    style: AppTextStyles.metaMuted.copyWith(color: AppColors.textQuaternary),
+                  ),
+                ],
               ],
             ),
           ),

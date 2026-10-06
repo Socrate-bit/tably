@@ -10,6 +10,7 @@ import '../../../core/widget/slide_in.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../preferences/cubit/profile_cubit.dart';
 import '../../subscription/cubit/subscription_cubit.dart';
+import '../../review/cubit/review_cubit.dart';
 import '../../subscription/widget/referral_code_dialog.dart';
 import '../cubit/onboarding_cubit.dart';
 import '../model/onboarding_step.dart';
@@ -83,6 +84,7 @@ class _StepsView extends StatelessWidget {
     // Watched out here rather than inside the LayoutBuilder below, which would
     // re-register the dependency on every layout pass.
     final codeApplied = context.select<SubscriptionCubit, bool>((c) => c.state.skipsPaywall);
+    final inReview = context.select<ReviewCubit, bool>((c) => c.state.inReview);
 
     // The language picker replaces the welcome screen until a language is chosen.
     if (state.showLanguage) {
@@ -114,7 +116,7 @@ class _StepsView extends StatelessWidget {
                     children: [
                       if (step.showTopBar)
                         _TopBar(step: step, onBack: cubit.back),
-                      Expanded(child: _stepBody(context, cubit, step, codeApplied)),
+                      Expanded(child: _stepBody(context, cubit, step, codeApplied, inReview)),
                       if (step.showContinueButton) ...[
                         SizedBox(height: 16.h),
                         PrimaryButton(
@@ -140,16 +142,19 @@ class _StepsView extends StatelessWidget {
     OnboardingCubit cubit,
     OnboardingStep step,
     bool codeApplied,
+    bool inReview,
   ) {
     final l10n = AppL10n.of(context);
     return switch (step.kind) {
       StepKind.welcome => WelcomeStep(
         languageCode: state.draft.languageCode,
-        store: state.draft.store,
+        // App Review builds never name a store.
+        store: inReview ? null : state.draft.store,
         country: state.draft.country,
         onOpenLanguage: cubit.openLanguage,
         onNext: cubit.next,
-        onEnterCode: () => ReferralCodeDialog.show(context),
+        // App Review builds offer no referral code.
+        onEnterCode: inReview ? null : () => ReferralCodeDialog.show(context),
         codeApplied: codeApplied,
       ),
       StepKind.text => NameStep(
