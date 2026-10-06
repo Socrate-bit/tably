@@ -14,7 +14,8 @@ class ReviewState extends Equatable {
   final bool isReady;
 
   /// This build is in App Review: store choice and comparison, the AI chef,
-  /// referral codes, savings claims and the onboarding rating prompt are hidden.
+  /// referral codes, savings and user-count claims and the onboarding rating
+  /// prompt are hidden.
   final bool inReview;
 
   @override
@@ -34,7 +35,7 @@ class ReviewCubit extends Cubit<ReviewState> {
       final build = await _service.currentBuild();
       _sub = _service.watchBuilds().listen(
         (builds) {
-          final inReview = builds.contains(build);
+          final inReview = builds.any((entry) => ReviewService.covers(entry, build));
           debugPrint('[ReviewCubit] build $build ${inReview ? 'is' : 'is not'} in review');
           emit(ReviewState(isReady: true, inReview: inReview));
         },
