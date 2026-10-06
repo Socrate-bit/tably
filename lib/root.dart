@@ -13,9 +13,10 @@ import 'features/recipe/cubit/recipe_cubit.dart';
 import 'features/recipe/cubit/search_quota_cubit.dart';
 import 'features/shopping/cubit/shopping_cubit.dart';
 import 'features/subscription/cubit/subscription_cubit.dart';
+import 'features/subscription/widget/paywall_gate.dart';
 
 /// Decides what the user sees: a spinner while auth and the profile resolve, onboarding for a
-/// new user, or the app. Also binds every cubit to the signed-in uid.
+/// new user, or the app behind the paywall. Also binds every cubit to the signed-in uid.
 class RootScreen extends StatelessWidget {
   const RootScreen({super.key});
 
@@ -35,7 +36,7 @@ class RootScreen extends StatelessWidget {
           return BlocBuilder<ProfileCubit, ProfileState>(
             builder: (context, profileState) {
               if (profileState.isLoading) return const LoadingView();
-              return profileState.hasOnboarded ? const HomeScreen() : const OnboardingScreen();
+              return profileState.hasOnboarded ? const PaywallGate(child: HomeScreen()) : const OnboardingScreen();
             },
           );
         },
