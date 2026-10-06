@@ -671,7 +671,10 @@ class PlanStartStep extends StatelessWidget {
 
 /// The review wall shown at the end of onboarding.
 class TestimonialStep extends StatelessWidget {
-  const TestimonialStep({super.key});
+  const TestimonialStep({super.key, this.showUserCount = true});
+
+  /// Shows the "500 000 people" title.
+  final bool showUserCount;
 
   @override
   Widget build(BuildContext context) {
@@ -697,11 +700,13 @@ class TestimonialStep extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Text(
-          l10n.onbTestimonialTitle,
-          style: AppTextStyles.h1Center.copyWith(height: 1.13),
-        ),
-        SizedBox(height: 10.h),
+        if (showUserCount) ...[
+          Text(
+            l10n.onbTestimonialTitle,
+            style: AppTextStyles.h1Center.copyWith(height: 1.13),
+          ),
+          SizedBox(height: 10.h),
+        ],
         Padding(
           padding: EdgeInsets.only(bottom: 20.h),
           child: Text(

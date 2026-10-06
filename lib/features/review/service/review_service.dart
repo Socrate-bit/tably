@@ -3,7 +3,7 @@ import 'package:package_info_plus/package_info_plus.dart';
 
 /// Reads the App Review flag at `settings/review`. Its `app_version` field
 /// names the builds under review as "version.build", e.g. "0.1.0.3" for
-/// version 0.1.0 build 3.
+/// version 0.1.0 build 3, or a bare version, e.g. "0.1.0" for all its builds.
 class ReviewService {
   ReviewService({FirebaseFirestore? firestore}) : _firestore = firestore;
 
@@ -21,6 +21,11 @@ class ReviewService {
   /// Live list of builds under review.
   Stream<List<String>> watchBuilds() =>
       _db.collection('settings').doc('review').snapshots().map((snap) => buildsFrom(snap.data()?['app_version']));
+
+  /// Whether [entry] from the flag names [build] ("version.build"): either
+  /// exactly, or as a bare version covering all of its builds.
+  static bool covers(String entry, String build) =>
+      entry == build || entry == build.substring(0, build.lastIndexOf('.'));
 
   /// The `app_version` field may hold one build or a list of them.
   static List<String> buildsFrom(Object? field) => switch (field) {
