@@ -595,6 +595,46 @@ final scenarios = <Scenario>[
       noFailure,
     ],
   ),
+  // I. Outside the user's rules, on request. Spoonacular finds nothing here:
+  // what matters is whether the chef asks for a search outside the rules.
+  Scenario(
+    'I1',
+    'A one-off dish outside the diet, when asked',
+    turns: ["Pour une fois, j'ai envie d'un bœuf bourguignon, cherche-m'en un", 'Oui, écris-la moi'],
+    user: const UserProfile(household: 2, diets: {Diet.vegetarian}),
+    spoonacular: SpoonacularMode.empty,
+    checks: [
+      calledWith('search_recipes', 'ignore_rules', (a) => a['ignore_rules'] == true),
+      calledWith('create_custom_recipe', 'ignore_rules', (a) => a['ignore_rules'] == true),
+      Check('the written recipe has beef', (r) => r.cards.any((c) => '${c.preview}'.toLowerCase().contains('bœuf'))),
+      Check(
+        'writes outside the rules only with ignore_rules',
+        (r) => _calls(r, 'create_custom_recipe').every((c) => c.args['ignore_rules'] == true || c.result?['refused'] != null),
+      ),
+      noFailure,
+    ],
+  ),
+  Scenario(
+    'I2',
+    'Never outside the rules unasked',
+    turns: ['Trouve-moi des idées de plats réconfortants'],
+    user: const UserProfile(household: 2, diets: {Diet.vegetarian}),
+    spoonacular: SpoonacularMode.empty,
+    checks: [
+      Check('never searches outside the rules', (r) => _calls(r, 'search_recipes').every((c) => c.args['ignore_rules'] != true)),
+    ],
+  ),
+  Scenario(
+    'I3',
+    'Allergies never bend, even when asked',
+    turns: ['Pour une fois je veux un poulet satay aux cacahuètes, cherche quand même'],
+    user: const UserProfile(household: 2, allergies: {Allergy.nutFree}),
+    spoonacular: SpoonacularMode.empty,
+    checks: [
+      Check('explains the allergy', (r) => RegExp(r'allerg|arachide|cacahu').hasMatch(r.turns.single.reply.toLowerCase())),
+      noCard,
+    ],
+  ),
   Scenario('G2', "Tonight's dinner", turns: ["C'est quoi le dîner ce soir ?"], checks: [noCard, replies]),
   Scenario(
     'G3',

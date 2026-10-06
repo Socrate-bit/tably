@@ -216,8 +216,9 @@ List<ChatTool> recipeTools(ChatTools t) {
         parameters: {
           'request': Schema.string(description: 'What to cook, with every detail the user gave.'),
           'slot_key': Schema.string(description: 'A meal of the week to put it in.'),
+          'ignore_rules': ChatTools.ignoreRules,
         },
-        optionalParameters: ['slot_key'],
+        optionalParameters: ['slot_key', 'ignore_rules'],
       ),
       run: (args, context) async {
         final request = args.string('request');
@@ -227,7 +228,8 @@ List<ChatTool> recipeTools(ChatTools t) {
         if (key != null && slot == null) return ToolResult({'error': 'unknown_slot_key', 'slot_key': key});
         final Recipe draft;
         try {
-          draft = await t.ai.write(request, t.profile.state.profile);
+          final user = t.profile.state.profile;
+          draft = await t.ai.write(request, args.boolean('ignore_rules') == true ? ChatTools.outsideRules(user) : user);
         } on RecipeRefusedException catch (e) {
           return ToolResult({'refused': e.reason});
         }

@@ -1,6 +1,7 @@
 import 'package:firebase_ai/firebase_ai.dart';
 
 import '../../../core/model/preference_option.dart';
+import '../../preferences/model/user_profile.dart';
 import '../../recipe/model/recipe.dart';
 import '../../recipe/service/recipe_ai_service.dart';
 import 'chat_tool.dart';
@@ -11,14 +12,15 @@ import 'tool_payloads.dart';
 /// one of the user's daily searches, so none runs once they are gone, and
 /// the prompt has the model look in their own recipes first.
 List<ChatTool> spoonacularTools(ChatTools t) {
-  /// Has Gemini check found recipes against the user's rules and translate
-  /// them, as for the catalogue, then keeps them for later calls.
-  Future<ToolResult> found(List<Map<String, dynamic>> raw, ToolContext context) async {
+  /// Has Gemini check found recipes against [profile]'s rules (the user's
+  /// by default) and translate them, as for the catalogue, then keeps them
+  /// for later calls.
+  Future<ToolResult> found(List<Map<String, dynamic>> raw, ToolContext context, {UserProfile? profile}) async {
     var recipes = const <Recipe>[];
     var rejected = 0;
     if (raw.isNotEmpty) {
       try {
-        (:recipes, :rejected) = await t.ai.adapt(raw, t.profile.state.profile);
+        (:recipes, :rejected) = await t.ai.adapt(raw, profile ?? t.profile.state.profile);
       } on NoMatchingRecipesException catch (e) {
         rejected = e.rejected;
       }
@@ -38,36 +40,40 @@ List<ChatTool> spoonacularTools(ChatTools t) {
         "Searches Spoonacular for new main courses that respect the user's rules: about 24 for one search of "
             'their small daily allowance. Use it only when find_recipes has not enough fitting recipes. Keep '
             'the query broad ("chicken" rather than "chicken curry") to get varied dishes in one go. '
-            'include_ingredients finds recipes using what the user has.',
+            'include_ingredients finds recipes using what the user has. ignore_rules searches outside their '
+            'rules when they ask for it.',
         parameters: {
           'query': Schema.string(description: 'In English, e.g. "chicken" or "fish".'),
+          'ignore_rules': ChatTools.ignoreRules,
           'include_ingredients': Schema.array(items: Schema.string(), description: 'In English, e.g. ["leek", "egg"].'),
           'cuisine': Schema.enumString(enumValues: [for (final c in Cuisine.values) c.id]),
           'craving': Schema.enumString(enumValues: ['quick', 'high_protein', 'low_calorie']),
           'protein': Schema.enumString(enumValues: [for (final p in RecipeProtein.values) p.id]),
         },
-        optionalParameters: ['query', 'include_ingredients', 'cuisine', 'craving', 'protein'],
+        optionalParameters: ['query', 'ignore_rules', 'include_ingredients', 'cuisine', 'craving', 'protein'],
       ),
       run: (args, context) async {
         t.quota.ensureAvailable();
         final cuisine = Cuisine.fromId(args.string('cuisine'));
+        final user = t.profile.state.profile;
+        final profile = args.boolean('ignore_rules') == true ? ChatTools.outsideRules(user) : user;
         // Spoonacular only reads English, and the model often writes in the
         // user's language, so both are translated (English passes as is).
-        final language = t.profile.state.profile.languageCode;
+        final language = user.languageCode;
         final query = args.string('query');
         final (english, include) = await (
           query == null ? Future<String?>.value() : t.ai.toEnglish(query, language),
           Future.wait([for (final i in args.strings('include_ingredients') ?? const []) t.ai.toEnglish(i, language)]),
         ).wait;
         final raw = await t.search.agentSearch(
-          t.profile.state.profile,
+          profile,
           query: english,
           includeIngredients: include,
           cuisines: {?cuisine},
           craving: Craving.values.where((c) => c.id == args['craving']).firstOrNull,
           protein: args['protein'] == null ? null : RecipeProtein.fromId(args.string('protein')),
         );
-        return found(raw, context);
+        return found(raw, context, profile: profile);
       },
     ),
     ChatTool(

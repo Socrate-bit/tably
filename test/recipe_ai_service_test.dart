@@ -38,6 +38,19 @@ void main() {
         ],
       })) as Map<String, dynamic>;
 
+  test('the writer is told only the diets and allergies the user has', () {
+    final none = RecipeAiService.writerInstruction(const UserProfile(), derived: false);
+    final halal = RecipeAiService.writerInstruction(
+      const UserProfile(diets: {Diet.halal}, allergies: {Allergy.nutFree}),
+      derived: false,
+    );
+
+    expect(none, isNot(contains('alcohol')));
+    expect(none, isNot(contains('Must avoid')));
+    expect(halal, contains('Halal means no pork and no alcohol'));
+    expect(halal, contains('Must avoid: nut_free'));
+  });
+
   test('keeps only what Gemini kept, with its text and Spoonacular numbers', () {
     final recipes = RecipeAiService.merge(raw, answer());
 

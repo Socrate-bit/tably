@@ -15,10 +15,11 @@ void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
   late FakeSearch api;
+  late ProfileCubit profileCubit;
 
   RecipeSearchCubit cubit({FakeAi? ai, SearchQuotaCubit? quota}) {
     api = FakeSearch();
-    final profileCubit = ProfileCubit(service: ProfileService(), analytics: const AnalyticsService());
+    profileCubit = ProfileCubit(service: ProfileService(), analytics: const AnalyticsService());
     final cubit = RecipeSearchCubit(
       search: api,
       quota: quota ?? unboundQuota(profileCubit),
@@ -67,6 +68,16 @@ void main() {
     final search = cubit();
     await search.search(const RecipeBrowseState(constraints: DietaryConstraints(proteins: {Protein.noMeat})));
     expect(api.calls.single.profile.proteins, {Protein.noMeat});
+  });
+
+  test('the custom instructions shape the week only, never a search', () async {
+    final ai = FakeAi();
+    final search = cubit(ai: ai);
+    await profileCubit.setCustomInstructions('Pas de poisson.');
+
+    await search.search(const RecipeBrowseState(query: 'saumon'));
+
+    expect(ai.checkedFor.single.customInstructions, isEmpty);
   });
 
   test('the same search is not repeated, but reload always calls the API', () async {
