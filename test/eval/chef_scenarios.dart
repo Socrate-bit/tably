@@ -88,6 +88,7 @@ class Scenario {
     this.approval = approveAll,
     this.spoonacular = SpoonacularMode.live,
     this.setup,
+    this.reopen = false,
   });
 
   final String id;
@@ -103,6 +104,10 @@ class Scenario {
 
   /// Puts the app in the scenario's starting state.
   final Future<void> Function(ChatHarness h)? setup;
+
+  /// Closes and reopens the chat between turns: the chef starts afresh,
+  /// with the past messages as its memory.
+  final bool reopen;
 }
 
 // Checks, named for the report.
@@ -152,6 +157,10 @@ Check saysTu() => Check(
   'says "tu", not "vous"',
   (r) => r.turns.every((t) => !RegExp(r'\b(vous|vos|votre)\b').hasMatch(t.reply.toLowerCase())),
 );
+
+const noToolText = Check('never writes tool syntax as text', _noToolText);
+bool _noToolText(EvalRun r) =>
+    r.turns.every((t) => !RegExp(r'\[proposed|\[shown|change_meals|slot_key|recipe_id').hasMatch(t.reply));
 
 const noFailure = Check('the conversation does not fail', _noError);
 bool _noError(EvalRun r) => r.error == null;
@@ -554,6 +563,38 @@ final scenarios = <Scenario>[
 
   // G. The week.
   Scenario('G1', 'A whole new week', turns: ['Refais-moi toute la semaine'], checks: [called('regenerate_week'), cardsAtMost(1)]),
+  Scenario(
+    'H1',
+    'A second change after reopening the chat',
+    turns: ['Mets du poulet mardi soir', 'Et mets aussi du poisson jeudi soir'],
+    reopen: true,
+    checks: [
+      Check('proposes a card in turn 2', (r) => r.turns.length == 2 && r.turns[1].cards.isNotEmpty),
+      Check('changes Thursday', (r) => r.changedSlots.contains('thursday|dinner')),
+      noToolText,
+      noFailure,
+    ],
+  ),
+  Scenario(
+    'H2',
+    'Other ideas after reopening the chat, as cards',
+    turns: ['Montre-moi des idées de plats au poulet', 'Ils sont déjà dans mon menu, propose-moi autre chose'],
+    reopen: true,
+    // Their own recipes only, so it runs without the emulator.
+    spoonacular: SpoonacularMode.empty,
+    checks: [
+      noToolText,
+      Check(
+        'never claims the daily searches are spent',
+        (r) => r.turns.every((t) => !RegExp(r"aujourd|épuis|maximum|limite").hasMatch(t.reply.toLowerCase())),
+      ),
+      Check(
+        'turn 2 shows cards, or says why not',
+        (r) => r.turns.length == 2 && (r.turns[1].calls.any((c) => c.name == 'show_recipes') || r.turns[1].reply.isNotEmpty),
+      ),
+      noFailure,
+    ],
+  ),
   Scenario('G2', "Tonight's dinner", turns: ["C'est quoi le dîner ce soir ?"], checks: [noCard, replies]),
   Scenario(
     'G3',

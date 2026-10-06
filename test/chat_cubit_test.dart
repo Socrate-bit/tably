@@ -27,9 +27,14 @@ class _FakeAgent extends ChatAgentService {
   @override
   bool get isStarted => _started;
 
+  /// The history the last conversation started with.
+  List<Content> history = const [];
+
   @override
-  void start({required String system, required List<Content> history, required List<FunctionDeclaration> tools}) =>
-      _started = true;
+  void start({required String system, required List<Content> history, required List<FunctionDeclaration> tools}) {
+    _started = true;
+    this.history = history;
+  }
 
   @override
   void reset() => _started = false;
@@ -213,17 +218,13 @@ void main() {
     expect(found.map((r) => (r as Map)['id']), containsAll(chicken.map((r) => r.id)));
   });
 
-  test('search_recipes runs each query, one search each, and drops repeats', () async {
+  test('search_recipes makes one search, in English', () async {
     final search = FakeSearch();
-    final ai = FakeAi();
-    await build(const [], search: search, ai: ai);
+    await build(const [], search: search);
 
-    await tools.byName['search_recipes']!.run(const {
-      'queries': ['lemon chicken', 'chicken curry'],
-    }, _noContext);
+    await tools.byName['search_recipes']!.run(const {'query': 'poulet'}, _noContext);
 
-    expect(search.agentQueries, ['en:lemon chicken', 'en:chicken curry'], reason: 'queries are put in English');
-    expect(ai.candidates.last, hasLength(2), reason: 'both searches found the same two candidates');
+    expect(search.agentQueries, ['en:poulet']);
   });
 
   test('a declined change never runs and the model is told', () async {
@@ -295,6 +296,53 @@ void main() {
     expect(chat.state.recipeById(recipe.id), recipe);
   });
 
+  test('a card written out as text shows as cards, without the text', () async {
+    final recipe = RecipeFixtures.recipes.first;
+    final (chat, _) = await build([
+      _text('Voici une idée.\n[shown recipes: ${recipe.id} "${recipe.title}"]'),
+    ]);
+
+    await chat.send('Une idée ?');
+
+    expect(chat.state.messages.last.text, 'Voici une idée.');
+    expect(chat.state.messages.last.recipes, [recipe]);
+  });
+
+  test('a reopened chat remembers the cards in notes, never in the chef\'s own words', () async {
+    final recipe = RecipeFixtures.recipes.first;
+    final (chat, agent) = await build([
+      _calls([FunctionCall('show_recipes', {'recipe_ids': [recipe.id]}, id: 's')]),
+      _text('Que dis-tu de celle-ci ?'),
+      _text('Bien sûr.'),
+    ]);
+    await chat.send('Une idée ?');
+
+    chat.refresh();
+    await chat.send('Une autre ?');
+
+    final said = [
+      for (final c in agent.history)
+        if (c.role == 'model') ...c.parts.whereType<TextPart>().map((p) => p.text),
+    ];
+    expect(said, ['Que dis-tu de celle-ci ?']);
+    expect(agent.sent.last, allOf(contains('Note from the app'), contains(recipe.id), endsWith('Une autre ?')));
+  });
+
+  test('one message spends at most two Spoonacular searches', () async {
+    final search = FakeSearch();
+    final (chat, agent) = await build([
+      _calls([
+        for (var i = 0; i < 3; i++) FunctionCall('search_recipes', {'query': 'q$i'}, id: '$i'),
+      ]),
+      _text('Voilà.'),
+    ], search: search);
+
+    await chat.send('Des idées ?');
+
+    expect(search.agentQueries, hasLength(ChatCubit.maxSearchesPerMessage));
+    expect(answersAt(agent, 1).last.response['error'], 'enough_searches_for_this_message');
+  });
+
   test('a model that never stops calling tools fails the turn', () async {
     final (chat, _) = await build([
       for (var i = 0; i <= ChatCubit.maxRounds; i++) _calls([FunctionCall('get_week_plan', const {}, id: '$i')]),
@@ -346,9 +394,7 @@ void main() {
     await build(const [], searchesUsed: 30);
     final search = tools.byName['search_recipes']!;
 
-    await expectLater(search.run(const {
-          'queries': ['curry'],
-        }, _noContext), throwsA(isA<SearchLimitException>()));
+    await expectLater(search.run(const {'query': 'curry'}, _noContext), throwsA(isA<SearchLimitException>()));
     expect(ChatTools.reasonFor(const SearchLimitException()), 'quota_exhausted');
   });
 }

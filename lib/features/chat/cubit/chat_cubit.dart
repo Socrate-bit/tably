@@ -43,6 +43,14 @@ class ChatCubit extends Cubit<ChatState> {
   /// Past messages a new conversation remembers.
   static const historyMessages = 30;
 
+  /// Spoonacular calls one user message may spend, whatever the model does.
+  static const maxSearchesPerMessage = 2;
+
+  /// A line imitating a card ("[shown recipes: 12 "Curry"]", "[proposed
+  /// change_meals: approved]"), and the recipe ids in it.
+  static final _cardLine = RegExp(r'^[ \t]*\[(?:shown recipes|proposed)[^\]\n]*\][ \t]*$', multiLine: true);
+  static final _idInLine = RegExp(r'([\w-]+) "');
+
   final ChatService _service;
   final ChatAgentService _agent;
   final ChatTools _tools;
@@ -59,6 +67,13 @@ class ChatCubit extends Cubit<ChatState> {
   /// waiting for the user, by message id.
   _Turn? _turn;
   final _proposals = <String, ({int index, ToolProposal proposal})>{};
+
+  /// The note on cards shown since the chef's last stored reply, for the
+  /// first message of a new conversation.
+  String? _note;
+
+  /// Spoonacular calls made for the user's current message.
+  int _searches = 0;
 
   /// Recipes found or written in this conversation, and those to show as
   /// cards under the next reply.
@@ -99,9 +114,10 @@ class ChatCubit extends Cubit<ChatState> {
     final message = text.trim();
     if (message.isEmpty || state.busy || _tools.quota.state.remaining == 0) return;
     _start();
+    _searches = 0;
     await _put(ChatMessage(id: _newId(), role: ChatRole.user, at: DateTime.now(), text: message));
     unawaited(_analytics.capture(AnalyticsEvents.chatMessageSent, properties: {'length': message.length}));
-    await _run(() => _agent.send(message), round: 0);
+    await _run(() => _agent.send(_withNote(message)), round: 0);
   }
 
   /// Sends the last message again after a failure.
@@ -109,7 +125,8 @@ class ChatCubit extends Cubit<ChatState> {
     final last = state.messages.where((m) => m.role == ChatRole.user).lastOrNull;
     if (last == null || state.busy || _tools.quota.state.remaining == 0) return;
     _start();
-    await _run(() => _agent.send(last.text), round: 0);
+    _searches = 0;
+    await _run(() => _agent.send(_withNote(last.text)), round: 0);
   }
 
   /// Runs a proposed change, or [run] in its place for a change only the
@@ -172,6 +189,14 @@ class ChatCubit extends Cubit<ChatState> {
     );
   }
 
+  /// [message], after the note on cards shown since the chef's last stored
+  /// reply, the first time a new conversation sends.
+  String _withNote(String message) {
+    final note = _note;
+    _note = null;
+    return note == null ? message : '$note\n\n$message';
+  }
+
   /// Asks the model, then works through its reply.
   Future<void> _run(Future<AgentReply> Function() ask, {required int round}) async {
     emit(state.copyWith(status: ChatStatus.thinking, clearError: true));
@@ -186,7 +211,12 @@ class ChatCubit extends Cubit<ChatState> {
   }
 
   Future<void> _handle(AgentReply reply, int round) async {
-    final text = reply.text.trim();
+    // A card the model wrote out as text instead of calling its tool shows
+    // as cards, never as that text.
+    for (final line in _cardLine.allMatches(reply.text)) {
+      _shown.addAll([for (final id in _idInLine.allMatches(line[0]!)) ?_context.recipe(id[1]!)]);
+    }
+    final text = reply.text.replaceAll(_cardLine, '').trim();
     if (text.isNotEmpty || _shown.isNotEmpty) {
       await _put(
         ChatMessage(id: _newId(), role: ChatRole.assistant, at: DateTime.now(), text: text, recipes: [..._shown]),
@@ -204,6 +234,14 @@ class ChatCubit extends Cubit<ChatState> {
       final tool = _tools.byName[call.name];
       if (tool == null) {
         turn.answers[index] = {'error': 'unknown_tool'};
+        continue;
+      }
+      if (tool.kind == ToolKind.quota && _searches++ >= maxSearchesPerMessage) {
+        turn.answers[index] = {
+          'error': 'enough_searches_for_this_message',
+          'next': 'their daily searches are fine; do not search again now, use what you found or offer to write '
+              'a recipe, and do not mention any limit',
+        };
         continue;
       }
       emit(state.copyWith(activity: call.name));
@@ -276,38 +314,50 @@ class ChatCubit extends Cubit<ChatState> {
     _shown.clear();
   }
 
-  /// The past conversation as the model's memory, in text. A trailing user
+  /// The past conversation as the model's memory, in text. The cards the
+  /// user saw go in notes from the app on the user's side, never in the
+  /// chef's own turns: a model copies the form of its past replies, and
+  /// would write "[shown recipes: …]" instead of showing them. Notes after
+  /// the last user message wait in [_note] for the next one. A trailing user
   /// message is left out: it is about to be sent (again).
   List<Content> _history() {
-    final recent = state.messages.length > historyMessages
+    var recent = state.messages.length > historyMessages
         ? state.messages.sublist(state.messages.length - historyMessages)
         : state.messages;
+    if (recent.lastOrNull?.role == ChatRole.user) recent = recent.sublist(0, recent.length - 1);
     final contents = <Content>[];
-    for (final m in recent) {
-      final (role, text) = switch (m.role) {
-        ChatRole.user => ('user', m.text),
-        ChatRole.assistant => (
-          'model',
-          [
-            m.text,
-            if (m.recipes.isNotEmpty) '[shown recipes: ${m.recipes.map((r) => '${r.id} "${r.title}"').join(', ')}]',
-          ].where((t) => t.isNotEmpty).join('\n'),
-        ),
-        ChatRole.action => ('model', '[proposed ${m.action?.tool}: ${m.action?.status.id}]'),
-      };
-      if (text.trim().isEmpty) continue;
+    final notes = <String>[];
+    void add(String role, String text) {
+      if (text.trim().isEmpty) return;
       if (contents.isNotEmpty && contents.last.role == role) {
         contents.last = Content(role, [...contents.last.parts, TextPart(text)]);
       } else {
         contents.add(Content(role, [TextPart(text)]));
       }
     }
+
+    for (final m in recent) {
+      switch (m.role) {
+        case ChatRole.user:
+          add('user', [if (notes.isNotEmpty) _noteFrom(notes), m.text].join('\n\n'));
+          notes.clear();
+        case ChatRole.assistant:
+          add('model', m.text);
+          if (m.recipes.isNotEmpty) {
+            notes.add('your reply showed recipe cards: ${m.recipes.map((r) => '${r.id} "${r.title}"').join(', ')}');
+          }
+        case ChatRole.action:
+          notes.add('your ${m.action?.tool} proposal was shown as a card, now ${m.action?.status.id}');
+      }
+    }
     while (contents.isNotEmpty && contents.first.role != 'user') {
       contents.removeAt(0);
     }
-    if (contents.isNotEmpty && contents.last.role == 'user') contents.removeLast();
+    _note = notes.isEmpty ? null : _noteFrom(notes);
     return contents;
   }
+
+  static String _noteFrom(List<String> notes) => '(Note from the app, not the user: ${notes.join('; ')}.)';
 
   /// Shows [message] at once, then saves it.
   Future<void> _put(ChatMessage message) async {

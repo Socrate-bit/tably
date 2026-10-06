@@ -7,20 +7,13 @@ import 'chat_tool.dart';
 import 'chat_tools.dart';
 import 'tool_payloads.dart';
 
-/// Spoonacular, through the `spoonacular` Cloud Function. Each request spends
+/// Spoonacular, through the `spoonacular` Cloud Function. Each call spends
 /// one of the user's daily searches, so none runs once they are gone, and
 /// the prompt has the model look in their own recipes first.
 List<ChatTool> spoonacularTools(ChatTools t) {
-  /// Queries one search_recipes call may run, each spending one search.
-  const maxQueries = 3;
-
   /// Has Gemini check found recipes against the user's rules and translate
   /// them, as for the catalogue, then keeps them for later calls.
-  Future<ToolResult> found(
-    List<Map<String, dynamic>> raw,
-    ToolContext context, {
-    Map<String, Object?> extra = const {},
-  }) async {
+  Future<ToolResult> found(List<Map<String, dynamic>> raw, ToolContext context) async {
     var recipes = const <Recipe>[];
     var rejected = 0;
     if (raw.isNotEmpty) {
@@ -34,7 +27,6 @@ List<ChatTool> spoonacularTools(ChatTools t) {
     return ToolResult({
       'recipes': [for (final r in recipes) ToolPayloads.recipeSummary(r, t.store)],
       if (rejected > 0) 'rejected_for_breaking_user_rules': rejected,
-      ...extra,
     });
   }
 
@@ -43,21 +35,18 @@ List<ChatTool> spoonacularTools(ChatTools t) {
       kind: ToolKind.quota,
       declaration: FunctionDeclaration(
         'search_recipes',
-        "Searches Spoonacular for new main courses that respect the user's rules, about 8 per query. Spends "
-            'one search per query: use it only when find_recipes has not enough fitting recipes. For several '
-            'kinds of dish, give them all as queries of this one call. include_ingredients finds recipes '
-            'using what the user has.',
+        "Searches Spoonacular for new main courses that respect the user's rules: about 24 for one search of "
+            'their small daily allowance. Use it only when find_recipes has not enough fitting recipes. Keep '
+            'the query broad ("chicken" rather than "chicken curry") to get varied dishes in one go. '
+            'include_ingredients finds recipes using what the user has.',
         parameters: {
-          'queries': Schema.array(
-            items: Schema.string(),
-            description: 'Up to $maxQueries, in English, e.g. ["chicken curry", "lemon chicken"].',
-          ),
+          'query': Schema.string(description: 'In English, e.g. "chicken" or "fish".'),
           'include_ingredients': Schema.array(items: Schema.string(), description: 'In English, e.g. ["leek", "egg"].'),
           'cuisine': Schema.enumString(enumValues: [for (final c in Cuisine.values) c.id]),
           'craving': Schema.enumString(enumValues: ['quick', 'high_protein', 'low_calorie']),
           'protein': Schema.enumString(enumValues: [for (final p in RecipeProtein.values) p.id]),
         },
-        optionalParameters: ['queries', 'include_ingredients', 'cuisine', 'craving', 'protein'],
+        optionalParameters: ['query', 'include_ingredients', 'cuisine', 'craving', 'protein'],
       ),
       run: (args, context) async {
         t.quota.ensureAvailable();
@@ -65,43 +54,20 @@ List<ChatTool> spoonacularTools(ChatTools t) {
         // Spoonacular only reads English, and the model often writes in the
         // user's language, so both are translated (English passes as is).
         final language = t.profile.state.profile.languageCode;
-        final (queries, include) = await (
-          Future.wait([
-            for (final q in (args.strings('queries') ?? const []).take(maxQueries)) t.ai.toEnglish(q, language),
-          ]),
+        final query = args.string('query');
+        final (english, include) = await (
+          query == null ? Future<String?>.value() : t.ai.toEnglish(query, language),
           Future.wait([for (final i in args.strings('include_ingredients') ?? const []) t.ai.toEnglish(i, language)]),
         ).wait;
-        // One search per query; a quota running out midway keeps what was found.
-        final raw = <Map<String, dynamic>>[];
-        var searched = 0;
-        for (final query in queries.isEmpty ? const <String?>[null] : queries) {
-          if (searched > 0 && t.quota.state.remaining == 0) break;
-          try {
-            raw.addAll(
-              await t.search.agentSearch(
-                t.profile.state.profile,
-                query: query,
-                includeIngredients: include,
-                cuisines: {?cuisine},
-                craving: Craving.values.where((c) => c.id == args['craving']).firstOrNull,
-                protein: args['protein'] == null ? null : RecipeProtein.fromId(args.string('protein')),
-              ),
-            );
-          } catch (e) {
-            if (searched == 0 || ChatTools.reasonFor(e) != 'quota_exhausted') rethrow;
-            break;
-          }
-          searched++;
-        }
-        final seen = <Object?>{};
-        return found(
-          [
-            for (final r in raw)
-              if (seen.add(r['id'])) r,
-          ],
-          context,
-          extra: {if (searched < queries.length) 'quota_exhausted_after': searched},
+        final raw = await t.search.agentSearch(
+          t.profile.state.profile,
+          query: english,
+          includeIngredients: include,
+          cuisines: {?cuisine},
+          craving: Craving.values.where((c) => c.id == args['craving']).firstOrNull,
+          protein: args['protein'] == null ? null : RecipeProtein.fromId(args.string('protein')),
         );
+        return found(raw, context);
       },
     ),
     ChatTool(
