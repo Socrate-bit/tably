@@ -144,7 +144,7 @@ class MealSlotCard extends StatelessWidget {
   }
 }
 
-/// The grip bar on the card's left edge: press and drag to move the meal
+/// The three-dot grip on the card's left edge: press and drag to move the meal
 /// up or down the week.
 class _DragHandle extends StatelessWidget {
   const _DragHandle({required this.index, required this.height});
@@ -162,12 +162,18 @@ class _DragHandle extends StatelessWidget {
         child: SizedBox(
           width: 22.w,
           height: height,
-          child: Center(
-            child: Container(
-              width: 5.w,
-              height: 36.h,
-              decoration: BoxDecoration(color: AppColors.neutralBar, borderRadius: BorderRadius.circular(3.r)),
-            ),
+          // Three stacked dots as the grip.
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              for (var i = 0; i < 3; i++)
+                Container(
+                  width: 5.r,
+                  height: 5.r,
+                  margin: EdgeInsets.symmetric(vertical: 2.r),
+                  decoration: const BoxDecoration(color: AppColors.neutralBar, shape: BoxShape.circle),
+                ),
+            ],
           ),
         ),
       ),

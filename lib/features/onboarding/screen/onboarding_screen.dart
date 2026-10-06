@@ -163,6 +163,10 @@ class _StepsView extends StatelessWidget {
         initialValue: state.draft.name,
         onChanged: cubit.setName,
       ),
+      StepKind.wishes => WishesStep(
+        initialValue: state.draft.customInstructions,
+        onChanged: cubit.setCustomInstructions,
+      ),
       StepKind.options => OptionsStep(
         step: step,
         isSelected: (optionId) => cubit.isSelected(step.id, optionId),

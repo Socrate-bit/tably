@@ -8,11 +8,55 @@ import '../../../../core/util/haptics.dart';
 import '../../../../core/util/option_labels.dart';
 import '../../../../core/widget/app_slider.dart';
 import '../../../../core/widget/household_stepper.dart';
+import '../../../../core/widget/note_field.dart';
 import '../../../../core/widget/surface_card.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../plan/widget/meals_per_day_options.dart';
 import '../../../plan/widget/variety_options.dart';
 import '../../../preferences/model/user_profile.dart';
+
+/// "Un souhait particulier ?" — optional free text saved as custom instructions.
+class WishesStep extends StatefulWidget {
+  const WishesStep({super.key, required this.initialValue, required this.onChanged});
+
+  final String initialValue;
+  final ValueChanged<String> onChanged;
+
+  @override
+  State<WishesStep> createState() => _WishesStepState();
+}
+
+class _WishesStepState extends State<WishesStep> {
+  late final TextEditingController _controller = TextEditingController(text: widget.initialValue)
+    ..addListener(() => widget.onChanged(_controller.text));
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppL10n.of(context);
+    return SingleChildScrollView(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Text(l10n.onbWishesTitle, style: AppTextStyles.h1),
+          SizedBox(height: 10.h),
+          Text(l10n.onbWishesSubtitle, style: AppTextStyles.subtitleTight),
+          SizedBox(height: 26.h),
+          NoteField(
+            controller: _controller,
+            hint: l10n.onbWishesHint,
+            maxLength: UserProfile.customInstructionsMax,
+          ),
+        ],
+      ),
+    );
+  }
+}
 
 /// "comment tu t'appelles ?" — a single rounded text field.
 class NameStep extends StatefulWidget {

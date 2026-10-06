@@ -352,6 +352,17 @@ class AppL10nEn extends AppL10n {
   String get onbAppliancesHint => 'Choose everything you have';
 
   @override
+  String get onbWishesTitle => 'Any special wishes?';
+
+  @override
+  String get onbWishesSubtitle =>
+      'Optional — Tably will keep it in mind when picking your recipes';
+
+  @override
+  String get onbWishesHint =>
+      'E.g. more Asian food, lots of veggies, quick lunches I can take to work, no mushrooms…';
+
+  @override
   String get applianceMicrowave => 'Microwave';
 
   @override

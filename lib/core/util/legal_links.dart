@@ -9,10 +9,9 @@ import 'error_feedback.dart';
 /// wording change goes live without an App Store release — and so the in-app
 /// link can never drift from the published policy.
 abstract final class LegalLinks {
-  /// GitHub Pages (Socrate-bit/app-support), not the repository's /blob/ URL:
-  /// /blob/ opens GitHub's source viewer and shows the policy as raw HTML.
-  static const privacyPolicy = 'https://ecomparis.org/privacy_tably.html';
-  static const terms = 'https://ecomparis.org/terms_tably.html';
+  /// Hosted on the Tably site (Vercel).
+  static const privacyPolicy = 'https://tably-app-site.vercel.app/confidentialite.html';
+  static const terms = 'https://tably-app-site.vercel.app/conditions.html';
 }
 
 /// Opens a legal document in the device browser. Feedback is shown only when

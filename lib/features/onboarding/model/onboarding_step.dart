@@ -7,6 +7,7 @@ import '../../../core/model/store.dart';
 enum StepKind {
   welcome,
   text,
+  wishes,
   options,
   counter,
   days,
@@ -111,6 +112,7 @@ abstract final class StepIds {
   static const allergies = 'allergies';
   static const proteins = 'proteins';
   static const appliances = 'appliances';
+  static const wishes = 'wishes';
   static const testimonial = 'testimonial';
 }
 
@@ -264,9 +266,9 @@ abstract final class OnboardingFlow {
       progress: 91,
       layout: OptionLayout.grid,
       multi: true,
-      continueLabelOverride: 'generate',
       options: _specs(Appliance.values, (a) => a.id, (a) => a.icon),
     ),
+    const OnboardingStep(id: StepIds.wishes, kind: StepKind.wishes, progress: 94, continueLabelOverride: 'generate'),
     const OnboardingStep(id: StepIds.testimonial, kind: StepKind.testimonial, progress: 96),
   ];
 }

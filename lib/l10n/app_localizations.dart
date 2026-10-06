@@ -733,6 +733,24 @@ abstract class AppL10n {
   /// **'Choisis tout ce que tu as'**
   String get onbAppliancesHint;
 
+  /// No description provided for @onbWishesTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Un souhait particulier ?'**
+  String get onbWishesTitle;
+
+  /// No description provided for @onbWishesSubtitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Facultatif — Tably en tiendra compte pour choisir tes recettes'**
+  String get onbWishesSubtitle;
+
+  /// No description provided for @onbWishesHint.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ex. : plus de cuisine asiatique, beaucoup de légumes, des déj faciles à emporter au boulot, pas de champignons…'**
+  String get onbWishesHint;
+
   /// No description provided for @applianceMicrowave.
   ///
   /// In fr, this message translates to:

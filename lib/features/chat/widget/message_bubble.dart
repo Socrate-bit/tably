@@ -30,8 +30,8 @@ class MessageBubble extends StatelessWidget {
             bottomRight: Radius.circular(mine ? 6.r : 20.r),
           ),
         ),
-        child: SelectableText(
-          message.text,
+        child: SelectableText.rich(
+          TextSpan(children: _boldSpans(message.text)),
           style: AppTextStyles.body.copyWith(color: mine ? AppColors.surface : AppColors.inkBody),
         ),
       ),
@@ -44,6 +44,18 @@ class MessageBubble extends StatelessWidget {
       ],
     );
   }
+}
+
+/// Splits [text] on `**` markers, rendering the enclosed parts in bold.
+List<TextSpan> _boldSpans(String text) {
+  final parts = text.split('**');
+  // An odd marker count means an unclosed `**`: keep it as literal text.
+  if (parts.length.isEven) return [TextSpan(text: text)];
+  return [
+    for (var i = 0; i < parts.length; i++)
+      if (parts[i].isNotEmpty)
+        TextSpan(text: parts[i], style: i.isOdd ? const TextStyle(fontWeight: FontWeight.w700) : null),
+  ];
 }
 
 /// The Tably logo as the chef's avatar, beside what the chef says.
