@@ -37,7 +37,8 @@ class OnboardingCubit extends Cubit<OnboardingState> {
   final CatalogueCubit _catalogueCubit;
   final AnalyticsService _analytics;
 
-  /// Follows the App Review flag, which skips the store choice and offer.
+  /// Follows the App Review flag, which skips the store choice and offer and
+  /// the rating prompt.
   late final StreamSubscription<ReviewState> _review;
 
   /// Follows the catalogue build to tick the generating checklist.
@@ -64,7 +65,12 @@ class OnboardingCubit extends Cubit<OnboardingState> {
     ));
 
     if (state.isLastStep) {
-      emit(state.copyWith(phase: OnboardingPhase.rating));
+      // App Review builds skip the rating prompt and build the plan straight away.
+      if (state.inReview) {
+        unawaited(_runGeneration());
+      } else {
+        emit(state.copyWith(phase: OnboardingPhase.rating));
+      }
       return;
     }
     final nextState = state.copyWith(stepIndex: state.stepIndex + 1);

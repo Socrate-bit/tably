@@ -13,8 +13,8 @@ class ReviewState extends Equatable {
   /// False until the flag has been read once (or failed to be).
   final bool isReady;
 
-  /// This build is in App Review: store choice and comparison, the AI chef
-  /// and referral codes are hidden.
+  /// This build is in App Review: store choice and comparison, the AI chef,
+  /// referral codes, savings claims and the onboarding rating prompt are hidden.
   final bool inReview;
 
   @override

@@ -9,15 +9,24 @@ import '../../../core/widget/progress_bar.dart';
 import '../../../core/widget/surface_card.dart';
 import '../../../l10n/app_localizations.dart';
 
-/// The cost card: spend so far against the weekly budget. Tapping it opens
-/// the store price comparison, unless [onTap] is null.
+/// The cost card: spend so far against the weekly budget, and what that
+/// saves unless [showSavings] is false. Tapping it opens the store price
+/// comparison, unless [onTap] is null.
 class CostCard extends StatelessWidget {
-  const CostCard({super.key, required this.total, required this.budget, required this.country, required this.onTap});
+  const CostCard({
+    super.key,
+    required this.total,
+    required this.budget,
+    required this.country,
+    required this.onTap,
+    this.showSavings = true,
+  });
 
   final double total;
   final double budget;
   final Country country;
   final VoidCallback? onTap;
+  final bool showSavings;
 
   @override
   Widget build(BuildContext context) {
@@ -49,13 +58,15 @@ class CostCard extends StatelessWidget {
             ),
             SizedBox(height: 12.h),
             ProgressBar(value: ratio, height: 8.h, trackColor: AppColors.track),
-            SizedBox(height: 10.h),
-            _OneLine(
-              Text(
-                l10n.budgetSavings(formatMoney(country, (budget - total).clamp(0, budget), decimals: 0)),
-                style: AppTextStyles.savings,
+            if (showSavings) ...[
+              SizedBox(height: 10.h),
+              _OneLine(
+                Text(
+                  l10n.budgetSavings(formatMoney(country, (budget - total).clamp(0, budget), decimals: 0)),
+                  style: AppTextStyles.savings,
+                ),
               ),
-            ),
+            ],
           ],
         ),
       ),
