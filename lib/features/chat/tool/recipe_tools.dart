@@ -46,9 +46,13 @@ List<ChatTool> recipeTools(ChatTools t) {
       declaration: FunctionDeclaration(
         'find_recipes',
         "Searches the user's own recipes (their pool and favourites) without spending any Spoonacular quota. "
-            'Always try this before search_recipes.',
+            'Always try this before search_recipes. It is free: for several kinds of dish, call it several '
+            'times in the same reply. Recipes matching more words of the query come first; in_week marks '
+            'those already planned this week.',
         parameters: {
-          'query': Schema.string(description: 'Words to find in the title or ingredients, in the user\'s language.'),
+          'query': Schema.string(
+            description: 'Words to find in the title or ingredients, in the user\'s language; any of them can match.',
+          ),
           'craving': Schema.enumString(enumValues: [for (final c in Craving.values) c.id]),
           'protein': Schema.enumString(enumValues: [for (final p in RecipeProtein.values) p.id]),
           'cuisine': Schema.enumString(enumValues: [for (final c in Cuisine.values) c.id]),
@@ -67,7 +71,16 @@ List<ChatTool> recipeTools(ChatTools t) {
         ],
       ),
       run: (args, context) async {
-        final query = args.string('query')?.toLowerCase();
+        // Words of 3 letters or more, so "poulet rôti" finds any chicken dish.
+        final words = [
+          for (final w in (args.string('query') ?? '').toLowerCase().split(RegExp(r"[\s,;'’-]+")))
+            if (w.length >= 3) w,
+        ];
+        int hits(Recipe r) {
+          final text = [r.title, ...r.ingredients.map((i) => i.name)].join(' ').toLowerCase();
+          return words.where(text.contains).length;
+        }
+
         final maxMinutes = args.integer('max_minutes');
         final maxPrice = args.number('max_price_eur');
         final favourites = t.recipes.state.favouritesIn(t.catalogue.state.recipes);
@@ -78,19 +91,21 @@ List<ChatTool> recipeTools(ChatTools t) {
               }.values;
         final matches = [
           for (final r in pool)
-            if ((query == null ||
-                    r.title.toLowerCase().contains(query) ||
-                    r.ingredients.any((i) => i.name.toLowerCase().contains(query))) &&
+            if ((words.isEmpty || hits(r) > 0) &&
                 (args['craving'] == null || r.craving.id == args['craving']) &&
                 (args['protein'] == null || r.protein.id == args['protein']) &&
                 (args['cuisine'] == null || r.cuisine?.id == args['cuisine']) &&
                 (maxMinutes == null || ToolPayloads.minutes(r) <= maxMinutes) &&
                 (maxPrice == null || r.price * t.store.priceFactor <= maxPrice))
               r,
-        ];
+        ]..sort((a, b) => hits(b).compareTo(hits(a)));
+        final inWeek = {for (final s in t.plan.state.week.slots) s.recipe.id};
         return ToolResult({
           'total': matches.length,
-          'recipes': [for (final r in matches.take(15)) ToolPayloads.recipeSummary(r, t.store)],
+          'recipes': [
+            for (final r in matches.take(15))
+              {...ToolPayloads.recipeSummary(r, t.store), if (inWeek.contains(r.id)) 'in_week': true},
+          ],
         });
       },
     ),
@@ -196,7 +211,8 @@ List<ChatTool> recipeTools(ChatTools t) {
         'create_custom_recipe',
         "Writes a brand-new recipe for the user from a description (e.g. \"a quick creamy leek pasta\"), "
             "respecting all their rules, and adds it to their recipes once they approve; with slot_key it also "
-            'goes in that meal. Use it when nothing in their recipes or on Spoonacular fits.',
+            'goes in that meal. Only when the user asks you to write or invent a recipe, or said yes to your '
+            'offer to write one; never on your own as a fallback for a search that found little.',
         parameters: {
           'request': Schema.string(description: 'What to cook, with every detail the user gave.'),
           'slot_key': Schema.string(description: 'A meal of the week to put it in.'),

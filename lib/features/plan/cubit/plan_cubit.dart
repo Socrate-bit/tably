@@ -98,24 +98,34 @@ class PlanCubit extends Cubit<PlanState> {
   /// Swaps the meal in [slotKey] for [recipe]. One from neither the cached
   /// pool nor the saved favourites — a search result — joins the pool first,
   /// so the week can use it.
-  Future<void> replace(String slotKey, Recipe recipe) async {
-    final known = _catalogueCubit.state.byId(recipe.id) ?? _recipeCubit.state.savedRecipe(recipe.id);
-    if (known == null) unawaited(_catalogueCubit.addRecipe(recipe));
-    await _apply(state.settings.copyWith(overrides: {...state.settings.overrides, slotKey: recipe.id}));
-    debugPrint('[PlanCubit] meal replaced: $slotKey → ${recipe.id}');
-    unawaited(_analytics.capture(
-      AnalyticsEvents.mealReplaced,
-      properties: {'slot': slotKey, 'recipe_id': recipe.id},
-    ));
+  Future<void> replace(String slotKey, Recipe recipe) => replaceMany({slotKey: recipe});
+
+  /// Swaps several meals at once, by slot key, in a single change.
+  Future<void> replaceMany(Map<String, Recipe> bySlot) async {
+    for (final recipe in bySlot.values) {
+      final known = _catalogueCubit.state.byId(recipe.id) ?? _recipeCubit.state.savedRecipe(recipe.id);
+      if (known == null) unawaited(_catalogueCubit.addRecipe(recipe));
+    }
+    await _apply(state.settings.copyWith(overrides: {
+      ...state.settings.overrides,
+      for (final MapEntry(:key, :value) in bySlot.entries) key: value.id,
+    }));
+    for (final MapEntry(:key, :value) in bySlot.entries) {
+      debugPrint('[PlanCubit] meal replaced: $key → ${value.id}');
+      unawaited(_analytics.capture(
+        AnalyticsEvents.mealReplaced,
+        properties: {'slot': key, 'recipe_id': value.id},
+      ));
+    }
   }
 
   /// Swaps the meal in [slot] for a random dish from the cached pool that is
-  /// not already in the week, preferring one matching the custom
-  /// instructions — no API call — and returns the updated slot so
+  /// not already in the week nor in [avoid], preferring one matching the
+  /// custom instructions — no API call — and returns the updated slot so
   /// the caller can show it.
-  Future<PlanSlot?> regenerateMeal(PlanSlot slot) async {
+  Future<PlanSlot?> regenerateMeal(PlanSlot slot, {Set<String> avoid = const {}}) async {
     final catalogue = _catalogueCubit.state.recipes.where((r) => r.origin == RecipeOrigin.built).toList();
-    final inWeek = state.week.slots.map((s) => s.recipe.id).toSet();
+    final inWeek = {...state.week.slots.map((s) => s.recipe.id), ...avoid};
     var pool = catalogue.where((r) => !inWeek.contains(r.id)).toList();
     if (pool.isEmpty) pool = catalogue.where((r) => r.id != slot.recipe.id).toList();
     if (pool.isEmpty) return null;

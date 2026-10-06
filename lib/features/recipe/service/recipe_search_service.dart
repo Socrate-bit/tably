@@ -34,7 +34,7 @@ class RecipeSearchService {
     Craving? craving,
     String? wish,
   }) async {
-    final data = await _call('searchRecipes', {
+    final data = await invoke('searchRecipes', {
       ..._constraints(profile),
       'number': number,
       'query': query,
@@ -60,7 +60,7 @@ class RecipeSearchService {
     Craving? craving,
     RecipeProtein? protein,
   }) async =>
-      _recipes(await _call('spoonacular', {
+      _recipes(await invoke('spoonacular', {
         'action': 'search',
         ..._constraints(profile),
         'query': query,
@@ -72,19 +72,19 @@ class RecipeSearchService {
 
   /// Recipes like the Spoonacular recipe [id].
   Future<List<Map<String, dynamic>>> similar(int id) async =>
-      _recipes(await _call('spoonacular', {'action': 'similar', 'id': id}));
+      _recipes(await invoke('spoonacular', {'action': 'similar', 'id': id}));
 
   /// The recipe on the web page at [url]; empty when the page has none.
   Future<List<Map<String, dynamic>>> extract(String url) async =>
-      _recipes(await _call('spoonacular', {'action': 'extract', 'url': url}));
+      _recipes(await invoke('spoonacular', {'action': 'extract', 'url': url}));
 
   /// What can replace the English [ingredient], with Spoonacular's note.
   Future<Map<String, dynamic>> substitutes(String ingredient) =>
-      _call('spoonacular', {'action': 'substitutes', 'ingredient': ingredient});
+      invoke('spoonacular', {'action': 'substitutes', 'ingredient': ingredient});
 
   /// Wines that go with the English [food], at most [maxPrice] dollars.
   Future<Map<String, dynamic>> winePairing(String food, {double? maxPrice}) =>
-      _call('spoonacular', {'action': 'winePairing', 'food': food, 'maxPrice': maxPrice});
+      invoke('spoonacular', {'action': 'winePairing', 'food': food, 'maxPrice': maxPrice});
 
   /// The profile's hard constraints, which every search applies.
   static Map<String, Object?> _constraints(UserProfile profile) => {
@@ -95,8 +95,10 @@ class RecipeSearchService {
       };
 
   /// Calls the function [name]. Throws [FirebaseFunctionsException] so the
-  /// caller can tell a spent quota from an outage.
-  Future<Map<String, dynamic>> _call(String name, Map<String, Object?> data) async {
+  /// caller can tell a spent quota from an outage. The AI chef eval replaces
+  /// it to reach the functions emulator.
+  @protected
+  Future<Map<String, dynamic>> invoke(String name, Map<String, Object?> data) async {
     final callable = _fn.httpsCallable(name, options: HttpsCallableOptions(timeout: const Duration(seconds: 70)));
     final result = await callable.call<Object?>(data);
     // Platform channels hand back loosely typed nested maps; a JSON round trip
