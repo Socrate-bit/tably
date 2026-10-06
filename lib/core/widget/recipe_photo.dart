@@ -44,7 +44,7 @@ class RecipePhoto extends StatelessWidget {
                   errorBuilder: (_, _, _) => const _Placeholder(),
                 )
               : asset == null
-                  ? const _Placeholder()
+                  ? _Placeholder(iconSize: height * 0.32)
                   : Image.asset(
                       asset,
                       fit: BoxFit.cover,
@@ -56,18 +56,27 @@ class RecipePhoto extends StatelessWidget {
   }
 }
 
-/// The design's neutral gradient, shown when there is no photo to draw.
+/// The design's neutral gradient, shown while loading or when there is no
+/// photo. Recipes that never had one (e.g. written by the AI chef) also get a
+/// dish icon when [iconSize] is set.
 class _Placeholder extends StatelessWidget {
-  const _Placeholder();
+  const _Placeholder({this.iconSize});
+
+  final double? iconSize;
 
   @override
-  Widget build(BuildContext context) => const DecoratedBox(
-        decoration: BoxDecoration(
+  Widget build(BuildContext context) => DecoratedBox(
+        decoration: const BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [AppColors.photoPlaceholder, AppColors.trackDark],
+            colors: [AppColors.brandSoft, AppColors.brandChip],
           ),
         ),
+        child: iconSize == null
+            ? null
+            : Center(
+                child: Icon(Icons.restaurant_menu_rounded, size: iconSize!.clamp(16.r, 72.r), color: AppColors.brand),
+              ),
       );
 }

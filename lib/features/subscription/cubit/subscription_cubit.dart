@@ -28,7 +28,11 @@ class SubscriptionCubit extends Cubit<SubscriptionState> {
         _analytics = analytics,
         // Seeded from the profile rather than defaulted, so a grant already on
         // the document counts even if this cubit is built after it arrived.
-        super(SubscriptionState(userType: profileCubit.state.profile.userType)) {
+        // Without Superwall (web) there is no paywall to pass, so the gate opens.
+        super(SubscriptionState(
+          userType: profileCubit.state.profile.userType,
+          status: PaywallService.isEnabled ? SubscriptionGateStatus.unknown : SubscriptionGateStatus.active,
+        )) {
     _statusSubscription = _paywall.status.listen(_onStatus);
     _profileSubscription = profileCubit.stream
         .map((s) => s.profile.userType)
@@ -117,9 +121,10 @@ class SubscriptionCubit extends Cubit<SubscriptionState> {
 
   void clearRedeemStatus() => emit(state.copyWith(redeemStatus: RedeemStatus.idle));
 
-  /// Shows the paywall once, as onboarding ends. Users with a redeemed code or
-  /// an active subscription go straight into the app.
-  Future<void> presentPaywallAfterOnboarding() async {
+  /// Shows the paywall to a user without access — when onboarding ends, on
+  /// launch, and on every tap on the gated app. Users with a redeemed code or
+  /// an active subscription go straight through.
+  Future<void> presentPaywall() async {
     if (state.hasAccess) {
       debugPrint('[SubscriptionCubit] paywall bypassed (${state.userType.id})');
       unawaited(_analytics.capture(
@@ -129,7 +134,7 @@ class SubscriptionCubit extends Cubit<SubscriptionState> {
       return;
     }
     unawaited(_analytics.capture(AnalyticsEvents.paywallShown));
-    await _paywall.present(PaywallService.onboardingCompletePlacement);
+    await _paywall.present(PaywallService.onboardingEndPlacement);
   }
 
   @override

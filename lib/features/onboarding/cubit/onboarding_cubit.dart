@@ -136,6 +136,10 @@ class OnboardingCubit extends Cubit<OnboardingState> {
 
   void setName(String name) => emit(state.copyWith(draft: state.draft.copyWith(name: name)));
 
+  /// Free-text wishes, saved as the profile's custom instructions. Optional.
+  void setCustomInstructions(String text) =>
+      emit(state.copyWith(draft: state.draft.copyWith(customInstructions: text.trim())));
+
   void incrementHousehold() => _setHousehold(state.draft.household + 1);
 
   void decrementHousehold() => _setHousehold(state.draft.household - 1);
