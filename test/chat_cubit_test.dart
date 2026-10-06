@@ -1,5 +1,6 @@
 import 'package:firebase_ai/firebase_ai.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:tably/core/model/preference_option.dart';
 import 'package:tably/features/chat/cubit/chat_cubit.dart';
 import 'package:tably/features/chat/model/chat_message.dart';
 import 'package:tably/features/chat/service/chat_agent_service.dart';
@@ -326,6 +327,33 @@ void main() {
     ];
     expect(said, ['Que dis-tu de celle-ci ?']);
     expect(agent.sent.last, allOf(contains('Note from the app'), contains(recipe.id), endsWith('Une autre ?')));
+  });
+
+  test('a search outside the rules sets them aside, but never the allergies', () async {
+    final ai = FakeAi();
+    final harness = await ChatHarness.start(
+      _FakeAgent([]),
+      user: const UserProfile(
+        household: 2,
+        diets: {Diet.vegetarian},
+        allergies: {Allergy.nutFree},
+        customInstructions: 'Pas de poisson.',
+      ),
+      ai: ai,
+    );
+    addTearDown(harness.close);
+    final search = harness.tools.byName['search_recipes']!;
+
+    await search.run(const {'query': 'beef'}, _noContext);
+    final kept = ai.checkedFor.last;
+    await search.run(const {'query': 'beef', 'ignore_rules': true}, _noContext);
+    final outside = ai.checkedFor.last;
+
+    expect(kept.diets, {Diet.vegetarian});
+    expect(kept.customInstructions, 'Pas de poisson.');
+    expect(outside.diets, {Diet.none});
+    expect(outside.customInstructions, isEmpty);
+    expect(outside.allergies, {Allergy.nutFree});
   });
 
   test('one message spends at most two Spoonacular searches', () async {

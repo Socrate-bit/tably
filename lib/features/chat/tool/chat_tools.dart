@@ -2,9 +2,11 @@ import 'package:cloud_functions/cloud_functions.dart';
 import 'package:firebase_ai/firebase_ai.dart';
 
 import '../../../core/analytics/analytics_service.dart';
+import '../../../core/model/preference_option.dart';
 import '../../../core/model/store.dart';
 import '../../plan/cubit/plan_cubit.dart';
 import '../../preferences/cubit/profile_cubit.dart';
+import '../../preferences/model/user_profile.dart';
 import '../../recipe/cubit/catalogue_cubit.dart';
 import '../../recipe/cubit/recipe_cubit.dart';
 import '../../recipe/cubit/search_quota_cubit.dart';
@@ -73,6 +75,24 @@ class ChatTools {
   /// The week as the model sees it.
   Map<String, Object?> weekJson() =>
       ToolPayloads.week(plan.state.week, store, recipesOutdated: catalogue.state.outdated);
+
+  /// The option to step outside the user's rules, when they ask for it.
+  static final ignoreRules = Schema.boolean(
+    description:
+        'Only when the user explicitly asks for something their rules exclude this time: a meat dish for a '
+        'vegetarian, a dish their memory rules out, a longer recipe. Sets aside diets, meats, memory, cooking '
+        'time and appliances; their allergies always apply.',
+  );
+
+  /// [profile] with only its allergies left, for what the user asked to do
+  /// outside their own rules: allergies are about safety, not taste.
+  static UserProfile outsideRules(UserProfile profile) => profile.copyWith(
+    diets: const {Diet.none},
+    proteins: Protein.meats,
+    appliances: Appliance.values.toSet(),
+    cookMinutes: UserProfile.cookMinutesCeiling,
+    customInstructions: '',
+  );
 
   /// A short, stable reason for a failure, which the model explains to the
   /// user in their language.

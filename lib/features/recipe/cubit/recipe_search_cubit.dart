@@ -58,7 +58,8 @@ class RecipeSearchCubit extends Cubit<RecipeSearchState> {
 
     final run = ++_latest;
     // The filters' diets, allergies and appliances stand in for the profile's.
-    final profile = browse.constraints.applyTo(_profileCubit.state.profile);
+    // The custom instructions only shape the week: a search shows everything.
+    final profile = browse.constraints.applyTo(_profileCubit.state.profile).copyWith(customInstructions: '');
     final stopwatch = Stopwatch()..start();
     emit(RecipeSearchState(status: RecipeSearchStatus.searching, searchedFor: browse));
     try {

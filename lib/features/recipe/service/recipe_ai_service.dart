@@ -422,6 +422,10 @@ $wished''';
     final appliances = profile.appliances.isEmpty
         ? 'none at all, so the recipe must need no cooking'
         : ids(profile.appliances.map((a) => a.id));
+    // As in [instruction], diets and allergies only appear when set: a rule
+    // left in with "none" still primes the model (no wine with no diet).
+    final diets = profile.diets.where((d) => d != Diet.none);
+    final allergies = profile.allergies.where((a) => a != Allergy.none);
     final task = derived
         ? '''The input has a "base" recipe and a "request". Return a copy of the base
 changed only as requested. Keep every other ingredient with its id as
@@ -433,11 +437,9 @@ with realistic amounts and clear steps a home cook can follow.''';
 You are Tably's chef and write recipes for a weekly dinner-planning app.
 $task
 
-Every recipe MUST respect the user's constraints:
-- Diets: ${ids(profile.diets.map((d) => d.id))}. Halal means no pork and no alcohol.
-- Must avoid: ${ids(profile.allergies.map((a) => a.id))}, including in stocks, sauces,
-  pastes and garnishes.
-- Main protein allowed: $proteins. Meat-free dishes are always fine unless
+Every recipe MUST respect the user's constraints, even when the request
+asks otherwise:
+${diets.isEmpty ? '' : '- Diets: ${ids(diets.map((d) => d.id))}.${diets.contains(Diet.halal) ? ' Halal means no pork and no alcohol.' : ''}\n'}${allergies.isEmpty ? '' : '- Must avoid: ${ids(allergies.map((a) => a.id))}, including in stocks, sauces,\n  pastes and garnishes.\n'}- Main protein allowed: $proteins. Meat-free dishes are always fine unless
   a diet rules them out.
 - Appliances the user has: $appliances (hob = stovetop, mixer = blender or
   food processor, slow_cooker = crockpot, pressure_cooker = Instant Pot,
