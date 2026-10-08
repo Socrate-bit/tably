@@ -117,7 +117,7 @@ class AccountScreen extends StatelessWidget {
                           AccountRow(
                             title: l10n.accountSignOut,
                             arrow: true,
-                            onTap: context.read<AuthCubit>().signOut,
+                            onTap: () => _signOut(context),
                           ),
                         AccountRow(
                           title: l10n.accountDelete,
@@ -181,6 +181,13 @@ class AccountScreen extends StatelessWidget {
   }
 
   /// Deleting an account is irreversible, so it always asks first.
+  /// Signs out, then returns the shell to its first tab for the next user.
+  Future<void> _signOut(BuildContext context) async {
+    // Read before the await: signing out unmounts this screen.
+    final home = context.read<HomeCubit>();
+    if (await context.read<AuthCubit>().signOut()) home.reset();
+  }
+
   Future<void> _confirmDelete(BuildContext context) async {
     final l10n = AppL10n.of(context);
     final confirmed = await showDialog<bool>(
@@ -206,7 +213,9 @@ class AccountScreen extends StatelessWidget {
     );
     if (confirmed == true && context.mounted) {
       Haptics.notify();
-      await context.read<AuthCubit>().deleteAccount();
+      // Read before the await: deleting the account unmounts this screen.
+      final home = context.read<HomeCubit>();
+      if (await context.read<AuthCubit>().deleteAccount()) home.reset();
     }
   }
 }

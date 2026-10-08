@@ -8,6 +8,7 @@ import '../../../core/widget/primary_button.dart';
 import '../../../core/widget/progress_bar.dart';
 import '../../../core/widget/slide_in.dart';
 import '../../../l10n/app_localizations.dart';
+import '../../account/widget/login_dialog.dart';
 import '../../preferences/cubit/profile_cubit.dart';
 import '../../subscription/cubit/subscription_cubit.dart';
 import '../../review/cubit/review_cubit.dart';
@@ -35,7 +36,12 @@ class OnboardingScreen extends StatelessWidget {
           previous.phase != current.phase &&
           current.phase == OnboardingPhase.done,
       // The paywall gate in RootScreen takes over once the profile is saved.
-      listener: (context, state) => context.read<ProfileCubit>().completeOnboarding(state.draft),
+      // The cubit outlives this screen, so reset it once saved: a new account
+      // then starts from the first step instead of the finished flow.
+      listener: (context, state) {
+        final onboarding = context.read<OnboardingCubit>();
+        context.read<ProfileCubit>().completeOnboarding(state.draft).then((_) => onboarding.reset());
+      },
       builder: (context, state) {
         return Scaffold(
           backgroundColor: AppColors.scaffold,
@@ -156,6 +162,8 @@ class _StepsView extends StatelessWidget {
         // App Review builds offer no referral code.
         onEnterCode: inReview ? null : () => ReferralCodeDialog.show(context),
         codeApplied: codeApplied,
+        // Only App Review builds can log into an existing (demo) account.
+        onLogin: inReview ? () => LoginDialog.show(context) : null,
       ),
       StepKind.text => NameStep(
         initialValue: state.draft.name,

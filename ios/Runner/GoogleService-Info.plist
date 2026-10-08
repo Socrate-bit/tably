@@ -9,7 +9,7 @@
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
-	<string>com.appscales.tably</string>
+	<string>com.appscales.tablyprod</string>
 	<key>PROJECT_ID</key>
 	<string>tably-9f3c2</string>
 	<key>STORAGE_BUCKET</key>
@@ -25,6 +25,6 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:444020010379:ios:e064cd1dcd551661fc538e</string>
+	<string>1:444020010379:ios:638f0796368e11d8fc538e</string>
 </dict>
 </plist>

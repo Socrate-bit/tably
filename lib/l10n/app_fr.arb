@@ -833,5 +833,10 @@
         "type": "String"
       }
     }
-  }
+  },
+  "loginTitle": "Se connecter",
+  "loginLink": "Déjà un compte ? Se connecter",
+  "loginEmail": "E-mail",
+  "loginPassword": "Mot de passe",
+  "loginError": "Connexion impossible. Vérifie ton e-mail et ton mot de passe."
 }

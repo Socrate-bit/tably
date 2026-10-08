@@ -25,6 +25,7 @@ class WelcomeStep extends StatelessWidget {
     required this.onNext,
     required this.onEnterCode,
     required this.codeApplied,
+    this.onLogin,
   });
 
   final String languageCode;
@@ -41,6 +42,9 @@ class WelcomeStep extends StatelessWidget {
   /// True once a referral code has been redeemed, which is the only signal the
   /// user gets here that their code took effect.
   final bool codeApplied;
+
+  /// Opens the login dialog; null hides the link (App Review builds only).
+  final VoidCallback? onLogin;
 
   @override
   Widget build(BuildContext context) {
@@ -62,6 +66,10 @@ class WelcomeStep extends StatelessWidget {
 
         const Spacer(),
         PrimaryButton(label: l10n.actionStart, onPressed: onNext),
+        if (onLogin case final login?) ...[
+          SizedBox(height: 16.h),
+          _Link(label: l10n.loginLink, onTap: login),
+        ],
         if (onEnterCode case final enterCode?) ...[
           SizedBox(height: 16.h),
           if (codeApplied)
@@ -71,25 +79,38 @@ class WelcomeStep extends StatelessWidget {
               style: AppTextStyles.metaSmall.copyWith(fontSize: 14.sp, color: AppColors.brand),
             )
           else
-            GestureDetector(
-              onTap: () {
-                Haptics.tap();
-                enterCode();
-              },
-              behavior: HitTestBehavior.opaque,
-              child: Text(
-                l10n.haveACode,
-                textAlign: TextAlign.center,
-                style: AppTextStyles.metaSmall.copyWith(
-                  fontSize: 14.sp,
-                  color: AppColors.brand,
-                  decoration: TextDecoration.underline,
-                  decorationColor: AppColors.brand,
-                ),
-              ),
-            ),
+            _Link(label: l10n.haveACode, onTap: enterCode),
         ],
       ],
+    );
+  }
+}
+
+/// An underlined brand-coloured text link under the start button.
+class _Link extends StatelessWidget {
+  const _Link({required this.label, required this.onTap});
+
+  final String label;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () {
+        Haptics.tap();
+        onTap();
+      },
+      behavior: HitTestBehavior.opaque,
+      child: Text(
+        label,
+        textAlign: TextAlign.center,
+        style: AppTextStyles.metaSmall.copyWith(
+          fontSize: 14.sp,
+          color: AppColors.brand,
+          decoration: TextDecoration.underline,
+          decorationColor: AppColors.brand,
+        ),
+      ),
     );
   }
 }

@@ -2724,6 +2724,36 @@ abstract class AppL10n {
   /// In fr, this message translates to:
   /// **'Tu as utilisé toutes tes recherches du jour : le chef revient quand elles se rechargent. Touche pour voir quand.'**
   String get chatQuotaReached;
+
+  /// No description provided for @loginTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Se connecter'**
+  String get loginTitle;
+
+  /// No description provided for @loginLink.
+  ///
+  /// In fr, this message translates to:
+  /// **'Déjà un compte ? Se connecter'**
+  String get loginLink;
+
+  /// No description provided for @loginEmail.
+  ///
+  /// In fr, this message translates to:
+  /// **'E-mail'**
+  String get loginEmail;
+
+  /// No description provided for @loginPassword.
+  ///
+  /// In fr, this message translates to:
+  /// **'Mot de passe'**
+  String get loginPassword;
+
+  /// No description provided for @loginError.
+  ///
+  /// In fr, this message translates to:
+  /// **'Connexion impossible. Vérifie ton e-mail et ton mot de passe.'**
+  String get loginError;
 }
 
 class _AppL10nDelegate extends LocalizationsDelegate<AppL10n> {

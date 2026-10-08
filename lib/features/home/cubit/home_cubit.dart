@@ -42,4 +42,7 @@ class HomeCubit extends Cubit<HomeState> {
   }
 
   void closeSub() => emit(HomeState(tab: state.tab));
+
+  /// Back to the first tab, so a new account doesn't land where the old one left off.
+  void reset() => emit(const HomeState());
 }

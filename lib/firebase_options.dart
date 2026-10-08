@@ -59,10 +59,10 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions ios = FirebaseOptions(
     apiKey: 'AIzaSyDUS_NYlTbI1Tt9sxmerblUmKI7OLHT0Ew',
-    appId: '1:444020010379:ios:e064cd1dcd551661fc538e',
+    appId: '1:444020010379:ios:638f0796368e11d8fc538e',
     messagingSenderId: '444020010379',
     projectId: 'tably-9f3c2',
     storageBucket: 'tably-9f3c2.firebasestorage.app',
-    iosBundleId: 'com.appscales.tably',
+    iosBundleId: 'com.appscales.tablyprod',
   );
 }

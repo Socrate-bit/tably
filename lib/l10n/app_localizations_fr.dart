@@ -1564,4 +1564,20 @@ class AppL10nFr extends AppL10n {
   @override
   String get chatQuotaReached =>
       'Tu as utilisé toutes tes recherches du jour : le chef revient quand elles se rechargent. Touche pour voir quand.';
+
+  @override
+  String get loginTitle => 'Se connecter';
+
+  @override
+  String get loginLink => 'Déjà un compte ? Se connecter';
+
+  @override
+  String get loginEmail => 'E-mail';
+
+  @override
+  String get loginPassword => 'Mot de passe';
+
+  @override
+  String get loginError =>
+      'Connexion impossible. Vérifie ton e-mail et ton mot de passe.';
 }

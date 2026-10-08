@@ -87,6 +87,19 @@ class AuthService {
     }
   }
 
+  /// Signs into an existing email/password account, replacing the anonymous
+  /// session. Only offered to App Review builds, for the demo account.
+  Future<User?> signInWithEmail(String email, String password) async {
+    try {
+      final credential = await _auth.signInWithEmailAndPassword(email: email.trim(), password: password);
+      debugPrint('[AuthService] email sign-in ok: ${credential.user?.uid}');
+      return credential.user;
+    } catch (e) {
+      debugPrint('[AuthService] email sign-in failed: $e');
+      rethrow;
+    }
+  }
+
   Future<void> signOut() async {
     try {
       await _auth.signOut();

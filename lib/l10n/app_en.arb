@@ -586,5 +586,10 @@
   "chatDetailMemoryWas": "Before: {text}",
   "chatMemoryTitle": "Chef's memory",
   "chatMemorySub": "What the chef remembers about you. It uses it to answer and to pick your recipes; you can edit it.",
-  "chatQuotaReached": "You've used all of today's searches: the chef is back when they reset. Tap to see when."
+  "chatQuotaReached": "You've used all of today's searches: the chef is back when they reset. Tap to see when.",
+  "loginTitle": "Log in",
+  "loginLink": "Already have an account? Log in",
+  "loginEmail": "Email",
+  "loginPassword": "Password",
+  "loginError": "Couldn't log in. Check your email and password."
 }

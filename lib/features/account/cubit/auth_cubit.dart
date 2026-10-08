@@ -109,22 +109,43 @@ class AuthCubit extends Cubit<AuthState> {
     }
   }
 
-  Future<void> signOut() async {
+  /// Signs into an existing account by email. Returns whether it worked.
+  Future<bool> signInWithEmail(String email, String password) async {
+    emit(state.copyWith(busy: true, clearError: true));
+    unawaited(_analytics.capture(AnalyticsEvents.signInStarted, properties: {'method': 'email'}));
     try {
-      await _analytics.reset();
-      await _auth.signOut();
+      await _auth.signInWithEmail(email, password);
+      unawaited(_analytics.capture(AnalyticsEvents.signInCompleted, properties: {'method': 'email'}));
+      return true;
     } catch (e, s) {
-      AnalyticsService.reportError('AuthCubit', 'signOut', e, stack: s);
-      emit(state.copyWith(error: e));
+      AnalyticsService.reportError('AuthCubit', 'signInWithEmail', e, stack: s);
+      emit(state.copyWith(busy: false, error: e));
+      return false;
     }
   }
 
-  Future<void> deleteAccount() async {
+  /// Returns whether the user was signed out.
+  Future<bool> signOut() async {
+    try {
+      await _analytics.reset();
+      await _auth.signOut();
+      return true;
+    } catch (e, s) {
+      AnalyticsService.reportError('AuthCubit', 'signOut', e, stack: s);
+      emit(state.copyWith(error: e));
+      return false;
+    }
+  }
+
+  /// Returns whether the account was deleted.
+  Future<bool> deleteAccount() async {
     try {
       await _auth.deleteAccount();
+      return true;
     } catch (e, s) {
       AnalyticsService.reportError('AuthCubit', 'deleteAccount', e, stack: s);
       emit(state.copyWith(error: e));
+      return false;
     }
   }
 

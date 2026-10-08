@@ -1552,4 +1552,19 @@ class AppL10nEn extends AppL10n {
   @override
   String get chatQuotaReached =>
       'You\'ve used all of today\'s searches: the chef is back when they reset. Tap to see when.';
+
+  @override
+  String get loginTitle => 'Log in';
+
+  @override
+  String get loginLink => 'Already have an account? Log in';
+
+  @override
+  String get loginEmail => 'Email';
+
+  @override
+  String get loginPassword => 'Password';
+
+  @override
+  String get loginError => 'Couldn\'t log in. Check your email and password.';
 }

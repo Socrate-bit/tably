@@ -236,6 +236,14 @@ class OnboardingCubit extends Cubit<OnboardingState> {
     debugPrint('[OnboardingCubit] onboarding complete');
   }
 
+  /// Back to the first step once the profile is saved, so a later sign-up
+  /// (e.g. after deleting the account) starts onboarding from scratch.
+  void reset() {
+    _buildProgress?.cancel();
+    emit(OnboardingState(inReview: state.inReview));
+    debugPrint('[OnboardingCubit] onboarding reset');
+  }
+
   @override
   Future<void> close() {
     _buildProgress?.cancel();
