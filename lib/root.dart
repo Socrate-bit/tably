@@ -49,7 +49,11 @@ class RootScreen extends StatelessWidget {
 
   /// One uid drives every stream in the app.
   static void _bind(BuildContext context, String? uid) {
-    if (uid == null) return;
+    if (uid == null) {
+      // Signed out: the old entitlement must not carry over to the next user.
+      context.read<SubscriptionCubit>().clearIdentity();
+      return;
+    }
     context.read<ProfileCubit>().bind(uid);
     context.read<CatalogueCubit>().bind(uid);
     context.read<PlanCubit>().bind(uid);

@@ -20,18 +20,26 @@ import 'package:tably/features/subscription/widget/paywall_gate.dart';
 class _FakePaywall extends PaywallService {
   final controller = StreamController<SubscriptionGateStatus>.broadcast();
   final presented = <String>[];
+  final calls = <String>[];
+  Completer<void>? identifying;
 
   @override
   Stream<SubscriptionGateStatus> get status => controller.stream;
 
   @override
-  Future<void> present(String placement) async => presented.add(placement);
+  Future<void> present(String placement) async {
+    calls.add('present');
+    presented.add(placement);
+  }
 
   @override
-  Future<void> identify(String uid) async {}
+  Future<void> identify(String uid) async {
+    await identifying?.future;
+    calls.add('identify $uid');
+  }
 
   @override
-  Future<void> reset() async {}
+  Future<void> reset() async => calls.add('reset');
 }
 
 void main() {
@@ -107,6 +115,34 @@ void main() {
         expect(paywall.presented, isEmpty);
       });
     }
+  });
+
+  group('SubscriptionCubit identity', () {
+    test('the paywall waits for identify to finish', () async {
+      paywall.identifying = Completer();
+      await emitStatus(SubscriptionGateStatus.inactive);
+      unawaited(cubit.identify('a'));
+      final presenting = cubit.presentPaywall();
+      await Future<void>.delayed(Duration.zero);
+      expect(paywall.presented, isEmpty);
+      paywall.identifying!.complete();
+      await presenting;
+      expect(paywall.calls, ['identify a', 'present']);
+    });
+
+    test('sign-out resets once, then the next user is identified', () async {
+      await cubit.identify('a');
+      await cubit.clearIdentity();
+      await cubit.clearIdentity();
+      await cubit.identify('b');
+      expect(paywall.calls, ['identify a', 'reset', 'identify b']);
+    });
+
+    test('switching users directly resets before identifying', () async {
+      await cubit.identify('a');
+      await cubit.identify('b');
+      expect(paywall.calls, ['identify a', 'reset', 'identify b']);
+    });
   });
 
   group('PaywallGate', () {

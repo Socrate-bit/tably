@@ -47,6 +47,19 @@ class SubscriptionCubit extends Cubit<SubscriptionState> {
   late final StreamSubscription<UserType> _profileSubscription;
   String? _uid;
 
+  /// Identity work queued in order, so a reset never races the next identify
+  /// and the paywall waits until purchases will land on the right user. Null
+  /// once settled, so presenting doesn't wait a frame for nothing.
+  Future<void>? _identity;
+
+  Future<void> _queue(Future<void> Function() step) {
+    late final Future<void> next;
+    next = (_identity ?? Future.value()).then((_) => step()).whenComplete(() {
+      if (identical(_identity, next)) _identity = null;
+    });
+    return _identity = next;
+  }
+
   void _onStatus(SubscriptionGateStatus status) {
     if (status == state.status) return;
     final wasActive = state.isActive;
@@ -61,12 +74,22 @@ class SubscriptionCubit extends Cubit<SubscriptionState> {
   /// Ties the paywall to the signed-in user. Safe to call repeatedly — only
   /// re-identifies when the uid actually changed, clearing the old identity so a
   /// new anonymous user starts without the previous one's entitlement.
-  Future<void> identify(String uid) async {
-    if (_uid == uid) return;
+  Future<void> identify(String uid) {
+    if (_uid == uid) return _identity ?? Future.value();
     final hadUser = _uid != null;
     _uid = uid;
-    if (hadUser) await _paywall.reset();
-    await _paywall.identify(uid);
+    return _queue(() async {
+      if (hadUser) await _paywall.reset();
+      await _paywall.identify(uid);
+    });
+  }
+
+  /// Drops the identity on sign-out, so the previous user's entitlement stops
+  /// opening the gate before the next user is identified.
+  Future<void> clearIdentity() {
+    if (_uid == null) return _identity ?? Future.value();
+    _uid = null;
+    return _queue(_paywall.reset);
   }
 
   /// Redeems a referral code. The granted type is not emitted here — it arrives
@@ -133,6 +156,9 @@ class SubscriptionCubit extends Cubit<SubscriptionState> {
       ));
       return;
     }
+    // A purchase made before identify would land on Superwall's anonymous id.
+    final pending = _identity;
+    if (pending != null) await pending;
     unawaited(_analytics.capture(AnalyticsEvents.paywallShown));
     await _paywall.present(PaywallService.onboardingEndPlacement);
   }

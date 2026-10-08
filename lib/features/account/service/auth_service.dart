@@ -71,7 +71,9 @@ class AuthService {
     } on FirebaseAuthException catch (e) {
       if (e.code != 'credential-already-in-use' && e.code != 'provider-already-linked') rethrow;
       debugPrint('[AuthService] credential already in use, signing in instead');
-      return _auth.signInWithCredential(credential);
+      // Apple's token is single-use and the failed link consumed it, so use
+      // the fresh credential Firebase attaches to the error.
+      return _auth.signInWithCredential(e.credential ?? credential);
     }
   }
 
