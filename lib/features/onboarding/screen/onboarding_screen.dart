@@ -206,7 +206,8 @@ class _StepsView extends StatelessWidget {
       StepKind.infoBars => const InfoBarsStep(),
       StepKind.infoMoney => InfoMoneyStep(country: state.draft.country),
       StepKind.planStart => const PlanStartStep(),
-      StepKind.testimonial => const TestimonialStep(),
+      // App Review builds make no claim about the user count.
+      StepKind.testimonial => TestimonialStep(showUserCount: !inReview),
     };
   }
 }
