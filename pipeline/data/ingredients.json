@@ -1,0 +1,4437 @@
+{
+  "arugula": {
+    "slug": "arugula",
+    "name": {
+      "fr": "roquette",
+      "en": "arugula"
+    },
+    "aliases": [
+      "rocket",
+      "rocket salad",
+      "roquette"
+    ],
+    "icon": "🥬",
+    "aisle": "produce",
+    "allergens": [],
+    "flags": {
+      "isPork": false,
+      "isMeat": false,
+      "isFish": false,
+      "isAnimal": false,
+      "hasAlcohol": false,
+      "isVegetable": true,
+      "isCarb": false
+    },
+    "gramsPerUnit": {
+      "handful": 20,
+      "pack": 125,
+      "bunch": 50
+    },
+    "densityGPerMl": null,
+    "ciqualCode": "20217",
+    "pricePerKg": 14,
+    "priceSource": "csv",
+    "status": "approved",
+    "per100g": null,
+    "nutritionSource": "ciqual"
+  },
+  "baby-spinach": {
+    "slug": "baby-spinach",
+    "name": {
+      "fr": "pousses d'épinard",
+      "en": "baby spinach"
+    },
+    "aliases": [
+      "jeunes pousses d'épinard",
+      "épinards baby",
+      "baby spinach",
+      "spinach leaves",
+      "spinach"
+    ],
+    "icon": "🥬",
+    "aisle": "produce",
+    "allergens": [],
+    "flags": {
+      "isPork": false,
+      "isMeat": false,
+      "isFish": false,
+      "isAnimal": false,
+      "hasAlcohol": false,
+      "isVegetable": true,
+      "isCarb": false
+    },
+    "gramsPerUnit": {
+      "handful": 20,
+      "pack": 125,
+      "leaf": 0.5
+    },
+    "densityGPerMl": null,
+    "ciqualCode": "20059",
+    "pricePerKg": 15.2,
+    "priceSource": "web",
+    "status": "approved",
+    "per100g": null,
+    "nutritionSource": "ciqual"
+  },
+  "bacon": {
+    "slug": "bacon",
+    "name": {
+      "fr": "bacon",
+      "en": "bacon"
+    },
+    "aliases": [
+      "tranches de bacon",
+      "bacon fumé",
+      "poitrine fumée",
+      "smoked bacon",
+      "streaky bacon",
+      "applewood bacon",
+      "filet de bacon"
+    ],
+    "icon": "🥓",
+    "aisle": "meat_fish",
+    "allergens": [],
+    "flags": {
+      "isPork": true,
+      "isMeat": true,
+      "isFish": false,
+      "isAnimal": true,
+      "hasAlcohol": false,
+      "isVegetable": false,
+      "isCarb": false
+    },
+    "gramsPerUnit": {
+      "slice": 20,
+      "pack": 150
+    },
+    "densityGPerMl": null,
+    "ciqualCode": "28727",
+    "per100g": {
+      "kcal": 300,
+      "protein": 17,
+      "carbs": 1,
+      "fat": 25,
+      "fiber": 0,
+      "salt": 2.5,
+      "sugars": 0.5
+    },
+    "pricePerKg": 17.6,
+    "priceSource": "csv",
+    "nutritionSource": "ciqual",
+    "status": "approved"
+  },
+  "basil": {
+    "slug": "basil",
+    "name": {
+      "fr": "basilic frais",
+      "en": "fresh basil"
+    },
+    "aliases": [
+      "basil",
+      "fresh basil leaves",
+      "basil leaves",
+      "basilic",
+      "feuilles de basilic"
+    ],
+    "icon": "🌿",
+    "aisle": "produce",
+    "allergens": [],
+    "flags": {
+      "isPork": false,
+      "isMeat": false,
+      "isFish": false,
+      "isAnimal": false,
+      "hasAlcohol": false,
+      "isVegetable": true,
+      "isCarb": false
+    },
+    "gramsPerUnit": {
+      "leaf": 0.5,
+      "bunch": 25,
+      "sprig": 2,
+      "handful": 15,
+      "tbsp": 3
+    },
+    "densityGPerMl": null,
+    "ciqualCode": "11033",
+    "per100g": null,
+    "pricePerKg": 75,
+    "priceSource": "web",
+    "nutritionSource": "ciqual",
+    "status": "approved"
+  },
+  "bay-leaf": {
+    "slug": "bay-leaf",
+    "name": {
+      "fr": "feuille de laurier",
+      "en": "bay leaf"
+    },
+    "aliases": [
+      "bay leaves",
+      "bay",
+      "dried bay leaf",
+      "laurier",
+      "feuilles de laurier",
+      "laurier sauce"
+    ],
+    "icon": "🌿",
+    "aisle": "herbs_grocery",
+    "allergens": [],
+    "flags": {
+      "isPork": false,
+      "isMeat": false,
+      "isFish": false,
+      "isAnimal": false,
+      "hasAlcohol": false,
+      "isVegetable": false,
+      "isCarb": false
+    },
+    "gramsPerUnit": {
+      "leaf": 0.5,
+      "piece": 0.5,
+      "sprig": 2,
+      "tsp": 1,
+      "tbsp": 3
+    },
+    "densityGPerMl": null,
+    "ciqualCode": "11053",
+    "per100g": {
+      "kcal": 313,
+      "protein": 7.6,
+      "carbs": 48,
+      "fat": 8.4,
+      "fiber": 26,
+      "salt": 0.09,
+      "sugars": 0
+    },
+    "pricePerKg": 90,
+    "priceSource": "csv",
+    "nutritionSource": "ciqual",
+    "status": "approved"
+  },
+  "beef-tenderloin": {
+    "slug": "beef-tenderloin",
+    "name": {
+      "fr": "filet de bœuf",
+      "en": "beef tenderloin"
+    },
+    "aliases": [
+      "beef filet",
+      "filet de boeuf",
+      "beef fillet",
+      "tenderloin"
+    ],
+    "icon": "🥩",
+    "aisle": "meat_fish",
+    "allergens": [],
+    "flags": {
+      "isPork": false,
+      "isMeat": true,
+      "isFish": false,
+      "isAnimal": true,
+      "hasAlcohol": false,
+      "isVegetable": false,
+      "isCarb": false
+    },
+    "gramsPerUnit": {
+      "piece": 180,
+      "slice": 150,
+      "pack": 400
+    },
+    "densityGPerMl": null,
+    "ciqualCode": "6116",
+    "pricePerKg": 45,
+    "priceSource": "web",
+    "status": "approved",
+    "per100g": null,
+    "nutritionSource": "ciqual"
+  },
+  "blueberry": {
+    "slug": "blueberry",
+    "name": {
+      "fr": "myrtille",
+      "en": "blueberry"
+    },
+    "aliases": [
+      "blueberries",
+      "myrtilles",
+      "myrtille fraiche",
+      "myrtilles fraiches",
+      "fresh blueberries"
+    ],
+    "icon": "🫐",
+    "aisle": "produce",
+    "allergens": [],
+    "flags": {
+      "isPork": false,
+      "isMeat": false,
+      "isFish": false,
+      "isAnimal": false,
+      "hasAlcohol": false,
+      "isVegetable": false,
+      "isCarb": false
+    },
+    "gramsPerUnit": {
+      "handful": 30,
+      "pack": 125
+    },
+    "densityGPerMl": null,
+    "ciqualCode": "13028",
+    "pricePerKg": 18,
+    "priceSource": "csv",
+    "status": "approved",
+    "per100g": null,
+    "nutritionSource": "ciqual"
+  },
+  "breadcrumbs": {
+    "slug": "breadcrumbs",
+    "name": {
+      "fr": "chapelure",
+      "en": "breadcrumbs"
+    },
+    "aliases": [
+      "chapelure italienne",
+      "italian breadcrumbs",
+      "bread crumbs",
+      "dry breadcrumbs"
+    ],
+    "icon": "🍞",
+    "aisle": "herbs_grocery",
+    "allergens": [
+      "gluten"
+    ],
+    "flags": {
+      "isPork": false,
+      "isMeat": false,
+      "isFish": false,
+      "isAnimal": false,
+      "hasAlcohol": false,
+      "isVegetable": false,
+      "isCarb": true
+    },
+    "gramsPerUnit": {
+      "tbsp": 8,
+      "tsp": 3,
+      "handful": 20,
+      "pack": 250
+    },
+    "densityGPerMl": null,
+    "ciqualCode": "7500",
+    "pricePerKg": 4,
+    "priceSource": "csv",
+    "status": "approved",
+    "per100g": null,
+    "nutritionSource": "ciqual"
+  },
+  "brown-rice": {
+    "slug": "brown-rice",
+    "name": {
+      "fr": "riz complet",
+      "en": "brown rice"
+    },
+    "aliases": [
+      "riz brun",
+      "wholegrain rice",
+      "whole grain rice"
+    ],
+    "icon": "🍚",
+    "aisle": "pasta_rice",
+    "allergens": [],
+    "flags": {
+      "isPork": false,
+      "isMeat": false,
+      "isFish": false,
+      "isAnimal": false,
+      "hasAlcohol": false,
+      "isVegetable": false,
+      "isCarb": true
+    },
+    "gramsPerUnit": {
+      "pack": 500
+    },
+    "densityGPerMl": null,
+    "ciqualCode": "9102",
+    "pricePerKg": 4.5,
+    "priceSource": "csv",
+    "status": "approved",
+    "per100g": null,
+    "nutritionSource": "ciqual"
+  },
+  "brussels-sprout": {
+    "slug": "brussels-sprout",
+    "name": {
+      "fr": "chou de bruxelles",
+      "en": "brussels sprout"
+    },
+    "aliases": [
+      "brussel sprouts",
+      "brussels sprouts",
+      "choux de bruxelles",
+      "chou de bruxelle"
+    ],
+    "icon": "🥬",
+    "aisle": "produce",
+    "allergens": [],
+    "flags": {
+      "isPork": false,
+      "isMeat": false,
+      "isFish": false,
+      "isAnimal": false,
+      "hasAlcohol": false,
+      "isVegetable": true,
+      "isCarb": false
+    },
+    "gramsPerUnit": {
+      "piece": 20,
+      "handful": 60,
+      "pack": 500
+    },
+    "densityGPerMl": null,
+    "ciqualCode": "20058",
+    "per100g": {
+      "kcal": 43,
+      "protein": 3.4,
+      "carbs": 5.2,
+      "fat": 0.3,
+      "fiber": 4.2,
+      "salt": 0.02,
+      "sugars": 2.2
+    },
+    "pricePerKg": 4.5,
+    "priceSource": "csv",
+    "nutritionSource": "ciqual",
+    "status": "approved"
+  },
+  "butter": {
+    "slug": "butter",
+    "name": {
+      "fr": "beurre",
+      "en": "butter"
+    },
+    "aliases": [
+      "beurre doux",
+      "beurre demi-sel",
+      "unsalted butter",
+      "salted butter"
+    ],
+    "icon": "🧈",
+    "aisle": "herbs_grocery",
+    "allergens": [
+      "milk"
+    ],
+    "flags": {
+      "isPork": false,
+      "isMeat": false,
+      "isFish": false,
+      "isAnimal": true,
+      "hasAlcohol": false,
+      "isVegetable": false,
+      "isCarb": false
+    },
+    "gramsPerUnit": {
+      "tbsp": 14,
+      "tsp": 5,
+      "pack": 250,
+      "slice": 10,
+      "cube": 10
+    },
+    "densityGPerMl": 0.95,
+    "ciqualCode": "16400",
+    "pricePerKg": 12.6,
+    "priceSource": "csv",
+    "status": "approved",
+    "per100g": null,
+    "nutritionSource": "ciqual"
+  },
+  "button-mushroom": {
+    "slug": "button-mushroom",
+    "name": {
+      "fr": "champignon de paris",
+      "en": "button mushroom"
+    },
+    "aliases": [
+      "button mushrooms",
+      "champignons de paris",
+      "white mushroom",
+      "white mushrooms",
+      "champignon",
+      "mushroom"
+    ],
+    "icon": "🍄",
+    "aisle": "produce",
+    "allergens": [],
+    "flags": {
+      "isPork": false,
+      "isMeat": false,
+      "isFish": false,
+      "isAnimal": false,
+      "hasAlcohol": false,
+      "isVegetable": true,
+      "isCarb": false
+    },
+    "gramsPerUnit": {
+      "piece": 20,
+      "pack": 250,
+      "handful": 30
+    },
+    "densityGPerMl": null,
+    "ciqualCode": "20056",
+    "pricePerKg": 5.99,
+    "priceSource": "csv",
+    "status": "approved",
+    "per100g": null,
+    "nutritionSource": "ciqual"
+  },
+  "cabbage": {
+    "slug": "cabbage",
+    "name": {
+      "fr": "chou",
+      "en": "cabbage"
+    },
+    "aliases": [
+      "green cabbage",
+      "white cabbage",
+      "chou vert",
+      "chou blanc",
+      "choux",
+      "cabbages"
+    ],
+    "icon": "🥬",
+    "aisle": "produce",
+    "allergens": [],
+    "flags": {
+      "isPork": false,
+      "isMeat": false,
+      "isFish": false,
+      "isAnimal": false,
+      "hasAlcohol": false,
+      "isVegetable": true,
+      "isCarb": false
+    },
+    "gramsPerUnit": {
+      "head": 1000,
+      "piece": 1000,
+      "leaf": 30,
+      "handful": 40
+    },
+    "densityGPerMl": null,
+    "ciqualCode": "20069",
+    "per100g": {
+      "kcal": 25,
+      "protein": 1.3,
+      "carbs": 5.8,
+      "fat": 0.1,
+      "fiber": 2.5,
+      "salt": 0.02,
+      "sugars": 3.2
+    },
+    "pricePerKg": 2.08,
+    "priceSource": "csv",
+    "nutritionSource": "ciqual",
+    "status": "approved"
+  },
+  "cajun-seasoning": {
+    "slug": "cajun-seasoning",
+    "name": {
+      "fr": "épices cajun",
+      "en": "cajun seasoning"
+    },
+    "aliases": [
+      "cajun spices",
+      "mélange d'épices cajun",
+      "assaisonnement cajun"
+    ],
+    "icon": "🌶️",
+    "aisle": "herbs_grocery",
+    "allergens": [],
+    "flags": {
+      "isPork": false,
+      "isMeat": false,
+      "isFish": false,
+      "isAnimal": false,
+      "hasAlcohol": false,
+      "isVegetable": false,
+      "isCarb": false
+    },
+    "gramsPerUnit": {
+      "tsp": 3,
+      "tbsp": 8,
+      "pinch": 0.5,
+      "pack": 40
+    },
+    "densityGPerMl": null,
+    "ciqualCode": "11056",
+    "pricePerKg": 60,
+    "priceSource": "csv",
+    "status": "approved",
+    "per100g": null,
+    "nutritionSource": "ciqual"
+  },
+  "canned-chicken": {
+    "slug": "canned-chicken",
+    "name": {
+      "fr": "poulet en conserve",
+      "en": "canned chicken"
+    },
+    "aliases": [
+      "canned chicken breast",
+      "poulet en boîte",
+      "chicken in a can"
+    ],
+    "icon": "🥫",
+    "aisle": "tins_sauces",
+    "allergens": [],
+    "flags": {
+      "isPork": false,
+      "isMeat": true,
+      "isFish": false,
+      "isAnimal": true,
+      "hasAlcohol": false,
+      "isVegetable": false,
+      "isCarb": false
+    },
+    "gramsPerUnit": {
+      "can": 200,
+      "pack": 200
+    },
+    "densityGPerMl": null,
+    "ciqualCode": "36003",
+    "pricePerKg": 12.42,
+    "priceSource": "web",
+    "status": "approved",
+    "per100g": null,
+    "nutritionSource": "ciqual"
+  },
+  "canned-chopped-tomato": {
+    "slug": "canned-chopped-tomato",
+    "name": {
+      "fr": "tomates concassées en conserve",
+      "en": "canned chopped tomato"
+    },
+    "aliases": [
+      "chopped tomatoes",
+      "tinned tomatoes",
+      "diced tomatoes",
+      "canned tomatoes",
+      "tomates concassées",
+      "canned crushed tomato"
+    ],
+    "icon": "🥫",
+    "aisle": "tins_sauces",
+    "allergens": [],
+    "flags": {
+      "isPork": false,
+      "isMeat": false,
+      "isFish": false,
+      "isAnimal": false,
+      "hasAlcohol": false,
+      "isVegetable": true,
+      "isCarb": false
+    },
+    "gramsPerUnit": {
+      "can": 400
+    },
+    "densityGPerMl": 1,
+    "ciqualCode": "20169",
+    "pricePerKg": 2.5,
+    "priceSource": "csv",
+    "status": "approved",
+    "per100g": null,
+    "nutritionSource": "ciqual"
+  },
+  "carrot": {
+    "slug": "carrot",
+    "name": {
+      "fr": "carotte",
+      "en": "carrot"
+    },
+    "aliases": [
+      "carottes",
+      "carrots"
+    ],
+    "icon": "🥕",
+    "aisle": "produce",
+    "allergens": [],
+    "flags": {
+      "isPork": false,
+      "isMeat": false,
+      "isFish": false,
+      "isAnimal": false,
+      "hasAlcohol": false,
+      "isVegetable": true,
+      "isCarb": false
+    },
+    "gramsPerUnit": {
+      "piece": 100,
+      "handful": 30
+    },
+    "densityGPerMl": null,
+    "ciqualCode": "20009",
+    "pricePerKg": 1.99,
+    "priceSource": "csv",
+    "status": "approved",
+    "per100g": null,
+    "nutritionSource": "ciqual"
+  },
+  "celery-stalk": {
+    "slug": "celery-stalk",
+    "name": {
+      "fr": "céleri branche",
+      "en": "celery stalk"
+    },
+    "aliases": [
+      "celery",
+      "celery stalks",
+      "céleri",
+      "branches de céleri",
+      "branche de céleri"
+    ],
+    "icon": "🥬",
+    "aisle": "produce",
+    "allergens": [
+      "celery"
+    ],
+    "flags": {
+      "isPork": false,
+      "isMeat": false,
+      "isFish": false,
+      "isAnimal": false,
+      "hasAlcohol": false,
+      "isVegetable": true,
+      "isCarb": false
+    },
+    "gramsPerUnit": {
+      "stalk": 40,
+      "head": 400,
+      "bunch": 400,
+      "piece": 40,
+      "handful": 30
+    },
+    "densityGPerMl": null,
+    "ciqualCode": "20023",
+    "pricePerKg": 3,
+    "priceSource": "csv",
+    "status": "approved",
+    "per100g": null,
+    "nutritionSource": "ciqual"
+  },
+  "cherry-tomato": {
+    "slug": "cherry-tomato",
+    "name": {
+      "fr": "tomate cerise",
+      "en": "cherry tomato"
+    },
+    "aliases": [
+      "cherry tomatoes",
+      "tomates cerises",
+      "grape tomato",
+      "grape tomatoes"
+    ],
+    "icon": "🍅",
+    "aisle": "produce",
+    "allergens": [],
+    "flags": {
+      "isPork": false,
+      "isMeat": false,
+      "isFish": false,
+      "isAnimal": false,
+      "hasAlcohol": false,
+      "isVegetable": true,
+      "isCarb": false
+    },
+    "gramsPerUnit": {
+      "piece": 15,
+      "handful": 100,
+      "pack": 250
+    },
+    "densityGPerMl": null,
+    "ciqualCode": "20172",
+    "pricePerKg": 7.45,
+    "priceSource": "csv",
+    "status": "approved",
+    "per100g": null,
+    "nutritionSource": "ciqual"
+  },
+  "chicken-breast": {
+    "slug": "chicken-breast",
+    "name": {
+      "fr": "filet de poulet",
+      "en": "chicken breast"
+    },
+    "aliases": [
+      "escalope de poulet",
+      "filets de poulet",
+      "chicken breasts",
+      "chicken escalope",
+      "skinless chicken breast",
+      "cooked chicken breast"
+    ],
+    "icon": "🍗",
+    "aisle": "meat_fish",
+    "allergens": [],
+    "flags": {
+      "isPork": false,
+      "isMeat": true,
+      "isFish": false,
+      "isAnimal": true,
+      "hasAlcohol": false,
+      "isVegetable": false,
+      "isCarb": false
+    },
+    "gramsPerUnit": {
+      "piece": 180,
+      "pack": 400
+    },
+    "densityGPerMl": null,
+    "ciqualCode": "36017",
+    "pricePerKg": 12.5,
+    "priceSource": "csv",
+    "status": "approved",
+    "per100g": null,
+    "nutritionSource": "ciqual"
+  },
+  "chicken-broth": {
+    "slug": "chicken-broth",
+    "name": {
+      "fr": "bouillon de volaille",
+      "en": "chicken broth"
+    },
+    "aliases": [
+      "chicken stock",
+      "liquid chicken broth",
+      "bouillon de poulet",
+      "bouillon de volaille liquide"
+    ],
+    "icon": "🍲",
+    "aisle": "tins_sauces",
+    "allergens": [],
+    "flags": {
+      "isPork": false,
+      "isMeat": true,
+      "isFish": false,
+      "isAnimal": true,
+      "hasAlcohol": false,
+      "isVegetable": false,
+      "isCarb": false
+    },
+    "gramsPerUnit": {
+      "can": 400,
+      "pack": 500
+    },
+    "densityGPerMl": 1,
+    "ciqualCode": "25947",
+    "pricePerKg": 8.5,
+    "priceSource": "web",
+    "status": "approved",
+    "per100g": null,
+    "nutritionSource": "ciqual"
+  },
+  "chicken-sausage": {
+    "slug": "chicken-sausage",
+    "name": {
+      "fr": "saucisse de poulet",
+      "en": "chicken sausage"
+    },
+    "aliases": [
+      "chicken sausages",
+      "saucisses de poulet",
+      "sweet italian chicken sausage"
+    ],
+    "icon": "🌭",
+    "aisle": "meat_fish",
+    "allergens": [],
+    "flags": {
+      "isPork": false,
+      "isMeat": true,
+      "isFish": false,
+      "isAnimal": true,
+      "hasAlcohol": false,
+      "isVegetable": false,
+      "isCarb": false
+    },
+    "gramsPerUnit": {
+      "piece": 85,
+      "pack": 340,
+      "slice": 10
+    },
+    "densityGPerMl": null,
+    "ciqualCode": "30005",
+    "pricePerKg": 10.15,
+    "priceSource": "web",
+    "status": "approved",
+    "per100g": null,
+    "nutritionSource": "ciqual"
+  },
+  "chicken-stock-cube": {
+    "slug": "chicken-stock-cube",
+    "name": {
+      "fr": "bouillon de volaille en cube",
+      "en": "chicken stock cube"
+    },
+    "aliases": [
+      "chicken bouillon cube",
+      "bouillon de poulet",
+      "cube de bouillon de poulet",
+      "bouillon cube volaille"
+    ],
+    "icon": "🧊",
+    "aisle": "tins_sauces",
+    "allergens": [
+      "celery"
+    ],
+    "flags": {
+      "isPork": false,
+      "isMeat": true,
+      "isFish": false,
+      "isAnimal": true,
+      "hasAlcohol": false,
+      "isVegetable": false,
+      "isCarb": false
+    },
+    "gramsPerUnit": {
+      "cube": 10,
+      "piece": 10
+    },
+    "densityGPerMl": null,
+    "ciqualCode": "11174",
+    "pricePerKg": 13.6,
+    "priceSource": "csv",
+    "status": "approved",
+    "per100g": null,
+    "nutritionSource": "ciqual"
+  },
+  "chicken-thigh": {
+    "slug": "chicken-thigh",
+    "name": {
+      "fr": "cuisse de poulet",
+      "en": "chicken thigh"
+    },
+    "aliases": [
+      "chicken thighs",
+      "boneless chicken thigh",
+      "hauts de cuisse de poulet",
+      "cuisses de poulet"
+    ],
+    "icon": "🍗",
+    "aisle": "meat_fish",
+    "allergens": [],
+    "flags": {
+      "isPork": false,
+      "isMeat": true,
+      "isFish": false,
+      "isAnimal": true,
+      "hasAlcohol": false,
+      "isVegetable": false,
+      "isCarb": false
+    },
+    "gramsPerUnit": {
+      "piece": 130
+    },
+    "densityGPerMl": null,
+    "ciqualCode": "36002",
+    "pricePerKg": 8,
+    "priceSource": "csv",
+    "status": "approved",
+    "per100g": null,
+    "nutritionSource": "ciqual"
+  },
+  "chili-flakes": {
+    "slug": "chili-flakes",
+    "name": {
+      "fr": "flocons de piment",
+      "en": "chili flakes"
+    },
+    "aliases": [
+      "chilli flakes",
+      "red pepper flakes",
+      "crushed red pepper",
+      "piment concassé",
+      "flocons de piment rouge",
+      "dried chili flakes"
+    ],
+    "icon": "🌶️",
+    "aisle": "herbs_grocery",
+    "allergens": [],
+    "flags": {
+      "isPork": false,
+      "isMeat": false,
+      "isFish": false,
+      "isAnimal": false,
+      "hasAlcohol": false,
+      "isVegetable": false,
+      "isCarb": false
+    },
+    "gramsPerUnit": {
+      "tsp": 2.5,
+      "tbsp": 7,
+      "pinch": 0.5
+    },
+    "densityGPerMl": null,
+    "ciqualCode": "11088",
+    "per100g": {
+      "kcal": 318,
+      "protein": 12,
+      "carbs": 56,
+      "fat": 17,
+      "fiber": 27,
+      "salt": 0.08,
+      "sugars": 10.3
+    },
+    "pricePerKg": 70,
+    "priceSource": "csv",
+    "nutritionSource": "ciqual",
+    "status": "approved"
+  },
+  "chives": {
+    "slug": "chives",
+    "name": {
+      "fr": "ciboulette",
+      "en": "chives"
+    },
+    "aliases": [
+      "ciboulette fraiche",
+      "ciboulette fraîche",
+      "fresh chives"
+    ],
+    "icon": "🌿",
+    "aisle": "produce",
+    "allergens": [],
+    "flags": {
+      "isPork": false,
+      "isMeat": false,
+      "isFish": false,
+      "isAnimal": false,
+      "hasAlcohol": false,
+      "isVegetable": true,
+      "isCarb": false
+    },
+    "gramsPerUnit": {
+      "bunch": 25,
+      "tbsp": 3,
+      "tsp": 1
+    },
+    "densityGPerMl": null,
+    "ciqualCode": "11003",
+    "pricePerKg": 40,
+    "priceSource": "csv",
+    "status": "approved",
+    "per100g": null,
+    "nutritionSource": "ciqual"
+  },
+  "ciabatta": {
+    "slug": "ciabatta",
+    "name": {
+      "fr": "ciabatta",
+      "en": "ciabatta"
+    },
+    "aliases": [
+      "pain ciabatta",
+      "ciabatta bread"
+    ],
+    "icon": "🍞",
+    "aisle": "pasta_rice",
+    "allergens": [
+      "gluten"
+    ],
+    "flags": {
+      "isPork": false,
+      "isMeat": false,
+      "isFish": false,
+      "isAnimal": false,
+      "hasAlcohol": false,
+      "isVegetable": false,
+      "isCarb": true
+    },
+    "gramsPerUnit": {
+      "piece": 250,
+      "slice": 30,
+      "pack": 250
+    },
+    "densityGPerMl": null,
+    "ciqualCode": "7000",
+    "pricePerKg": 4.7,
+    "priceSource": "web",
+    "status": "approved",
+    "per100g": null,
+    "nutritionSource": "ciqual"
+  },
+  "cilantro": {
+    "slug": "cilantro",
+    "name": {
+      "fr": "coriandre fraîche",
+      "en": "fresh cilantro"
+    },
+    "aliases": [
+      "coriandre",
+      "fresh coriander",
+      "cilantro leaves",
+      "coriander leaves"
+    ],
+    "icon": "🌿",
+    "aisle": "produce",
+    "allergens": [],
+    "flags": {
+      "isPork": false,
+      "isMeat": false,
+      "isFish": false,
+      "isAnimal": false,
+      "hasAlcohol": false,
+      "isVegetable": true,
+      "isCarb": false
+    },
+    "gramsPerUnit": {
+      "handful": 10,
+      "bunch": 25,
+      "sprig": 2,
+      "leaf": 0.1,
+      "tbsp": 3,
+      "tsp": 1
+    },
+    "densityGPerMl": null,
+    "ciqualCode": "11094",
+    "pricePerKg": 24,
+    "priceSource": "csv",
+    "status": "approved",
+    "per100g": null,
+    "nutritionSource": "ciqual"
+  },
+  "complete-seasoning": {
+    "slug": "complete-seasoning",
+    "name": {
+      "fr": "assaisonnement complet",
+      "en": "complete seasoning"
+    },
+    "aliases": [
+      "sazón completo",
+      "sazon completo",
+      "complete spice blend"
+    ],
+    "icon": "🧂",
+    "aisle": "herbs_grocery",
+    "allergens": [],
+    "flags": {
+      "isPork": false,
+      "isMeat": false,
+      "isFish": false,
+      "isAnimal": false,
+      "hasAlcohol": false,
+      "isVegetable": false,
+      "isCarb": false
+    },
+    "gramsPerUnit": {
+      "tsp": 3,
+      "tbsp": 8,
+      "pinch": 0.5
+    },
+    "densityGPerMl": null,
+    "ciqualCode": "11081",
+    "pricePerKg": 15,
+    "priceSource": "web",
+    "status": "approved",
+    "per100g": null,
+    "nutritionSource": "ciqual"
+  },
+  "corned-beef-brisket": {
+    "slug": "corned-beef-brisket",
+    "name": {
+      "fr": "poitrine de bœuf salée",
+      "en": "corned beef brisket"
+    },
+    "aliases": [
+      "corned beef",
+      "corned-beef brisket",
+      "salt beef",
+      "brisket de bœuf salé",
+      "poitrine de boeuf demi-sel",
+      "corned beef brisket"
+    ],
+    "icon": "🥩",
+    "aisle": "meat_fish",
+    "allergens": [],
+    "flags": {
+      "isPork": false,
+      "isMeat": true,
+      "isFish": false,
+      "isAnimal": true,
+      "hasAlcohol": false,
+      "isVegetable": false,
+      "isCarb": false
+    },
+    "gramsPerUnit": {
+      "piece": 1500,
+      "pack": 1000,
+      "slice": 40
+    },
+    "densityGPerMl": null,
+    "ciqualCode": null,
+    "per100g": {
+      "kcal": 250,
+      "protein": 18,
+      "carbs": 0.5,
+      "fat": 19,
+      "fiber": 0,
+      "salt": 3.5,
+      "sugars": 0
+    },
+    "pricePerKg": 11.3,
+    "priceSource": "web",
+    "nutritionSource": null,
+    "status": "approved"
+  },
+  "cornstarch": {
+    "slug": "cornstarch",
+    "name": {
+      "fr": "fécule de maïs",
+      "en": "cornstarch"
+    },
+    "aliases": [
+      "corn starch",
+      "maizena",
+      "maïzena",
+      "cornflour"
+    ],
+    "icon": "🌽",
+    "aisle": "herbs_grocery",
+    "allergens": [],
+    "flags": {
+      "isPork": false,
+      "isMeat": false,
+      "isFish": false,
+      "isAnimal": false,
+      "hasAlcohol": false,
+      "isVegetable": false,
+      "isCarb": true
+    },
+    "gramsPerUnit": {
+      "tsp": 3,
+      "tbsp": 8,
+      "pack": 250
+    },
+    "densityGPerMl": null,
+    "ciqualCode": "9510",
+    "pricePerKg": 5,
+    "priceSource": "csv",
+    "status": "approved",
+    "per100g": null,
+    "nutritionSource": "ciqual"
+  },
+  "courgette": {
+    "slug": "courgette",
+    "name": {
+      "fr": "courgette",
+      "en": "courgette"
+    },
+    "aliases": [
+      "zucchini",
+      "courgettes",
+      "zucchinis"
+    ],
+    "icon": "🥒",
+    "aisle": "produce",
+    "allergens": [],
+    "flags": {
+      "isPork": false,
+      "isMeat": false,
+      "isFish": false,
+      "isAnimal": false,
+      "hasAlcohol": false,
+      "isVegetable": true,
+      "isCarb": false
+    },
+    "gramsPerUnit": {
+      "piece": 200
+    },
+    "densityGPerMl": null,
+    "ciqualCode": "20020",
+    "pricePerKg": 3.04,
+    "priceSource": "csv",
+    "status": "approved",
+    "per100g": null,
+    "nutritionSource": "ciqual"
+  },
+  "cream": {
+    "slug": "cream",
+    "name": {
+      "fr": "crème liquide entière",
+      "en": "cream"
+    },
+    "aliases": [
+      "crème",
+      "creme",
+      "heavy cream",
+      "whipping cream",
+      "crème fluide",
+      "crème épaisse",
+      "double cream",
+      "fresh cream",
+      "pouring cream",
+      "crème liquide",
+      "crème entière",
+      "liquid cream"
+    ],
+    "icon": "🥛",
+    "aisle": "herbs_grocery",
+    "allergens": [
+      "milk"
+    ],
+    "flags": {
+      "isPork": false,
+      "isMeat": false,
+      "isFish": false,
+      "isAnimal": true,
+      "hasAlcohol": false,
+      "isVegetable": false,
+      "isCarb": false
+    },
+    "gramsPerUnit": {
+      "tbsp": 15,
+      "tsp": 5
+    },
+    "densityGPerMl": 1,
+    "ciqualCode": "19411",
+    "pricePerKg": 4.35,
+    "priceSource": "web",
+    "status": "approved",
+    "per100g": null,
+    "nutritionSource": "ciqual"
+  },
+  "creme-fraiche": {
+    "slug": "creme-fraiche",
+    "name": {
+      "fr": "crème fraîche épaisse",
+      "en": "crème fraîche"
+    },
+    "aliases": [
+      "creme fraiche",
+      "sour cream",
+      "thick cream",
+      "crème fraîche"
+    ],
+    "icon": "🥛",
+    "aisle": "herbs_grocery",
+    "allergens": [
+      "milk"
+    ],
+    "flags": {
+      "isPork": false,
+      "isMeat": false,
+      "isFish": false,
+      "isAnimal": true,
+      "hasAlcohol": false,
+      "isVegetable": false,
+      "isCarb": false
+    },
+    "gramsPerUnit": {
+      "tbsp": 15,
+      "tsp": 5,
+      "pack": 200
+    },
+    "densityGPerMl": 1,
+    "ciqualCode": "19410",
+    "per100g": null,
+    "pricePerKg": 4,
+    "priceSource": "web",
+    "nutritionSource": "ciqual",
+    "status": "approved"
+  },
+  "cremini-mushroom": {
+    "slug": "cremini-mushroom",
+    "name": {
+      "fr": "champignon brun",
+      "en": "cremini mushroom"
+    },
+    "aliases": [
+      "cremini mushrooms",
+      "crimini mushroom",
+      "crimini mushrooms",
+      "baby bella",
+      "baby bella mushroom",
+      "champignon cremini",
+      "champignons bruns",
+      "champignon de paris brun",
+      "brown button mushroom",
+      "brown mushroom"
+    ],
+    "icon": "🍄",
+    "aisle": "produce",
+    "allergens": [],
+    "flags": {
+      "isPork": false,
+      "isMeat": false,
+      "isFish": false,
+      "isAnimal": false,
+      "hasAlcohol": false,
+      "isVegetable": true,
+      "isCarb": false
+    },
+    "gramsPerUnit": {
+      "piece": 18,
+      "handful": 30,
+      "pack": 250
+    },
+    "densityGPerMl": null,
+    "ciqualCode": "20010",
+    "per100g": {
+      "kcal": 22,
+      "protein": 2.5,
+      "carbs": 0.5,
+      "fat": 0.2,
+      "fiber": 1.5,
+      "salt": 0.01,
+      "sugars": 0.5
+    },
+    "pricePerKg": 7,
+    "priceSource": "web",
+    "nutritionSource": "ciqual",
+    "status": "approved"
+  },
+  "cucumber": {
+    "slug": "cucumber",
+    "name": {
+      "fr": "concombre",
+      "en": "cucumber"
+    },
+    "aliases": [
+      "cucumbers",
+      "concombres"
+    ],
+    "icon": "🥒",
+    "aisle": "produce",
+    "allergens": [],
+    "flags": {
+      "isPork": false,
+      "isMeat": false,
+      "isFish": false,
+      "isAnimal": false,
+      "hasAlcohol": false,
+      "isVegetable": true,
+      "isCarb": false
+    },
+    "gramsPerUnit": {
+      "piece": 300,
+      "slice": 10
+    },
+    "densityGPerMl": null,
+    "ciqualCode": "20019",
+    "pricePerKg": 3.73,
+    "priceSource": "csv",
+    "status": "approved",
+    "per100g": null,
+    "nutritionSource": "ciqual"
+  },
+  "cumin": {
+    "slug": "cumin",
+    "name": {
+      "fr": "cumin",
+      "en": "cumin"
+    },
+    "aliases": [
+      "ground cumin",
+      "cumin moulu",
+      "cumin seeds",
+      "graines de cumin",
+      "cumin en poudre"
+    ],
+    "icon": "🧂",
+    "aisle": "herbs_grocery",
+    "allergens": [],
+    "flags": {
+      "isPork": false,
+      "isMeat": false,
+      "isFish": false,
+      "isAnimal": false,
+      "hasAlcohol": false,
+      "isVegetable": false,
+      "isCarb": false
+    },
+    "gramsPerUnit": {
+      "tsp": 3,
+      "tbsp": 8,
+      "pinch": 0.5
+    },
+    "densityGPerMl": null,
+    "ciqualCode": "11042",
+    "pricePerKg": 73.59,
+    "priceSource": "csv",
+    "status": "approved",
+    "per100g": null,
+    "nutritionSource": "ciqual"
+  },
+  "curry-powder": {
+    "slug": "curry-powder",
+    "name": {
+      "fr": "curry en poudre",
+      "en": "curry powder"
+    },
+    "aliases": [
+      "curry",
+      "poudre de curry"
+    ],
+    "icon": "🍛",
+    "aisle": "herbs_grocery",
+    "allergens": [],
+    "flags": {
+      "isPork": false,
+      "isMeat": false,
+      "isFish": false,
+      "isAnimal": false,
+      "hasAlcohol": false,
+      "isVegetable": false,
+      "isCarb": false
+    },
+    "gramsPerUnit": {
+      "tsp": 3,
+      "tbsp": 8,
+      "pinch": 0.5
+    },
+    "densityGPerMl": null,
+    "ciqualCode": "11005",
+    "pricePerKg": 30,
+    "priceSource": "csv",
+    "status": "approved",
+    "per100g": null,
+    "nutritionSource": "ciqual"
+  },
+  "dried-basil": {
+    "slug": "dried-basil",
+    "name": {
+      "fr": "basilic séché",
+      "en": "dried basil"
+    },
+    "aliases": [
+      "basilic seche",
+      "dried basil leaves",
+      "basil leaves"
+    ],
+    "icon": "🌿",
+    "aisle": "herbs_grocery",
+    "allergens": [],
+    "flags": {
+      "isPork": false,
+      "isMeat": false,
+      "isFish": false,
+      "isAnimal": false,
+      "hasAlcohol": false,
+      "isVegetable": false,
+      "isCarb": false
+    },
+    "gramsPerUnit": {
+      "tsp": 1,
+      "tbsp": 3,
+      "pinch": 0.3,
+      "handful": 5
+    },
+    "densityGPerMl": null,
+    "ciqualCode": "11032",
+    "pricePerKg": 110,
+    "priceSource": "csv",
+    "status": "approved",
+    "per100g": null,
+    "nutritionSource": "ciqual"
+  },
+  "dried-blueberry": {
+    "slug": "dried-blueberry",
+    "name": {
+      "fr": "myrtille séchée",
+      "en": "dried blueberry"
+    },
+    "aliases": [
+      "dried blueberries",
+      "myrtilles séchées",
+      "dried bilberry"
+    ],
+    "icon": "🫐",
+    "aisle": "herbs_grocery",
+    "allergens": [],
+    "flags": {
+      "isPork": false,
+      "isMeat": false,
+      "isFish": false,
+      "isAnimal": false,
+      "hasAlcohol": false,
+      "isVegetable": false,
+      "isCarb": true
+    },
+    "gramsPerUnit": {
+      "handful": 30,
+      "tbsp": 10,
+      "pack": 150
+    },
+    "densityGPerMl": null,
+    "ciqualCode": "13178",
+    "pricePerKg": 42,
+    "priceSource": "web",
+    "status": "approved",
+    "per100g": null,
+    "nutritionSource": "ciqual"
+  },
+  "dried-cranberry": {
+    "slug": "dried-cranberry",
+    "name": {
+      "fr": "canneberges séchées",
+      "en": "dried cranberry"
+    },
+    "aliases": [
+      "dried cranberries",
+      "cranberries séchées",
+      "canneberge séchée",
+      "cranberry séchée",
+      "craisins"
+    ],
+    "icon": "🫐",
+    "aisle": "herbs_grocery",
+    "allergens": [
+      "sulphites"
+    ],
+    "flags": {
+      "isPork": false,
+      "isMeat": false,
+      "isFish": false,
+      "isAnimal": false,
+      "hasAlcohol": false,
+      "isVegetable": false,
+      "isCarb": false
+    },
+    "gramsPerUnit": {
+      "tbsp": 10,
+      "handful": 30,
+      "pack": 200
+    },
+    "densityGPerMl": null,
+    "ciqualCode": "13178",
+    "pricePerKg": 16,
+    "priceSource": "csv",
+    "status": "approved",
+    "per100g": null,
+    "nutritionSource": "ciqual"
+  },
+  "dried-oregano": {
+    "slug": "dried-oregano",
+    "name": {
+      "fr": "origan séché",
+      "en": "dried oregano"
+    },
+    "aliases": [
+      "origan seche",
+      "origan",
+      "oregano"
+    ],
+    "icon": "🌿",
+    "aisle": "herbs_grocery",
+    "allergens": [],
+    "flags": {
+      "isPork": false,
+      "isMeat": false,
+      "isFish": false,
+      "isAnimal": false,
+      "hasAlcohol": false,
+      "isVegetable": false,
+      "isCarb": false
+    },
+    "gramsPerUnit": {
+      "tsp": 1.5,
+      "tbsp": 4,
+      "pinch": 0.3,
+      "handful": 10
+    },
+    "densityGPerMl": null,
+    "ciqualCode": "11035",
+    "pricePerKg": 110,
+    "priceSource": "csv",
+    "status": "approved",
+    "per100g": null,
+    "nutritionSource": "ciqual"
+  },
+  "dried-thyme": {
+    "slug": "dried-thyme",
+    "name": {
+      "fr": "thym séché",
+      "en": "dried thyme"
+    },
+    "aliases": [
+      "thym",
+      "thyme",
+      "dried thyme",
+      "thym seche"
+    ],
+    "icon": "🌿",
+    "aisle": "herbs_grocery",
+    "allergens": [],
+    "flags": {
+      "isPork": false,
+      "isMeat": false,
+      "isFish": false,
+      "isAnimal": false,
+      "hasAlcohol": false,
+      "isVegetable": false,
+      "isCarb": false
+    },
+    "gramsPerUnit": {
+      "pinch": 0.5,
+      "tsp": 1.5,
+      "tbsp": 4,
+      "handful": 10
+    },
+    "densityGPerMl": null,
+    "ciqualCode": "11038",
+    "pricePerKg": 70,
+    "priceSource": "csv",
+    "status": "approved",
+    "per100g": null,
+    "nutritionSource": "ciqual"
+  },
+  "edamame": {
+    "slug": "edamame",
+    "name": {
+      "fr": "édamamé",
+      "en": "edamame"
+    },
+    "aliases": [
+      "edamames",
+      "fèves de soja",
+      "soybeans",
+      "green soybeans"
+    ],
+    "icon": "🫛",
+    "aisle": "pasta_rice",
+    "allergens": [
+      "soy"
+    ],
+    "flags": {
+      "isPork": false,
+      "isMeat": false,
+      "isFish": false,
+      "isAnimal": false,
+      "hasAlcohol": false,
+      "isVegetable": false,
+      "isCarb": true
+    },
+    "gramsPerUnit": {
+      "handful": 30,
+      "pack": 250,
+      "can": 250
+    },
+    "densityGPerMl": null,
+    "ciqualCode": null,
+    "pricePerKg": 9.8,
+    "priceSource": "web",
+    "status": "approved",
+    "per100g": {
+      "kcal": 122,
+      "protein": 11,
+      "carbs": 9,
+      "fat": 5,
+      "fiber": 5,
+      "salt": 0.01,
+      "sugars": 2
+    },
+    "nutritionSource": "llm_estimate"
+  },
+  "egg": {
+    "slug": "egg",
+    "name": {
+      "fr": "œuf",
+      "en": "egg"
+    },
+    "aliases": [
+      "oeuf",
+      "oeufs",
+      "œufs",
+      "eggs"
+    ],
+    "icon": "🥚",
+    "aisle": "herbs_grocery",
+    "allergens": [
+      "egg"
+    ],
+    "flags": {
+      "isPork": false,
+      "isMeat": false,
+      "isFish": false,
+      "isAnimal": true,
+      "hasAlcohol": false,
+      "isVegetable": false,
+      "isCarb": false
+    },
+    "gramsPerUnit": {
+      "piece": 55,
+      "pack": 330
+    },
+    "densityGPerMl": null,
+    "ciqualCode": "22000",
+    "pricePerKg": 4.4,
+    "priceSource": "csv",
+    "status": "approved",
+    "per100g": null,
+    "nutritionSource": "ciqual"
+  },
+  "eggplant": {
+    "slug": "eggplant",
+    "name": {
+      "fr": "aubergine",
+      "en": "eggplant"
+    },
+    "aliases": [
+      "aubergines",
+      "eggplants"
+    ],
+    "icon": "🍆",
+    "aisle": "produce",
+    "allergens": [],
+    "flags": {
+      "isPork": false,
+      "isMeat": false,
+      "isFish": false,
+      "isAnimal": false,
+      "hasAlcohol": false,
+      "isVegetable": true,
+      "isCarb": false
+    },
+    "gramsPerUnit": {
+      "piece": 250,
+      "slice": 20
+    },
+    "densityGPerMl": null,
+    "ciqualCode": "20053",
+    "pricePerKg": 3.58,
+    "priceSource": "csv",
+    "status": "approved",
+    "per100g": null,
+    "nutritionSource": "ciqual"
+  },
+  "feta": {
+    "slug": "feta",
+    "name": {
+      "fr": "feta",
+      "en": "feta cheese"
+    },
+    "aliases": [
+      "feta cheese",
+      "fromage feta"
+    ],
+    "icon": "🧀",
+    "aisle": "herbs_grocery",
+    "allergens": [
+      "milk"
+    ],
+    "flags": {
+      "isPork": false,
+      "isMeat": false,
+      "isFish": false,
+      "isAnimal": true,
+      "hasAlcohol": false,
+      "isVegetable": false,
+      "isCarb": false
+    },
+    "gramsPerUnit": {
+      "pack": 200,
+      "piece": 200,
+      "handful": 30,
+      "tbsp": 15
+    },
+    "densityGPerMl": null,
+    "ciqualCode": "12066",
+    "pricePerKg": 14,
+    "priceSource": "csv",
+    "status": "approved",
+    "per100g": null,
+    "nutritionSource": "ciqual"
+  },
+  "fettuccine": {
+    "slug": "fettuccine",
+    "name": {
+      "fr": "fettuccine",
+      "en": "fettuccine"
+    },
+    "aliases": [
+      "fettuccini",
+      "fettuccines",
+      "pâtes fettuccine"
+    ],
+    "icon": "🍝",
+    "aisle": "pasta_rice",
+    "allergens": [
+      "gluten"
+    ],
+    "flags": {
+      "isPork": false,
+      "isMeat": false,
+      "isFish": false,
+      "isAnimal": false,
+      "hasAlcohol": false,
+      "isVegetable": false,
+      "isCarb": true
+    },
+    "gramsPerUnit": {
+      "pack": 500
+    },
+    "densityGPerMl": null,
+    "ciqualCode": "9810",
+    "per100g": {
+      "kcal": 355,
+      "protein": 12.5,
+      "carbs": 71,
+      "fat": 1.5,
+      "fiber": 3,
+      "salt": 0.01,
+      "sugars": 3.2
+    },
+    "pricePerKg": 4.2,
+    "priceSource": "web",
+    "nutritionSource": "ciqual",
+    "status": "approved"
+  },
+  "flour": {
+    "slug": "flour",
+    "name": {
+      "fr": "farine de blé",
+      "en": "flour"
+    },
+    "aliases": [
+      "wheat flour",
+      "all-purpose flour",
+      "plain flour",
+      "farine",
+      "farine de blé",
+      "farine T55"
+    ],
+    "icon": "🌾",
+    "aisle": "herbs_grocery",
+    "allergens": [
+      "gluten"
+    ],
+    "flags": {
+      "isPork": false,
+      "isMeat": false,
+      "isFish": false,
+      "isAnimal": false,
+      "hasAlcohol": false,
+      "isVegetable": false,
+      "isCarb": true
+    },
+    "gramsPerUnit": {
+      "tbsp": 10,
+      "tsp": 3,
+      "pinch": 1,
+      "handful": 30
+    },
+    "densityGPerMl": null,
+    "ciqualCode": "9410",
+    "per100g": {
+      "kcal": 364,
+      "protein": 10,
+      "carbs": 76,
+      "fat": 1,
+      "fiber": 3,
+      "salt": 0.01,
+      "sugars": 0.7
+    },
+    "pricePerKg": 0.96,
+    "priceSource": "csv",
+    "nutritionSource": null,
+    "status": "approved"
+  },
+  "fresh-sage": {
+    "slug": "fresh-sage",
+    "name": {
+      "fr": "sauge fraîche",
+      "en": "fresh sage"
+    },
+    "aliases": [
+      "sage",
+      "sauge",
+      "feuilles de sauge",
+      "fresh sage leaves"
+    ],
+    "icon": "🌿",
+    "aisle": "produce",
+    "allergens": [],
+    "flags": {
+      "isPork": false,
+      "isMeat": false,
+      "isFish": false,
+      "isAnimal": false,
+      "hasAlcohol": false,
+      "isVegetable": true,
+      "isCarb": false
+    },
+    "gramsPerUnit": {
+      "tbsp": 2,
+      "tsp": 0.7,
+      "leaf": 0.5,
+      "sprig": 2,
+      "bunch": 25,
+      "handful": 10
+    },
+    "densityGPerMl": null,
+    "ciqualCode": "11069",
+    "pricePerKg": 65,
+    "priceSource": "csv",
+    "status": "approved",
+    "per100g": null,
+    "nutritionSource": "ciqual"
+  },
+  "frozen-french-fries": {
+    "slug": "frozen-french-fries",
+    "name": {
+      "fr": "frites surgelées",
+      "en": "frozen french fries"
+    },
+    "aliases": [
+      "frites",
+      "frozen fries",
+      "french fries"
+    ],
+    "icon": "🍟",
+    "aisle": "pasta_rice",
+    "allergens": [],
+    "flags": {
+      "isPork": false,
+      "isMeat": false,
+      "isFish": false,
+      "isAnimal": false,
+      "hasAlcohol": false,
+      "isVegetable": false,
+      "isCarb": true
+    },
+    "gramsPerUnit": {
+      "pack": 1000,
+      "handful": 50
+    },
+    "densityGPerMl": null,
+    "ciqualCode": "4044",
+    "pricePerKg": 3.6,
+    "priceSource": "csv",
+    "status": "approved",
+    "per100g": null,
+    "nutritionSource": "ciqual"
+  },
+  "garlic": {
+    "slug": "garlic",
+    "name": {
+      "fr": "ail",
+      "en": "garlic"
+    },
+    "aliases": [
+      "garlic clove",
+      "garlic cloves",
+      "gousse d'ail",
+      "gousses d'ail"
+    ],
+    "icon": "🧄",
+    "aisle": "produce",
+    "allergens": [],
+    "flags": {
+      "isPork": false,
+      "isMeat": false,
+      "isFish": false,
+      "isAnimal": false,
+      "hasAlcohol": false,
+      "isVegetable": false,
+      "isCarb": false
+    },
+    "gramsPerUnit": {
+      "clove": 5,
+      "head": 50,
+      "piece": 5,
+      "tsp": 4,
+      "tbsp": 12
+    },
+    "densityGPerMl": null,
+    "ciqualCode": "11000",
+    "pricePerKg": 19.26,
+    "priceSource": "csv",
+    "status": "approved",
+    "per100g": null,
+    "nutritionSource": "ciqual"
+  },
+  "ginger": {
+    "slug": "ginger",
+    "name": {
+      "fr": "gingembre",
+      "en": "ginger"
+    },
+    "aliases": [
+      "ginger root",
+      "fresh ginger",
+      "gingembre frais",
+      "racine de gingembre"
+    ],
+    "icon": "🫚",
+    "aisle": "produce",
+    "allergens": [],
+    "flags": {
+      "isPork": false,
+      "isMeat": false,
+      "isFish": false,
+      "isAnimal": false,
+      "hasAlcohol": false,
+      "isVegetable": false,
+      "isCarb": false
+    },
+    "gramsPerUnit": {
+      "tsp": 3,
+      "tbsp": 8,
+      "piece": 50
+    },
+    "densityGPerMl": null,
+    "ciqualCode": "11074",
+    "pricePerKg": 6.19,
+    "priceSource": "csv",
+    "status": "approved",
+    "per100g": null,
+    "nutritionSource": "ciqual"
+  },
+  "grape": {
+    "slug": "grape",
+    "name": {
+      "fr": "raisin",
+      "en": "grape"
+    },
+    "aliases": [
+      "grapes",
+      "raisins",
+      "raisin de table",
+      "table grape",
+      "grappe de raisin"
+    ],
+    "icon": "🍇",
+    "aisle": "produce",
+    "allergens": [],
+    "flags": {
+      "isPork": false,
+      "isMeat": false,
+      "isFish": false,
+      "isAnimal": false,
+      "hasAlcohol": false,
+      "isVegetable": false,
+      "isCarb": false
+    },
+    "gramsPerUnit": {
+      "piece": 5,
+      "handful": 80,
+      "bunch": 500
+    },
+    "densityGPerMl": null,
+    "ciqualCode": "13112",
+    "per100g": {
+      "kcal": 69,
+      "protein": 0.7,
+      "carbs": 16,
+      "fat": 0.2,
+      "fiber": 0.9,
+      "salt": 0,
+      "sugars": 15.5
+    },
+    "pricePerKg": 6.96,
+    "priceSource": "csv",
+    "nutritionSource": "ciqual",
+    "status": "approved"
+  },
+  "green-bean": {
+    "slug": "green-bean",
+    "name": {
+      "fr": "haricot vert",
+      "en": "green bean"
+    },
+    "aliases": [
+      "green beans",
+      "french bean",
+      "french beans",
+      "haricots verts",
+      "haricot vert"
+    ],
+    "icon": "🫛",
+    "aisle": "produce",
+    "allergens": [],
+    "flags": {
+      "isPork": false,
+      "isMeat": false,
+      "isFish": false,
+      "isAnimal": false,
+      "hasAlcohol": false,
+      "isVegetable": true,
+      "isCarb": false
+    },
+    "gramsPerUnit": {
+      "handful": 80
+    },
+    "densityGPerMl": null,
+    "ciqualCode": "20061",
+    "per100g": {
+      "kcal": 31,
+      "protein": 1.8,
+      "carbs": 4.5,
+      "fat": 0.2,
+      "fiber": 3,
+      "salt": 0.01,
+      "sugars": 2
+    },
+    "pricePerKg": 4.75,
+    "priceSource": "web",
+    "nutritionSource": "ciqual",
+    "status": "approved"
+  },
+  "green-bell-pepper": {
+    "slug": "green-bell-pepper",
+    "name": {
+      "fr": "poivron vert",
+      "en": "green bell pepper"
+    },
+    "aliases": [
+      "green pepper",
+      "bell pepper",
+      "poivron",
+      "yellow bell pepper",
+      "poivron jaune"
+    ],
+    "icon": "🫑",
+    "aisle": "produce",
+    "allergens": [],
+    "flags": {
+      "isPork": false,
+      "isMeat": false,
+      "isFish": false,
+      "isAnimal": false,
+      "hasAlcohol": false,
+      "isVegetable": true,
+      "isCarb": false
+    },
+    "gramsPerUnit": {
+      "piece": 160,
+      "handful": 40
+    },
+    "densityGPerMl": null,
+    "ciqualCode": "20085",
+    "pricePerKg": 4.75,
+    "priceSource": "csv",
+    "status": "approved",
+    "per100g": null,
+    "nutritionSource": "ciqual"
+  },
+  "green-chili-pepper": {
+    "slug": "green-chili-pepper",
+    "name": {
+      "fr": "piment vert",
+      "en": "green chili pepper"
+    },
+    "aliases": [
+      "green chilli",
+      "green chile",
+      "green chilies",
+      "green chili peppers",
+      "piment vert frais",
+      "piments verts",
+      "green chilli pepper"
+    ],
+    "icon": "🌶️",
+    "aisle": "produce",
+    "allergens": [],
+    "flags": {
+      "isPork": false,
+      "isMeat": false,
+      "isFish": false,
+      "isAnimal": false,
+      "hasAlcohol": false,
+      "isVegetable": true,
+      "isCarb": false
+    },
+    "gramsPerUnit": {
+      "piece": 15
+    },
+    "densityGPerMl": null,
+    "ciqualCode": "20151",
+    "per100g": {
+      "kcal": 40,
+      "protein": 1.9,
+      "carbs": 8.8,
+      "fat": 0.4,
+      "fiber": 1.5,
+      "salt": 0.02,
+      "sugars": 5.1
+    },
+    "pricePerKg": 15,
+    "priceSource": "web",
+    "nutritionSource": "ciqual",
+    "status": "approved"
+  },
+  "green-grape": {
+    "slug": "green-grape",
+    "name": {
+      "fr": "raisin blanc",
+      "en": "green grape"
+    },
+    "aliases": [
+      "raisin vert",
+      "green grapes",
+      "white grape",
+      "white grapes",
+      "raisins blancs"
+    ],
+    "icon": "🍇",
+    "aisle": "produce",
+    "allergens": [],
+    "flags": {
+      "isPork": false,
+      "isMeat": false,
+      "isFish": false,
+      "isAnimal": false,
+      "hasAlcohol": false,
+      "isVegetable": false,
+      "isCarb": false
+    },
+    "gramsPerUnit": {
+      "piece": 5,
+      "handful": 30,
+      "bunch": 250
+    },
+    "densityGPerMl": null,
+    "ciqualCode": "13112",
+    "pricePerKg": 3.7,
+    "priceSource": "web",
+    "status": "approved",
+    "per100g": null,
+    "nutritionSource": "ciqual"
+  },
+  "green-pea": {
+    "slug": "green-pea",
+    "name": {
+      "fr": "petit pois",
+      "en": "green pea"
+    },
+    "aliases": [
+      "green peas",
+      "petits pois",
+      "pois",
+      "garden pea",
+      "garden peas",
+      "fresh peas",
+      "frozen peas"
+    ],
+    "icon": "🫛",
+    "aisle": "produce",
+    "allergens": [],
+    "flags": {
+      "isPork": false,
+      "isMeat": false,
+      "isFish": false,
+      "isAnimal": false,
+      "hasAlcohol": false,
+      "isVegetable": true,
+      "isCarb": false
+    },
+    "gramsPerUnit": {
+      "handful": 35,
+      "pack": 500
+    },
+    "densityGPerMl": null,
+    "ciqualCode": "20072",
+    "per100g": {
+      "kcal": 81,
+      "protein": 5.4,
+      "carbs": 11.2,
+      "fat": 0.4,
+      "fiber": 5.5,
+      "salt": 0.01,
+      "sugars": 4.8
+    },
+    "pricePerKg": 2.8,
+    "priceSource": "csv",
+    "nutritionSource": "ciqual",
+    "status": "approved"
+  },
+  "green-pepper": {
+    "slug": "green-pepper",
+    "name": {
+      "fr": "poivron vert",
+      "en": "green pepper"
+    },
+    "aliases": [
+      "green bell pepper",
+      "poivrons verts",
+      "sweet green pepper"
+    ],
+    "icon": "🫑",
+    "aisle": "produce",
+    "allergens": [],
+    "flags": {
+      "isPork": false,
+      "isMeat": false,
+      "isFish": false,
+      "isAnimal": false,
+      "hasAlcohol": false,
+      "isVegetable": true,
+      "isCarb": false
+    },
+    "gramsPerUnit": {
+      "piece": 160,
+      "handful": 50
+    },
+    "densityGPerMl": null,
+    "ciqualCode": "20085",
+    "pricePerKg": 4.75,
+    "priceSource": "csv",
+    "status": "approved",
+    "per100g": null,
+    "nutritionSource": "ciqual"
+  },
+  "guanciale": {
+    "slug": "guanciale",
+    "name": {
+      "fr": "guanciale",
+      "en": "guanciale"
+    },
+    "aliases": [
+      "joue de porc séchée",
+      "cured pork jowl",
+      "cured pork cheek"
+    ],
+    "icon": "🥓",
+    "aisle": "meat_fish",
+    "allergens": [],
+    "flags": {
+      "isPork": true,
+      "isMeat": true,
+      "isFish": false,
+      "isAnimal": true,
+      "hasAlcohol": false,
+      "isVegetable": false,
+      "isCarb": false
+    },
+    "gramsPerUnit": {
+      "slice": 25,
+      "piece": 250,
+      "pack": 100
+    },
+    "densityGPerMl": null,
+    "ciqualCode": "28471",
+    "per100g": {
+      "kcal": 655,
+      "protein": 8.5,
+      "carbs": 0,
+      "fat": 69,
+      "fiber": 0,
+      "salt": 2.5,
+      "sugars": 0
+    },
+    "pricePerKg": 25,
+    "priceSource": "web",
+    "nutritionSource": "ciqual",
+    "status": "approved"
+  },
+  "hot-sauce": {
+    "slug": "hot-sauce",
+    "name": {
+      "fr": "sauce piquante",
+      "en": "hot sauce"
+    },
+    "aliases": [
+      "sauce piment",
+      "tabasco",
+      "sriracha",
+      "chili sauce"
+    ],
+    "icon": "🌶️",
+    "aisle": "tins_sauces",
+    "allergens": [],
+    "flags": {
+      "isPork": false,
+      "isMeat": false,
+      "isFish": false,
+      "isAnimal": false,
+      "hasAlcohol": false,
+      "isVegetable": false,
+      "isCarb": false
+    },
+    "gramsPerUnit": {
+      "tsp": 5,
+      "tbsp": 15
+    },
+    "densityGPerMl": 1.05,
+    "ciqualCode": "11112",
+    "pricePerKg": 15.1,
+    "priceSource": "csv",
+    "status": "approved",
+    "per100g": null,
+    "nutritionSource": "ciqual"
+  },
+  "italian-seasoning": {
+    "slug": "italian-seasoning",
+    "name": {
+      "fr": "herbes italiennes",
+      "en": "italian seasoning"
+    },
+    "aliases": [
+      "italian herbs",
+      "assaisonnement italien",
+      "mélange d'herbes italiennes"
+    ],
+    "icon": "🌿",
+    "aisle": "herbs_grocery",
+    "allergens": [],
+    "flags": {
+      "isPork": false,
+      "isMeat": false,
+      "isFish": false,
+      "isAnimal": false,
+      "hasAlcohol": false,
+      "isVegetable": false,
+      "isCarb": false
+    },
+    "gramsPerUnit": {
+      "tsp": 2,
+      "tbsp": 6,
+      "pinch": 0.5
+    },
+    "densityGPerMl": null,
+    "ciqualCode": "11060",
+    "pricePerKg": 72,
+    "priceSource": "web",
+    "status": "approved",
+    "per100g": null,
+    "nutritionSource": "ciqual"
+  },
+  "jalapeno": {
+    "slug": "jalapeno",
+    "name": {
+      "fr": "piment jalapeño",
+      "en": "jalapeño"
+    },
+    "aliases": [
+      "jalapeno pepper",
+      "piment jalapeno",
+      "jalapenos",
+      "jalapeños",
+      "jalapeño pepper"
+    ],
+    "icon": "🌶️",
+    "aisle": "produce",
+    "allergens": [],
+    "flags": {
+      "isPork": false,
+      "isMeat": false,
+      "isFish": false,
+      "isAnimal": false,
+      "hasAlcohol": false,
+      "isVegetable": true,
+      "isCarb": false
+    },
+    "gramsPerUnit": {
+      "piece": 15
+    },
+    "densityGPerMl": null,
+    "ciqualCode": "20151",
+    "pricePerKg": 13.5,
+    "priceSource": "web",
+    "status": "approved",
+    "per100g": null,
+    "nutritionSource": "ciqual"
+  },
+  "leek": {
+    "slug": "leek",
+    "name": {
+      "fr": "poireau",
+      "en": "leek"
+    },
+    "aliases": [
+      "poireaux",
+      "blanc de poireau",
+      "blancs de poireaux",
+      "leeks"
+    ],
+    "icon": "🥬",
+    "aisle": "produce",
+    "allergens": [],
+    "flags": {
+      "isPork": false,
+      "isMeat": false,
+      "isFish": false,
+      "isAnimal": false,
+      "hasAlcohol": false,
+      "isVegetable": true,
+      "isCarb": false
+    },
+    "gramsPerUnit": {
+      "piece": 180,
+      "stalk": 180,
+      "bunch": 1000
+    },
+    "densityGPerMl": null,
+    "ciqualCode": "20039",
+    "per100g": {
+      "kcal": 32,
+      "protein": 1.6,
+      "carbs": 4.5,
+      "fat": 0.3,
+      "fiber": 3.2,
+      "salt": 0.02,
+      "sugars": 2.8
+    },
+    "pricePerKg": 2.85,
+    "priceSource": "csv",
+    "nutritionSource": "ciqual",
+    "status": "approved"
+  },
+  "lemon": {
+    "slug": "lemon",
+    "name": {
+      "fr": "citron",
+      "en": "lemon"
+    },
+    "aliases": [
+      "citrons",
+      "lemons",
+      "citron jaune",
+      "yellow lemon"
+    ],
+    "icon": "🍋",
+    "aisle": "produce",
+    "allergens": [],
+    "flags": {
+      "isPork": false,
+      "isMeat": false,
+      "isFish": false,
+      "isAnimal": false,
+      "hasAlcohol": false,
+      "isVegetable": false,
+      "isCarb": false
+    },
+    "gramsPerUnit": {
+      "piece": 100,
+      "slice": 15
+    },
+    "densityGPerMl": null,
+    "ciqualCode": "13009",
+    "pricePerKg": 4.5,
+    "priceSource": "csv",
+    "status": "approved",
+    "per100g": null,
+    "nutritionSource": "ciqual"
+  },
+  "lemon-juice": {
+    "slug": "lemon-juice",
+    "name": {
+      "fr": "jus de citron",
+      "en": "lemon juice"
+    },
+    "aliases": [
+      "jus de citron",
+      "bottled lemon juice",
+      "fresh lemon juice"
+    ],
+    "icon": "🍋",
+    "aisle": "produce",
+    "allergens": [],
+    "flags": {
+      "isPork": false,
+      "isMeat": false,
+      "isFish": false,
+      "isAnimal": false,
+      "hasAlcohol": false,
+      "isVegetable": false,
+      "isCarb": false
+    },
+    "gramsPerUnit": {
+      "tsp": 5,
+      "tbsp": 15
+    },
+    "densityGPerMl": 1,
+    "ciqualCode": "2028",
+    "pricePerKg": 4.5,
+    "priceSource": "web",
+    "status": "approved",
+    "per100g": null,
+    "nutritionSource": "ciqual"
+  },
+  "lemongrass": {
+    "slug": "lemongrass",
+    "name": {
+      "fr": "citronnelle",
+      "en": "lemongrass"
+    },
+    "aliases": [
+      "lemon grass",
+      "tige de citronnelle",
+      "bâton de citronnelle",
+      "fresh lemongrass"
+    ],
+    "icon": "🌿",
+    "aisle": "produce",
+    "allergens": [],
+    "flags": {
+      "isPork": false,
+      "isMeat": false,
+      "isFish": false,
+      "isAnimal": false,
+      "hasAlcohol": false,
+      "isVegetable": true,
+      "isCarb": false
+    },
+    "gramsPerUnit": {
+      "stalk": 15,
+      "piece": 15
+    },
+    "densityGPerMl": null,
+    "ciqualCode": null,
+    "pricePerKg": 24.5,
+    "priceSource": "web",
+    "status": "approved",
+    "per100g": {
+      "kcal": 99,
+      "protein": 1.8,
+      "carbs": 25.3,
+      "fat": 0.5,
+      "fiber": 7.9,
+      "salt": 0.02,
+      "sugars": 0
+    },
+    "nutritionSource": "llm_estimate"
+  },
+  "light-cream": {
+    "slug": "light-cream",
+    "name": {
+      "fr": "crème légère",
+      "en": "light cream"
+    },
+    "aliases": [
+      "crème fraîche légère",
+      "crème fluide légère",
+      "crème 15%",
+      "single cream",
+      "light cream 12% fat"
+    ],
+    "icon": "🥛",
+    "aisle": "herbs_grocery",
+    "allergens": [
+      "milk"
+    ],
+    "flags": {
+      "isPork": false,
+      "isMeat": false,
+      "isFish": false,
+      "isAnimal": true,
+      "hasAlcohol": false,
+      "isVegetable": false,
+      "isCarb": false
+    },
+    "gramsPerUnit": {
+      "tbsp": 15,
+      "tsp": 5,
+      "pack": 200
+    },
+    "densityGPerMl": 1.01,
+    "ciqualCode": "19430",
+    "pricePerKg": 4.48,
+    "priceSource": "csv",
+    "status": "approved",
+    "per100g": null,
+    "nutritionSource": "ciqual"
+  },
+  "lime-zest": {
+    "slug": "lime-zest",
+    "name": {
+      "fr": "zeste de citron vert",
+      "en": "lime zest"
+    },
+    "aliases": [
+      "lime zest",
+      "zest of lime",
+      "grated lime zest",
+      "lime peel",
+      "zeste de lime",
+      "zestes de citron vert",
+      "zeste de citron vert"
+    ],
+    "icon": "🍋",
+    "aisle": "produce",
+    "allergens": [],
+    "flags": {
+      "isPork": false,
+      "isMeat": false,
+      "isFish": false,
+      "isAnimal": false,
+      "hasAlcohol": false,
+      "isVegetable": false,
+      "isCarb": false
+    },
+    "gramsPerUnit": {
+      "piece": 5,
+      "tsp": 2,
+      "tbsp": 6
+    },
+    "densityGPerMl": null,
+    "ciqualCode": "13125",
+    "per100g": {
+      "kcal": 47,
+      "protein": 1.5,
+      "carbs": 16,
+      "fat": 0.3,
+      "fiber": 10,
+      "salt": 0.01,
+      "sugars": 4
+    },
+    "pricePerKg": 3.7,
+    "priceSource": "web",
+    "nutritionSource": "ciqual",
+    "status": "approved"
+  },
+  "linguine": {
+    "slug": "linguine",
+    "name": {
+      "fr": "linguine",
+      "en": "linguine"
+    },
+    "aliases": [
+      "linguini",
+      "pâtes linguine"
+    ],
+    "icon": "🍝",
+    "aisle": "pasta_rice",
+    "allergens": [
+      "gluten"
+    ],
+    "flags": {
+      "isPork": false,
+      "isMeat": false,
+      "isFish": false,
+      "isAnimal": false,
+      "hasAlcohol": false,
+      "isVegetable": false,
+      "isCarb": true
+    },
+    "gramsPerUnit": {
+      "pack": 500
+    },
+    "densityGPerMl": null,
+    "ciqualCode": "9810",
+    "per100g": {
+      "kcal": 355,
+      "protein": 12,
+      "carbs": 72,
+      "fat": 1.5,
+      "fiber": 3,
+      "salt": 0.01,
+      "sugars": 3
+    },
+    "pricePerKg": 3.34,
+    "priceSource": "csv",
+    "nutritionSource": "ciqual",
+    "status": "approved"
+  },
+  "mayonnaise": {
+    "slug": "mayonnaise",
+    "name": {
+      "fr": "mayonnaise",
+      "en": "mayonnaise"
+    },
+    "aliases": [
+      "mayo"
+    ],
+    "icon": "🫙",
+    "aisle": "tins_sauces",
+    "allergens": [
+      "egg",
+      "mustard"
+    ],
+    "flags": {
+      "isPork": false,
+      "isMeat": false,
+      "isFish": false,
+      "isAnimal": true,
+      "hasAlcohol": false,
+      "isVegetable": false,
+      "isCarb": false
+    },
+    "gramsPerUnit": {
+      "tbsp": 15,
+      "tsp": 5,
+      "jar": 250
+    },
+    "densityGPerMl": 0.95,
+    "ciqualCode": "11054",
+    "pricePerKg": 7.32,
+    "priceSource": "csv",
+    "status": "approved",
+    "per100g": null,
+    "nutritionSource": "ciqual"
+  },
+  "mixed-salad-greens": {
+    "slug": "mixed-salad-greens",
+    "name": {
+      "fr": "mélange de jeunes pousses",
+      "en": "mixed salad greens"
+    },
+    "aliases": [
+      "mesclun",
+      "mixed greens",
+      "mixed salad leaves",
+      "mélange de salade",
+      "jeunes pousses",
+      "salade mélangée",
+      "salad leaves"
+    ],
+    "icon": "🥗",
+    "aisle": "produce",
+    "allergens": [],
+    "flags": {
+      "isPork": false,
+      "isMeat": false,
+      "isFish": false,
+      "isAnimal": false,
+      "hasAlcohol": false,
+      "isVegetable": true,
+      "isCarb": false
+    },
+    "gramsPerUnit": {
+      "pack": 125,
+      "handful": 20
+    },
+    "densityGPerMl": null,
+    "ciqualCode": "20272",
+    "per100g": {
+      "kcal": 18,
+      "protein": 1.5,
+      "carbs": 1.5,
+      "fat": 0.3,
+      "fiber": 1.5,
+      "salt": 0.05,
+      "sugars": 1
+    },
+    "pricePerKg": 12,
+    "priceSource": "csv",
+    "status": "approved",
+    "nutritionSource": "ciqual"
+  },
+  "mixed-vegetables": {
+    "slug": "mixed-vegetables",
+    "name": {
+      "fr": "mélange de légumes",
+      "en": "mixed vegetables"
+    },
+    "aliases": [
+      "mélange légumes",
+      "légumes variés",
+      "chopped vegetables",
+      "légumes hachés"
+    ],
+    "icon": "🥦",
+    "aisle": "produce",
+    "allergens": [],
+    "flags": {
+      "isPork": false,
+      "isMeat": false,
+      "isFish": false,
+      "isAnimal": false,
+      "hasAlcohol": false,
+      "isVegetable": true,
+      "isCarb": false
+    },
+    "gramsPerUnit": {
+      "handful": 30,
+      "pack": 300
+    },
+    "densityGPerMl": null,
+    "ciqualCode": "20101",
+    "pricePerKg": 2.9,
+    "priceSource": "web",
+    "status": "approved",
+    "per100g": null,
+    "nutritionSource": "ciqual"
+  },
+  "mozzarella": {
+    "slug": "mozzarella",
+    "name": {
+      "fr": "mozzarella",
+      "en": "mozzarella"
+    },
+    "aliases": [
+      "mozzarella cheese",
+      "mozzarella rapee",
+      "shredded mozzarella"
+    ],
+    "icon": "🧀",
+    "aisle": "herbs_grocery",
+    "allergens": [
+      "milk"
+    ],
+    "flags": {
+      "isPork": false,
+      "isMeat": false,
+      "isFish": false,
+      "isAnimal": true,
+      "hasAlcohol": false,
+      "isVegetable": false,
+      "isCarb": false
+    },
+    "gramsPerUnit": {
+      "pack": 125,
+      "slice": 20,
+      "handful": 30
+    },
+    "densityGPerMl": null,
+    "ciqualCode": "19590",
+    "pricePerKg": 8.72,
+    "priceSource": "csv",
+    "status": "approved",
+    "per100g": null,
+    "nutritionSource": "ciqual"
+  },
+  "olive-oil": {
+    "slug": "olive-oil",
+    "name": {
+      "fr": "huile d'olive",
+      "en": "olive oil"
+    },
+    "aliases": [
+      "extra virgin olive oil",
+      "huile d'olive vierge extra"
+    ],
+    "icon": "🫒",
+    "aisle": "herbs_grocery",
+    "allergens": [],
+    "flags": {
+      "isPork": false,
+      "isMeat": false,
+      "isFish": false,
+      "isAnimal": false,
+      "hasAlcohol": false,
+      "isVegetable": false,
+      "isCarb": false
+    },
+    "gramsPerUnit": {},
+    "densityGPerMl": 0.92,
+    "ciqualCode": "17270",
+    "pricePerKg": 13.32,
+    "priceSource": "csv",
+    "status": "approved",
+    "per100g": null,
+    "nutritionSource": "ciqual"
+  },
+  "onion": {
+    "slug": "onion",
+    "name": {
+      "fr": "oignon",
+      "en": "onion"
+    },
+    "aliases": [
+      "onions",
+      "yellow onion",
+      "brown onion",
+      "oignon jaune",
+      "oignons"
+    ],
+    "icon": "🧅",
+    "aisle": "produce",
+    "allergens": [],
+    "flags": {
+      "isPork": false,
+      "isMeat": false,
+      "isFish": false,
+      "isAnimal": false,
+      "hasAlcohol": false,
+      "isVegetable": true,
+      "isCarb": false
+    },
+    "gramsPerUnit": {
+      "piece": 150,
+      "slice": 10
+    },
+    "densityGPerMl": null,
+    "ciqualCode": "20034",
+    "pricePerKg": 2.95,
+    "priceSource": "csv",
+    "status": "approved",
+    "per100g": null,
+    "nutritionSource": "ciqual"
+  },
+  "onion-powder": {
+    "slug": "onion-powder",
+    "name": {
+      "fr": "oignon en poudre",
+      "en": "onion powder"
+    },
+    "aliases": [
+      "oignon seche",
+      "powdered onion"
+    ],
+    "icon": "🧅",
+    "aisle": "herbs_grocery",
+    "allergens": [],
+    "flags": {
+      "isPork": false,
+      "isMeat": false,
+      "isFish": false,
+      "isAnimal": false,
+      "hasAlcohol": false,
+      "isVegetable": false,
+      "isCarb": false
+    },
+    "gramsPerUnit": {
+      "tsp": 3,
+      "tbsp": 8,
+      "pinch": 0.5
+    },
+    "densityGPerMl": null,
+    "ciqualCode": "20180",
+    "pricePerKg": 42,
+    "priceSource": "web",
+    "status": "approved",
+    "per100g": null,
+    "nutritionSource": "ciqual"
+  },
+  "orecchiette": {
+    "slug": "orecchiette",
+    "name": {
+      "fr": "orecchiette",
+      "en": "orecchiette"
+    },
+    "aliases": [
+      "orecchiete",
+      "pâtes orecchiette",
+      "orecchiette pasta"
+    ],
+    "icon": "🍝",
+    "aisle": "pasta_rice",
+    "allergens": [
+      "gluten"
+    ],
+    "flags": {
+      "isPork": false,
+      "isMeat": false,
+      "isFish": false,
+      "isAnimal": false,
+      "hasAlcohol": false,
+      "isVegetable": false,
+      "isCarb": true
+    },
+    "gramsPerUnit": {
+      "pack": 500
+    },
+    "densityGPerMl": null,
+    "ciqualCode": "9810",
+    "per100g": {
+      "kcal": 350,
+      "protein": 12,
+      "carbs": 71,
+      "fat": 1.5,
+      "fiber": 3,
+      "salt": 0.01,
+      "sugars": 3.2
+    },
+    "pricePerKg": 4.05,
+    "priceSource": "web",
+    "nutritionSource": "ciqual",
+    "status": "approved"
+  },
+  "pancetta": {
+    "slug": "pancetta",
+    "name": {
+      "fr": "pancetta",
+      "en": "pancetta"
+    },
+    "aliases": [
+      "pancetta cubed",
+      "diced pancetta",
+      "pancetta en dés",
+      "pancetta en cubes",
+      "poitrine roulée sèche",
+      "pancetta tesa"
+    ],
+    "icon": "🥓",
+    "aisle": "meat_fish",
+    "allergens": [],
+    "flags": {
+      "isPork": true,
+      "isMeat": true,
+      "isFish": false,
+      "isAnimal": true,
+      "hasAlcohol": false,
+      "isVegetable": false,
+      "isCarb": false
+    },
+    "gramsPerUnit": {
+      "slice": 10,
+      "pack": 150,
+      "handful": 30
+    },
+    "densityGPerMl": null,
+    "ciqualCode": "28858",
+    "per100g": {
+      "kcal": 380,
+      "protein": 16,
+      "carbs": 0.5,
+      "fat": 35,
+      "fiber": 0,
+      "salt": 3.5,
+      "sugars": 0
+    },
+    "pricePerKg": 28,
+    "priceSource": "csv",
+    "nutritionSource": "ciqual",
+    "status": "approved"
+  },
+  "parmesan": {
+    "slug": "parmesan",
+    "name": {
+      "fr": "parmesan",
+      "en": "parmesan"
+    },
+    "aliases": [
+      "parmigiano reggiano",
+      "parmesan râpé",
+      "shredded parmesan",
+      "grated parmesan",
+      "parmesan cheese"
+    ],
+    "icon": "🧀",
+    "aisle": "herbs_grocery",
+    "allergens": [
+      "milk"
+    ],
+    "flags": {
+      "isPork": false,
+      "isMeat": false,
+      "isFish": false,
+      "isAnimal": true,
+      "hasAlcohol": false,
+      "isVegetable": false,
+      "isCarb": false
+    },
+    "gramsPerUnit": {
+      "tbsp": 7,
+      "tsp": 2.5,
+      "handful": 20,
+      "pack": 100
+    },
+    "densityGPerMl": null,
+    "ciqualCode": "12120",
+    "pricePerKg": 28.15,
+    "priceSource": "csv",
+    "status": "approved",
+    "per100g": null,
+    "nutritionSource": "ciqual"
+  },
+  "parsley": {
+    "slug": "parsley",
+    "name": {
+      "fr": "persil",
+      "en": "parsley"
+    },
+    "aliases": [
+      "fresh parsley",
+      "chopped parsley",
+      "flat-leaf parsley",
+      "curly parsley",
+      "persil frais",
+      "persil plat",
+      "persil frisé",
+      "persil ciselé"
+    ],
+    "icon": "🌿",
+    "aisle": "produce",
+    "allergens": [],
+    "flags": {
+      "isPork": false,
+      "isMeat": false,
+      "isFish": false,
+      "isAnimal": false,
+      "hasAlcohol": false,
+      "isVegetable": true,
+      "isCarb": false
+    },
+    "gramsPerUnit": {
+      "tbsp": 4,
+      "tsp": 1.5,
+      "bunch": 50,
+      "sprig": 2,
+      "handful": 15,
+      "leaf": 0.5
+    },
+    "densityGPerMl": null,
+    "ciqualCode": "11014",
+    "per100g": {
+      "kcal": 36,
+      "protein": 3,
+      "carbs": 6.3,
+      "fat": 0.8,
+      "fiber": 3.3,
+      "salt": 0.14,
+      "sugars": 0.9
+    },
+    "pricePerKg": 22,
+    "priceSource": "csv",
+    "nutritionSource": "ciqual",
+    "status": "approved"
+  },
+  "pecan": {
+    "slug": "pecan",
+    "name": {
+      "fr": "noix de pécan",
+      "en": "pecan"
+    },
+    "aliases": [
+      "pecans",
+      "noix de pecan",
+      "pecan nut",
+      "pecan nuts"
+    ],
+    "icon": "🌰",
+    "aisle": "herbs_grocery",
+    "allergens": [
+      "nuts"
+    ],
+    "flags": {
+      "isPork": false,
+      "isMeat": false,
+      "isFish": false,
+      "isAnimal": false,
+      "hasAlcohol": false,
+      "isVegetable": false,
+      "isCarb": false
+    },
+    "gramsPerUnit": {
+      "handful": 30,
+      "piece": 2,
+      "tbsp": 8
+    },
+    "densityGPerMl": null,
+    "ciqualCode": "15026",
+    "pricePerKg": 38,
+    "priceSource": "csv",
+    "status": "approved",
+    "per100g": null,
+    "nutritionSource": "ciqual"
+  },
+  "pecorino-romano": {
+    "slug": "pecorino-romano",
+    "name": {
+      "fr": "pecorino romano",
+      "en": "pecorino romano"
+    },
+    "aliases": [
+      "pecorino",
+      "pecorino cheese",
+      "fromage pecorino"
+    ],
+    "icon": "🧀",
+    "aisle": "herbs_grocery",
+    "allergens": [
+      "milk"
+    ],
+    "flags": {
+      "isPork": false,
+      "isMeat": false,
+      "isFish": false,
+      "isAnimal": true,
+      "hasAlcohol": false,
+      "isVegetable": false,
+      "isCarb": false
+    },
+    "gramsPerUnit": {
+      "tbsp": 10,
+      "handful": 25,
+      "pack": 200
+    },
+    "densityGPerMl": null,
+    "ciqualCode": "12122",
+    "per100g": {
+      "kcal": 387,
+      "protein": 28,
+      "carbs": 0.5,
+      "fat": 30.8,
+      "fiber": 0,
+      "salt": 3.8,
+      "sugars": 0.5
+    },
+    "pricePerKg": 26,
+    "priceSource": "web",
+    "nutritionSource": "ciqual",
+    "status": "approved"
+  },
+  "pepper": {
+    "slug": "pepper",
+    "name": {
+      "fr": "poivre",
+      "en": "pepper"
+    },
+    "aliases": [
+      "black pepper",
+      "ground black pepper",
+      "poivre noir",
+      "freshly ground pepper",
+      "black peppercorn"
+    ],
+    "icon": "🌶️",
+    "aisle": "herbs_grocery",
+    "allergens": [],
+    "flags": {
+      "isPork": false,
+      "isMeat": false,
+      "isFish": false,
+      "isAnimal": false,
+      "hasAlcohol": false,
+      "isVegetable": false,
+      "isCarb": false
+    },
+    "gramsPerUnit": {
+      "tsp": 2.5,
+      "tbsp": 7,
+      "pinch": 0.3
+    },
+    "densityGPerMl": null,
+    "ciqualCode": "11015",
+    "pricePerKg": 52.25,
+    "priceSource": "csv",
+    "status": "approved",
+    "per100g": null,
+    "nutritionSource": "ciqual"
+  },
+  "pine-nut": {
+    "slug": "pine-nut",
+    "name": {
+      "fr": "pignon de pin",
+      "en": "pine nut"
+    },
+    "aliases": [
+      "pine nuts",
+      "pignons de pin",
+      "pignon",
+      "pignons"
+    ],
+    "icon": "🌰",
+    "aisle": "herbs_grocery",
+    "allergens": [
+      "nuts"
+    ],
+    "flags": {
+      "isPork": false,
+      "isMeat": false,
+      "isFish": false,
+      "isAnimal": false,
+      "hasAlcohol": false,
+      "isVegetable": false,
+      "isCarb": false
+    },
+    "gramsPerUnit": {
+      "tbsp": 10,
+      "handful": 25,
+      "pack": 100
+    },
+    "densityGPerMl": null,
+    "ciqualCode": "15025",
+    "pricePerKg": 60,
+    "priceSource": "csv",
+    "status": "approved",
+    "per100g": null,
+    "nutritionSource": "ciqual"
+  },
+  "plum-tomato": {
+    "slug": "plum-tomato",
+    "name": {
+      "fr": "tomate allongée",
+      "en": "plum tomato"
+    },
+    "aliases": [
+      "roma tomato",
+      "tomate roma",
+      "plum tomatoes",
+      "tomates allongées",
+      "tomato"
+    ],
+    "icon": "🍅",
+    "aisle": "produce",
+    "allergens": [],
+    "flags": {
+      "isPork": false,
+      "isMeat": false,
+      "isFish": false,
+      "isAnimal": false,
+      "hasAlcohol": false,
+      "isVegetable": true,
+      "isCarb": false
+    },
+    "gramsPerUnit": {
+      "piece": 90
+    },
+    "densityGPerMl": null,
+    "ciqualCode": "20047",
+    "pricePerKg": 2.5,
+    "priceSource": "web",
+    "status": "approved",
+    "per100g": null,
+    "nutritionSource": "ciqual"
+  },
+  "pork-shoulder": {
+    "slug": "pork-shoulder",
+    "name": {
+      "fr": "épaule de porc",
+      "en": "pork shoulder"
+    },
+    "aliases": [
+      "pork shoulders",
+      "pork butt",
+      "boston butt",
+      "épaule de porc",
+      "échine de porc",
+      "palette de porc"
+    ],
+    "icon": "🐖",
+    "aisle": "meat_fish",
+    "allergens": [],
+    "flags": {
+      "isPork": true,
+      "isMeat": true,
+      "isFish": false,
+      "isAnimal": true,
+      "hasAlcohol": false,
+      "isVegetable": false,
+      "isCarb": false
+    },
+    "gramsPerUnit": {
+      "piece": 1000,
+      "slice": 150
+    },
+    "densityGPerMl": null,
+    "ciqualCode": "28001",
+    "per100g": {
+      "kcal": 215,
+      "protein": 17,
+      "carbs": 0,
+      "fat": 16,
+      "fiber": 0,
+      "salt": 0.15,
+      "sugars": 0
+    },
+    "pricePerKg": 12.03,
+    "priceSource": "csv",
+    "nutritionSource": "ciqual",
+    "status": "approved"
+  },
+  "potato": {
+    "slug": "potato",
+    "name": {
+      "fr": "pomme de terre",
+      "en": "potato"
+    },
+    "aliases": [
+      "potatoes",
+      "pommes de terre",
+      "patate",
+      "patates",
+      "white potato",
+      "russet potato"
+    ],
+    "icon": "🥔",
+    "aisle": "pasta_rice",
+    "allergens": [],
+    "flags": {
+      "isPork": false,
+      "isMeat": false,
+      "isFish": false,
+      "isAnimal": false,
+      "hasAlcohol": false,
+      "isVegetable": false,
+      "isCarb": true
+    },
+    "gramsPerUnit": {
+      "piece": 150
+    },
+    "densityGPerMl": null,
+    "ciqualCode": "4008",
+    "per100g": {
+      "kcal": 77,
+      "protein": 2,
+      "carbs": 17,
+      "fat": 0.1,
+      "fiber": 2.2,
+      "salt": 0.01,
+      "sugars": 0.8
+    },
+    "pricePerKg": 2.34,
+    "priceSource": "csv",
+    "nutritionSource": "ciqual",
+    "status": "approved"
+  },
+  "quinoa": {
+    "slug": "quinoa",
+    "name": {
+      "fr": "quinoa",
+      "en": "quinoa"
+    },
+    "aliases": [
+      "quinoa cru",
+      "white quinoa",
+      "red quinoa",
+      "quinoa grain"
+    ],
+    "icon": "🥣",
+    "aisle": "pasta_rice",
+    "allergens": [],
+    "flags": {
+      "isPork": false,
+      "isMeat": false,
+      "isFish": false,
+      "isAnimal": false,
+      "hasAlcohol": false,
+      "isVegetable": false,
+      "isCarb": true
+    },
+    "gramsPerUnit": {
+      "pack": 500,
+      "handful": 30
+    },
+    "densityGPerMl": null,
+    "ciqualCode": "9340",
+    "pricePerKg": 7.97,
+    "priceSource": "csv",
+    "status": "approved",
+    "per100g": null,
+    "nutritionSource": "ciqual"
+  },
+  "red-onion": {
+    "slug": "red-onion",
+    "name": {
+      "fr": "oignon rouge",
+      "en": "red onion"
+    },
+    "aliases": [
+      "red onions",
+      "oignons rouges"
+    ],
+    "icon": "🧅",
+    "aisle": "produce",
+    "allergens": [],
+    "flags": {
+      "isPork": false,
+      "isMeat": false,
+      "isFish": false,
+      "isAnimal": false,
+      "hasAlcohol": false,
+      "isVegetable": true,
+      "isCarb": false
+    },
+    "gramsPerUnit": {
+      "piece": 120
+    },
+    "densityGPerMl": null,
+    "ciqualCode": "20238",
+    "pricePerKg": 3.3,
+    "priceSource": "csv",
+    "status": "approved",
+    "per100g": null,
+    "nutritionSource": "ciqual"
+  },
+  "red-pepper": {
+    "slug": "red-pepper",
+    "name": {
+      "fr": "poivron rouge",
+      "en": "red pepper"
+    },
+    "aliases": [
+      "red bell pepper",
+      "red capsicum",
+      "poivron",
+      "red peppers"
+    ],
+    "icon": "🫑",
+    "aisle": "produce",
+    "allergens": [],
+    "flags": {
+      "isPork": false,
+      "isMeat": false,
+      "isFish": false,
+      "isAnimal": false,
+      "hasAlcohol": false,
+      "isVegetable": true,
+      "isCarb": false
+    },
+    "gramsPerUnit": {
+      "piece": 160
+    },
+    "densityGPerMl": null,
+    "ciqualCode": "20087",
+    "pricePerKg": 4.99,
+    "priceSource": "csv",
+    "status": "approved",
+    "per100g": null,
+    "nutritionSource": "ciqual"
+  },
+  "red-wine": {
+    "slug": "red-wine",
+    "name": {
+      "fr": "vin rouge",
+      "en": "red wine"
+    },
+    "aliases": [
+      "dry red wine",
+      "vin rouge sec",
+      "red wine dry",
+      "cooking red wine",
+      "vin rouge"
+    ],
+    "icon": "🍷",
+    "aisle": "herbs_grocery",
+    "allergens": [
+      "sulphites"
+    ],
+    "flags": {
+      "isPork": false,
+      "isMeat": false,
+      "isFish": false,
+      "isAnimal": false,
+      "hasAlcohol": true,
+      "isVegetable": false,
+      "isCarb": false
+    },
+    "gramsPerUnit": {
+      "tbsp": 15
+    },
+    "densityGPerMl": 0.99,
+    "ciqualCode": "5214",
+    "per100g": {
+      "kcal": 68,
+      "protein": 0.1,
+      "carbs": 0.3,
+      "fat": 0,
+      "fiber": 0,
+      "salt": 0.01,
+      "sugars": 0.2
+    },
+    "pricePerKg": 3.63,
+    "priceSource": "csv",
+    "nutritionSource": "ciqual",
+    "status": "approved"
+  },
+  "red-wine-vinegar": {
+    "slug": "red-wine-vinegar",
+    "name": {
+      "fr": "vinaigre de vin rouge",
+      "en": "red wine vinegar"
+    },
+    "aliases": [
+      "vinaigre de vin",
+      "red vinegar"
+    ],
+    "icon": "🍾",
+    "aisle": "tins_sauces",
+    "allergens": [
+      "sulphites"
+    ],
+    "flags": {
+      "isPork": false,
+      "isMeat": false,
+      "isFish": false,
+      "isAnimal": false,
+      "hasAlcohol": false,
+      "isVegetable": false,
+      "isCarb": false
+    },
+    "gramsPerUnit": {
+      "tsp": 5,
+      "tbsp": 15
+    },
+    "densityGPerMl": 1,
+    "ciqualCode": "11220",
+    "pricePerKg": 3,
+    "priceSource": "csv",
+    "status": "approved",
+    "per100g": null,
+    "nutritionSource": "ciqual"
+  },
+  "salmon-fillet": {
+    "slug": "salmon-fillet",
+    "name": {
+      "fr": "pavé de saumon",
+      "en": "salmon fillet"
+    },
+    "aliases": [
+      "salmon fillets",
+      "filet de saumon",
+      "pavés de saumon",
+      "saumon"
+    ],
+    "icon": "🐟",
+    "aisle": "meat_fish",
+    "allergens": [
+      "fish"
+    ],
+    "flags": {
+      "isPork": false,
+      "isMeat": false,
+      "isFish": true,
+      "isAnimal": true,
+      "hasAlcohol": false,
+      "isVegetable": false,
+      "isCarb": false
+    },
+    "gramsPerUnit": {
+      "piece": 125,
+      "pack": 250
+    },
+    "densityGPerMl": null,
+    "ciqualCode": "26036",
+    "pricePerKg": 23.59,
+    "priceSource": "csv",
+    "status": "approved",
+    "per100g": null,
+    "nutritionSource": "ciqual"
+  },
+  "salt": {
+    "slug": "salt",
+    "name": {
+      "fr": "sel",
+      "en": "salt"
+    },
+    "aliases": [
+      "sea salt",
+      "fine salt",
+      "sel fin",
+      "kosher salt"
+    ],
+    "icon": "🧂",
+    "aisle": "herbs_grocery",
+    "allergens": [],
+    "flags": {
+      "isPork": false,
+      "isMeat": false,
+      "isFish": false,
+      "isAnimal": false,
+      "hasAlcohol": false,
+      "isVegetable": false,
+      "isCarb": false
+    },
+    "gramsPerUnit": {
+      "tsp": 6,
+      "tbsp": 18,
+      "pinch": 0.3
+    },
+    "densityGPerMl": null,
+    "ciqualCode": "11058",
+    "pricePerKg": 1.16,
+    "priceSource": "csv",
+    "status": "approved",
+    "per100g": null,
+    "nutritionSource": "ciqual"
+  },
+  "scallion": {
+    "slug": "scallion",
+    "name": {
+      "fr": "oignon nouveau",
+      "en": "scallion"
+    },
+    "aliases": [
+      "green onion",
+      "spring onion",
+      "cebette",
+      "cébette",
+      "ciboule",
+      "oignons nouveaux",
+      "scallions"
+    ],
+    "icon": "🧅",
+    "aisle": "produce",
+    "allergens": [],
+    "flags": {
+      "isPork": false,
+      "isMeat": false,
+      "isFish": false,
+      "isAnimal": false,
+      "hasAlcohol": false,
+      "isVegetable": true,
+      "isCarb": false
+    },
+    "gramsPerUnit": {
+      "piece": 15,
+      "stalk": 15,
+      "bunch": 100,
+      "handful": 20
+    },
+    "densityGPerMl": null,
+    "ciqualCode": "20323",
+    "pricePerKg": 13,
+    "priceSource": "csv",
+    "status": "approved",
+    "per100g": null,
+    "nutritionSource": "ciqual"
+  },
+  "shallot": {
+    "slug": "shallot",
+    "name": {
+      "fr": "échalote",
+      "en": "shallot"
+    },
+    "aliases": [
+      "echalote",
+      "échalotes",
+      "echalotes",
+      "shallots",
+      "french shallot",
+      "french shallots"
+    ],
+    "icon": "🧅",
+    "aisle": "produce",
+    "allergens": [],
+    "flags": {
+      "isPork": false,
+      "isMeat": false,
+      "isFish": false,
+      "isAnimal": false,
+      "hasAlcohol": false,
+      "isVegetable": true,
+      "isCarb": false
+    },
+    "gramsPerUnit": {
+      "piece": 25,
+      "tbsp": 10,
+      "tsp": 3,
+      "pack": 250
+    },
+    "densityGPerMl": null,
+    "ciqualCode": "20097",
+    "per100g": {
+      "kcal": 72,
+      "protein": 2.5,
+      "carbs": 16.8,
+      "fat": 0.1,
+      "fiber": 3.2,
+      "salt": 0.01,
+      "sugars": 7.9
+    },
+    "pricePerKg": 6.5,
+    "priceSource": "csv",
+    "nutritionSource": "ciqual",
+    "status": "approved"
+  },
+  "shrimp": {
+    "slug": "shrimp",
+    "name": {
+      "fr": "crevette",
+      "en": "shrimp"
+    },
+    "aliases": [
+      "shrimps",
+      "prawn",
+      "prawns",
+      "crevettes"
+    ],
+    "icon": "🦐",
+    "aisle": "meat_fish",
+    "allergens": [
+      "shellfish"
+    ],
+    "flags": {
+      "isPork": false,
+      "isMeat": false,
+      "isFish": true,
+      "isAnimal": true,
+      "hasAlcohol": false,
+      "isVegetable": false,
+      "isCarb": false
+    },
+    "gramsPerUnit": {
+      "piece": 15,
+      "pack": 200,
+      "handful": 30
+    },
+    "densityGPerMl": null,
+    "ciqualCode": "10021",
+    "pricePerKg": 9.5,
+    "priceSource": "web",
+    "status": "approved",
+    "per100g": null,
+    "nutritionSource": "ciqual"
+  },
+  "smoked-paprika": {
+    "slug": "smoked-paprika",
+    "name": {
+      "fr": "paprika fumé",
+      "en": "smoked paprika"
+    },
+    "aliases": [
+      "pimentón",
+      "pimenton",
+      "smoked paprika powder",
+      "paprika fumé"
+    ],
+    "icon": "🌶️",
+    "aisle": "herbs_grocery",
+    "allergens": [],
+    "flags": {
+      "isPork": false,
+      "isMeat": false,
+      "isFish": false,
+      "isAnimal": false,
+      "hasAlcohol": false,
+      "isVegetable": false,
+      "isCarb": false
+    },
+    "gramsPerUnit": {
+      "tsp": 3,
+      "tbsp": 8,
+      "pinch": 0.4
+    },
+    "densityGPerMl": null,
+    "ciqualCode": "11049",
+    "per100g": {
+      "kcal": 282,
+      "protein": 14.1,
+      "carbs": 54,
+      "fat": 12.9,
+      "fiber": 34.9,
+      "salt": 0.15,
+      "sugars": 10.3
+    },
+    "pricePerKg": 45,
+    "priceSource": "csv",
+    "nutritionSource": "ciqual",
+    "status": "approved"
+  },
+  "soy-sauce": {
+    "slug": "soy-sauce",
+    "name": {
+      "fr": "sauce soja",
+      "en": "soy sauce"
+    },
+    "aliases": [
+      "shoyu",
+      "tamari",
+      "sauce soja salée",
+      "sauce soja claire",
+      "light soy sauce",
+      "salty soy sauce"
+    ],
+    "icon": "🍶",
+    "aisle": "tins_sauces",
+    "allergens": [
+      "gluten",
+      "soy"
+    ],
+    "flags": {
+      "isPork": false,
+      "isMeat": false,
+      "isFish": false,
+      "isAnimal": false,
+      "hasAlcohol": false,
+      "isVegetable": false,
+      "isCarb": false
+    },
+    "gramsPerUnit": {
+      "tbsp": 17,
+      "tsp": 6
+    },
+    "densityGPerMl": 1.15,
+    "ciqualCode": "11104",
+    "pricePerKg": 18.45,
+    "priceSource": "csv",
+    "status": "approved",
+    "per100g": null,
+    "nutritionSource": "ciqual"
+  },
+  "sweet-paprika": {
+    "slug": "sweet-paprika",
+    "name": {
+      "fr": "paprika doux",
+      "en": "sweet paprika"
+    },
+    "aliases": [
+      "paprika",
+      "paprika doux",
+      "sweet paprika powder",
+      "ground paprika",
+      "paprika en poudre"
+    ],
+    "icon": "🌶️",
+    "aisle": "herbs_grocery",
+    "allergens": [],
+    "flags": {
+      "isPork": false,
+      "isMeat": false,
+      "isFish": false,
+      "isAnimal": false,
+      "hasAlcohol": false,
+      "isVegetable": false,
+      "isCarb": false
+    },
+    "gramsPerUnit": {
+      "tsp": 3,
+      "tbsp": 8,
+      "pinch": 0.5
+    },
+    "densityGPerMl": null,
+    "ciqualCode": "11049",
+    "per100g": {
+      "kcal": 282,
+      "protein": 14.1,
+      "carbs": 34,
+      "fat": 13,
+      "fiber": 34.9,
+      "salt": 0.07,
+      "sugars": 10.3
+    },
+    "pricePerKg": 45,
+    "priceSource": "csv",
+    "nutritionSource": "ciqual",
+    "status": "approved"
+  },
+  "swiss-cheese": {
+    "slug": "swiss-cheese",
+    "name": {
+      "fr": "emmental suisse",
+      "en": "swiss cheese"
+    },
+    "aliases": [
+      "swiss",
+      "emmental",
+      "fromage suisse",
+      "gruyere suisse"
+    ],
+    "icon": "🧀",
+    "aisle": "herbs_grocery",
+    "allergens": [
+      "milk"
+    ],
+    "flags": {
+      "isPork": false,
+      "isMeat": false,
+      "isFish": false,
+      "isAnimal": true,
+      "hasAlcohol": false,
+      "isVegetable": false,
+      "isCarb": false
+    },
+    "gramsPerUnit": {
+      "slice": 20,
+      "handful": 30,
+      "pack": 200
+    },
+    "densityGPerMl": null,
+    "ciqualCode": "12999",
+    "pricePerKg": 9.43,
+    "priceSource": "csv",
+    "status": "approved",
+    "per100g": null,
+    "nutritionSource": "ciqual"
+  },
+  "tomato-sauce": {
+    "slug": "tomato-sauce",
+    "name": {
+      "fr": "sauce tomate",
+      "en": "tomato sauce"
+    },
+    "aliases": [
+      "canned tomato sauce",
+      "jarred tomato sauce",
+      "coulis de tomate",
+      "passata",
+      "marinara sauce"
+    ],
+    "icon": "🥫",
+    "aisle": "tins_sauces",
+    "allergens": [],
+    "flags": {
+      "isPork": false,
+      "isMeat": false,
+      "isFish": false,
+      "isAnimal": false,
+      "hasAlcohol": false,
+      "isVegetable": true,
+      "isCarb": false
+    },
+    "gramsPerUnit": {
+      "jar": 700,
+      "can": 400,
+      "tbsp": 15
+    },
+    "densityGPerMl": 1.05,
+    "ciqualCode": "20170",
+    "pricePerKg": 5.22,
+    "priceSource": "csv",
+    "status": "approved",
+    "per100g": null,
+    "nutritionSource": "ciqual"
+  },
+  "vegetable-oil": {
+    "slug": "vegetable-oil",
+    "name": {
+      "fr": "huile végétale",
+      "en": "vegetable oil"
+    },
+    "aliases": [
+      "huile neutre",
+      "huile de cuisson",
+      "neutral oil",
+      "cooking oil"
+    ],
+    "icon": "🫗",
+    "aisle": "herbs_grocery",
+    "allergens": [],
+    "flags": {
+      "isPork": false,
+      "isMeat": false,
+      "isFish": false,
+      "isAnimal": false,
+      "hasAlcohol": false,
+      "isVegetable": false,
+      "isCarb": false
+    },
+    "gramsPerUnit": {
+      "tbsp": 14,
+      "tsp": 4.5
+    },
+    "densityGPerMl": 0.92,
+    "ciqualCode": "17001",
+    "pricePerKg": 2.06,
+    "priceSource": "web",
+    "status": "approved",
+    "per100g": null,
+    "nutritionSource": "ciqual"
+  },
+  "water": {
+    "slug": "water",
+    "name": {
+      "fr": "eau",
+      "en": "water"
+    },
+    "aliases": [
+      "eau",
+      "tap water",
+      "cold water",
+      "warm water",
+      "hot water",
+      "eau du robinet",
+      "eau froide",
+      "eau chaude",
+      "eau tiède"
+    ],
+    "icon": "💧",
+    "aisle": "herbs_grocery",
+    "allergens": [],
+    "flags": {
+      "isPork": false,
+      "isMeat": false,
+      "isFish": false,
+      "isAnimal": false,
+      "hasAlcohol": false,
+      "isVegetable": false,
+      "isCarb": false
+    },
+    "gramsPerUnit": {
+      "tbsp": 15,
+      "tsp": 5
+    },
+    "densityGPerMl": 1,
+    "ciqualCode": "18066",
+    "per100g": {
+      "kcal": 0.1,
+      "protein": 0.1,
+      "carbs": 0.1,
+      "fat": 0.1,
+      "fiber": 0.1,
+      "salt": 0.1,
+      "sugars": 0.1
+    },
+    "pricePerKg": 0.28,
+    "priceSource": "web",
+    "nutritionSource": "ciqual",
+    "status": "approved"
+  },
+  "white-pepper": {
+    "slug": "white-pepper",
+    "name": {
+      "fr": "poivre blanc",
+      "en": "white pepper"
+    },
+    "aliases": [
+      "ground white pepper",
+      "poivre blanc moulu",
+      "poivre blanc en poudre"
+    ],
+    "icon": "🧂",
+    "aisle": "herbs_grocery",
+    "allergens": [],
+    "flags": {
+      "isPork": false,
+      "isMeat": false,
+      "isFish": false,
+      "isAnimal": false,
+      "hasAlcohol": false,
+      "isVegetable": false,
+      "isCarb": false
+    },
+    "gramsPerUnit": {
+      "tsp": 3,
+      "tbsp": 8,
+      "pinch": 0.5
+    },
+    "densityGPerMl": null,
+    "ciqualCode": "11019",
+    "pricePerKg": 78.31,
+    "priceSource": "csv",
+    "status": "approved",
+    "per100g": null,
+    "nutritionSource": "ciqual"
+  },
+  "white-rice": {
+    "slug": "white-rice",
+    "name": {
+      "fr": "riz blanc",
+      "en": "white rice"
+    },
+    "aliases": [
+      "rice",
+      "long grain rice",
+      "basmati rice",
+      "riz",
+      "riz basmati",
+      "jasmine rice"
+    ],
+    "icon": "🍚",
+    "aisle": "pasta_rice",
+    "allergens": [],
+    "flags": {
+      "isPork": false,
+      "isMeat": false,
+      "isFish": false,
+      "isAnimal": false,
+      "hasAlcohol": false,
+      "isVegetable": false,
+      "isCarb": true
+    },
+    "gramsPerUnit": {
+      "handful": 40,
+      "tbsp": 12
+    },
+    "densityGPerMl": null,
+    "ciqualCode": "9100",
+    "pricePerKg": 3.81,
+    "priceSource": "csv",
+    "status": "approved",
+    "per100g": null,
+    "nutritionSource": "ciqual"
+  },
+  "white-wine": {
+    "slug": "white-wine",
+    "name": {
+      "fr": "vin blanc",
+      "en": "white wine"
+    },
+    "aliases": [
+      "vin blanc sec",
+      "dry white wine",
+      "cooking white wine"
+    ],
+    "icon": "🍷",
+    "aisle": "herbs_grocery",
+    "allergens": [
+      "sulphites"
+    ],
+    "flags": {
+      "isPork": false,
+      "isMeat": false,
+      "isFish": false,
+      "isAnimal": false,
+      "hasAlcohol": true,
+      "isVegetable": false,
+      "isCarb": false
+    },
+    "gramsPerUnit": {
+      "tbsp": 15,
+      "tsp": 5
+    },
+    "densityGPerMl": 0.99,
+    "ciqualCode": "5215",
+    "pricePerKg": 4.5,
+    "priceSource": "csv",
+    "status": "approved",
+    "per100g": null,
+    "nutritionSource": "ciqual"
+  },
+  "wholegrain-mustard": {
+    "slug": "wholegrain-mustard",
+    "name": {
+      "fr": "moutarde à l'ancienne",
+      "en": "wholegrain mustard"
+    },
+    "aliases": [
+      "coarse dijon mustard",
+      "whole grain mustard",
+      "grainy mustard",
+      "coarse mustard",
+      "moutarde a l'ancienne"
+    ],
+    "icon": "🫙",
+    "aisle": "tins_sauces",
+    "allergens": [
+      "mustard"
+    ],
+    "flags": {
+      "isPork": false,
+      "isMeat": false,
+      "isFish": false,
+      "isAnimal": false,
+      "hasAlcohol": false,
+      "isVegetable": false,
+      "isCarb": false
+    },
+    "gramsPerUnit": {
+      "tbsp": 15,
+      "tsp": 5,
+      "jar": 200
+    },
+    "densityGPerMl": 1.05,
+    "ciqualCode": "11021",
+    "pricePerKg": 8.53,
+    "priceSource": "csv",
+    "status": "approved",
+    "per100g": null,
+    "nutritionSource": "ciqual"
+  },
+  "wild-boar-loin": {
+    "slug": "wild-boar-loin",
+    "name": {
+      "fr": "longe de sanglier",
+      "en": "wild boar loin"
+    },
+    "aliases": [
+      "wild boar",
+      "boar loin",
+      "wild boar tenderloin",
+      "sanglier",
+      "filet de sanglier",
+      "longe de sanglier",
+      "carré de sanglier"
+    ],
+    "icon": "🐗",
+    "aisle": "meat_fish",
+    "allergens": [],
+    "flags": {
+      "isPork": true,
+      "isMeat": true,
+      "isFish": false,
+      "isAnimal": true,
+      "hasAlcohol": false,
+      "isVegetable": false,
+      "isCarb": false
+    },
+    "gramsPerUnit": {
+      "piece": 250,
+      "slice": 120,
+      "pack": 400
+    },
+    "densityGPerMl": null,
+    "ciqualCode": "14002",
+    "per100g": {
+      "kcal": 122,
+      "protein": 21.5,
+      "carbs": 0,
+      "fat": 3.3,
+      "fiber": 0,
+      "salt": 0.2,
+      "sugars": 0
+    },
+    "pricePerKg": 25.5,
+    "priceSource": "web",
+    "nutritionSource": "ciqual",
+    "status": "approved"
+  }
+}

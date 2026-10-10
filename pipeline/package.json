@@ -1,0 +1,33 @@
+{
+  "name": "tably-pipeline",
+  "private": true,
+  "type": "module",
+  "description": "Offline recipe ingest: Spoonacular → clean/normalise/tag/price → Firestore",
+  "engines": {
+    "node": ">=24"
+  },
+  "scripts": {
+    "pipeline": "tsx src/cli.ts",
+    "seed": "tsx src/cli.ts seed",
+    "run": "tsx src/cli.ts run",
+    "report": "tsx src/cli.ts report",
+    "import-ciqual": "tsx src/cli.ts import-ciqual",
+    "import-prices": "tsx src/cli.ts import-prices",
+    "review-ingredients": "tsx src/cli.ts review-ingredients",
+    "upload": "tsx src/cli.ts upload",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@google/genai": "^2.28.0",
+    "blurhash": "^2.0.5",
+    "csv-parse": "^7.0.3",
+    "firebase-admin": "^14.5.0",
+    "sharp": "^0.35.5",
+    "zod": "^4.6.5"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.5",
+    "tsx": "^4.23.15",
+    "typescript": "^7.0.2"
+  }
+}

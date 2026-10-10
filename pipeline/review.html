@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Tably pipeline review</title>
+<style>
+  :root { --bg:#f6f6f4; --card:#fff; --ink:#1d1d1f; --muted:#6b6b70; --ok:#1e8e3e; --warn:#b26a00; --bad:#c5221f; --line:#e6e6e3; }
+  * { box-sizing:border-box }
+  body { margin:0; font:15px/1.45 -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; color:var(--ink); background:var(--bg) }
+  header { position:sticky; top:0; z-index:2; display:flex; align-items:center; gap:16px; padding:12px 24px; background:var(--card); border-bottom:1px solid var(--line) }
+  header h1 { font-size:18px; margin:0; flex:1 }
+  button { font:inherit; padding:8px 14px; border:1px solid var(--line); border-radius:8px; background:#fff; cursor:pointer }
+  button:hover { background:#f0f0ee }
+  .counter { color:var(--muted) }
+  main { max-width:1500px; margin:0 auto; padding:20px 24px 80px }
+  .cols { display:grid; grid-template-columns:1fr 1fr; gap:20px }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:12px; padding:18px 20px; margin-bottom:20px }
+  .card h2 { margin:0 0 4px; font-size:20px }
+  .card h3 { margin:18px 0 8px; font-size:13px; text-transform:uppercase; letter-spacing:.04em; color:var(--muted) }
+  .sub { color:var(--muted); font-size:13px }
+  img.photo { width:100%; aspect-ratio:1; object-fit:cover; border-radius:10px; background:#eee; margin-top:10px }
+  .src img.photo { aspect-ratio:636/393 }
+  .facts { display:flex; flex-wrap:wrap; gap:8px; margin-top:10px }
+  .fact { background:#f1f1ee; border-radius:999px; padding:4px 10px; font-size:13px }
+  ol, ul { padding-left:22px; margin:6px 0 }
+  li { margin:4px 0 }
+  .note { color:var(--muted); font-size:13px }
+  .orig { color:#9a9a9e; font-size:12px }
+  .opt { color:var(--muted); font-style:italic }
+  .status { display:inline-block; padding:2px 8px; border-radius:6px; font-size:12px; font-weight:600; color:#fff; background:var(--ok) }
+  .status.draft { background:var(--warn) } .status.rejected { background:var(--bad) }
+  .comment { display:flex; gap:10px; padding:8px 10px; border-radius:8px; margin:6px 0; background:#f7f7f5 }
+  .comment .dot { width:10px; height:10px; border-radius:50%; margin-top:6px; flex:none }
+  .ok .dot { background:var(--ok) } .warn .dot { background:var(--warn) } .bad .dot { background:var(--bad) }
+  .stage { display:grid; grid-template-columns:90px 1fr; gap:10px; padding:8px 0; border-top:1px solid var(--line) }
+  .stage b { font-size:13px }
+  .en { color:var(--muted); font-size:13px; display:block }
+  details summary { cursor:pointer; color:var(--muted); font-size:13px }
+  .suit span { margin-right:8px }
+  @media (max-width:1000px) { .cols { grid-template-columns:1fr } }
+</style>
+</head>
+<body>
+<header>
+  <button id="prev">← Précédent</button>
+  <h1 id="title">…</h1>
+  <span class="counter" id="counter"></span>
+  <button id="next">Suivant →</button>
+</header>
+<main id="main"></main>
+<script>
+let data = [], i = 0;
+const esc = (s) => String(s ?? "").replace(/[&<>]/g, (c) => ({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
+const li = (items, f) => items.map((x) => `<li>${f(x)}</li>`).join("");
+function render() {
+  const r = data[i];
+  document.getElementById("title").textContent = `${r.id} — ${r.final?.title.fr ?? r.clean?.title.fr ?? r.source.title}`;
+  document.getElementById("counter").textContent = `${i + 1} / ${data.length}`;
+  const s = r.source, c = r.clean, f = r.final;
+  const status = f ? f.status : (c?.rejected ? "rejected" : r.latestStage);
+  const macros = f ? `<div class="facts">
+      <span class="fact">${f.servings} portions</span><span class="fact">${f.macros.kcal} kcal</span>
+      <span class="fact">prot ${f.macros.protein} g</span><span class="fact">gluc ${f.macros.carbs} g</span><span class="fact">lip ${f.macros.fat} g</span>
+      <span class="fact">fibres ${f.macros.fiber} g</span><span class="fact">sel ${f.macros.salt} g</span><span class="fact">${f.price} €/portion</span>
+      <span class="fact">${f.tier}</span>${f.tags ? `<span class="fact">${f.tags.totalMinutes} min (${f.tags.activeMinutes} actives)</span><span class="fact">${f.tags.difficulty}</span><span class="fact">${(f.tags.cravings ?? [f.tags.craving]).join(" · ")}</span><span class="fact">${f.tags.protein}</span><span class="fact">${(f.tags.cuisines ?? [f.tags.cuisine]).join(" · ")}</span><span class="fact">${f.tags.appliances.join(", ")}</span>` : ""}
+    </div>` : "";
+  const suitable = f?.suitable ? `<div class="suit sub">${Object.entries(f.suitable).map(([k, v]) => `<span>${v ? "✅" : "❌"} ${k}</span>`).join("")}</div>` : "";
+  document.getElementById("main").innerHTML = `
+  <div class="card">
+    <h3>Commentaires du pipeline</h3>
+    ${r.comments.map((x) => `<div class="comment ${x.level}"><span class="dot"></span><span>${esc(x.text)}</span></div>`).join("") || "<p class=sub>—</p>"}
+    <h3>Étapes du pipeline</h3>
+    ${r.stages.map((st) => `<div class="stage"><b>${st.name}</b><div>${esc(st.summary)}${st.notes?.length ? `<ul class="note">${li(st.notes, esc)}</ul>` : ""}</div></div>`).join("")}
+  </div>
+  <div class="cols">
+    <div class="card src">
+      <h2>AVANT — source Spoonacular</h2>
+      <div class="sub">${esc(s.title)} · ${s.servings} portions · ${s.readyInMinutes} min · ${s.url ? `<a href="${s.url}" target="_blank">source</a>` : ""}</div>
+      <img class="photo" src="${s.image}" alt="">
+      <div class="facts">
+        <span class="fact">${Math.round(s.nutrition.Calories ?? 0)} kcal</span><span class="fact">prot ${Math.round(s.nutrition.Protein ?? 0)} g</span>
+        <span class="fact">gluc ${Math.round(s.nutrition.Carbohydrates ?? 0)} g</span><span class="fact">lip ${Math.round(s.nutrition.Fat ?? 0)} g</span>
+        <span class="fact">${s.pricePerServingEur ?? "?"} €/portion (US × 0.86)</span>
+        ${(s.cuisines ?? []).map((x) => `<span class="fact">${esc(x)}</span>`).join("")}${(s.diets ?? []).map((x) => `<span class="fact">${esc(x)}</span>`).join("")}
+      </div>
+      <h3>Ingrédients (${s.ingredients.length})</h3><ul>${li(s.ingredients, esc)}</ul>
+      <h3>Étapes (${s.steps.length})</h3><ol>${li(s.steps, esc)}</ol>
+    </div>
+    <div class="card">
+      <h2>APRÈS — Tably <span class="status ${status}">${status}</span></h2>
+      ${f ? `<div class="sub">${esc(f.title.fr)} · <i>${esc(f.title.en)}</i></div>` : c ? `<div class="sub">${esc(c.title.fr)} · <i>${esc(c.title.en)}</i>${c.rejected ? ` · <b>rejeté : ${esc(c.rejected)}</b>` : ""}</div>` : "<p class=sub>pas encore traité</p>"}
+      ${f?.photo ? `<img class="photo" src="${f.photo}" alt="">` : ""}
+      ${macros}${suitable}
+      ${f ? `<h3>Ingrédients pour 1 portion, arrondis comme dans l'app (${f.ingredients.length})</h3><ul>${li(f.ingredients, (x) => `${esc(x.text)} <span class="orig">exact ${esc(x.exact)} · ${x.grams} g</span>${x.note ? ` <span class="note">— ${esc(x.note)}</span>` : ""}${x.optional ? ' <span class="opt">facultatif</span>' : ""}`)}</ul>
+        <h3>Étapes (${f.steps.length}) — rendu pour ${f.servings} portions</h3><ol>${li(f.steps, (x) => `${x.fr}<span class="en">${x.en}</span><span class="orig">${esc(x.rawFr)}</span>`)}</ol>` : ""}
+      ${c ? `<details><summary>Intermédiaire après « clean » (plat entier, ${c.claimedServings} portions)</summary>
+        <h3>Ingrédients (${c.ingredients.length})</h3><ul>${li(c.ingredients, (x) => `${esc(x.text)}${x.note ? ` <span class="note">— ${esc(x.note)}</span>` : ""}${x.optional ? ' <span class="opt">facultatif</span>' : ""} <span class="orig">← ${esc(x.original)}</span>`)}</ul>
+        <h3>Étapes (${c.steps.length})</h3><ol>${li(c.steps, (x) => `${esc(x.fr)}<span class="en">${esc(x.en)}</span>`)}</ol></details>` : ""}
+    </div>
+  </div>`;
+  window.scrollTo(0, 0);
+  location.hash = r.id;
+}
+function go(d) { i = (i + d + data.length) % data.length; render(); }
+document.getElementById("prev").onclick = () => go(-1);
+document.getElementById("next").onclick = () => go(1);
+document.addEventListener("keydown", (e) => { if (e.key === "ArrowLeft") go(-1); if (e.key === "ArrowRight") go(1); });
+fetch("review/data.json").then((r) => r.json()).then((d) => {
+  data = d;
+  const h = location.hash.slice(1);
+  i = Math.max(0, data.findIndex((r) => r.id === h));
+  render();
+});
+</script>
+</body>
+</html>
